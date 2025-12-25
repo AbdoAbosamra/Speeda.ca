@@ -1,0 +1,163 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Category;
+use App\Models\Location;
+use App\Models\ServiceProvider;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+/**
+ * Handles user registration and authentication logic
+ * Separates business logic from controllers following SOLID principles
+ */
+class AuthService
+{
+    /**
+     * Register a new user with role-specific setup
+     */
+    public function registerUser(array $validatedData): User
+    {
+        return DB::transaction(function () use ($validatedData) {
+            // Create base user
+            $user = $this->createUser($validatedData);
+
+            // Setup role-specific records
+            if ($user->role === 'service_provider') {
+                $this->setupServiceProvider($user, $validatedData);
+            }
+
+            Log::info('User registered successfully', [
+                'user_id' => $user->id,
+                'role' => $user->role,
+                'email' => $user->email
+            ]);
+
+            return $user;
+        });
+    }
+
+    /**
+     * Create user record
+     */
+    private function createUser(array $data): User
+    {
+        $profession = null;
+        if (!empty($data['profession']) && $data['profession'] !== 'other') {
+            $category = Category::find($data['profession']);
+            if ($category && $category->parent_id !== null) {
+                $profession = $category->name;
+            }
+        } elseif ($data['profession'] === 'other') {
+            $profession = 'Others';
+        }
+
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'role' => $data['role'],
+            'profession' => $profession,
+            'password' => Hash::make($data['password']),
+            'email_verified_at' => $data['role'] === 'service_provider' ? now() : null,
+        ]);
+    }
+
+    /**
+     * Setup service provider records
+     */
+    private function setupServiceProvider(User $user, array $data): void
+    {
+        // Handle "other" profession - find "Others" category under "Others" section
+        $categoryId = null;
+        if (!empty($data['profession']) && $data['profession'] !== 'other') {
+            $categoryId = (int) $data['profession'];
+        } elseif ($data['profession'] === 'other') {
+            // Find the "Others" category under the "Others" section
+            $othersSection = Category::where('name', 'Others')
+                ->where('is_section', true)
+                ->first();
+
+            if ($othersSection) {
+                $othersCategory = Category::where('name', 'Others')
+                    ->where('parent_id', $othersSection->id)
+                    ->first();
+
+                if ($othersCategory) {
+                    $categoryId = $othersCategory->id;
+                }
+            }
+        }
+
+        $locationId = $this->getOrCreateLocation($data['city'] ?? null);        // Create ServiceProvider record
+        $serviceProvider = ServiceProvider::create([
+            'user_id' => $user->id,
+            'category_id' => $categoryId,
+            'location_id' => $locationId,
+            'phone' => $data['mobile'] ?? null,
+            'whatsapp_number' => $data['whatsapp_number'] ?? null,
+            'company_name' => $user->name,
+            'bio' => 'Service provider profile. Please complete your details.',
+            'is_verified' => false,
+            'views' => 0,
+            'rating' => 0,
+        ]);
+
+        // Deprecated: ServiceProviderProfile creation removed in favor of single ServiceProvider model
+
+        Log::info('Service provider setup completed', [
+            'service_provider_id' => $serviceProvider->id,
+            'category_id' => $categoryId,
+            'location_id' => $locationId
+        ]);
+    }
+
+    /**
+     * Get or create location by city name
+     */
+    private function getOrCreateLocation(?string $city): ?int
+    {
+        if (empty($city)) {
+            return null;
+        }
+
+        $location = Location::whereRaw('LOWER(city) = ?', [mb_strtolower($city)])->first();
+
+        if ($location) {
+            return $location->id;
+        }
+
+        try {
+            $newLocation = Location::create([
+                'city' => $city,
+                'is_active' => true
+            ]);
+            return $newLocation->id;
+        } catch (\Exception $e) {
+            Log::warning('Failed to create location', [
+                'city' => $city,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Get redirect path based on user role
+     */
+    public function getRedirectPath(User $user): string
+    {
+        if ($user->role === 'service_provider') {
+            $serviceProvider = ServiceProvider::where('user_id', $user->id)->first();
+            if ($serviceProvider) {
+                return route('service-providers.show', $serviceProvider->id);
+            }
+            return route('dashboard');
+        }
+
+        return route('location');
+    }
+}

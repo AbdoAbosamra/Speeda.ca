@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         executionOrder="depends,defects"
+         failOnWarning="false"
+         failOnRisky="false"
+         failOnEmptyTestSuite="false"
+         beStrictAboutOutputDuringTests="true"
+         cacheDirectory=".phpunit.cache"
+         backupGlobals="false"
+>
+    <!-- 🧪 Enhanced Test Suites Configuration -->
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Performance">
+            <directory>tests/Performance</directory>
+        </testsuite>
+        <testsuite name="Security">
+            <directory>tests/Feature/Security</directory>
+        </testsuite>
+        <testsuite name="All">
+            <directory>tests</directory>
+            <exclude>tests/Browser</exclude>
+        </testsuite>
+    </testsuites>
+
+    <!-- 📊 Coverage Configuration -->
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+        <exclude>
+            <directory>app/Console/Commands</directory>
+            <file>app/Console/Kernel.php</file>
+            <file>app/Http/Kernel.php</file>
+            <file>app/Exceptions/Handler.php</file>
+            <directory>app/Providers</directory>
+        </exclude>
+    </source>
+
+    <!-- 📈 Coverage Reporting -->
+    <coverage cacheDirectory=".phpunit.cache/code-coverage"
+              includeUncoveredFiles="true"
+              processUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="false">
+        <report>
+            <html outputDirectory="coverage/html" lowUpperBound="50" highLowerBound="80"/>
+            <clover outputFile="coverage/clover.xml"/>
+            <text outputFile="coverage/coverage.txt" showUncoveredFiles="false" showOnlySummary="true"/>
+        </report>
+    </coverage>
+
+    <!-- 🔧 Test Environment Configuration -->
+    <php>
+        <!-- Application Environment -->
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:YourTestKeyHere"/>
+        <env name="APP_DEBUG" value="true"/>
+        <env name="APP_URL" value="http://localhost:8000"/>
+
+        <!-- Database Configuration -->
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+
+        <!-- Alternative MySQL test database -->
+        <!-- <env name="DB_CONNECTION" value="mysql"/> -->
+        <!-- <env name="DB_DATABASE" value="speeda_test"/> -->
+        <!-- <env name="DB_USERNAME" value="root"/> -->
+        <!-- <env name="DB_PASSWORD" value=""/> -->
+
+        <!-- Cache & Sessions -->
+        <env name="CACHE_STORE" value="array"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+
+        <!-- Mail & Notifications -->
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="BROADCAST_DRIVER" value="log"/>
+
+        <!-- Security -->
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="HASH_DRIVER" value="bcrypt"/>
+
+        <!-- Disable services for testing -->
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+
+        <!-- SMS & WhatsApp Testing -->
+        <env name="SMS_DRIVER" value="log"/>
+        <env name="WHATSAPP_DRIVER" value="log"/>
+
+        <!-- File Storage -->
+        <env name="FILESYSTEM_DISK" value="local"/>
+
+        <!-- Logging -->
+        <env name="LOG_CHANNEL" value="single"/>
+        <env name="LOG_LEVEL" value="debug"/>
+
+        <!-- Rate Limiting -->
+        <env name="RATE_LIMITER_STORE" value="array"/>
+
+        <!-- External Services (Mocked) -->
+        <env name="PAYMENT_GATEWAY_MODE" value="test"/>
+        <env name="GOOGLE_MAPS_API_KEY" value="test_key"/>
+
+        <!-- Performance Testing -->
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="DEBUGBAR_ENABLED" value="false"/>
+
+        <!-- Feature Flags for Testing -->
+        <env name="FEATURE_REAL_TIME_NOTIFICATIONS" value="false"/>
+        <env name="FEATURE_PAYMENT_PROCESSING" value="false"/>
+        <env name="FEATURE_EMAIL_VERIFICATION" value="false"/>
+    </php>
+
+    <!-- 🔗 Extensions Configuration -->
+    <extensions>
+        <!-- Add test extensions here if needed -->
+    </extensions>
+
+    <!-- 📝 Logging Configuration -->
+    <logging>
+        <testdox outputFile="test-reports/testdox.txt"/>
+    </logging>
+</phpunit>

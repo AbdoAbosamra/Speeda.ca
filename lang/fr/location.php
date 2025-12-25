@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'choose_location_breadcrumb' => 'Choisir un emplacement',
+    'choose_city' => 'Choisissez votre ville',
+    'choose_city_subtitle' => 'Sélectionnez votre emplacement pour trouver des prestataires de services près de chez vous',
+    'cant_find_city' => 'Vous ne trouvez pas votre ville?',
+    'expanding_message' => "Nous nous développons régulièrement vers de nouveaux emplacements. Faites-nous savoir où vous souhaiteriez voir Speeda ensuite!",
+    'request_new_location' => 'Demander un nouvel emplacement',
+    'cairo' => 'Le Caire',
+    'alexandria' => 'Alexandrie',
+    'giza' => 'Gizeh',
+    'sharm_el_sheikh' => 'Charm el-Cheikh',
+    'hurghada' => 'Hourghada',
+    'luxor' => 'Louxor',
+    'aswan' => 'Assouan',
+    'nearby_locations' => 'Emplacements à proximité',
+    'suggest_new_location' => 'Suggérer un nouvel emplacement',
+    'location_name' => 'Nom de l\'emplacement',
+    'location_name_placeholder' => 'par exemple: Port-Saïd, Mansourah, Tanta',
+    'additional_details' => 'Détails supplémentaires (Facultatif)',
+    'details_placeholder' => 'Parlez-nous de cet emplacement...',
+    'messenger_redirect_info' => 'Vous serez redirigé vers Messenger pour envoyer votre suggestion.',
+    'send_via_messenger' => 'Envoyer via Messenger',
+    'new_location_suggestion' => 'Nouvelle suggestion d\'emplacement',
+];

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار WhatsApp - سبيدا</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #e9ecef 100%);
+            padding: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .method-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .method-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            color: white;
+        }
+        .method-number {
+            background: #25D366;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .url-preview {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            margin-top: 1rem;
+        }
+        .success-rate {
+            float: left;
+            background: #ffc107;
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .header h1 {
+            color: #25D366;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1><i class="fab fa-whatsapp"></i> اختبار طرق WhatsApp</h1>
+            <p class="lead">جرّب كل طريقة وحدد الأفضل</p>
+        </div>
+
+        <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle"></i> كيفية الاختبار:</h5>
+            <ol>
+                <li>اضغط على كل زر اختبار</li>
+                <li>شوف إذا الرسالة ظهرت في خانة الشات في WhatsApp</li>
+                <li>اختار الطريقة الأفضل اللي شغالة معاك</li>
+            </ol>
+        </div>
+
+        <div class="row">
+            <!-- Method 1: wa.me simple -->
+            <div class="col-md-6">
+                <div class="method-card">
+                    <span class="method-number">1</span>
+                    <span class="success-rate">⭐ موصى بها</span>
+                    <h4 class="mt-3">wa.me + رسالة بسيطة</h4>
+                    <p class="text-muted">الطريقة الأكثر شهرة وتوافق</p>
+                    <a href="https://wa.me/16138796698?text=مرحبا، أنا مهتم بخدماتك عبر منصة سبيدا"
+                       target="_blank"
+                       class="btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> اختبر الطريقة 1
+                    </a>
+                    <div class="url-preview">
+                        <strong>URL:</strong><br>
+                        https://wa.me/16138796698?text=مرحبا، أنا مهتم بخدماتك عبر منصة سبيدا
+                    </div>
+                </div>
+            </div>
+
+            <!-- Method 2: wa.me with encoding -->
+            <div class="col-md-6">
+                <div class="method-card">
+                    <span class="method-number">2</span>
+                    <span class="success-rate">⭐ مجربة</span>
+                    <h4 class="mt-3">wa.me مع urlencode</h4>
+                    <p class="text-muted">نفس الطريقة الأولى مع encoding</p>
+                    <a href="https://wa.me/16138796698?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C+%D8%A3%D9%86%D8%A7+%D9%85%D9%87%D8%AA%D9%85+%D8%A8%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%D9%83+%D8%B9%D8%A8%D8%B1+%D9%85%D9%86%D8%B5%D8%A9+%D8%B3%D8%A8%D9%8A%D8%AF%D8%A7"
+                       target="_blank"
+                       class="btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> اختبر الطريقة 2
+                    </a>
+                    <div class="url-preview">
+                        <strong>URL (encoded):</strong><br>
+                        https://wa.me/16138796698?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Method 3: api.whatsapp.com -->
+            <div class="col-md-6">
+                <div class="method-card">
+                    <span class="method-number">3</span>
+                    <h4 class="mt-3">api.whatsapp.com</h4>
+                    <p class="text-muted">API الرسمي من WhatsApp</p>
+                    <a href="https://api.whatsapp.com/send?phone=16138796698&text=مرحبا، أنا مهتم بخدماتك عبر منصة سبيدا"
+                       target="_blank"
+                       class="btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> اختبر الطريقة 3
+                    </a>
+                    <div class="url-preview">
+                        <strong>URL:</strong><br>
+                        https://api.whatsapp.com/send?phone=16138796698&text=مرحبا...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Method 4: api.whatsapp.com with encoding -->
+            <div class="col-md-6">
+                <div class="method-card">
+                    <span class="method-number">4</span>
+                    <h4 class="mt-3">api.whatsapp.com مع encoding</h4>
+                    <p class="text-muted">API مع urlencode</p>
+                    <a href="https://api.whatsapp.com/send?phone=16138796698&text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C+%D8%A3%D9%86%D8%A7+%D9%85%D9%87%D8%AA%D9%85+%D8%A8%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%D9%83+%D8%B9%D8%A8%D8%B1+%D9%85%D9%86%D8%B5%D8%A9+%D8%B3%D8%A8%D9%8A%D8%AF%D8%A7"
+                       target="_blank"
+                       class="btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> اختبر الطريقة 4
+                    </a>
+                    <div class="url-preview">
+                        <strong>URL (encoded):</strong><br>
+                        https://api.whatsapp.com/send?phone=16138796698&text=%D9%85...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Method 5: with line breaks %0A -->
+            <div class="col-md-6">
+                <div class="method-card">
+                    <span class="method-number">5</span>
+                    <h4 class="mt-3">مع سطور جديدة %0A</h4>
+                    <p class="text-muted">رسالة متعددة الأسطر</p>
+                    <a href="https://wa.me/16138796698?text=مرحبا،%20أنا%20مهتم%20بخدماتك%0A%0Aالاسم:%20omar"
+                       target="_blank"
+                       class="btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> اختبر الطريقة 5
+                    </a>
+                    <div class="url-preview">
+                        <strong>URL:</strong><br>
+                        https://wa.me/16138796698?text=مرحبا...%0A%0Aالاسم:%20omar
+                    </div>
+                </div>
+            </div>
+
+            <!-- Method 6: English message -->
+            <div class="col-md-6">
+                <div class="method-card">
+                    <span class="method-number">6</span>
+                    <h4 class="mt-3">رسالة إنجليزية</h4>
+                    <p class="text-muted">للاختبار - قد تعمل بشكل أفضل</p>
+                    <a href="https://wa.me/16138796698?text=Hello,%20I%20am%20interested%20in%20your%20services%20via%20Speeda"
+                       target="_blank"
+                       class="btn btn-whatsapp">
+                        <i class="fab fa-whatsapp"></i> اختبر الطريقة 6
+                    </a>
+                    <div class="url-preview">
+                        <strong>URL:</strong><br>
+                        https://wa.me/16138796698?text=Hello...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-success mt-4">
+            <h5><i class="fas fa-check-circle"></i> النتيجة:</h5>
+            <p>بعد التجربة، الطريقة الأنسب عادة هي:</p>
+            <ul>
+                <li><strong>الطريقة 1 أو 2</strong> (wa.me) - الأكثر توافقاً</li>
+                <li>إذا لم تعمل، جرب <strong>الطريقة 6</strong> بالإنجليزي</li>
+                <li>بعض المتصفحات تحتاج <strong>encoding</strong> والبعض لا</li>
+            </ul>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body bg-light">
+                <h5>📱 ملاحظات:</h5>
+                <ul class="mb-0">
+                    <li>تأكد أن WhatsApp مثبت على جهازك</li>
+                    <li>بعض المتصفحات تحتاج إذن لفتح WhatsApp</li>
+                    <li>جرّب من الموبايل والكمبيوتر</li>
+                    <li>الرسالة يجب تظهر تلقائياً في خانة الكتابة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

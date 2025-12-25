@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'choose_location_breadcrumb' => 'اختر الموقع',
+    'choose_city' => 'اختر مدينتك',
+    'choose_city_subtitle' => 'اختر موقعك للعثور على مقدمي الخدمات القريبين منك',
+    'cant_find_city' => 'لا تجد مدينتك؟',
+    'expanding_message' => 'نحن نتوسع إلى مواقع جديدة بانتظام. أخبرنا أين ترغب في رؤية سبيدا التالية!',
+    'request_new_location' => 'طلب موقع جديد',
+    'cairo' => 'القاهرة',
+    'alexandria' => 'الإسكندرية',
+    'giza' => 'الجيزة',
+    'sharm_el_sheikh' => 'شرم الشيخ',
+    'hurghada' => 'الغردقة',
+    'luxor' => 'الأقصر',
+    'aswan' => 'أسوان',
+    'nearby_locations' => 'مواقع قريبة',
+    'suggest_new_location' => 'اقترح موقع جديد',
+    'location_name' => 'اسم الموقع',
+    'location_name_placeholder' => 'مثال: بورسعيد، المنصورة، طنطا',
+    'additional_details' => 'تفاصيل إضافية (اختياري)',
+    'details_placeholder' => 'أخبرنا المزيد عن هذا الموقع...',
+    'messenger_redirect_info' => 'سيتم توجيهك إلى ماسنجر لإرسال اقتراحك.',
+    'send_via_messenger' => 'إرسال عبر ماسنجر',
+    'new_location_suggestion' => 'اقتراح موقع جديد',
+];

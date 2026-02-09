@@ -3,7 +3,7 @@
         "laravel-boost": {
             "command": "C:\\php\\php.exe",
             "args": [
-                "Y:\\My Projects\\Speeda\\artisan",
+                "Y:\\Deployment\\Speeda\\artisan",
                 "boost:mcp"
             ]
         }

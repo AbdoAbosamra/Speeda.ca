@@ -223,7 +223,30 @@ return [
     'decorators_desc' => 'Event decoration and styling',
     'entertainers' => 'Entertainers',
     'entertainers_desc' => 'Entertainers and performers for events',
+    // Main Sections
+    'food_services' => 'Food Services',
+    'construction_services' => 'Construction Services',
 
+    // Food Services Categories
+    'restaurants' => 'Restaurants',
+    'restaurants_desc' => 'Discover the best local restaurants and diverse cuisines.',
+    'home_kitchen' => 'Home Kitchen',
+    'home_kitchen_desc' => 'Fresh, home-cooked meals prepared with love by local chefs.',
+    'catering_services_food' => 'Catering Services',
+    'catering_services_food_desc' => 'Professional food catering for events and private gatherings.',
+
+    // Construction Services Categories
+    'general_construction' => 'General Construction',
+    'general_construction_desc' => 'Building, renovation, and structural construction services.',
+
+    // New & Merged Categories
+    'photographers_videographers' => 'Photographers & Videographers',
+    'photographers_videographers_desc' => 'Professional photo and video services for your special events.',
+    'driving_lessons_schools' => 'Driving Lessons & Schools',
+    'driving_lessons_schools_desc' => 'Certified driving instructors and schools to help you master the road.',
+
+    // Renamed Categories
+    'electrical_services' => 'Electrical Services',
     // General
     'others_desc' => 'Other services not listed',
 ];

@@ -18,7 +18,7 @@
             --primary-700: #1d4ed8;
             --primary-800: #1e40af;
             --primary-900: #1e3a8a;
-            
+
             /* ألوان النجاح - Success Colors */
             --success-base: #10b981;
             --success-50: #ecfdf5;
@@ -31,7 +31,7 @@
             --success-700: #047857;
             --success-800: #065f46;
             --success-900: #064e3b;
-            
+
             /* ألوان التحذير - Warning Colors */
             --warning-base: #f59e0b;
             --warning-50: #fffbeb;
@@ -44,7 +44,7 @@
             --warning-700: #b45309;
             --warning-800: #92400e;
             --warning-900: #78350f;
-            
+
             /* ألوان الخطأ - Danger Colors */
             --danger-base: #ef4444;
             --danger-50: #fef2f2;
@@ -57,20 +57,20 @@
             --danger-700: #b91c1c;
             --danger-800: #991b1b;
             --danger-900: #7f1d1d;
-            
+
             /* ألوان النصوص */
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-light: #94a3b8;
             --text-white: #ffffff;
-            
+
             /* خلفيات متدرجة */
             --bg-white: #ffffff;
             --bg-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.92));
             --bg-glass-solid: rgba(255, 255, 255, 0.95);
             --bg-subtle: linear-gradient(135deg, #f8fafc, #f1f5f9);
             --bg-card: linear-gradient(135deg, #ffffff, #f9fafb);
-            
+
             /* حدود وظلال */
             --border-color: #e2e8f0;
             --border-gradient: linear-gradient(135deg, #e2e8f0, #cbd5e1);
@@ -80,7 +80,7 @@
             --shadow-xl: 0 24px 64px rgba(15, 23, 42, 0.16);
             --shadow-glow: 0 0 32px rgba(99, 102, 241, 0.2);
             --shadow-glow-hover: 0 8px 40px rgba(99, 102, 241, 0.35);
-            
+
             /* تدرجات مخصصة */
             --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
             --gradient-secondary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%);
@@ -121,8 +121,8 @@
         }
 
         @keyframes navSlideDown {
-            0% { 
-                transform: translateY(-120%); 
+            0% {
+                transform: translateY(-120%);
                 opacity: 0;
                 filter: blur(10px);
             }
@@ -130,8 +130,8 @@
                 transform: translateY(5px);
                 opacity: 0.8;
             }
-            100% { 
-                transform: translateY(0); 
+            100% {
+                transform: translateY(0);
                 opacity: 1;
                 filter: blur(0);
             }
@@ -154,8 +154,10 @@
             transition: padding 0.3s ease;
         }
 
+        /* Keep inner padding stable to avoid layout shifts when toggling .scrolled */
         .sp-nav.scrolled .sp-nav-inner {
-            padding: 0.75rem 2.5rem;
+            /* no padding change here to prevent content jump on scroll */
+            padding: 1rem 2.5rem;
         }
 
         /* --- منطقة اللوجو المحسّنة --- */
@@ -171,16 +173,16 @@
         }
 
         @keyframes logoAppear {
-            0% { 
-                opacity: 0; 
+            0% {
+                opacity: 0;
                 transform: scale(0.8) rotate(-5deg);
                 filter: blur(8px);
             }
             60% {
                 transform: scale(1.05) rotate(2deg);
             }
-            100% { 
-                opacity: 1; 
+            100% {
+                opacity: 1;
                 transform: scale(1) rotate(0deg);
                 filter: blur(0);
             }
@@ -210,11 +212,14 @@
             height: 75px;
             width: auto;
             filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.12));
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+            transform-origin: left center;
+            transform: none;
         }
 
+        /* Use transform (no layout change) instead of changing the image height to avoid navbar reflow */
         .sp-nav.scrolled .sp-brand img {
-            height: 60px;
+            transform: scale(0.85);
         }
 
         .sp-brand:hover img {
@@ -581,7 +586,7 @@
             flex-grow: 1;
             max-width: 480px;
         }
-        
+
         .sp-search-input {
             width: 100%;
             padding: 1rem 4rem 1rem 4rem;
@@ -593,7 +598,7 @@
             color: var(--text-primary);
             font-weight: 500;
         }
-        
+
         .sp-search-input:focus {
             outline: none;
             border-color: var(--primary-color);
@@ -601,7 +606,7 @@
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), var(--shadow-glow);
             transform: translateY(-3px) scale(1.01);
         }
-        
+
         .sp-search-icon {
             position: absolute;
             left: 1.5rem;
@@ -670,13 +675,13 @@
         }
 
         @keyframes searchResultsAppear {
-            0% { 
-                opacity: 0; 
+            0% {
+                opacity: 0;
                 transform: translateY(-20px) scale(0.95);
                 filter: blur(4px);
             }
-            100% { 
-                opacity: 1; 
+            100% {
+                opacity: 1;
                 transform: translateY(0) scale(1);
                 filter: blur(0);
             }
@@ -771,12 +776,12 @@
         }
 
         @keyframes notificationPulse {
-            0%, 100% { 
-                transform: scale(1); 
+            0%, 100% {
+                transform: scale(1);
                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
             }
-            50% { 
-                transform: scale(1.15); 
+            50% {
+                transform: scale(1.15);
                 box-shadow: 0 6px 20px rgba(239, 68, 68, 0.7);
             }
         }
@@ -941,13 +946,13 @@
         }
 
         @keyframes megaMenuAppear {
-            0% { 
-                opacity: 0; 
+            0% {
+                opacity: 0;
                 transform: translateX(-50%) translateY(-30px) scale(0.9);
                 filter: blur(8px);
             }
-            100% { 
-                opacity: 1; 
+            100% {
+                opacity: 1;
                 transform: translateX(-50%) translateY(0) scale(1);
                 filter: blur(0);
             }
@@ -1089,40 +1094,40 @@
                 animation: mobileMenuSlide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
             @keyframes mobileMenuSlide {
-                from { 
-                    opacity: 0; 
+                from {
+                    opacity: 0;
                     transform: translateY(-20px);
                 }
-                to { 
-                    opacity: 1; 
+                to {
+                    opacity: 1;
                     transform: translateY(0);
                 }
             }
             .sp-nav.is-open .sp-nav-links { display: flex; }
-            .sp-menu-links { 
-                flex-direction: column; 
-                align-items: stretch; 
-                width: 100%; 
-                gap: 0.75rem; 
+            .sp-menu-links {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 0.75rem;
             }
-            .sp-link { 
-                padding: 1.25rem; 
-                border-radius: 14px; 
+            .sp-link {
+                padding: 1.25rem;
+                border-radius: 14px;
                 width: 100%;
                 font-size: 1.05rem;
             }
-            .sp-actions { 
-                flex-direction: column; 
-                width: 100%; 
-                gap: 1.25rem; 
+            .sp-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 1.25rem;
             }
-            .sp-user-info { 
-                width: 100%; 
+            .sp-user-info {
+                width: 100%;
                 justify-content: center;
                 padding: 1.25rem;
             }
-            .sp-pill, .sp-outline-pill, .sp-logout-button { 
-                width: 100%; 
+            .sp-pill, .sp-outline-pill, .sp-logout-button {
+                width: 100%;
                 justify-content: center;
                 padding: 1.25rem;
             }
@@ -1135,7 +1140,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.querySelector('.sp-nav');
             const navToggle = nav.querySelector('[data-sp-nav-toggle]');
-            
+
             // Toggle Mobile Menu
             navToggle?.addEventListener('click', () => {
                 nav.classList.toggle('is-open');
@@ -1208,7 +1213,7 @@
             <div class="sp-actions">
                 <!-- Language Switcher -->
                 @include('components.language-switcher')
-                
+
                 @auth
                     <div class="sp-user-info">
                         <img src="{{ $user->profile_photo_url ?? asset('images/user.png') }}" alt="{{ $user->name }}" class="sp-user-avatar">
@@ -1223,6 +1228,12 @@
                         <a href="{{ route('service-providers.show', $provider) }}" class="sp-pill {{ request()->url() === route('service-providers.show', $provider) ? 'is-active' : '' }}">
                             <i class="fas fa-id-card"></i>
                             {{ __('general.my_profile') }}
+                        </a>
+                    @elseif(auth()->user()->isAdmin())
+                        {{-- Admin: Admin Dashboard --}}
+                        <a href="{{ route('admin.dashboard') }}" class="sp-pill">
+                            <i class="fas fa-tachometer-alt"></i>
+                            {{ __('admin.dashboard') }}
                         </a>
                     @else
                         {{-- Regular User: Dashboard --}}

@@ -1,13 +1,13 @@
 {{--
-    Unified Error Handler Component
-    Usage: <x-error-handler />
+Unified Error Handler Component
+Usage: <x-error-handler />
 
-    Features:
-    - Session flash messages (success, error, warning, info)
-    - Validation errors summary
-    - Inline field errors
-    - Toast notifications
-    - Multi-language support
+Features:
+- Session flash messages (success, error, warning, info)
+- Validation errors summary
+- Inline field errors
+- Toast notifications
+- Multi-language support
 --}}
 
 {{-- Session Flash Messages --}}
@@ -19,7 +19,7 @@
                     <i class="fas fa-check-circle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.success') }}!</strong>
-                        <div>{{ session('success') }}</div>
+                        <div>{!! session('success') !!}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -32,7 +32,7 @@
                     <i class="fas fa-exclamation-circle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.error') }}!</strong>
-                        <div>{{ session('error') }}</div>
+                        <div>{!! session('error') !!}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -45,7 +45,7 @@
                     <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.warning') }}!</strong>
-                        <div>{{ session('warning') }}</div>
+                        <div>{!! session('warning') !!}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -58,7 +58,7 @@
                     <i class="fas fa-info-circle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.info') }}!</strong>
-                        <div>{{ session('info') }}</div>
+                        <div>{!! session('info') !!}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -98,10 +98,10 @@
 {{-- Auto-dismiss alerts after 5 seconds --}}
 @if(session('success') || session('error') || session('warning') || session('info'))
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
                 const alerts = document.querySelectorAll('.alert-container .alert');
-                alerts.forEach(function(alert) {
+                alerts.forEach(function (alert) {
                     const bsAlert = new bootstrap.Alert(alert);
                     bsAlert.close();
                 });
@@ -242,6 +242,7 @@
             opacity: 0;
             transform: translateY(-20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);

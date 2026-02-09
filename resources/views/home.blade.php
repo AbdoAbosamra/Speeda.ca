@@ -12,6 +12,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom Styles -->
     <style>
         :root {
@@ -29,6 +33,218 @@
             line-height: 1.6;
             background-color: #ffffff;
         }
+
+        /* ===== Client Search Section Styles ===== */
+        #client-search-section {
+            position: relative;
+            padding: 80px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #F8FAFC;
+        }
+
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.5;
+        }
+
+        .client-search-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .section-preheading {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .client-hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--dark-text);
+            animation: fadeInUp 0.8s ease-out 0.1s backwards;
+        }
+
+        .highlight-text {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+
+        .client-hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .client-cta-container {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out 0.3s backwards;
+        }
+
+        button.btn-3d {
+            --button_radius: 12px;
+            --button_color: var(--primary-color);
+            --button_outline_color: #0056b3;
+
+            font-size: 18px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            border-radius: var(--button_radius);
+            background: var(--button_outline_color);
+            padding: 0;
+            outline: none;
+        }
+
+        button.btn-3d:focus {
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+        }
+
+        .button_top {
+            display: block;
+            box-sizing: border-box;
+            border: 2px solid var(--button_outline_color);
+            border-radius: var(--button_radius);
+            padding: 16px 48px;
+            background: var(--button_color);
+            color: white;
+            transform: translateY(-4px);
+            transition: transform 0.1s ease;
+            text-decoration: none;
+        }
+
+        button.btn-3d:hover .button_top {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 123, 255, 0.2);
+        }
+
+        button.btn-3d:active .button_top {
+            transform: translateY(0);
+        }
+
+        .client-sub-cta {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+        }
+
+        .client-benefits-grid {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .client-benefit-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: left;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+            transition: transform 0.1s ease-out;
+            flex: 1 1 300px;
+            max-width: 350px;
+            min-width: 280px;
+        }
+
+        .client-benefit-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .client-icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            transform: translateZ(20px);
+        }
+
+        .client-benefit-card h4 {
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+            color: var(--dark-text);
+            transform: translateZ(20px);
+        }
+
+        .client-benefit-card p {
+            color: var(--secondary-color);
+            line-height: 1.5;
+            font-size: 0.9rem;
+            transform: translateZ(20px);
+        }
+
+        .client-b-blue .client-icon-box {
+            background: rgba(0, 123, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        .client-b-amber .client-icon-box {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .client-b-green .client-icon-box {
+            background: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .client-hero-title { font-size: 2.2rem; }
+            #client-search-section { padding: 50px 15px; }
+            .client-benefits-grid { flex-direction: column; align-items: center; }
+            .client-benefit-card { width: 100%; max-width: 100%; }
+            .button_top { padding: 14px 32px; font-size: 16px; }
+        }
+        /* ===== End Client Search Section Styles ===== */
 
         /* Navigation */
         .navbar-brand img {
@@ -118,9 +334,7 @@
 
         .hero-image {
             border-radius: 15px;
-            /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); */
             transition: transform 0.5s ease;
-
         }
 
         .hero-image:hover {
@@ -138,17 +352,6 @@
             line-height: 1.2;
             text-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
             animation: fadeInUp 1s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .hero-tagline {
@@ -249,7 +452,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 20% 30%, rgba(255, 193, 7, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 80% 70%, rgba(25, 135, 84, 0.05) 0%, transparent 50%);
             pointer-events: none;
@@ -663,56 +866,57 @@
             margin-left: auto;
             margin-right: auto;
         }
+
         #cookie-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(3px);
-      z-index: 9998;
-      display: none;
-    }
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+            z-index: 9998;
+            display: none;
+        }
 
-    /* ===== Cookie Banner Styling ===== */
-    #cookie-banner {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #2b2b2b;
-      color: #fff;
-      padding: 25px;
-      width: 90%;
-      max-width: 600px;
-      text-align: center;
-      border-radius: 12px 12px 0 0;
-      box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.4);
-      font-size: 14px;
-      z-index: 9999;
-      display: none;
-    }
+        /* ===== Cookie Banner Styling ===== */
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2b2b2b;
+            color: #fff;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.4);
+            font-size: 14px;
+            z-index: 9999;
+            display: none;
+        }
 
-    #cookie-banner a {
-      color: #4fc3f7;
-      text-decoration: underline;
-    }
+        #cookie-banner a {
+            color: #4fc3f7;
+            text-decoration: underline;
+        }
 
-    #cookie-banner button {
-      background-color: #4fc3f7;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      margin-top: 10px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+        #cookie-banner button {
+            background-color: #4fc3f7;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
 
-    #cookie-banner button:hover {
-      background-color: #03a9f4;
-    }
+        #cookie-banner button:hover {
+            background-color: #03a9f4;
+        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -776,6 +980,71 @@
 </head>
 <body>
 @include('components.main-nav')
+
+<!-- Client Search Section (New Section) -->
+<section id="client-search-section">
+    <canvas id="bg-canvas"></canvas>
+    <div class="client-search-container">
+        <!-- Top Question -->
+        <h3 class="section-preheading">Are you a service provider in Canada?</h3>
+
+        <!-- Main Heading -->
+        <div class="text-center">
+            <h1 class="client-hero-title">
+                Clients are actively <br>
+                <span class="highlight-text">searching for services like yours</span>
+            </h1>
+        </div>
+
+        <!-- Subheading -->
+        <div class="text-center">
+            <p class="client-hero-subtitle">
+                Create your professional profile today and get discovered by clients who need your expertise.
+            </p>
+        </div>
+
+        <!-- Primary CTA Button (3D CSS) -->
+        <div class="client-cta-container">
+            <!-- Button structure updated to match provided code -->
+            <button class="btn-3d">
+                <span class="button_top">
+                    <i class="fas fa-user-plus me-2"></i> Create Your Free Profile Now
+                </span>
+            </button>
+            <div class="client-sub-cta">No credit card required • Setup in 5 minutes</div>
+        </div>
+
+        <!-- Benefits Grid (One Line Layout) -->
+        <div class="client-benefits-grid">
+            <!-- Card 1 -->
+            <div class="client-benefit-card client-b-blue" data-tilt>
+                <div class="client-icon-box">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <h4>No Contracts</h4>
+                <p>Start and stop anytime. No long-term commitments or hidden fees.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="client-benefit-card client-b-amber" data-tilt>
+                <div class="client-icon-box">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <h4>No Commissions</h4>
+                <p>Keep 100% of what you earn. We don't take a cut from your hard work.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="client-benefit-card client-b-green" data-tilt>
+                <div class="client-icon-box">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <h4>Full Control</h4>
+                <p>You decide your rates, schedule, and which clients to work with.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Hero Section -->
 <section id="hero">
@@ -991,35 +1260,126 @@
             card.style.animationDelay = `${index * 0.1}s`;
         });
     });
-        document.addEventListener("DOMContentLoaded", function () {
-      const banner = document.getElementById("cookie-banner");
-      const overlay = document.getElementById("cookie-overlay");
-      const acceptBtn = document.getElementById("accept-cookies");
 
-      // Function to show banner & block access
-      function showBanner() {
-        banner.style.display = "block";
-        overlay.style.display = "block";
-        document.body.style.overflow = "hidden"; // disable scrolling
-      }
+    document.addEventListener("DOMContentLoaded", function () {
+        const banner = document.getElementById("cookie-banner");
+        const overlay = document.getElementById("cookie-overlay");
+        const acceptBtn = document.getElementById("accept-cookies");
 
-      // Function to hide banner & allow access
-      function hideBanner() {
-        banner.style.display = "none";
-        overlay.style.display = "none";
-        document.body.style.overflow = "auto"; // enable scrolling
-      }
+        // Function to show banner & block access
+        function showBanner() {
+            banner.style.display = "block";
+            overlay.style.display = "block";
+            document.body.style.overflow = "hidden"; // disable scrolling
+        }
 
-      // Check if user already accepted
-      if (!localStorage.getItem("cookieConsentAccepted")) {
-        showBanner();
-      }
+        // Function to hide banner & allow access
+        function hideBanner() {
+            banner.style.display = "none";
+            overlay.style.display = "none";
+            document.body.style.overflow = "auto"; // enable scrolling
+        }
 
-      // When user accepts
-      acceptBtn.addEventListener("click", function () {
-        localStorage.setItem("cookieConsentAccepted", "true");
-        hideBanner();
-      });
+        // Check if user already accepted
+        if (!localStorage.getItem("cookieConsentAccepted")) {
+            showBanner();
+        }
+
+        // When user accepts
+        acceptBtn.addEventListener("click", function () {
+            localStorage.setItem("cookieConsentAccepted", "true");
+            hideBanner();
+        });
+    });
+
+    // --- 1. Canvas Background Animation (Subtle Mesh) ---
+    const canvas = document.getElementById('bg-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = document.getElementById('client-search-section').offsetWidth;
+            height = canvas.height = document.getElementById('client-search-section').offsetHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.3;
+                this.vy = (Math.random() - 0.5) * 0.3;
+                this.size = Math.random() * 200 + 100;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < -100) this.x = width + 100;
+                if (this.x > width + 100) this.x = -100;
+                if (this.y < -100) this.y = height + 100;
+                if (this.y > height + 100) this.y = -100;
+            }
+
+            draw() {
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                const color = Math.random() > 0.5 ? '237, 242, 255' : '240, 253, 244';
+
+                gradient.addColorStop(0, `rgba(${color}, 0.4)`);
+                gradient.addColorStop(1, `rgba(${color}, 0)`);
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 12; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        initParticles();
+        animate();
+    }
+
+    // --- 2. 3D Tilt Effect for Benefit Cards (Vanilla JS) ---
+    const cards = document.querySelectorAll('.client-benefit-card[data-tilt]');
+
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const xPct = x / rect.width;
+            const yPct = y / rect.height;
+
+            const xRotation = (yPct - 0.5) * -6;
+            const yRotation = (xPct - 0.5) * 6;
+
+            card.style.transform = `perspective(1000px) rotateX(${xRotation}deg) rotateY(${yRotation}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+        });
     });
 </script>
 </body>

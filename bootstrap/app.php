@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\TrackVisitor;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Auth;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,14 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Add SetLocale to web middleware group (runs after StartSession)
+        // Add SetLocale and TrackVisitor to web middleware group (runs after StartSession)
         $middleware->web(append: [
             SetLocale::class,
+            TrackVisitor::class,
         ]);
 
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'handle.large.uploads' => \App\Http\Middleware\HandleLargeUploads::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -98,7 +102,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Support\Facades\Log::error('Application error: '.$e->getMessage(), [
                 'exception' => $e,
                 'url' => $request->url(),
-                'user' => auth()->user()?->id,
+                'user' => Auth::id(),
             ]);
 
             if ($request->expectsJson()) {

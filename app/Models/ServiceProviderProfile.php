@@ -102,9 +102,33 @@ class ServiceProviderProfile extends Model
         return $sp->serviceAreas()->with('location')->get()->pluck('location')->filter();
     }
 
-    public function bookings(): HasMany
+    // public function bookings(): HasMany
+    // {
+    //     return $this->hasMany(Booking::class);
+    // }
+
+    /**
+     * Get all reviews for this service provider.
+     */
+    public function reviews(): HasMany
     {
-        return $this->hasMany(Booking::class);
+        return $this->hasMany(Review::class, 'service_provider_profile_id');
+    }
+
+    /**
+     * Get only active (approved) reviews for this provider.
+     */
+    public function activeReviews(): HasMany
+    {
+        return $this->reviews()->where('is_active', true);
+    }
+
+    /**
+     * Get only verified reviews for this provider.
+     */
+    public function verifiedReviews(): HasMany
+    {
+        return $this->reviews()->where('is_verified', true);
     }
 
     // Accessors
@@ -165,10 +189,10 @@ class ServiceProviderProfile extends Model
         }, $this->portfolio_images);
     }
 
-    public function getFormattedHourlyRateAttribute(): string
-    {
-        return $this->hourly_rate ? '$'.number_format((float) $this->hourly_rate, 2).'/hour' : 'Rate not specified';
-    }
+    // public function getFormattedHourlyRateAttribute(): string
+    // {
+    //     return $this->hourly_rate ? '$'.number_format((float) $this->hourly_rate, 2).'/hour' : 'Rate not specified';
+    // }
 
     public function getExperienceTextAttribute(): string
     {
@@ -200,18 +224,18 @@ class ServiceProviderProfile extends Model
         return $query->where('location_id', $locationId);
     }
 
-    public function scopeAvailableWeekends($query)
-    {
-        return $query->where('available_weekends', true);
-    }
+    // public function scopeAvailableWeekends($query)
+    // {
+    //     return $query->where('available_weekends', true);
+    // }
 
-    public function scopeAvailableEvenings($query)
-    {
-        return $query->where('available_evenings', true);
-    }
+    // public function scopeAvailableEvenings($query)
+    // {
+    //     return $query->where('available_evenings', true);
+    // }
 
-    public function scopeEmergencyAvailable($query)
-    {
-        return $query->where('emergency_available', true);
-    }
+    // public function scopeEmergencyAvailable($query)
+    // {
+    //     return $query->where('emergency_available', true);
+    // }
 }

@@ -1,6 +1,8 @@
 {{-- resources/views/service-providers/show.blade.php --}}
 <!DOCTYPE html>
-<html lang="en" x-data="{ saved: @json(auth()->check() && auth()->user()->savedProviders->contains($serviceProvider->id)) }">
+<html lang="en"
+    x-data="{ saved: @json(auth()->check() && auth()->user()->savedProviders->contains($serviceProvider->id)) }">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    
+
     <!-- Google Fonts -->
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
@@ -69,8 +71,13 @@
         }
 
         @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Navbar Styles */
@@ -214,7 +221,7 @@
             position: absolute;
             bottom: -60px;
             left: 30px;
-            top:110px;
+            top: 110px;
             width: 120px;
             height: 120px;
             border-radius: 50%;
@@ -296,11 +303,25 @@
             color: white;
         }
 
-        .phone-icon { background: linear-gradient(135deg, #4361ee, #3f37c9); }
-        .email-icon { background: linear-gradient(135deg, #f72585, #b5179e); }
-        .location-icon { background: linear-gradient(135deg, #7209b7, #560bad); }
-        .hours-icon { background: linear-gradient(135deg, #3a0ca3, #3f37c9); }
-        .website-icon { background: linear-gradient(135deg, #4cc9f0, #4361ee); }
+        .phone-icon {
+            background: linear-gradient(135deg, #4361ee, #3f37c9);
+        }
+
+        .email-icon {
+            background: linear-gradient(135deg, #f72585, #b5179e);
+        }
+
+        .location-icon {
+            background: linear-gradient(135deg, #7209b7, #560bad);
+        }
+
+        .hours-icon {
+            background: linear-gradient(135deg, #3a0ca3, #3f37c9);
+        }
+
+        .website-icon {
+            background: linear-gradient(135deg, #4cc9f0, #4361ee);
+        }
 
         /* Premium WhatsApp Country Badge */
         .whatsapp-country-badge {
@@ -310,7 +331,7 @@
             background: linear-gradient(135deg, #dc2626, #b91c1c, #991b1b);
             padding: 12px 20px;
             border-radius: 12px;
-            box-shadow: 
+            box-shadow:
                 0 4px 6px rgba(220, 38, 38, 0.2),
                 0 8px 16px rgba(220, 38, 38, 0.15),
                 inset 0 1px 2px rgba(255, 255, 255, 0.2),
@@ -332,23 +353,28 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent 30%,
-                rgba(255, 255, 255, 0.15) 50%,
-                transparent 70%
-            );
+            background: linear-gradient(45deg,
+                    transparent 30%,
+                    rgba(255, 255, 255, 0.15) 50%,
+                    transparent 70%);
             animation: badgeShine 3s ease-in-out infinite;
         }
 
         @keyframes badgeShine {
-            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+
+            0%,
+            100% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            50% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
         }
 
         .whatsapp-country-badge:hover {
             transform: translateY(-2px);
-            box-shadow: 
+            box-shadow:
                 0 6px 12px rgba(220, 38, 38, 0.3),
                 0 12px 24px rgba(220, 38, 38, 0.2),
                 inset 0 1px 2px rgba(255, 255, 255, 0.25),
@@ -364,8 +390,15 @@
         }
 
         @keyframes flagWave {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
+
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
         }
 
         .whatsapp-country-badge .country-code {
@@ -386,7 +419,7 @@
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             letter-spacing: 1px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 
+            box-shadow:
                 0 2px 4px rgba(0, 0, 0, 0.1),
                 inset 0 1px 1px rgba(255, 255, 255, 0.2);
         }
@@ -398,15 +431,15 @@
                 height: 42px;
                 gap: 6px;
             }
-            
+
             .whatsapp-country-badge .flag-emoji {
                 font-size: 1.3rem;
             }
-            
+
             .whatsapp-country-badge .country-code {
                 font-size: 0.9rem;
             }
-            
+
             .whatsapp-country-badge .country-name {
                 font-size: 0.7rem;
                 padding: 3px 8px;
@@ -414,7 +447,8 @@
         }
 
         /* Enhanced Form Styles */
-        .form-control-lg, .form-select-lg {
+        .form-control-lg,
+        .form-select-lg {
             font-size: 1.05rem;
             font-weight: 500;
             border: 2px solid #e2e8f0;
@@ -424,14 +458,16 @@
             background-color: #ffffff;
         }
 
-        .form-control-lg:focus, .form-select-lg:focus {
+        .form-control-lg:focus,
+        .form-select-lg:focus {
             border-color: #4361ee;
             box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
             transform: translateY(-1px);
             background-color: #ffffff;
         }
 
-        .form-control-lg:hover, .form-select-lg:hover {
+        .form-control-lg:hover,
+        .form-select-lg:hover {
             border-color: #cbd5e1;
         }
 
@@ -680,7 +716,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Toast Notification */
@@ -708,6 +746,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -736,12 +775,14 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Animated Background -->
     <div class="animated-bg"></div>
 
     <!-- Toast Container -->
-    <div class="toast-container" x-data="{ showToast: false, message: '', type: 'success' }" x-show="showToast" x-transition>
+    <div class="toast-container" x-data="{ showToast: false, message: '', type: 'success' }" x-show="showToast"
+        x-transition>
         <div class="custom-toast" :class="`toast-${type}`">
             <div class="toast-icon">
                 <i class="fas" :class="type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'"></i>
@@ -759,9 +800,13 @@
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fas fa-home me-1"></i>{{ __('general.home') }}</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('service-providers.index') }}"><i class="fas fa-list me-1"></i>{{ __('service_provider.providers_label') }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}</li>
+                <li class="breadcrumb-item"><a href="{{ route('home') }}"><i
+                            class="fas fa-home me-1"></i>{{ __('general.home') }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('service-providers.index') }}"><i
+                            class="fas fa-list me-1"></i>{{ __('service_provider.providers_label') }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                </li>
             </ol>
         </nav>
 
@@ -787,11 +832,11 @@
                     <div class="profile-image-container">
                         @if($serviceProvider->profile_image)
                             <img src="{{ asset('storage/' . $serviceProvider->profile_image) }}"
-                                 alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
-                                 class="profile-image"
-                                 loading="lazy">
+                                alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
+                                class="profile-image" loading="lazy">
                         @else
-                            <div class="profile-image d-flex align-items-center justify-content-center bg-primary text-white">
+                            <div
+                                class="profile-image d-flex align-items-center justify-content-center bg-primary text-white">
                                 <i class="fas fa-user fa-3x"></i>
                             </div>
                         @endif
@@ -801,16 +846,24 @@
                     <div class="profile-content">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <h1 class="fw-bold mb-2">{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}</h1>
+                                <h1 class="fw-bold mb-2">
+                                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                                </h1>
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-briefcase me-1"></i>
                                     {{ $serviceProvider->category->translated_name ?? __('service_provider.uncategorized') }}
                                 </p>
                             </div>
                             <div class="d-flex align-items-center gap-3">
+                                {{-- Endorsement Button - visible to all (component handles auth) --}}
+                                @if(!auth()->check() || auth()->id() !== $serviceProvider->user_id)
+                                    <x-endorsement-button :service-provider="$serviceProvider" />
+                                @endif
+
                                 <!-- Certified Badge (only visible to owner) -->
                                 @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->certification)
-                                    <div class="verification-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                    <div class="verification-badge"
+                                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                                         <i class="fas fa-certificate"></i>
                                         <span>{{ __('service_provider.certified') }}</span>
                                     </div>
@@ -821,36 +874,40 @@
                         @if(auth()->id() === $serviceProvider->user_id)
                             <!-- Owner-only Edit Section -->
                             <div class="mb-4">
-                                <h4 class="fw-bold text-secondary mb-3"><i class="fas fa-edit me-2"></i>{{ __('service_provider.edit_profile') }}</h4>
+                                <h4 class="fw-bold text-secondary mb-3"><i
+                                        class="fas fa-edit me-2"></i>{{ __('service_provider.edit_profile') }}</h4>
 
-                                <form action="{{ route('service-providers.profile.update', $serviceProvider->id) }}" method="POST" enctype="multipart/form-data" id="profileUpdateForm">
+                                <form action="{{ route('service-providers.profile.update', $serviceProvider->id) }}"
+                                    method="POST" enctype="multipart/form-data" id="profileUpdateForm">
                                     @csrf
                                     @method('PUT')
 
                                     {{-- Basic Information --}}
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-primary text-white">
-                                            <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>{{ __('service_provider.basic_information') }}</h6>
+                                            <h6 class="mb-0"><i
+                                                    class="fas fa-info-circle me-2"></i>{{ __('service_provider.basic_information') }}
+                                            </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-building text-primary me-1"></i>
-                                                    {{ __('service_provider.company_activity_name') }} <span class="text-danger">*</span>
+                                                    {{ __('service_provider.company_activity_name') }} <span
+                                                        class="text-danger">*</span>
                                                 </label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-briefcase text-muted"></i>
                                                     </span>
-                                                    <input type="text" 
-                                                           name="business_name" 
-                                                           class="form-control form-control-lg border-start-0" 
-                                                           value="{{ old('business_name', $serviceProvider->company_name) }}" 
-                                                           placeholder="مثال: ورشة السلام للسباكة"
-                                                           required>
+                                                    <input type="text" name="business_name"
+                                                        class="form-control form-control-lg border-start-0"
+                                                        value="{{ old('business_name', $serviceProvider->company_name) }}"
+                                                        placeholder="مثال: ورشة السلام للسباكة" required>
                                                 </div>
                                                 @error('business_name')
-                                                    <small class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                    <small class="text-danger"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>
 
@@ -859,17 +916,16 @@
                                                     <i class="fas fa-align-left text-primary me-1"></i>
                                                     {{ __('general.description') }}
                                                 </label>
-                                                <textarea name="bio" 
-                                                          class="form-control form-control-lg" 
-                                                          rows="5" 
-                                                          placeholder="{{ __('service_provider.description_hint') }}"
-                                                          style="resize: vertical; min-height: 120px;">{{ old('bio', $serviceProvider->bio) }}</textarea>
+                                                <textarea name="bio" class="form-control form-control-lg" rows="5"
+                                                    placeholder="{{ __('service_provider.description_hint') }}"
+                                                    style="resize: vertical; min-height: 120px;">{{ old('bio', $serviceProvider->bio) }}</textarea>
                                                 <small class="text-muted">
                                                     <i class="fas fa-lightbulb text-warning me-1"></i>
                                                     {{ __('service_provider.description_helper') }}
                                                 </small>
                                                 @error('bio')
-                                                    <small class="text-danger d-block mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                    <small class="text-danger d-block mt-1"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>
 
@@ -882,19 +938,18 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-calendar-check text-muted"></i>
                                                     </span>
-                                                    <input type="number" 
-                                                           name="experience_years" 
-                                                           class="form-control form-control-lg border-start-0" 
-                                                           value="{{ old('experience_years', $serviceProvider->experience_years) }}" 
-                                                           min="0" 
-                                                           max="50" 
-                                                           placeholder="{{ __('general.example') }}: 5">
+                                                    <input type="number" name="experience_years"
+                                                        class="form-control form-control-lg border-start-0"
+                                                        value="{{ old('experience_years', $serviceProvider->experience_years) }}"
+                                                        min="0" max="50" placeholder="{{ __('general.example') }}: 5">
                                                     <span class="input-group-text bg-light">
-                                                        <span class="badge bg-primary">{{ __('service_provider.years') }}</span>
+                                                        <span
+                                                            class="badge bg-primary">{{ __('service_provider.years') }}</span>
                                                     </span>
                                                 </div>
                                                 @error('experience_years')
-                                                    <small class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                    <small class="text-danger"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>
                                         </div>
@@ -903,13 +958,19 @@
                                     {{-- Contact Information - Category is READ-ONLY --}}
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-success text-white">
-                                            <h6 class="mb-0"><i class="fas fa-phone me-2"></i>{{ __('service_provider.contact_info') }}</h6>
+                                            <h6 class="mb-0"><i
+                                                    class="fas fa-phone me-2"></i>{{ __('service_provider.contact_info') }}
+                                            </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
-                                                <label class="form-label fw-bold">{{ __('service_provider.job_specialization') }}</label>
-                                                <input type="text" class="form-control bg-light" value="{{ $serviceProvider->category->translated_name ?? __('service_provider.not_specified') }}" disabled readonly>
-                                                <small class="text-muted"><i class="fas fa-lock me-1"></i>{{ __('service_provider.cannot_change_job') }}</small>
+                                                <label
+                                                    class="form-label fw-bold">{{ __('service_provider.job_specialization') }}</label>
+                                                <input type="text" class="form-control bg-light"
+                                                    value="{{ $serviceProvider->category->translated_name ?? __('service_provider.not_specified') }}"
+                                                    disabled readonly>
+                                                <small class="text-muted"><i
+                                                        class="fas fa-lock me-1"></i>{{ __('service_provider.cannot_change_job') }}</small>
                                             </div>
 
                                             <div class="mb-3">
@@ -927,27 +988,26 @@
                                                         <input type="hidden" name="phone_country_code" value="+1">
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="text" 
-                                                               name="phone" 
-                                                               class="form-control form-control-lg" 
-                                                               value="{{ old('phone', preg_replace('/^\+1/', '', $serviceProvider->phone)) }}" 
-                                                               placeholder="6135204877"
-                                                               pattern="[0-9]{10,15}"
-                                                               minlength="10"
-                                                               maxlength="15"
-                                                               required>
+                                                        <input type="text" name="phone" class="form-control form-control-lg"
+                                                            value="{{ old('phone', preg_replace('/^\+1/', '', $serviceProvider->phone)) }}"
+                                                            placeholder="6135204877" pattern="[0-9]{10,15}" minlength="10"
+                                                            maxlength="15" required>
                                                         <small class="text-muted d-block mt-1">
-                                                            <i class="fas fa-info-circle me-1"></i>{{ __('service_provider.enter_10_digit_number') }}
+                                                            <i
+                                                                class="fas fa-info-circle me-1"></i>{{ __('service_provider.enter_10_digit_number') }}
                                                         </small>
                                                     </div>
                                                 </div>
                                                 @error('phone')
-                                                    <small class="text-danger d-block mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                    <small class="text-danger d-block mt-1"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>
 
                                             <div class="mb-3">
-                                                <label class="form-label fw-bold">{{ __('service_provider.whatsapp_number') }} <span class="text-danger">*</span></label>
+                                                <label
+                                                    class="form-label fw-bold">{{ __('service_provider.whatsapp_number') }}
+                                                    <span class="text-danger">*</span></label>
                                                 <div class="row g-2">
                                                     <div class="col-md-4">
                                                         <div class="whatsapp-country-badge">
@@ -958,17 +1018,14 @@
                                                         <input type="hidden" name="whatsapp_country_code" value="+1">
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <input type="text" 
-                                                               name="whatsapp_number" 
-                                                               class="form-control form-control-lg" 
-                                                               value="{{ old('whatsapp_number', preg_replace('/^\+1/', '', $serviceProvider->whatsapp_number)) }}" 
-                                                               placeholder="6135204877"
-                                                               pattern="[0-9]{10,15}"
-                                                               minlength="10"
-                                                               maxlength="15"
-                                                               required>
+                                                        <input type="text" name="whatsapp_number"
+                                                            class="form-control form-control-lg"
+                                                            value="{{ old('whatsapp_number', preg_replace('/^\+1/', '', $serviceProvider->whatsapp_number)) }}"
+                                                            placeholder="6135204877" pattern="[0-9]{10,15}" minlength="10"
+                                                            maxlength="15" required>
                                                         <small class="text-muted d-block mt-1">
-                                                            <i class="fas fa-info-circle me-1"></i>{{ __('service_provider.enter_10_digit_number') }}
+                                                            <i
+                                                                class="fas fa-info-circle me-1"></i>{{ __('service_provider.enter_10_digit_number') }}
                                                         </small>
                                                     </div>
                                                 </div>
@@ -982,7 +1039,9 @@
                                     {{-- Location Information --}}
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-info text-white">
-                                            <h6 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ __('service_provider.location_section') }}</h6>
+                                            <h6 class="mb-0"><i
+                                                    class="fas fa-map-marker-alt me-2"></i>{{ __('service_provider.location_section') }}
+                                            </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
@@ -994,8 +1053,10 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-city text-info"></i>
                                                     </span>
-                                                    <select name="location_id" class="form-select form-select-lg border-start-0">
-                                                        <option value="">{{ __('general.select_location_placeholder') }}</option>
+                                                    <select name="location_id"
+                                                        class="form-select form-select-lg border-start-0">
+                                                        <option value="">{{ __('general.select_location_placeholder') }}
+                                                        </option>
                                                         @foreach($locations ?? [] as $loc)
                                                             <option value="{{ $loc->id }}" {{ $serviceProvider->location_id == $loc->id ? 'selected' : '' }}>
                                                                 {{ $loc->city ?? $loc->name ?? 'Location ' . $loc->id }}
@@ -1004,7 +1065,8 @@
                                                     </select>
                                                 </div>
                                                 @error('location_id')
-                                                    <small class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                    <small class="text-danger"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>
 
@@ -1017,18 +1079,18 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-location-dot text-danger"></i>
                                                     </span>
-                                                    <input type="text" 
-                                                           name="address" 
-                                                           class="form-control form-control-lg border-start-0" 
-                                                           value="{{ old('address', $serviceProvider->address) }}" 
-                                                           placeholder="{{ __('general.example') }}: {{ __('general.address_placeholder') }}">
+                                                    <input type="text" name="address"
+                                                        class="form-control form-control-lg border-start-0"
+                                                        value="{{ old('address', $serviceProvider->address) }}"
+                                                        placeholder="{{ __('general.example') }}: {{ __('general.address_placeholder') }}">
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-info-circle text-info me-1"></i>
                                                     {{ __('service_provider.detailed_work_address') }}
                                                 </small>
                                                 @error('address')
-                                                    <small class="text-danger d-block mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                    <small class="text-danger d-block mt-1"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>
                                         </div>
@@ -1037,7 +1099,9 @@
                                     {{-- Services & Files --}}
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-warning text-dark">
-                                            <h6 class="mb-0"><i class="fas fa-briefcase me-2"></i>{{ __('service_provider.services_files') }}</h6>
+                                            <h6 class="mb-0"><i
+                                                    class="fas fa-briefcase me-2"></i>{{ __('service_provider.services_files') }}
+                                            </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
@@ -1049,32 +1113,38 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-tools text-warning"></i>
                                                     </span>
-                                                    <input type="text" 
-                                                           name="services_offered" 
-                                                           class="form-control form-control-lg border-start-0" 
-                                                           value="{{ old('services_offered', is_array($serviceProvider->services_offered) ? implode(', ', $serviceProvider->services_offered) : $serviceProvider->services_offered) }}" 
-                                                           placeholder="{{ __('general.example') }}: {{ __('service_provider.services_offered_input_hint') }}">
+                                                    <input type="text" name="services_offered"
+                                                        class="form-control form-control-lg border-start-0"
+                                                        value="{{ old('services_offered', is_array($serviceProvider->services_offered) ? implode(', ', $serviceProvider->services_offered) : $serviceProvider->services_offered) }}"
+                                                        placeholder="{{ __('general.example') }}: {{ __('service_provider.services_offered_input_hint') }}">
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-lightbulb text-warning me-1"></i>
                                                     {{ __('service_provider.separate_services_comma') }}
                                                 </small>
                                                 @error('services_offered')
-                                                    <small class="text-danger d-block mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                    <small class="text-danger d-block mt-1"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">{{ __('general.profile_image') }}</label>
-                                                <input type="file" name="profile_image" id="profileImageInput" class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp" onchange="validateFileSize(this, 2)">
+                                                <input type="file" name="profile_image" id="profileImageInput"
+                                                    class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp"
+                                                    onchange="validateFileSize(this, 2)">
                                                 <small class="text-muted d-block">
                                                     <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.profile_logo_image') }} - {{ __('service_provider.max_size_2mb') }}
+                                                    {{ __('service_provider.profile_logo_image') }} -
+                                                    {{ __('service_provider.max_size_2mb') }}
                                                 </small>
                                                 @if($serviceProvider->profile_image)
                                                     <div class="mt-2">
-                                                        <img src="{{ asset('storage/' . $serviceProvider->profile_image) }}" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
-                                                        <small class="text-muted d-block">{{ __('service_provider.current_image') }}</small>
+                                                        <img src="{{ asset('storage/' . $serviceProvider->profile_image) }}"
+                                                            class="rounded"
+                                                            style="width: 80px; height: 80px; object-fit: cover;">
+                                                        <small
+                                                            class="text-muted d-block">{{ __('service_provider.current_image') }}</small>
                                                     </div>
                                                 @endif
                                                 @error('profile_image')
@@ -1083,16 +1153,24 @@
                                             </div>
 
                                             <div class="mb-3">
-                                                <label class="form-label fw-bold">{{ __('service_provider.certification') }}</label>
-                                                <input type="file" name="certification" id="certificationInput" class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf" onchange="validateFileSize(this, 2)">
+                                                <label
+                                                    class="form-label fw-bold">{{ __('service_provider.certification') }}</label>
+                                                <input type="file" name="certification" id="certificationInput"
+                                                    class="form-control"
+                                                    accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
+                                                    onchange="validateFileSize(this, 2)">
                                                 <small class="text-muted d-block">
                                                     <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.certificate_or_license') }} - {{ __('service_provider.max_size_2mb') }}
+                                                    {{ __('service_provider.certificate_or_license') }} -
+                                                    {{ __('service_provider.max_size_2mb') }}
                                                 </small>
                                                 @if($serviceProvider->certification)
                                                     <div class="mt-2">
-                                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> {{ __('service_provider.certificate_uploaded') }}</span>
-                                                        <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank" class="badge bg-primary"><i class="fas fa-eye"></i> {{ __('service_provider.view') }}</a>
+                                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i>
+                                                            {{ __('service_provider.certificate_uploaded') }}</span>
+                                                        <a href="{{ asset('storage/' . $serviceProvider->certification) }}"
+                                                            target="_blank" class="badge bg-primary"><i class="fas fa-eye"></i>
+                                                            {{ __('service_provider.view') }}</a>
                                                     </div>
                                                 @endif
                                                 @error('certification')
@@ -1117,14 +1195,13 @@
                                                     </small>
                                                 </div>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('service-providers.show', $serviceProvider->id) }}" 
-                                                       class="btn btn-outline-secondary btn-lg px-4"
-                                                       style="border-radius: 12px;">
+                                                    <a href="{{ route('service-providers.show', $serviceProvider->id) }}"
+                                                        class="btn btn-outline-secondary btn-lg px-4"
+                                                        style="border-radius: 12px;">
                                                         <i class="fas fa-times-circle me-2"></i>{{ __('general.cancel') }}
                                                     </a>
-                                                    <button type="submit" 
-                                                            class="btn btn-primary btn-lg px-5"
-                                                            style="border-radius: 12px; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);">
+                                                    <button type="submit" class="btn btn-primary btn-lg px-5"
+                                                        style="border-radius: 12px; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);">
                                                         <i class="fas fa-save me-2"></i>{{ __('general.save_changes') }}
                                                         <i class="fas fa-arrow-left ms-2"></i>
                                                     </button>
@@ -1147,7 +1224,8 @@
                         <!-- Services Offered -->
                         <div class="mb-4">
                             <h4 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-list-check me-2"></i>{{ __('service_provider.services_offered_title') }}
+                                <i
+                                    class="fas fa-list-check me-2"></i>{{ __('service_provider.services_offered_title') }}
                             </h4>
                             @php
                                 $services = $serviceProvider->services_offered;
@@ -1173,23 +1251,26 @@
                         @if($serviceProvider->images && $serviceProvider->images->count() > 0)
                             <div class="gallery-container">
                                 <h4 class="fw-bold text-primary mb-3">{{ __('service_provider.gallery_title') }}
-                                <div class="row g-3">
-                                    @foreach($serviceProvider->images->take(6) as $image)
-                                        <div class="col-md-4">
-                                            <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ asset('storage/' . $image->image_path) }}">
-                                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ __('service_provider.gallery_image_alt') }}" loading="lazy">
-                                                <div class="gallery-overlay">
-                                                    <i class="fas fa-search-plus text-white fa-2x"></i>
+                                    <div class="row g-3">
+                                        @foreach($serviceProvider->images->take(6) as $image)
+                                            <div class="col-md-4">
+                                                <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
+                                                    data-image="{{ asset('storage/' . $image->image_path) }}">
+                                                    <img src="{{ asset('storage/' . $image->image_path) }}"
+                                                        alt="{{ __('service_provider.gallery_image_alt') }}" loading="lazy">
+                                                    <div class="gallery-overlay">
+                                                        <i class="fas fa-search-plus text-white fa-2x"></i>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                @if($serviceProvider->images->count() > 6)
-                                    <div class="text-center mt-3">
-                                        <button class="btn btn-outline-primary">{{ __('service_provider.view_all_images') }}</button>
+                                        @endforeach
                                     </div>
-                                @endif
+                                    @if($serviceProvider->images->count() > 6)
+                                        <div class="text-center mt-3">
+                                            <button
+                                                class="btn btn-outline-primary">{{ __('service_provider.view_all_images') }}</button>
+                                        </div>
+                                    @endif
                             </div>
                         @endif
 
@@ -1197,50 +1278,51 @@
                         {{-- <div class="mt-5">
                             <h4 class="fw-bold text-primary mb-4">{{ __('service_provider.customer_reviews_title') }}
 
-                            @if($serviceProvider->reviews->count() > 0)
+                                @if($serviceProvider->reviews->count() > 0)
                                 <div class="reviews-container">
                                     @foreach($serviceProvider->reviews->take(3) as $review)
-                                        <div class="review-card">
-                                            <div class="review-header">
-                                                @if($review->user->avatar)
-                                                    <img src="{{ asset('storage/' . $review->user->avatar) }}" alt="{{ $review->user->name }}" class="review-avatar">
-                                                @else
-                                                    <div class="review-avatar bg-primary text-white d-flex align-items-center justify-content-center">
-                                                        <i class="fas fa-user"></i>
-                                                    </div>
-                                                @endif
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">{{ $review->user->name }}</h6>
-                                                    <div class="review-rating">
-                                                        @for($i = 1; $i <= 5; $i++)
-                                                            @if($i <= $review->rating)
-                                                                <i class="fas fa-star"></i>
-                                                            @else
-                                                                <i class="far fa-star"></i>
-                                                            @endif
+                                    <div class="review-card">
+                                        <div class="review-header">
+                                            @if($review->user->avatar)
+                                            <img src="{{ asset('storage/' . $review->user->avatar) }}"
+                                                alt="{{ $review->user->name }}" class="review-avatar">
+                                            @else
+                                            <div
+                                                class="review-avatar bg-primary text-white d-flex align-items-center justify-content-center">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            @endif
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ $review->user->name }}</h6>
+                                                <div class="review-rating">
+                                                    @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
+                                                        <i class="fas fa-star"></i>
+                                                        @else
+                                                        <i class="far fa-star"></i>
+                                                        @endif
                                                         @endfor
-                                                    </div>
-                                                </div>
-                                                <div class="ms-auto text-muted small">
-                                                    {{ $review->created_at->diffForHumans() }}
                                                 </div>
                                             </div>
-                                            <p>{{ $review->comment }}</p>
+                                            <div class="ms-auto text-muted small">
+                                                {{ $review->created_at->diffForHumans() }}
+                                            </div>
                                         </div>
+                                        <p>{{ $review->comment }}</p>
+                                    </div>
                                     @endforeach
 
                                     @if($serviceProvider->reviews->count() > 3)
-                                        <div class="text-center mt-4">
-                                            <button class="btn btn-outline-primary">View All Reviews</button>
-                                        </div>
+                                    <div class="text-center mt-4">
+                                        <button class="btn btn-outline-primary">View All Reviews</button>
+                                    </div>
                                     @endif
                                 </div>
-                            @else
+                                @else
                                 <div class="text-center py-4">
                                     <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
                                     <p class="text-muted">No reviews yet. Be the first to review!</p>
                                 </div>
-                            @endif
+                                @endif
                         </div> --}}
                     </div>
                 </div>
@@ -1256,48 +1338,49 @@
 
                         <!-- Phone (Hidden until button click) -->
                         @if($serviceProvider->phone)
-                        @php
-                            $phoneDisplay = $serviceProvider->phone;
-                            if($isContactRevealed) {
-                                // Show full number if already revealed
-                                $displayPhone = $phoneDisplay;
-                                $phoneClass = 'text-success fw-bold';
-                            } else {
-                                // Hide last 3 digits if not revealed
-                                if(strlen($phoneDisplay) > 3) {
-                                    $displayPhone = substr($phoneDisplay, 0, -3) . '***';
+                            @php
+                                $phoneDisplay = $serviceProvider->phone;
+                                if ($isContactRevealed) {
+                                    // Show full number if already revealed
+                                    $displayPhone = $phoneDisplay;
+                                    $phoneClass = 'text-success fw-bold';
                                 } else {
-                                    $displayPhone = '***';
+                                    // Hide last 3 digits if not revealed
+                                    if (strlen($phoneDisplay) > 3) {
+                                        $displayPhone = substr($phoneDisplay, 0, -3) . '***';
+                                    } else {
+                                        $displayPhone = '***';
+                                    }
+                                    $phoneClass = 'text-muted';
                                 }
-                                $phoneClass = 'text-muted';
-                            }
-                        @endphp
-                        <div class="contact-item">
-                            <div class="d-flex align-items-center">
-                                <div class="contact-icon phone-icon">
-                                    <i class="fas fa-phone"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1 fw-bold">{{ __('general.phone_number') }}</h6>
-                                    <span id="phoneNumber" class="{{ $phoneClass }}">{{ $displayPhone }}</span>
-                                    @if(!$isContactRevealed)
-                                    <small class="d-block text-muted" style="font-size: 0.75rem;"><i class="fas fa-lock me-1"></i>{{ __('service_provider.phone_reveal_hint') }}</small>
-                                    @endif
+                            @endphp
+                            <div class="contact-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="contact-icon phone-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-bold">{{ __('general.phone_number') }}</h6>
+                                        <span id="phoneNumber" class="{{ $phoneClass }}">{{ $displayPhone }}</span>
+                                        @if(!$isContactRevealed)
+                                            <small class="d-block text-muted" style="font-size: 0.75rem;"><i
+                                                    class="fas fa-lock me-1"></i>{{ __('service_provider.phone_reveal_hint') }}</small>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         @endif
 
                         <!-- WhatsApp Number (Hidden until button click) -->
                         @php
                             $whatsappDisplay = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
-                            if($isContactRevealed) {
+                            if ($isContactRevealed) {
                                 // Show full number if already revealed
                                 $displayWhatsapp = $whatsappDisplay;
                                 $whatsappClass = 'text-success fw-bold';
                             } else {
                                 // Hide last 3 digits if not revealed
-                                if(strlen($whatsappDisplay) > 3) {
+                                if (strlen($whatsappDisplay) > 3) {
                                     $displayWhatsapp = substr($whatsappDisplay, 0, -3) . '***';
                                 } else {
                                     $displayWhatsapp = '***';
@@ -1307,14 +1390,16 @@
                         @endphp
                         <div class="contact-item">
                             <div class="d-flex align-items-center">
-                                <div class="contact-icon" style="background: linear-gradient(135deg, #25D366, #128C7E);">
+                                <div class="contact-icon"
+                                    style="background: linear-gradient(135deg, #25D366, #128C7E);">
                                     <i class="fab fa-whatsapp"></i>
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1 fw-bold">{{ __('service_provider.whatsapp_number') }}</h6>
                                     <span id="whatsappNumber" class="{{ $whatsappClass }}">{{ $displayWhatsapp }}</span>
                                     @if(!$isContactRevealed)
-                                    <small class="d-block text-muted" style="font-size: 0.75rem;"><i class="fas fa-lock me-1"></i>{{ __('service_provider.contact_reveal_hint') }}</small>
+                                        <small class="d-block text-muted" style="font-size: 0.75rem;"><i
+                                                class="fas fa-lock me-1"></i>{{ __('service_provider.contact_reveal_hint') }}</small>
                                     @endif
                                 </div>
                             </div>
@@ -1328,7 +1413,9 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1 fw-bold">{{ __('general.location') }}</h6>
-                                    <p class="mb-0">{{ $serviceProvider->location->city ?? __('service_provider.location_not_specified') }}</p>
+                                    <p class="mb-0">
+                                        {{ $serviceProvider->location->city ?? __('service_provider.location_not_specified') }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -1337,13 +1424,14 @@
                         @if($serviceProvider->address)
                             <div class="contact-item">
                                 <div class="d-flex align-items-center">
-                                    <div class="contact-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+                                    <div class="contact-icon"
+                                        style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
                                         <i class="fas fa-map-pin"></i>
                                     </div>
                                     <div class="flex-grow-1">
                                         <h6 class="mb-1 fw-bold">{{ __('general.address') }}</h6>
                                         @php
-                                            if($isContactRevealed) {
+                                            if ($isContactRevealed) {
                                                 // Show full address if already revealed
                                                 $displayAddress = $serviceProvider->address;
                                                 $addressClass = 'text-primary fw-bold';
@@ -1355,7 +1443,8 @@
                                         @endphp
                                         <p class="mb-0 small {{ $addressClass }}" id="addressText">{{ $displayAddress }}</p>
                                         @if(!$isContactRevealed)
-                                        <small class="text-muted" style="font-size: 0.7rem;"><i class="fas fa-lock me-1"></i>{{ __('service_provider.address_reveal_hint') }}</small>
+                                            <small class="text-muted" style="font-size: 0.7rem;"><i
+                                                    class="fas fa-lock me-1"></i>{{ __('service_provider.address_reveal_hint') }}</small>
                                         @endif
                                     </div>
                                 </div>
@@ -1370,9 +1459,10 @@
                                 </div>
                                 <div>
                                     <h6 class="mb-1 fw-bold">{{ __('general.email_address') }}
-                                    <a href="mailto:{{ $serviceProvider->contact_email }}" class="text-decoration-none">
-                                        {{ $serviceProvider->contact_email }}
-                                    </a>
+                                        <a href="mailto:{{ $serviceProvider->contact_email }}"
+                                            class="text-decoration-none">
+                                            {{ $serviceProvider->contact_email }}
+                                        </a>
                                 </div>
                             </div>
                         </div>
@@ -1381,18 +1471,23 @@
                         @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->is_certified && $serviceProvider->certification)
                             <div class="contact-item">
                                 <div class="d-flex align-items-center">
-                                    <div class="contact-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                    <div class="contact-icon"
+                                        style="background: linear-gradient(135deg, #10b981, #059669);">
                                         <i class="fas fa-certificate"></i>
                                     </div>
                                     <div>
                                         <h6 class="mb-1 fw-bold">{{ __('service_provider.certification') }}</h6>
                                         @if(Str::endsWith($serviceProvider->certification, '.pdf'))
-                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank" class="text-decoration-none">
-                                                <i class="fas fa-file-pdf text-danger"></i> {{ __('service_provider.view_certificate_pdf') }}
+                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank"
+                                                class="text-decoration-none">
+                                                <i class="fas fa-file-pdf text-danger"></i>
+                                                {{ __('service_provider.view_certificate_pdf') }}
                                             </a>
                                         @else
-                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank" class="text-decoration-none">
-                                                <i class="fas fa-image text-primary"></i> {{ __('service_provider.view_certificate') }}
+                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank"
+                                                class="text-decoration-none">
+                                                <i class="fas fa-image text-primary"></i>
+                                                {{ __('service_provider.view_certificate') }}
                                             </a>
                                         @endif
                                     </div>
@@ -1408,7 +1503,9 @@
                                 </div>
                                 <div>
                                     <h6 class="mb-1 fw-bold">{{ __('service_provider.profile_views') }}</h6>
-                                    <p class="mb-0">{{ number_format($serviceProvider->views) }} {{ __('service_provider.views_label') }}</p>
+                                    <p class="mb-0">{{ number_format($serviceProvider->views) }}
+                                        {{ __('service_provider.views_label') }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -1441,9 +1538,10 @@
                         @endphp
 
                         {{-- WhatsApp Button with reveal functionality --}}
-                        <button onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
-                                class="btn w-100 mb-3"
-                                style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
+                        <button
+                            onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
+                            class="btn w-100 mb-3"
+                            style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
                             <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
                         </button>
 
@@ -1461,11 +1559,13 @@
                                 <i class="fas fa-info-circle me-2"></i>{{ __('service_provider.category_info_title') }}
                             </h6>
                             <div class="mb-2">
-                                <strong>{{ __('service_provider.category_label') }}</strong> {{ $serviceProvider->category->translated_name }}
+                                <strong>{{ __('service_provider.category_label') }}</strong>
+                                {{ $serviceProvider->category->translated_name }}
                             </div>
                             @if($serviceProvider->category->parent)
                                 <div class="mb-2">
-                                    <strong>{{ __('service_provider.main_category_label') }}</strong> {{ $serviceProvider->category->parent->translated_name }}
+                                    <strong>{{ __('service_provider.main_category_label') }}</strong>
+                                    {{ $serviceProvider->category->parent->translated_name }}
                                 </div>
                             @endif
                             @if($serviceProvider->category->description)
@@ -1494,7 +1594,8 @@
                                 <div class="similar-provider-card">
                                     <div class="similar-provider-image">
                                         @if($similar->profile_image)
-                                            <img src="{{ asset('storage/' . $similar->profile_image) }}" alt="{{ $similar->company_name ?? $similar->user->name }}" loading="lazy">
+                                            <img src="{{ asset('storage/' . $similar->profile_image) }}"
+                                                alt="{{ $similar->company_name ?? $similar->user->name }}" loading="lazy">
                                         @else
                                             <div class="h-100 d-flex align-items-center justify-content-center text-white">
                                                 <i class="fas fa-user fa-3x"></i>
@@ -1519,10 +1620,10 @@
                                         </div>
 
                                         <a href="{{ route('service-providers.show', $similar->id) }}"
-                                           class="btn btn-outline-primary btn-sm rounded-pill w-100"
-                                           style="transition: var(--transition);"
-                                           onmouseover="this.style.transform='translateY(-2px)'"
-                                           onmouseout="this.style.transform='translateY(0)'">
+                                            class="btn btn-outline-primary btn-sm rounded-pill w-100"
+                                            style="transition: var(--transition);"
+                                            onmouseover="this.style.transform='translateY(-2px)'"
+                                            onmouseout="this.style.transform='translateY(0)'">
                                             <i class="fas fa-eye me-1"></i> {{ __('service_provider.view_profile') }}
                                         </a>
                                     </div>
@@ -1582,7 +1683,7 @@
                 // Additional validation for images
                 if (fileType.startsWith('image/')) {
                     const img = new Image();
-                    img.onload = function() {
+                    img.onload = function () {
                         console.log(`Image dimensions: ${this.width}x${this.height}`);
                     };
                     img.src = URL.createObjectURL(input.files[0]);
@@ -1593,12 +1694,12 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Image Modal
             const imageModal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
 
-            imageModal.addEventListener('show.bs.modal', function(event) {
+            imageModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const imageSrc = button.getAttribute('data-image');
                 modalImage.src = imageSrc;
@@ -1609,7 +1710,7 @@
             // was removed to comply with view-only (no-API) policy.
 
             // Toast notification function
-            window.showToast = function(message, type = 'success') {
+            window.showToast = function (message, type = 'success') {
                 const toastContainer = document.querySelector('.toast-container');
                 const toastElement = toastContainer.querySelector('.custom-toast');
                 const toastMessage = toastElement.querySelector('.toast-message');
@@ -1704,7 +1805,7 @@
             console.log('Message:', message);
 
             // Open WhatsApp after a short delay
-            setTimeout(function() {
+            setTimeout(function () {
                 // Try to open in new window
                 const newWindow = window.open(whatsappUrl, '_blank');
 
@@ -1732,7 +1833,7 @@
                 previewContainer.style.cssText = 'display: none; position: relative;';
                 profileImageInput.parentElement.appendChild(previewContainer);
 
-                profileImageInput.addEventListener('change', function(e) {
+                profileImageInput.addEventListener('change', function (e) {
                     const file = e.target.files[0];
                     if (file) {
                         // Validate file size (5MB)
@@ -1768,7 +1869,7 @@
                         previewContainer.style.display = 'block';
 
                         const reader = new FileReader();
-                        reader.onload = function(event) {
+                        reader.onload = function (event) {
                             const img = previewContainer.querySelector('img');
                             img.src = event.target.result;
                             previewContainer.querySelector('.spinner-border').remove();
@@ -1782,7 +1883,7 @@
                         reader.readAsDataURL(file);
 
                         // Remove preview functionality
-                        previewContainer.querySelector('.remove-preview').addEventListener('click', function() {
+                        previewContainer.querySelector('.remove-preview').addEventListener('click', function () {
                             e.target.value = '';
                             previewContainer.style.display = 'none';
                         });
@@ -1793,7 +1894,7 @@
             // File validation for certification
             const certInput = profileForm.querySelector('input[name="certification"]');
             if (certInput) {
-                certInput.addEventListener('change', function(e) {
+                certInput.addEventListener('change', function (e) {
                     const file = e.target.files[0];
                     if (file) {
                         // Validate file size (10MB)
@@ -1862,7 +1963,7 @@
             // Phone number formatting
             const phoneInput = profileForm.querySelector('input[name="phone"]');
             if (phoneInput) {
-                phoneInput.addEventListener('input', function(e) {
+                phoneInput.addEventListener('input', function (e) {
                     // Remove all non-numeric characters except +
                     let value = e.target.value.replace(/[^\d+]/g, '');
                     e.target.value = value;
@@ -1871,7 +1972,7 @@
 
             const whatsappInput = profileForm.querySelector('input[name="whatsapp_number"]');
             if (whatsappInput) {
-                whatsappInput.addEventListener('input', function(e) {
+                whatsappInput.addEventListener('input', function (e) {
                     // Remove all non-numeric characters except +
                     let value = e.target.value.replace(/[^\d+]/g, '');
                     e.target.value = value;
@@ -1879,7 +1980,7 @@
             }
 
             // Enhanced form submission with upload progress
-            profileForm.addEventListener('submit', function(e) {
+            profileForm.addEventListener('submit', function (e) {
                 // Prevent double submission
                 if (isSubmitting) {
                     e.preventDefault();
@@ -1955,7 +2056,7 @@
                     document.body.appendChild(progressOverlay);
 
                     // Restore button after timeout (fallback)
-                    setTimeout(function() {
+                    setTimeout(function () {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = originalText;
                         isSubmitting = false;
@@ -1977,7 +2078,7 @@
 
         // Show validation errors prominently
         @if($errors->any())
-            window.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('DOMContentLoaded', function () {
                 // Scroll to first error
                 const firstError = document.querySelector('.text-danger');
                 if (firstError) {
@@ -1993,12 +2094,12 @@
                     alertDiv.style.zIndex = '9999';
                     alertDiv.style.maxWidth = '500px';
                     alertDiv.innerHTML = `
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>{{ __("validation.please_correct_errors") }}</h6>
-                        <ul class="mb-0 small">
-                            ${errorList.map(error => '<li>' + error + '</li>').join('')}
-                        </ul>
-                    `;
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>{{ __("validation.please_correct_errors") }}</h6>
+                                <ul class="mb-0 small">
+                                    ${errorList.map(error => '<li>' + error + '</li>').join('')}
+                                </ul>
+                            `;
                     document.body.appendChild(alertDiv);
 
                     // Auto dismiss after 10 seconds
@@ -2010,7 +2111,7 @@
         @endif
 
         @if(session('success'))
-            window.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('DOMContentLoaded', function () {
                 showToast('{{ session("success") }}', 'success');
             });
         @endif
@@ -2030,9 +2131,26 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-5px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(5px);
+            }
         }
 
         .spinner-border-sm {
@@ -2042,4 +2160,5 @@
         }
     </style>
 </body>
+
 </html>

@@ -47,13 +47,17 @@ class AuthService
     private function createUser(array $data): User
     {
         $profession = null;
-        if (!empty($data['profession']) && $data['profession'] !== 'other') {
-            $category = Category::find($data['profession']);
-            if ($category && $category->parent_id !== null) {
-                $profession = $category->name;
+
+        // Only process profession for service providers
+        if (isset($data['profession'])) {
+            if (!empty($data['profession']) && $data['profession'] !== 'other') {
+                $category = Category::find($data['profession']);
+                if ($category && $category->parent_id !== null) {
+                    $profession = $category->name;
+                }
+            } elseif ($data['profession'] === 'other') {
+                $profession = 'Others';
             }
-        } elseif ($data['profession'] === 'other') {
-            $profession = 'Others';
         }
 
         return User::create([
@@ -73,26 +77,32 @@ class AuthService
     {
         // Handle "other" profession - find "Others" category under "Others" section
         $categoryId = null;
-        if (!empty($data['profession']) && $data['profession'] !== 'other') {
-            $categoryId = (int) $data['profession'];
-        } elseif ($data['profession'] === 'other') {
-            // Find the "Others" category under the "Others" section
-            $othersSection = Category::where('name', 'Others')
-                ->where('is_section', true)
-                ->first();
 
-            if ($othersSection) {
-                $othersCategory = Category::where('name', 'Others')
-                    ->where('parent_id', $othersSection->id)
+        // Only process profession if it exists and user is service provider
+        if (isset($data['profession'])) {
+            if (!empty($data['profession']) && $data['profession'] !== 'other') {
+                $categoryId = (int) $data['profession'];
+            } elseif ($data['profession'] === 'other') {
+                // Find the "Others" category under the "Others" section
+                $othersSection = Category::where('name', 'Others')
+                    ->where('is_section', true)
                     ->first();
 
-                if ($othersCategory) {
-                    $categoryId = $othersCategory->id;
+                if ($othersSection) {
+                    $othersCategory = Category::where('name', 'Others')
+                        ->where('parent_id', $othersSection->id)
+                        ->first();
+
+                    if ($othersCategory) {
+                        $categoryId = $othersCategory->id;
+                    }
                 }
             }
         }
 
-        $locationId = $this->getOrCreateLocation($data['city'] ?? null);        // Create ServiceProvider record
+        $locationId = $this->getOrCreateLocation($data['city'] ?? null);
+
+        // Create ServiceProvider record
         $serviceProvider = ServiceProvider::create([
             'user_id' => $user->id,
             'category_id' => $categoryId,

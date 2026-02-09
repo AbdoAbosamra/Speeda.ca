@@ -37,7 +37,7 @@
                         <i class="fab fa-linkedin-in fa-lg"></i>
                     </a>
                 </div>
-                <p style="margin-top:25px"><a href="mailto:info@speeda.ca">info@speeda.ca</a></p>
+                <p style="margin-top:25px"><a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
             </div>
         </div>
         <div class="copyright">

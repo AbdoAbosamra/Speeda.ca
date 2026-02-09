@@ -223,7 +223,30 @@ return [
     'decorators_desc' => 'تزيين وتنسيق الفعاليات',
     'entertainers' => 'الفنانون',
     'entertainers_desc' => 'فنانون ومؤدون للفعاليات والحفلات',
+    // الأقسام الرئيسية الجديدة والمحدثة
+    'food_services' => 'خدمات الطعام',
+    'construction_services' => 'خدمات الإنشاءات والمقاولات',
 
+    // فئات خدمات الطعام
+    'restaurants' => 'المطاعم',
+    'restaurants_desc' => 'اكتشف أفضل المطاعم المحلية والمطابخ المتنوعة',
+    'home_kitchen' => 'أكل بيتي (مطبخ منزلي)',
+    'home_kitchen_desc' => 'وجبات منزلية طازجة ومحضرة بحب بأيادي طباخين محليين',
+    'catering_services_food' => 'خدمات الضيافة والبوفيه',
+    'catering_services_food_desc' => 'خدمات احترافية لتقديم الطعام للمناسبات والولائم',
+
+    // فئات الإنشاءات
+    'general_construction' => 'المقاولات والإنشاءات العامة',
+    'general_construction_desc' => 'خدمات بناء وتشييد وترميم المباني والمنشآت',
+
+    // الفئات المدمجة والمضافة حديثاً
+    'photographers_videographers' => 'تصوير فوتوغرافي وفيديو',
+    'photographers_videographers_desc' => 'خدمات تصوير احترافية لتوثيق أجمل لحظاتكم ومناسباتكم',
+    'driving_lessons_schools' => 'تعليم القيادة ومدارس السياقة',
+    'driving_lessons_schools_desc' => 'مدربون معتمدون ومدارس لتعليم قيادة السيارات بمهارة',
+
+    // تعديل مسمى قائم
+    'electrical_services' => 'الخدمات الكهربائية',
     // عام
     'others_desc' => 'خدمات أخرى غير مدرجة',
 ];

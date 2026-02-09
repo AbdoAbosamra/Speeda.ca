@@ -167,4 +167,9 @@ return [
 
     // Additional error messages
     'image_too_large_dimensions' => 'Image dimensions are too large (max 5000x5000 pixels)',
+
+    // New buttons
+    'recommend' => 'Recommend',
+    'rate' => 'Rate',
+    'share' => 'Share',
 ];

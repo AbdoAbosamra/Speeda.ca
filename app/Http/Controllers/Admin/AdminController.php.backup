@@ -1,0 +1,564 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Helpers\ErrorHelper;
+use App\Models\User;
+use App\Models\Location;
+use App\Models\Category;
+use App\Models\ServiceProvider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
+
+class AdminController extends Controller
+{
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('admin');
+    }
+
+    /**
+     * Display admin dashboard with statistics
+     */
+    public function dashboard()
+    {
+        try {
+            // Calculate statistics
+            $stats = [
+                'totalUsers' => User::where('role', '!=', 'admin')->count(), // Exclude admins
+                'totalClients' => User::where('role', 'client')->count(),
+                'totalServiceProviderUsers' => User::where('role', 'service_provider')->count(),
+                'totalAdmins' => User::where('role', 'admin')->count(),
+                'totalLocations' => Location::count(),
+                'activeLocations' => Location::where('is_active', true)->count(),
+                'totalCategories' => Category::count(),
+                'activeCategories' => Category::where('is_active', true)->count(),
+                'totalSections' => Category::where('is_section', true)->count(),
+                'totalSubcategories' => Category::where('is_section', false)->count(),
+                'totalServiceProviders' => ServiceProvider::count(),
+                'verifiedProviders' => ServiceProvider::where('is_verified', true)->count(),
+                'certifiedProviders' => ServiceProvider::where('is_certified', true)->count(),
+            ];
+
+            // Recent users (last 10) - Exclude admins
+            $recentUsers = User::where('role', '!=', 'admin')->latest()->take(10)->get();
+
+            // Recent service providers (last 10)
+            $recentProviders = ServiceProvider::with(['user', 'category', 'location'])
+                ->latest()
+                ->take(10)
+                ->get();
+
+            return view('admin.dashboard', compact('stats', 'recentUsers', 'recentProviders'));
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->route('admin.dashboard');
+        }
+    }
+
+    /**
+     * Display list of all users
+     */
+    public function users(Request $request)
+    {
+        try {
+            $query = User::query();
+
+            // Search filter
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%")
+                      ->orWhere('mobile', 'LIKE', "%{$search}%");
+                });
+            }
+
+            // Role filter
+            if ($request->filled('role')) {
+                $query->where('role', $request->input('role'));
+            }
+
+            // Exclude admins from regular users list (unless specifically filtering for admin)
+            if (!$request->filled('role') || $request->input('role') !== 'admin') {
+                $query->where('role', '!=', 'admin');
+            }
+
+            $users = $query->latest()->paginate(20);
+
+            return view('admin.users.index', compact('users'));
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->route('admin.dashboard');
+        }
+    }
+
+    /**
+     * Delete a user
+     */
+    public function deleteUser(User $user)
+    {
+        try {
+            // Prevent admin from deleting themselves
+            if ($user->id === auth()->id()) {
+                ErrorHelper::flashNotification(__('admin.cannot_delete_yourself'), 'error');
+                return redirect()->back();
+            }
+
+            // Prevent deleting other admins
+            if ($user->isAdmin() && $user->id !== auth()->id()) {
+                ErrorHelper::flashNotification(__('admin.cannot_delete_admin'), 'error');
+                return redirect()->back();
+            }
+
+            $userName = $user->name;
+            $user->delete();
+
+            Log::info('User deleted by admin', [
+                'deleted_user_id' => $user->id,
+                'deleted_user_name' => $userName,
+                'admin_id' => auth()->id(),
+            ]);
+
+            ErrorHelper::flashNotification(
+                __('admin.user_deleted_successfully', ['name' => $userName]),
+                'success'
+            );
+
+            return redirect()->route('admin.users');
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Display list of all locations (only active ones)
+     */
+    public function locations()
+    {
+        try {
+            // Show all locations to admin (active + inactive), ordering active ones first
+            $locations = Location::orderByDesc('is_active')->orderBy('city')->paginate(20);
+            return view('admin.locations.index', compact('locations'));
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->route('admin.dashboard');
+        }
+    }
+
+    /**
+     * Store a new location
+     */
+    public function storeLocation(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'city' => ['required', 'string', 'max:255', 'unique:locations,city'],
+                'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120'],
+            ], [
+                'city.required' => __('admin.city_required'),
+                'city.unique' => __('admin.city_already_exists'),
+                'image.image' => __('admin.image_must_be_image'),
+                'image.max' => __('admin.image_too_large'),
+            ]);
+
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $filename = 'location_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $image->getClientOriginalExtension();
+                $imagePath = $image->storeAs('location-images', $filename, 'public');
+            }
+
+            $location = Location::create([
+                'city' => $validated['city'],
+                'image' => $imagePath,
+                'is_active' => $request->has('is_active'),
+            ]);
+
+            Log::info('Location created by admin', [
+                'location_id' => $location->id,
+                'city' => $location->city,
+                'admin_id' => auth()->id(),
+            ]);
+
+            ErrorHelper::flashNotification(
+                __('admin.location_created_successfully'),
+                'success'
+            );
+
+            // Clear caches so public pages reflect changes immediately
+            try {
+                Artisan::call('view:clear');
+                Artisan::call('route:clear');
+                Artisan::call('config:clear');
+                Artisan::call('cache:clear');
+            } catch (\Exception $e) {
+                Log::warning('Failed to clear caches after creating location: '.$e->getMessage());
+            }
+
+            return redirect()->route('admin.locations');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back()->withInput();
+        }
+    }
+
+    /**
+     * Update a location
+     */
+    public function updateLocation(Request $request, Location $location)
+    {
+        try {
+            $validated = $request->validate([
+                'city' => ['required', 'string', 'max:255', 'unique:locations,city,' . $location->id],
+                'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120'],
+                'is_active' => ['nullable', 'boolean'],
+            ], [
+                'city.required' => __('admin.city_required'),
+                'city.unique' => __('admin.city_already_exists'),
+                'image.image' => __('admin.image_must_be_image'),
+                'image.max' => __('admin.image_too_large'),
+            ]);
+
+            $updateData = [
+                'city' => $validated['city'],
+                'is_active' => $request->has('is_active'),
+            ];
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($location->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($location->image)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($location->image);
+                }
+
+                $image = $request->file('image');
+                $filename = 'location_' . $location->id . '_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $image->getClientOriginalExtension();
+                $imagePath = $image->storeAs('location-images', $filename, 'public');
+                $updateData['image'] = $imagePath;
+            }
+
+            $location->update($updateData);
+
+            Log::info('Location updated by admin', [
+                'location_id' => $location->id,
+                'city' => $location->city,
+                'admin_id' => auth()->id(),
+            ]);
+
+            ErrorHelper::flashNotification(
+                __('admin.location_updated_successfully'),
+                'success'
+            );
+
+                // Clear caches so public pages reflect changes immediately
+                try {
+                    Artisan::call('view:clear');
+                    Artisan::call('route:clear');
+                    Artisan::call('config:clear');
+                    Artisan::call('cache:clear');
+                } catch (\Exception $e) {
+                    Log::warning('Failed to clear caches after updating location: '.$e->getMessage());
+                }
+
+                return redirect()->route('admin.locations');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back()->withInput();
+        }
+    }
+
+    /**
+     * Delete a location
+     */
+    public function deleteLocation(Location $location)
+    {
+        try {
+            // Check if location has service providers
+            $providersCount = $location->serviceProviders()->count();
+            if ($providersCount > 0) {
+                ErrorHelper::flashNotification(
+                    __('admin.location_has_providers', ['count' => $providersCount]),
+                    'error'
+                );
+                return redirect()->back();
+            }
+
+            $cityName = $location->city;
+            $location->delete();
+
+            Log::info('Location deleted by admin', [
+                'location_id' => $location->id,
+                'city' => $cityName,
+                'admin_id' => auth()->id(),
+            ]);
+
+            ErrorHelper::flashNotification(
+                __('admin.location_deleted_successfully', ['city' => $cityName]),
+                'success'
+            );
+
+                try {
+                    Artisan::call('view:clear');
+                    Artisan::call('route:clear');
+                    Artisan::call('config:clear');
+                    Artisan::call('cache:clear');
+                } catch (\Exception $e) {
+                    Log::warning('Failed to clear caches after deleting location: '.$e->getMessage());
+                }
+
+                return redirect()->route('admin.locations');
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Display list of all categories
+     */
+    public function categories()
+    {
+        try {
+            $sections = Category::where('is_section', true)
+                ->with(['children' => function($query) {
+                    $query->orderBy('name');
+                }])
+                ->orderBy('sort_order')
+                ->get();
+
+            $allCategories = Category::with('parent')
+                ->orderBy('name')
+                ->get();
+
+            return view('admin.categories.index', compact('sections', 'allCategories'));
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->route('admin.dashboard');
+        }
+    }
+
+    /**
+     * Store a new category
+     */
+    public function storeCategory(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'description' => ['nullable', 'string'],
+                'parent_id' => ['nullable', 'exists:categories,id'],
+                'is_section' => ['nullable', 'boolean'],
+                'is_active' => ['nullable', 'boolean'],
+                'sort_order' => ['nullable', 'integer'],
+                'icon' => ['nullable', 'string', 'max:255'],
+                'color' => ['nullable', 'string', 'max:255'],
+            ], [
+                'name.required' => __('admin.category_name_required'),
+                'parent_id.exists' => __('admin.invalid_parent_category'),
+            ]);
+
+            $category = Category::create([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'parent_id' => $validated['parent_id'] ?? null,
+                'is_section' => $request->has('is_section'),
+                'is_active' => $request->has('is_active'),
+                'sort_order' => $validated['sort_order'] ?? 0,
+                'icon' => $validated['icon'] ?? null,
+                'color' => $validated['color'] ?? null,
+            ]);
+
+            Log::info('Category created by admin', [
+                'category_id' => $category->id,
+                'name' => $category->name,
+                'admin_id' => auth()->id(),
+            ]);
+
+            ErrorHelper::flashNotification(
+                __('admin.category_created_successfully'),
+                'success'
+            );
+
+                // Clear caches so changes appear immediately
+                try {
+                    Artisan::call('view:clear');
+                    Artisan::call('route:clear');
+                    Artisan::call('config:clear');
+                    Artisan::call('cache:clear');
+                } catch (\Exception $e) {
+                    Log::warning('Failed to clear caches after creating category: '.$e->getMessage());
+                }
+
+                return redirect()->route('admin.categories');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back()->withInput();
+        }
+    }
+
+    /**
+     * Update a category
+     */
+    public function updateCategory(Request $request, Category $category)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'description' => ['nullable', 'string'],
+                'parent_id' => ['nullable', 'exists:categories,id'],
+                'is_section' => ['nullable', 'boolean'],
+                'is_active' => ['nullable', 'boolean'],
+                'sort_order' => ['nullable', 'integer'],
+                'icon' => ['nullable', 'string', 'max:255'],
+                'color' => ['nullable', 'string', 'max:255'],
+            ], [
+                'name.required' => __('admin.category_name_required'),
+                'parent_id.exists' => __('admin.invalid_parent_category'),
+            ]);
+
+            // Prevent setting parent to itself
+            if ($validated['parent_id'] == $category->id) {
+                throw new \Exception(__('admin.cannot_set_self_as_parent'));
+            }
+
+            $category->update([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'parent_id' => $validated['parent_id'] ?? null,
+                'is_section' => $request->has('is_section'),
+                'is_active' => $request->has('is_active'),
+                'sort_order' => $validated['sort_order'] ?? $category->sort_order,
+                'icon' => $validated['icon'] ?? $category->icon,
+                'color' => $validated['color'] ?? $category->color,
+            ]);
+
+            Log::info('Category updated by admin', [
+                'category_id' => $category->id,
+                'name' => $category->name,
+                'admin_id' => auth()->id(),
+            ]);
+
+            ErrorHelper::flashNotification(
+                __('admin.category_updated_successfully'),
+                'success'
+            );
+
+            try {
+                Artisan::call('view:clear');
+                Artisan::call('route:clear');
+                Artisan::call('config:clear');
+                Artisan::call('cache:clear');
+            } catch (\Exception $e) {
+                Log::warning('Failed to clear caches after updating category: '.$e->getMessage());
+            }
+
+            return redirect()->route('admin.categories');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back()->withInput();
+        }
+    }
+
+    /**
+     * Delete a category
+     */
+    public function deleteCategory(Category $category)
+    {
+        try {
+            // Check if category has children
+            if ($category->children()->count() > 0) {
+                ErrorHelper::flashNotification(
+                    __('admin.category_has_children'),
+                    'error'
+                );
+                return redirect()->back();
+            }
+
+            // Check if category has service providers
+            $providersCount = $category->serviceProviders()->count();
+            if ($providersCount > 0) {
+                ErrorHelper::flashNotification(
+                    __('admin.category_has_providers', ['count' => $providersCount]),
+                    'error'
+                );
+                return redirect()->back();
+            }
+
+            $categoryName = $category->name;
+            $category->delete();
+
+            Log::info('Category deleted by admin', [
+                'category_id' => $category->id,
+                'name' => $categoryName,
+                'admin_id' => auth()->id(),
+            ]);
+
+            ErrorHelper::flashNotification(
+                __('admin.category_deleted_successfully', ['name' => $categoryName]),
+                'success'
+            );
+
+            try {
+                Artisan::call('view:clear');
+                Artisan::call('route:clear');
+                Artisan::call('config:clear');
+                Artisan::call('cache:clear');
+            } catch (\Exception $e) {
+                Log::warning('Failed to clear caches after deleting category: '.$e->getMessage());
+            }
+
+            return redirect()->route('admin.categories');
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Clear common caches (views, routes, config, app cache)
+     */
+    public function clearCache(Request $request)
+    {
+        try {
+            Artisan::call('view:clear');
+            Artisan::call('route:clear');
+            Artisan::call('config:clear');
+            Artisan::call('cache:clear');
+
+            ErrorHelper::flashNotification(__('admin.cache_cleared', [], app()->getLocale()), 'success');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back();
+        }
+    }
+}

@@ -564,7 +564,7 @@
 
                         <div class="subsection">
                             <p class="subsection-title">Official Email Addresses:</p>
-                            <p>support@Speeda.ca / info@Speeda.ca</p>
+                            <p><a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                         </div>
                     </div>
                 </div>
@@ -608,7 +608,7 @@
                     <h3>Contact Information</h3>
                     <p><strong>Bnine General Trading Inc. (Speeda)</strong></p>
                     <p>Ottawa, Ontario, Canada</p>
-                    <p>Email: <a href="mailto:info@Speeda.ca">info@Speeda.ca</a> / <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                    <p>Email: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     <p>Website: <a href="https://www.Speeda.ca" target="_blank">www.Speeda.ca</a></p>
                 </div>
 
@@ -872,7 +872,7 @@
 
                         <div class="subsection">
                             <p class="subsection-title">عناوين البريد الرسمية:</p>
-                            <p>support@Speeda.ca / info@Speeda.ca</p>
+                            <p><a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                         </div>
                     </div>
                 </div>
@@ -916,7 +916,7 @@
                     <h3>معلومات الاتصال</h3>
                     <p><strong>Bnine General Trading Inc. (Speeda)</strong></p>
                     <p>أوتاوا، أونتاريو، كندا</p>
-                    <p>البريد الإلكتروني: <a href="mailto:info@Speeda.ca">info@Speeda.ca</a> / <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                    <p>البريد الإلكتروني: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     <p>الموقع الإلكتروني: <a href="https://www.Speeda.ca" target="_blank">www.Speeda.ca</a></p>
                 </div>
 
@@ -1180,7 +1180,7 @@
 
                         <div class="subsection">
                             <p class="subsection-title">Adresses E-mail Officielles :</p>
-                            <p>support@Speeda.ca / info@Speeda.ca</p>
+                            <p><a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                         </div>
                     </div>
                 </div>
@@ -1224,7 +1224,7 @@
                     <h3>Coordonnées</h3>
                     <p><strong>Bnine General Trading Inc. (Speeda)</strong></p>
                     <p>Ottawa, Ontario, Canada</p>
-                    <p>Email: <a href="mailto:info@Speeda.ca">info@Speeda.ca</a> / <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                    <p>Email: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     <p>Site Web: <a href="https://www.Speeda.ca" target="_blank">www.Speeda.ca</a></p>
                 </div>
 

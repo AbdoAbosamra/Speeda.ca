@@ -223,6 +223,10 @@
 <body>
 @include('components.main-nav')
 
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
+
 <div class="container mt-4">
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="mb-4">
@@ -232,41 +236,32 @@
         </ol>
     </nav>
 
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1>{{ __('location.choose_city') }}</h1>
-        <p>{{ __('location.choose_city_subtitle') }}</p>
-    </div>
-
-    <!-- Cities Grid -->
+    <!-- Cities Grid (dynamic from DB) -->
     <div class="row">
-        <div class="col-lg-6 mb-4">
-            <a href="{{ route('categories', ['city' => 'Laval']) }}" class="city-card">
-                <img src="https://images.squarespace-cdn.com/content/v1/5c2cf1f4d274cb12e1341495/8f19405c-f09e-48be-89ee-43164946f860/Mayenne+Laval+copy.jpg" alt="{{ __('cities.laval') }}">
-                <h2>{{ $cities[0]->city }}</h2>
-            </a>
-        </div>
+        @forelse($cities as $index => $loc)
+            <div class="col-lg-6 mb-4">
+                @php
+                    $img = null;
+                    try {
+                        $img = $loc->image ? Storage::url($loc->image) : null;
+                    } catch (\Exception $e) {
+                        $img = null;
+                    }
+                    $bg = $img ? $img : ('https://via.placeholder.com/1200x800?text=' . urlencode($loc->city));
+                @endphp
 
-        <div class="col-lg-6 mb-4">
-            <a href="{{ route('categories', ['city' => 'Montreal']) }}" class="city-card">
-                <img src="https://www.tourismorama.com/wp-content/uploads/2023/02/visiter-montreal-canada.jpg" alt="{{ __('cities.montreal') }}">
-                <h2>{{ $cities[1]->city }}</h2>
-            </a>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <a href="{{ route('categories', ['city' => 'Ottawa']) }}" class="city-card">
-                <img src="https://travel.destinationcanada.com/_next/image?url=https:%2F%2Fadmin.destinationcanada.com%2Fsites%2Fdefault%2Ffiles%2Fimages%2Farticle%2Fottawa_sign-byward_market-photographer-southavy-pathammavong_5.jpg&w=1920&q=75" alt="{{ __('cities.ottawa') }}">
-                <h2>{{ $cities[2]->city }}</h2>
-            </a>
-        </div>
-
-        <div class="col-lg-6 mb-4">
-            <a href="{{ route('categories', ['city' => 'Gatineau']) }}" class="city-card">
-                <img src="https://www.worldatlas.com/r/w768/upload/2a/47/23/shutterstock-166445219.jpg" alt="{{ __('cities.gatineau') }}">
-                <h2>{{ $cities[3]->city }}</h2>
-            </a>
-        </div>
+                <a href="{{ route('categories', ['city' => $loc->city]) }}"
+                   class="city-card"
+                   style="background-image: url('{{ $bg }}'); background-size: cover; background-position: center;">
+                    <div style="position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);"></div>
+                    <h2 style="position:absolute; left:1rem; bottom:1rem; color:#fff; margin:0;">{{ $loc->city }}</h2>
+                </a>
+            </div>
+        @empty
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">{{ __('location.no_cities_available') ?? 'No cities available.' }}</p>
+            </div>
+        @endforelse
     </div>
 
     <!-- Call to Action Section -->

@@ -538,7 +538,7 @@
                             <li>Object to any unnecessary use of their data.</li>
                         </ul>
                         <p>Please direct requests to the following email:
-                        <a href="mailto:info@Speeda.ca">info@Speeda.ca</a></p>
+                        <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     </div>
                 </div>
 
@@ -614,7 +614,7 @@
                     <p><strong>Bnine General Trading Inc.</strong></p>
                     <p>Owner and Operator of the Speeda Platform</p>
                     <p>📍 Headquarters: Ottawa, Ontario, Canada</p>
-                    <p>Email: <a href="mailto:info@Speeda.ca">info@Speeda.ca</a> / <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                    <p>Email: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     <p>Website: <a href="https://speeada.ca" target="_blank">https://speeada.ca</a></p>
                 </div>
 
@@ -847,7 +847,7 @@
                             <li>الاعتراض على أي استخدام غير ضروري لبياناتهم.</li>
                         </ul>
                         <p>يُرجى توجيه الطلبات إلى البريد التالي:
-                        <a href="mailto:info@Speeda.ca">info@Speeda.ca</a></p>
+                        <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     </div>
                 </div>
 
@@ -923,7 +923,7 @@
                     <p><strong>Bnine General Trading Inc.</strong></p>
                     <p>المالك والمشغّل لمنصة Speeda</p>
                     <p>📍 المقر الرئيسي: أوتاوا، أونتاريو، كندا</p>
-                    <p>البريد الإلكتروني: <a href="mailto:info@Speeda.ca">info@Speeda.ca</a> / <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                    <p>البريد الإلكتروني: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     <p>الموقع الإلكتروني: <a href="https://speeada.ca" target="_blank">https://speeada.ca</a></p>
                 </div>
 
@@ -1156,7 +1156,7 @@
                             <li>S'opposer à toute utilisation non nécessaire de leurs données.</li>
                         </ul>
                         <p>Veuillez adresser vos demandes à l'adresse e-mail suivante :
-                        <a href="mailto:info@Speeda.ca">info@Speeda.ca</a></p>
+                        <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     </div>
                 </div>
 
@@ -1232,7 +1232,7 @@
                     <p><strong>Bnine General Trading Inc.</strong></p>
                     <p>Propriétaire et exploitant de la plateforme Speeda</p>
                     <p>📍 Siège social : Ottawa, Ontario, Canada</p>
-                    <p>Email: <a href="mailto:info@Speeda.ca">info@Speeda.ca</a> / <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                    <p>Email: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
                     <p>Site Web: <a href="https://speeada.ca" target="_blank">https://speeada.ca</a></p>
                 </div>
 

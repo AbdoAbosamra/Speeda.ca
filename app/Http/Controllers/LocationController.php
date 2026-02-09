@@ -8,13 +8,8 @@ use App\Models\Location;
 class LocationController extends Controller
 {
     public function index(){
-        // Get all available cities from the enum values
-        $cities = [
-            (object)['city' => 'Laval'],
-            (object)['city' => 'Montreal'],
-            (object)['city' => 'Ottawa'],
-            (object)['city' => 'Gatineau']
-        ];
+        // Fetch active locations from DB so admin changes are reflected on public site
+        $cities = Location::where('is_active', true)->orderBy('city')->get();
         return view("location", compact("cities"));
     }
 }

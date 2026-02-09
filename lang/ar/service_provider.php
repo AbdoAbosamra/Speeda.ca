@@ -162,4 +162,9 @@ return [
 
     // Error messages
     'image_too_large_dimensions' => 'أبعاد الصورة كبيرة جداً (الحد الأقصى 5000x5000 بكسل)',
+
+    // New buttons
+    'recommend' => 'يوصى',
+    'rate' => 'قيم',
+    'share' => 'مشاركة',
 ];

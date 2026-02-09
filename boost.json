@@ -1,11 +1,8 @@
 {
     "agents": [
-        "cursor",
-        "phpstorm"
+        "copilot"
     ],
     "editors": [
-        "cursor",
-        "phpstorm",
         "vscode"
     ],
     "guidelines": []

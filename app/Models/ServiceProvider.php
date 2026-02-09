@@ -43,6 +43,7 @@ class ServiceProvider extends Model
         'whatsapp_number',
         'views',
         'rating',
+        'endorsement_count',
     ];
 
     /**
@@ -73,8 +74,8 @@ class ServiceProvider extends Model
     protected function businessName(): Attribute
     {
         return Attribute::make(
-            get: fn ($value, array $attributes) => $value ?? $attributes['company_name'] ?? null,
-            set: fn ($value) => ['company_name' => $value]
+            get: fn($value, array $attributes) => $value ?? $attributes['company_name'] ?? null,
+            set: fn($value) => ['company_name' => $value]
         );
     }
 
@@ -121,6 +122,49 @@ class ServiceProvider extends Model
     }
 
     /**
+     * Get the legacy profile (if exists).
+     */
+    public function profile()
+    {
+        return $this->hasOne(ServiceProviderProfile::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get all reviews for this service provider.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get active reviews for this service provider.
+     */
+    public function activeReviews()
+    {
+        return $this->reviews()->where('is_active', true);
+    }
+
+    /**
+     * Get all endorsements for this service provider.
+     */
+    public function endorsements(): HasMany
+    {
+        return $this->hasMany(Endorsement::class);
+    }
+
+    /**
+     * Check if a user has endorsed this provider.
+     */
+    public function isEndorsedBy(?int $userId): bool
+    {
+        if (!$userId) {
+            return false;
+        }
+        return $this->endorsements()->where('user_id', $userId)->exists();
+    }
+
+    /**
      * Check if the current user is the owner of this profile.
      */
     public function isOwner()
@@ -131,12 +175,12 @@ class ServiceProvider extends Model
     /**
      * Get the formatted hourly rate.
      */
-    public function getFormattedHourlyRateAttribute(): string
-    {
-        return $this->hourly_rate !== null
-            ? '$'.number_format((float) $this->hourly_rate, 2).'/hr'
-            : 'Not specified';
-    }
+    // public function getFormattedHourlyRateAttribute(): string
+    // {
+    //     return $this->hourly_rate !== null
+    //         ? '$'.number_format((float) $this->hourly_rate, 2).'/hr'
+    //         : 'Not specified';
+    // }
 
     /**
      * Get the URL for the profile image.
@@ -152,7 +196,7 @@ class ServiceProvider extends Model
             ?? $this->user?->name
             ?? 'SP';
 
-        return 'https://via.placeholder.com/300x300/E5E7EB/6B7280?text='.urlencode(strtoupper(substr($placeholderSeed, 0, 2)));
+        return 'https://via.placeholder.com/300x300/E5E7EB/6B7280?text=' . urlencode(strtoupper(substr($placeholderSeed, 0, 2)));
     }
 
     /**
@@ -160,11 +204,11 @@ class ServiceProvider extends Model
      */
     public function getFormattedExperienceAttribute(): string
     {
-        if (! $this->experience_years) {
+        if (!$this->experience_years) {
             return 'Not specified';
         }
 
-        return $this->experience_years.' year'.($this->experience_years > 1 ? 's' : '').' experience';
+        return $this->experience_years . ' year' . ($this->experience_years > 1 ? 's' : '') . ' experience';
     }
 
     /**
@@ -177,9 +221,9 @@ class ServiceProvider extends Model
         if ($this->views < 1000) {
             return (string) $this->views;
         } elseif ($this->views < 1000000) {
-            return round($this->views / 1000, 1).'K';
+            return round($this->views / 1000, 1) . 'K';
         } else {
-            return round($this->views / 1000000, 1).'M';
+            return round($this->views / 1000000, 1) . 'M';
         }
     }
 
@@ -233,17 +277,8 @@ class ServiceProvider extends Model
     /**
      * Get all bookings for this service provider.
      */
-    public function bookings(): HasMany
-    {
-        return $this->hasMany(Booking::class);
-    }
-
-    /**
-     * Get all reviews for this service provider.
-     * Using the non-existent Review model for testing compatibility.
-     */
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class);
-    }
+    // public function bookings(): HasMany
+    // {
+    //     return $this->hasMany(Booking::class);
+    // }
 }

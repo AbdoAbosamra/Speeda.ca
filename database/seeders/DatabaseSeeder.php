@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             CategorySeeder::class,  // MUST run first (categories before locations)
+            SafeCategoryUpdateSeeder::class,
             LocationSeeder::class,
         ]);
 

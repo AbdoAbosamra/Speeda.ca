@@ -27,17 +27,32 @@ class ServiceProviderController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('company_name', 'LIKE', "%{$search}%")
-                  ->orWhere('bio', 'LIKE', "%{$search}%")
-                  ->orWhere('services_offered', 'LIKE', "%{$search}%")
-                  ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'LIKE', "%{$search}%");
-                  });
+                    ->orWhere('bio', 'LIKE', "%{$search}%")
+                    ->orWhere('services_offered', 'LIKE', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'LIKE', "%{$search}%");
+                    });
             });
         }
 
         // Category filter
         if ($request->filled('category')) {
-            $query->where('category_id', $request->input('category'));
+            $category = $request->input('category');
+            if ($category === 'others') {
+                $othersNames = ['other', 'others', 'أخرى'];
+                $otherIds = Category::all()->filter(function ($c) use ($othersNames) {
+                    return in_array(strtolower(trim($c->translated_name)), $othersNames);
+                })->pluck('id')->toArray();
+
+                if (!empty($otherIds)) {
+                    $query->whereIn('category_id', $otherIds);
+                } else {
+                    // If there are no 'others' categories, return no results
+                    $query->whereNull('id');
+                }
+            } else {
+                $query->where('category_id', $category);
+            }
         }
 
         // Location filter
@@ -155,11 +170,15 @@ class ServiceProviderController extends Controller
 
             // Check if this user has revealed this provider's contact
             $isContactRevealed = session()->has('revealed_contacts') &&
-                                 in_array($serviceProvider->id, session('revealed_contacts', []));
+                in_array($serviceProvider->id, session('revealed_contacts', []));
+
+            // Get all categories for dropdown (needed for the search bar in header)
+            $categories = Category::orderBy('name')->get();
 
             return view('service-providers.show', compact(
                 'serviceProvider',
                 'locations',
+                'categories',
                 'similarProviders',
                 'formattedNumber',
                 'isContactRevealed'

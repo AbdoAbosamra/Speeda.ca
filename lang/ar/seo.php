@@ -1,0 +1,23 @@
+<?php
+
+return [
+    // Home page
+    'home_title' => 'ابحث عن مزودي الخدمات',
+    'home_description' => 'ابحث عن مزودي خدمات موثوقين في منطقتك. تصفح الفئات وتواصل مع المحترفين.',
+    'home_keywords' => 'مزودو خدمات, محترفون, خدمات محلية, دليل الأعمال',
+
+    // Category
+    'category_description' => 'ابحث عن مزودي خدمات :name في منطقتك.',
+    'category_keywords' => 'خدمات, مزودون, محترفون',
+
+    // Location
+    'location_description' => 'مزودو خدمات في :city. ابحث عن محترفين موثوقين بالقرب منك.',
+    'location_keywords' => 'خدمات محلية, خدمات المدينة, مزودون',
+
+    // Provider
+    'provider_default_description' => 'عرض ملف :name والخدمات على سبيدا.',
+
+    // Default
+    'default_description' => 'سبيدا - منصتك الموثوقة لإيجاد مزودي الخدمات.',
+    'default_keywords' => 'مزودو خدمات, خدمات مهنية, دليل',
+];

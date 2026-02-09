@@ -223,7 +223,30 @@ return [
     'decorators_desc' => 'Services professionnels de décoration et stylisme d\'événements',
     'entertainers' => 'Artistes',
     'entertainers_desc' => 'Services d\'animation et performers professionnels pour événements',
+    // Sections Principales
+    'food_services' => 'Services de Restauration',
+    'construction_services' => 'Services de Construction',
 
+    // Catégories Services de Restauration
+    'restaurants' => 'Restaurants',
+    'restaurants_desc' => 'Découvrez les meilleurs restaurants locaux et des cuisines variées.',
+    'home_kitchen' => 'Cuisine Maison',
+    'home_kitchen_desc' => 'Repas frais faits maison, préparés avec amour par des chefs locaux.',
+    'catering_services_food' => 'Services de Traiteur',
+    'catering_services_food_desc' => 'Services de traiteur professionnels pour vos événements et réceptions.',
+
+    // Catégories Services de Construction
+    'general_construction' => 'Construction Générale',
+    'general_construction_desc' => 'Services de construction, de rénovation et de travaux structurels.',
+
+    // Nouvelles Catégories et Catégories Fusionnées
+    'photographers_videographers' => 'Photographes et Vidéastes',
+    'photographers_videographers_desc' => 'Services professionnels de photo et vidéo pour vos moments précieux.',
+    'driving_lessons_schools' => 'Cours de Conduite et Écoles',
+    'driving_lessons_schools_desc' => 'Moniteurs certifiés et écoles de conduite pour maîtriser la route.',
+
+    // Catégories Renommées
+    'electrical_services' => 'Services Électriques',
     // Général
     'others_desc' => 'Autres services non répertoriés',
 ];

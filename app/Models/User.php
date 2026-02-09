@@ -60,10 +60,18 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * Endorsements made by this user.
+     */
+    public function endorsements()
+    {
+        return $this->hasMany(Endorsement::class);
+    }
+
     // Role management
     public function assignRole(string $role): void
     {
-        if (!in_array($role, ['client', 'service_provider'])) {
+        if (!in_array($role, ['client', 'service_provider', 'admin'])) {
             throw new \InvalidArgumentException("Invalid role: {$role}");
         }
 
@@ -79,6 +87,21 @@ class User extends Authenticatable
     public function isClient(): bool
     {
         return $this->role === 'client';
+    }
+
+    public function isAdmin(): bool
+    {
+        // Consider user admin if role is 'admin' OR email is in ADMINS env list (comma separated)
+        if ($this->role === 'admin') {
+            return true;
+        }
+
+        $admins = array_filter(array_map('trim', explode(',', env('ADMINS', env('ADMIN_EMAIL', '')))));
+        if ($this->email && in_array($this->email, $admins, true)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function hasServiceProviderProfile(): bool

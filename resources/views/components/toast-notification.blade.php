@@ -1,11 +1,12 @@
 {{--
-    Toast Notification System
-    Usage: Include at bottom of layout: <x-toast-notification />
+Toast Notification System
+Usage: Include at bottom of layout: <x-toast-notification />
 --}}
 
 <!-- Toast Container -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
-    <div id="globalToast" class="toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="globalToast" class="toast align-items-center border-0 shadow-lg" role="alert" aria-live="assertive"
+        aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body d-flex align-items-center">
                 <i class="toast-icon fas me-2 fs-5"></i>
@@ -14,7 +15,8 @@
                     <span class="toast-message"></span>
                 </div>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -73,7 +75,7 @@
      * @param {string} title - Optional title (default: based on type)
      * @param {number} duration - Duration in ms (default: 5000)
      */
-    window.showToast = function(message, type = 'info', title = '', duration = 5000) {
+    window.showToast = function (message, type = 'info', title = '', duration = 5000) {
         const toastEl = document.getElementById('globalToast');
         const toast = new bootstrap.Toast(toastEl, {
             autohide: true,
@@ -88,7 +90,7 @@
         const icon = toastEl.querySelector('.toast-icon');
         icon.className = 'toast-icon fas me-2 fs-5';
 
-        switch(type) {
+        switch (type) {
             case 'success':
                 icon.classList.add('fa-check-circle');
                 title = title || '{{ __("general.success") }}';
@@ -109,14 +111,14 @@
 
         // Set content
         toastEl.querySelector('.toast-title').textContent = title;
-        toastEl.querySelector('.toast-message').textContent = message;
+        toastEl.querySelector('.toast-message').innerHTML = message;
 
         // Show toast
         toast.show();
     };
 
     // Handle Laravel flash messages on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         @if(session('toast_success'))
             showToast('{{ session("toast_success") }}', 'success');
         @endif
@@ -136,7 +138,7 @@
 
     // Global AJAX error handler
     if (typeof $ !== 'undefined') {
-        $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
+        $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
             if (jqXHR.status === 419) {
                 showToast('{{ __("validation.session_expired") }}', 'error', '{{ __("general.error") }}');
             } else if (jqXHR.status === 401) {

@@ -19,10 +19,14 @@ class CategoryController extends Controller
         // Get search query if provided
         $search = $request->input('search');
 
-        // Get selected city if provided (e.g., ?city_id=3)
-        $selectedCity = $request->has('city_id')
-            ? Location::find($request->get('city_id'))
-            : null;
+        // Get selected city by id or by name (support ?city_id=3 or ?city=Montreal)
+        if ($request->filled('city_id')) {
+            $selectedCity = Location::find($request->get('city_id'));
+        } elseif ($request->filled('city')) {
+            $selectedCity = Location::where('city', $request->get('city'))->first();
+        } else {
+            $selectedCity = null;
+        }
 
         // For views we prefer passing a simple city name (string) instead of model objects
         $selectedCityName = $selectedCity ? ($selectedCity->city ?? (string) $selectedCity) : null;

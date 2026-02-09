@@ -1,14 +1,23 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceProviderController;
+use App\Http\Controllers\Admin\AdminCommentController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\VisitorAnalyticsController;
+use App\Http\Controllers\DebugController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Include authentication routes
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // ==================== LOCALE ROUTES ====================
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
@@ -19,7 +28,7 @@ Route::get('/current-locale', [LocaleController::class, 'getCurrentLocale'])->na
 Route::view('/', 'home')->name('home');
 
 // Test translation route
-Route::get('/test-translations', function() {
+Route::get('/test-translations', function () {
     return response()->json([
         'roadside_en' => __('categories.roadside_assistance_24_7'),
         'accounting_en' => __('categories.accounting_bookkeeping_tax_preparation'),
@@ -52,8 +61,17 @@ Route::post('/service-providers/{serviceProvider}/reveal-contact', [ServiceProvi
 
 // ==================== AUTHENTICATED ROUTES ====================
 Route::middleware(['auth'])->get('/dashboard', function () {
+    // Redirect admin to admin dashboard
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+    if ($user && $user->isAdmin()) {
+        return redirect()->route('admin.dashboard');
+    }
     return redirect()->route('service-providers.index');
 })->name('dashboard');
+
+// Simple authenticated diagnostics for debugging roles, migrations, storage, locations
+Route::middleware(['auth'])->get('/debug-status', [DebugController::class, 'status'])->name('debug.status');
 
 // ==================== USER PROFILE ROUTES ====================
 Route::middleware(['auth'])->group(function () {
@@ -65,7 +83,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->prefix('service-providers')->group(function () {
     // View own profile - redirect to show page (with edit section for owner)
     Route::get('/profile', function () {
-        $provider = auth()->user()->serviceProvider;
+        $provider = Auth::user()->serviceProvider;
         if (!$provider) {
             return redirect()->route('dashboard')->with('error', __('service_provider.no_profile_found'));
         }
@@ -86,6 +104,107 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
     Route::post('/profile/image-upload', [ServiceProviderController::class, 'uploadProfileImage'])
         ->name('service-providers.profile.image-upload');
 });
+
+// ==================== REVIEWS ROUTES (Client) ====================
+// Public routes - see active reviews
+Route::get('/service-providers/{serviceProvider}/reviews', [ReviewController::class, 'index'])
+    ->name('reviews.index');
+Route::get('/reviews/{review}', [ReviewController::class, 'show'])
+    ->name('reviews.show');
+
+// Authenticated client routes - create/edit/delete reviews
+Route::get('/reviews/create/{serviceProvider}', [ReviewController::class, 'create'])
+    ->name('reviews.create');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+});
+
+// ==================== RATINGS ROUTES ====================
+Route::middleware(['auth'])->group(function () {
+    Route::post('/service-providers/{serviceProvider}/rate', [RatingController::class, 'store'])
+        ->name('ratings.store');
+    Route::get('/service-providers/{serviceProvider}/my-rating', [RatingController::class, 'getUserRating'])
+        ->name('ratings.user');
+});
+
+// ==================== ENDORSEMENTS ROUTES ====================
+Route::middleware(['auth'])->group(function () {
+    Route::post('/service-providers/{serviceProvider}/endorse', [EndorsementController::class, 'toggle'])
+        ->name('endorsements.toggle');
+});
+
+// ==================== COMMENTS ROUTES ====================
+// Public routes - see active comments
+Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
+
+// Authenticated routes - create/edit/delete/flag comments
+Route::middleware(['auth'])->prefix('comments')->name('comments.')->group(function () {
+    Route::get('/create', [CommentController::class, 'create'])->name('create');
+    Route::post('/', [CommentController::class, 'store'])->name('store');
+    Route::get('/{comment}/edit', [CommentController::class, 'edit'])->name('edit');
+    Route::put('/{comment}', [CommentController::class, 'update'])->name('update');
+    Route::delete('/{comment}', [CommentController::class, 'destroy'])->name('destroy');
+    Route::post('/{comment}/flag', [CommentController::class, 'flag'])->name('flag');
+});
+
+// ==================== ADMIN ROUTES ====================
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Activity Logs
+    Route::get('/activity-logs', [App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity_logs');
+
+    // Undo Action
+    Route::post('/undo/{log}', [App\Http\Controllers\Admin\UndoController::class, 'undo'])->name('undo');
+
+    // Dashboard
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // Categories
+    Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
+    Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
+    Route::put('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('categories.delete');
+    Route::patch('/categories/{category}/deactivate', [AdminController::class, 'deactivateCategory'])->name('categories.deactivate');
+    Route::patch('/categories/{category}/activate', [AdminController::class, 'activateCategory'])->name('categories.activate');
+
+    // Locations
+    Route::get('/locations', [AdminController::class, 'locations'])->name('locations');
+    Route::post('/locations', [AdminController::class, 'storeLocation'])->name('locations.store');
+    Route::put('/locations/{location}', [AdminController::class, 'updateLocation'])->name('locations.update');
+    Route::delete('/locations/{location}', [AdminController::class, 'deleteLocation'])->name('locations.delete');
+    Route::patch('/locations/{location}/deactivate', [AdminController::class, 'deactivateLocation'])->name('locations.deactivate');
+    Route::patch('/locations/{location}/activate', [AdminController::class, 'activateLocation'])->name('locations.activate');
+
+    // Visitor Analytics (Read-only)
+    Route::get('/visitors', [VisitorAnalyticsController::class, 'index'])->name('visitors');
+    Route::get('/visitors/live-count', [VisitorAnalyticsController::class, 'getLiveCount'])->name('visitors.live-count');
+    Route::get('/visitors/export', [VisitorAnalyticsController::class, 'export'])->name('visitors.export');
+
+    // Utility - Clear caches to ensure admin changes reflect immediately
+    Route::post('/clear-cache', [AdminController::class, 'clearCache'])->name('clear-cache');
+
+    // Reviews Management (Admin approval workflow)
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews');
+    Route::get('/reviews/{review}', [AdminReviewController::class, 'show'])->name('reviews.show');
+    Route::post('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{review}/reject', [AdminReviewController::class, 'reject'])->name('reviews.reject');
+    Route::post('/reviews/{review}/feature', [AdminReviewController::class, 'feature'])->name('reviews.feature');
+    Route::post('/reviews/{review}/unfeature', [AdminReviewController::class, 'unfeature'])->name('reviews.unfeature');
+    Route::delete('/reviews/{review}', [AdminReviewController::class, 'delete'])->name('reviews.delete');
+
+    // Comments Management (Admin approval workflow)
+    Route::get('/comments', [AdminCommentController::class, 'index'])->name('comments');
+    Route::get('/comments/{comment}', [AdminCommentController::class, 'show'])->name('comments.show');
+    Route::post('/comments/{comment}/approve', [AdminCommentController::class, 'approve'])->name('comments.approve');
+    Route::post('/comments/{comment}/reject', [AdminCommentController::class, 'reject'])->name('comments.reject');
+    Route::post('/comments/{comment}/flag', [AdminCommentController::class, 'flag'])->name('comments.flag');
+    Route::post('/comments/{comment}/unflag', [AdminCommentController::class, 'unflag'])->name('comments.unflag');
+    Route::delete('/comments/{comment}', [AdminCommentController::class, 'delete'])->name('comments.delete');
+    Route::post('/comments/{comment}/restore', [AdminCommentController::class, 'restore'])->name('comments.restore');
+});
+
 
 // ==================== CSRF TOKEN ====================
 Route::get('/csrf-token', function () {

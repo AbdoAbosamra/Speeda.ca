@@ -311,8 +311,7 @@
                 <p><i class="fas fa-map-marker-alt"></i> {{ __('terms.contact_location') }}</p>
                 <p>
                     <i class="fas fa-envelope"></i> {{ __('terms.contact_email') }}: 
-                    <a href="mailto:info@Speeda.ca">info@Speeda.ca</a> / 
-                    <a href="mailto:support@Speeda.ca">support@Speeda.ca</a>
+                    <a href="mailto:support@speeda.ca">support@speeda.ca</a>
                 </p>
                 <p>
                     <i class="fas fa-globe"></i> {{ __('terms.contact_website') }}: 

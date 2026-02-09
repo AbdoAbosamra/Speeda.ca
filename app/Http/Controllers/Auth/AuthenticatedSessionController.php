@@ -31,6 +31,12 @@ class AuthenticatedSessionController extends Controller
             // Determine redirect based on user role
             $user = Auth::user();
 
+            // ✅ ADMIN: Redirect to admin dashboard
+            if ($user->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', __('auth.login_success'));
+            }
+
             if ($user->role === 'service_provider') {
                 return redirect()->intended(route('service-providers.show', $user->serviceProvider->id))
                     ->with('success', __('auth.login_success'));

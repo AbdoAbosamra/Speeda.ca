@@ -121,13 +121,8 @@ class ServiceProvider extends Model
         return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Get the legacy profile (if exists).
-     */
-    public function profile()
-    {
-        return $this->hasOne(ServiceProviderProfile::class, 'user_id', 'user_id');
-    }
+    // Legacy cleanup: profile() method removed
+    // ServiceProviderProfile model no longer exists
 
     /**
      * Get all reviews for this service provider.

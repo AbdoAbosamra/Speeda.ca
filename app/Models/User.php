@@ -31,11 +31,8 @@ class User extends Authenticatable
         ];
     }
 
-    // Relationships (without withDefault)
-    public function serviceProviderProfile()
-    {
-        return $this->hasOne(ServiceProviderProfile::class);
-    }
+    // Legacy cleanup: ServiceProviderProfile relationship removed
+    // Profile is now integrated into ServiceProvider model
 
     /**
      * A user may have one service provider record (if they registered as a provider).
@@ -104,8 +101,6 @@ class User extends Authenticatable
         return false;
     }
 
-    public function hasServiceProviderProfile(): bool
-    {
-        return $this->serviceProviderProfile()->exists();
-    }
+    // Legacy cleanup: hasServiceProviderProfile() method removed
+    // Use serviceProvider()->exists() instead
 }

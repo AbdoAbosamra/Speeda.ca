@@ -37,9 +37,9 @@ class TrackVisitor
      */
     protected function recordVisitor(Request $request): void
     {
-        // Hash IP and User Agent to prevent identification
-        $ipHash = hash('sha256', $request->ip());
-        $userAgentHash = hash('sha256', $request->userAgent());
+        // GDPR-compliant hashing with salt using app key
+        $ipHash = hash_hmac('sha256', $request->ip(), config('app.key'));
+        $userAgentHash = hash_hmac('sha256', $request->userAgent(), config('app.key'));
 
         // Check if this visitor has already been recorded in the last 5 minutes
         $recentVisit = Visitor::where('ip_hash', $ipHash)

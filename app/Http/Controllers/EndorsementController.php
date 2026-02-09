@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Endorsement;
 use App\Models\ServiceProvider;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,35 +26,44 @@ class EndorsementController extends Controller
      * POST /service-providers/{serviceProvider}/endorse
      * 
      * @param ServiceProvider $serviceProvider
-     * @return JsonResponse
+     * @return RedirectResponse
      */
-    public function toggle(ServiceProvider $serviceProvider): JsonResponse
+    public function toggle(Request $request, ServiceProvider $serviceProvider): RedirectResponse
     {
         /** @var User|null $user */
         $user = Auth::user();
 
         // Check if user is authenticated
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => __('endorsements.login_required'),
-            ], 401);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('endorsements.login_required'),
+                ], 401);
+            }
+            return redirect()->route('login')->with('error', __('endorsements.login_required'));
         }
 
         // Only clients can endorse
         if (!$user->isClient()) {
-            return response()->json([
-                'success' => false,
-                'message' => __('endorsements.clients_only'),
-            ], 403);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('endorsements.clients_only'),
+                ], 403);
+            }
+            abort(403, __('endorsements.clients_only'));
         }
 
         // Cannot endorse yourself
         if ($serviceProvider->user_id === $user->id) {
-            return response()->json([
-                'success' => false,
-                'message' => __('endorsements.cannot_endorse_self'),
-            ], 403);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('endorsements.cannot_endorse_self'),
+                ], 403);
+            }
+            abort(403, __('endorsements.cannot_endorse_self'));
         }
 
         try {
@@ -94,12 +103,19 @@ class EndorsementController extends Controller
                 // Get updated count
                 $serviceProvider->refresh();
 
-                return response()->json([
-                    'success' => true,
-                    'endorsed' => $endorsed,
-                    'count' => $serviceProvider->endorsement_count,
-                    'message' => __('endorsements.toggle_success'),
-                ]);
+                $message = $endorsed ? __('endorsements.added') : __('endorsements.removed');
+
+                // ARCHITECTURE COMPLIANCE: Only return JSON for AJAX requests
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'endorsed' => $endorsed,
+                        'count' => $serviceProvider->endorsement_count,
+                        'message' => $message,
+                    ]);
+                }
+
+                return redirect()->back()->with('success', $message);
             });
         } catch (\Exception $e) {
             Log::error('Endorsement toggle failed', [
@@ -108,10 +124,15 @@ class EndorsementController extends Controller
                 'service_provider_id' => $serviceProvider->id,
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => __('general.error_occurred'),
-            ], 500);
+            // ARCHITECTURE COMPLIANCE: Only return JSON for AJAX requests
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('general.error_occurred'),
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', __('general.error_occurred'));
         }
     }
 }

@@ -205,10 +205,16 @@ class ServiceProviderController extends Controller
             session(['revealed_contacts' => $revealedContacts]);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Contact revealed'
-        ]);
+        // ARCHITECTURE COMPLIANCE: Only return JSON for AJAX requests
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Contact revealed'
+            ]);
+        }
+
+        // Fallback to redirect for non-AJAX requests
+        return redirect()->back()->with('success', 'Contact information revealed');
     }
 
     /**

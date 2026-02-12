@@ -1,6 +1,6 @@
 <?php ($user = auth()->user()); ?>
 
-<?php if (! $__env->hasRenderedOnce('7570abfd-a808-48d4-a019-952affedaa56')): $__env->markAsRenderedOnce('7570abfd-a808-48d4-a019-952affedaa56'); ?>
+<?php if (! $__env->hasRenderedOnce('8b2dfd96-a0eb-4150-b312-8af34238a7a0')): $__env->markAsRenderedOnce('8b2dfd96-a0eb-4150-b312-8af34238a7a0'); ?>
     <style>
         /* ===============================================
            النظام اللوني الرباعي المتطور
@@ -1135,7 +1135,7 @@
     </style>
 <?php endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('f465f985-c3e9-4bb1-b77d-077c19bcaf13')): $__env->markAsRenderedOnce('f465f985-c3e9-4bb1-b77d-077c19bcaf13'); ?>
+<?php if (! $__env->hasRenderedOnce('fd3c6a71-2560-4dc5-8acc-fa8f9fc25a4b')): $__env->markAsRenderedOnce('fd3c6a71-2560-4dc5-8acc-fa8f9fc25a4b'); ?>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.querySelector('.sp-nav');

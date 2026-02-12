@@ -27,7 +27,7 @@
                     <a href="https://www.facebook.com/profile.php?id=61583422931690" class="text-decoration-none">
                         <i class="fab fa-facebook-f fa-lg"></i>
                     </a>
-                
+                    
                 </div>
                 <p style="margin-top:25px"><a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
             </div>

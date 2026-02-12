@@ -1712,15 +1712,19 @@
                     <div class="card-footer">
                         <div class="action-buttons">
                             <?php if(auth()->check() && auth()->user()->isClient()): ?>
-                                <button class="btn-action btn-recommend"
-                                        data-provider-id="<?php echo e($provider->id); ?>"
-                                        onclick="toggleRecommend(<?php echo e($provider->id); ?>, this)">
-                                    <i class="fas fa-thumbs-up"></i>
-                                    <span><?php echo e($provider->isEndorsedBy(auth()->id()) ? 'Recommended' : 'Recommend'); ?></span>
-                                </button>
+                                <?php
+                                    $isEndorsed = $provider->isEndorsedBy(auth()->id());
+                                ?>
+                                <form action="<?php echo e(route('endorsements.toggle', $provider->id)); ?>" method="POST" style="display: inline;">
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit" class="btn-action btn-recommend <?php echo e($isEndorsed ? 'recommended' : ''); ?>">
+                                        <i class="<?php echo e($isEndorsed ? 'fas' : 'far'); ?> fa-thumbs-up"></i>
+                                        <span><?php echo e($isEndorsed ? 'Recommended' : 'Recommend'); ?></span>
+                                    </button>
+                                </form>
                             <?php else: ?>
                                 <button class="btn-action btn-recommend" disabled>
-                                    <i class="fas fa-thumbs-up"></i>
+                                    <i class="far fa-thumbs-up"></i>
                                     <span>Recommend</span>
                                 </button>
                             <?php endif; ?>
@@ -1974,54 +1978,6 @@
                 });
             });
         });
-
-        // دالة التوصية/إلغاء التوصية
-        function toggleRecommend(providerId, button) {
-            const icon = button.querySelector('i');
-            const textSpan = button.querySelector('span');
-            const statValue = document.querySelector(`[data-endorsements-count="${providerId}"]`);
-
-            fetch(`/service-providers/${providerId}/endorse`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // تحديث الزر
-                    if (data.endorsed) {
-                        button.classList.add('recommended');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        textSpan.textContent = 'Recommended';
-                    } else {
-                        button.classList.remove('recommended');
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                        textSpan.textContent = 'Recommend';
-                    }
-
-                    // تحديث العداد
-                    if (statValue) {
-                        statValue.textContent = data.count;
-                        statValue.style.transform = 'scale(1.2)';
-                        setTimeout(() => {
-                            statValue.style.transform = 'scale(1)';
-                        }, 300);
-                    }
-                } else {
-                    alert(data.message || 'An error occurred');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing your request.');
-            });
-        }
 
         // دوال Modal للتقييم
 document.addEventListener('DOMContentLoaded', function() {

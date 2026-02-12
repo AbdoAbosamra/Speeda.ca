@@ -28,111 +28,52 @@ class EndorsementController extends Controller
      * @param ServiceProvider $serviceProvider
      * @return RedirectResponse
      */
-    public function toggle(Request $request, ServiceProvider $serviceProvider): RedirectResponse
+    public function toggle(Request $request, ServiceProvider $serviceProvider)
     {
-        /** @var User|null $user */
-        $user = Auth::user();
+        $user = auth()->user();
 
-        // Check if user is authenticated
+        // Check authentication
         if (!$user) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('endorsements.login_required'),
-                ], 401);
-            }
-            return redirect()->route('login')->with('error', __('endorsements.login_required'));
+            return redirect()->route('login')->with('error', 'Please login to recommend providers.');
         }
 
         // Only clients can endorse
         if (!$user->isClient()) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('endorsements.clients_only'),
-                ], 403);
-            }
-            abort(403, __('endorsements.clients_only'));
+            return redirect()->back()->with('error', 'Only clients can recommend providers.');
         }
 
         // Cannot endorse yourself
         if ($serviceProvider->user_id === $user->id) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('endorsements.cannot_endorse_self'),
-                ], 403);
-            }
-            abort(403, __('endorsements.cannot_endorse_self'));
+            return redirect()->back()->with('error', 'You cannot recommend your own profile.');
         }
 
         try {
-            return DB::transaction(function () use ($serviceProvider, $user) {
-                // Check if endorsement exists
-                $existingEndorsement = Endorsement::where('service_provider_id', $serviceProvider->id)
-                    ->where('user_id', $user->id)
-                    ->first();
+            $existing = Endorsement::where('service_provider_id', $serviceProvider->id)
+                ->where('user_id', $user->id)
+                ->first();
 
-                $endorsed = false;
+            if ($existing) {
+                $existing->delete();
+                $serviceProvider->decrement('endorsement_count');
+                $message = 'Recommendation removed.';
+            } else {
+                Endorsement::create([
+                    'service_provider_id' => $serviceProvider->id,
+                    'user_id' => $user->id,
+                ]);
+                $serviceProvider->increment('endorsement_count');
+                $message = 'Provider recommended!';
+            }
 
-                if ($existingEndorsement) {
-                    // Remove endorsement
-                    $existingEndorsement->delete();
-                    $serviceProvider->decrement('endorsement_count');
-                    $endorsed = false;
-
-                    Log::info('Endorsement removed', [
-                        'user_id' => $user->id,
-                        'service_provider_id' => $serviceProvider->id,
-                    ]);
-                } else {
-                    // Create endorsement
-                    Endorsement::create([
-                        'service_provider_id' => $serviceProvider->id,
-                        'user_id' => $user->id,
-                    ]);
-                    $serviceProvider->increment('endorsement_count');
-                    $endorsed = true;
-
-                    Log::info('Endorsement added', [
-                        'user_id' => $user->id,
-                        'service_provider_id' => $serviceProvider->id,
-                    ]);
-                }
-
-                // Get updated count
-                $serviceProvider->refresh();
-
-                $message = $endorsed ? __('endorsements.added') : __('endorsements.removed');
-
-                // ARCHITECTURE COMPLIANCE: Only return JSON for AJAX requests
-                if ($request->expectsJson()) {
-                    return response()->json([
-                        'success' => true,
-                        'endorsed' => $endorsed,
-                        'count' => $serviceProvider->endorsement_count,
-                        'message' => $message,
-                    ]);
-                }
-
-                return redirect()->back()->with('success', $message);
-            });
+            return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Endorsement toggle failed', [
                 'error' => $e->getMessage(),
                 'user_id' => $user->id,
-                'service_provider_id' => $serviceProvider->id,
+                'provider_id' => $serviceProvider->id,
             ]);
 
-            // ARCHITECTURE COMPLIANCE: Only return JSON for AJAX requests
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('general.error_occurred'),
-                ], 500);
-            }
-
-            return redirect()->back()->with('error', __('general.error_occurred'));
+            return redirect()->back()->with('error', 'An error occurred. Please try again.');
         }
     }
 }

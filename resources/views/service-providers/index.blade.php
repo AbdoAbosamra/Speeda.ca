@@ -1703,15 +1703,19 @@
                     <div class="card-footer">
                         <div class="action-buttons">
                             @if(auth()->check() && auth()->user()->isClient())
-                                <button class="btn-action btn-recommend"
-                                        data-provider-id="{{ $provider->id }}"
-                                        onclick="toggleRecommend({{ $provider->id }}, this)">
-                                    <i class="fas fa-thumbs-up"></i>
-                                    <span>{{ $provider->isEndorsedBy(auth()->id()) ? 'Recommended' : 'Recommend' }}</span>
-                                </button>
+                                @php
+                                    $isEndorsed = $provider->isEndorsedBy(auth()->id());
+                                @endphp
+                                <form action="{{ route('endorsements.toggle', $provider->id) }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="btn-action btn-recommend {{ $isEndorsed ? 'recommended' : '' }}">
+                                        <i class="{{ $isEndorsed ? 'fas' : 'far' }} fa-thumbs-up"></i>
+                                        <span>{{ $isEndorsed ? 'Recommended' : 'Recommend' }}</span>
+                                    </button>
+                                </form>
                             @else
                                 <button class="btn-action btn-recommend" disabled>
-                                    <i class="fas fa-thumbs-up"></i>
+                                    <i class="far fa-thumbs-up"></i>
                                     <span>Recommend</span>
                                 </button>
                             @endif
@@ -1961,54 +1965,6 @@
                 });
             });
         });
-
-        // دالة التوصية/إلغاء التوصية
-        function toggleRecommend(providerId, button) {
-            const icon = button.querySelector('i');
-            const textSpan = button.querySelector('span');
-            const statValue = document.querySelector(`[data-endorsements-count="${providerId}"]`);
-
-            fetch(`/service-providers/${providerId}/endorse`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // تحديث الزر
-                    if (data.endorsed) {
-                        button.classList.add('recommended');
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        textSpan.textContent = 'Recommended';
-                    } else {
-                        button.classList.remove('recommended');
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                        textSpan.textContent = 'Recommend';
-                    }
-
-                    // تحديث العداد
-                    if (statValue) {
-                        statValue.textContent = data.count;
-                        statValue.style.transform = 'scale(1.2)';
-                        setTimeout(() => {
-                            statValue.style.transform = 'scale(1)';
-                        }, 300);
-                    }
-                } else {
-                    alert(data.message || 'An error occurred');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing your request.');
-            });
-        }
 
         // دوال Modal للتقييم
 document.addEventListener('DOMContentLoaded', function() {

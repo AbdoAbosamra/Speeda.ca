@@ -12,7 +12,6 @@ use App\Models\Location;
 use App\Models\Category;
 use App\Models\Visitor;
 use App\Models\Review;
-use App\Models\Comment;
 use App\Models\User;
 use App\Services\VisitorTrackingService;
 use App\Traits\LogsAdminActions;
@@ -64,7 +63,6 @@ class AdminController extends Controller
                 'totalUsers' => User::count(),
                 // Pending moderation counts
                 'pendingReviews' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
-                'pendingComments' => Comment::pending()->count(),
                 'newUsersToday' => User::whereDate('created_at', today())->count(),
             ];
 
@@ -88,7 +86,6 @@ class AdminController extends Controller
                 'totalCategories' => 0,
                 'totalUsers' => 0,
                 'pendingReviews' => 0,
-                'pendingComments' => 0,
                 'newUsersToday' => 0,
             ];
             return view('admin.dashboard', compact('stats'));

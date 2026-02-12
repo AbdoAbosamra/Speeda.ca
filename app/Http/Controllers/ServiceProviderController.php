@@ -172,24 +172,10 @@ class ServiceProviderController extends Controller
                 $serviceProvider->refresh(); // Reload to get updated views count
             }
 
-            // Eager load relationships including reviews with client info
-            $serviceProvider->loadMissing([
-                'user',
-                'category',
-                'location',
-                'activeReviews.client',
-                'activeReviews.approvedBy',
-                'endorsements'
-            ]);
-
-            // Get approved reviews with pagination
-            $reviews = $serviceProvider->activeReviews()
-                ->with(['client', 'approvedBy'])
-                ->orderByDesc('created_at')
-                ->paginate(5, ['*'], 'reviews_page');
-
-            // Get review statistics using dynamic calculation
-            $activeReviewsData = $serviceProvider->activeReviews()
+            // === STEP 1: Calculate review statistics FIRST (before eager loading) ===
+            // Use fresh query builder to avoid conflicts with eager loading
+            $activeReviewsData = Review::where('service_provider_id', $serviceProvider->id)
+                ->where('is_active', true)
                 ->selectRaw('
                     COUNT(*) as total_count,
                     AVG(rating) as average_rating,
@@ -212,6 +198,22 @@ class ServiceProviderController extends Controller
                 'two_star' => (int) ($activeReviewsData->two_star ?? 0),
                 'one_star' => (int) ($activeReviewsData->one_star ?? 0),
             ];
+
+            // === STEP 2: Eager load relationships for display ===
+            $serviceProvider->loadMissing([
+                'user',
+                'category',
+                'location',
+                'activeReviews.client',
+                'activeReviews.approvedBy',
+                'endorsements'
+            ]);
+
+            // === STEP 3: Get paginated reviews for display ===
+            $reviews = $serviceProvider->activeReviews()
+                ->with(['client', 'approvedBy'])
+                ->orderByDesc('created_at')
+                ->paginate(5, ['*'], 'reviews_page');
 
             // Get all locations for dropdown (not needed for public view, only for owner edit)
             $locations = Location::orderBy('city')->get();

@@ -6,6 +6,7 @@ use App\Helpers\ErrorHelper;
 use App\Http\Requests\UpdateServiceProviderProfileRequest;
 use App\Models\Category;
 use App\Models\Location;
+use App\Models\Review;
 use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

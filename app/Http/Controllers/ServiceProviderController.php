@@ -20,7 +20,9 @@ class ServiceProviderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ServiceProvider::with(['user', 'category', 'location']);
+        $query = ServiceProvider::with(['user', 'category', 'location'])
+            ->withCount(['activeReviews as reviews_count'])
+            ->withCount(['endorsements as endorsements_count']);
         // Remove is_verified filter to show all service providers
 
         // Safe filtering: Only show providers whose users are active
@@ -186,15 +188,29 @@ class ServiceProviderController extends Controller
                 ->orderByDesc('created_at')
                 ->paginate(5, ['*'], 'reviews_page');
 
-            // Get review statistics
+            // Get review statistics using dynamic calculation
+            $activeReviewsData = $serviceProvider->activeReviews()
+                ->selectRaw('
+                    COUNT(*) as total_count,
+                    AVG(rating) as average_rating,
+                    SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as five_star,
+                    SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as four_star,
+                    SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as three_star,
+                    SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as two_star,
+                    SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as one_star
+                ')
+                ->first();
+
             $reviewStats = [
-                'total_count' => $serviceProvider->activeReviews()->count(),
-                'average_rating' => $serviceProvider->rating ?? 0,
-                'five_star' => $serviceProvider->activeReviews()->where('rating', 5)->count(),
-                'four_star' => $serviceProvider->activeReviews()->where('rating', 4)->count(),
-                'three_star' => $serviceProvider->activeReviews()->where('rating', 3)->count(),
-                'two_star' => $serviceProvider->activeReviews()->where('rating', 2)->count(),
-                'one_star' => $serviceProvider->activeReviews()->where('rating', 1)->count(),
+                'total_count' => (int) ($activeReviewsData->total_count ?? 0),
+                'average_rating' => $activeReviewsData->average_rating
+                    ? round($activeReviewsData->average_rating, 1)
+                    : 0,
+                'five_star' => (int) ($activeReviewsData->five_star ?? 0),
+                'four_star' => (int) ($activeReviewsData->four_star ?? 0),
+                'three_star' => (int) ($activeReviewsData->three_star ?? 0),
+                'two_star' => (int) ($activeReviewsData->two_star ?? 0),
+                'one_star' => (int) ($activeReviewsData->one_star ?? 0),
             ];
 
             // Get all locations for dropdown (not needed for public view, only for owner edit)

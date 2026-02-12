@@ -1650,14 +1650,18 @@
                                     <?php echo e($provider->category->translated_name ?? __('service_provider.uncategorized')); ?>
 
                                 </p>
-                                <div class="rating-display">
+                                <div class="rating-display" data-provider-id="<?php echo e($provider->id); ?>">
                                     <div class="stars">
+                                        <?php
+                                            $displayRating = $provider->display_rating ?? $provider->rating ?? 0;
+                                            $reviewCount = $provider->reviews_count ?? 0;
+                                        ?>
                                         <?php for($i = 1; $i <= 5; $i++): ?>
-                                            <i class="fas fa-star <?php echo e($i <= round($provider->rating) ? 'text-warning' : 'text-muted'); ?>"></i>
+                                            <i class="fas fa-star <?php echo e($i <= round($displayRating) ? 'text-warning' : 'text-muted'); ?>"></i>
                                         <?php endfor; ?>
                                     </div>
-                                    <span class="rating-score"><?php echo e(number_format($provider->rating, 1)); ?></span>
-                                    <span class="reviews-count">(<?php echo e($provider->reviews_count ?? 0); ?>)</span>
+                                    <span class="rating-score"><?php echo e(number_format($displayRating, 1)); ?></span>
+                                    <span class="reviews-count">(<?php echo e($reviewCount); ?>)</span>
                                 </div>
                             </div>
                         </div>
@@ -1694,7 +1698,7 @@
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-thumbs-up stat-icon"></i>
-                            <div class="stat-value"><?php echo e($provider->endorsement_count); ?></div>
+                            <div class="stat-value" data-endorsements-count="<?php echo e($provider->id); ?>"><?php echo e($provider->endorsements_count ?? 0); ?></div>
                             <div class="stat-label">Recommends</div>
                         </div>
                         <div class="stat-item">
@@ -1975,8 +1979,7 @@
         function toggleRecommend(providerId, button) {
             const icon = button.querySelector('i');
             const textSpan = button.querySelector('span');
-            const statValue = document.querySelector(`[data-provider-id="${providerId}"]`).closest('.provider-card')
-                .querySelector('.stat-item:nth-child(2) .stat-value');
+            const statValue = document.querySelector(`[data-endorsements-count="${providerId}"]`);
 
             fetch(`/service-providers/${providerId}/endorse`, {
                 method: 'POST',
@@ -1992,21 +1995,15 @@
                     // تحديث الزر
                     if (data.endorsed) {
                         button.classList.add('recommended');
-                        icon.style.transform = 'rotate(-10deg)';
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
                         textSpan.textContent = 'Recommended';
-                        button.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
                     } else {
                         button.classList.remove('recommended');
-                        icon.style.transform = 'rotate(0deg)';
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
                         textSpan.textContent = 'Recommend';
-                        button.style.background = 'linear-gradient(135deg, #4f46e5, #6366f1)';
                     }
-
-                    // إضافة تأثير
-                    button.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        button.style.transform = 'translateY(-3px)';
-                    }, 150);
 
                     // تحديث العداد
                     if (statValue) {
@@ -2016,12 +2013,6 @@
                             statValue.style.transform = 'scale(1)';
                         }, 300);
                     }
-
-                    // تأثير النبض
-                    button.classList.add('pulse');
-                    setTimeout(() => {
-                        button.classList.remove('pulse');
-                    }, 2000);
                 } else {
                     alert(data.message || 'An error occurred');
                 }

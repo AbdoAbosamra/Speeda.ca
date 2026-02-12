@@ -231,11 +231,60 @@ class ServiceProvider extends Model
     }
 
     /**
-     * Check if the service provider is verified.
+     * Get the calculated rating from active reviews.
+     * This ensures rating is always accurate even if stored value is stale.
+     *
+     * @return Attribute
      */
-    public function isVerified(): bool
+    protected function calculatedRating(): Attribute
     {
-        return $this->is_verified;
+        return Attribute::make(
+            get: function () {
+                // If we have active reviews loaded, calculate from them
+                if ($this->relationLoaded('activeReviews')) {
+                    $activeReviews = $this->activeReviews;
+                } else {
+                    // Otherwise query directly (one query, not N+1)
+                    $activeReviews = $this->activeReviews()->get();
+                }
+
+                if ($activeReviews->isEmpty()) {
+                    return null;
+                }
+
+                $average = $activeReviews->avg('rating');
+                return round($average, 1);
+            }
+        );
+    }
+
+    /**
+     * Get the formatted rating display (e.g., "4.6" or "0.0" if no reviews).
+     *
+     * @return Attribute
+     */
+    protected function displayRating(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->calculated_rating ?? $this->rating ?? 0
+        );
+    }
+
+    /**
+     * Get the total count of approved reviews.
+     *
+     * @return Attribute
+     */
+    protected function totalReviewsCount(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if ($this->relationLoaded('activeReviews')) {
+                    return $this->activeReviews->count();
+                }
+                return $this->activeReviews()->count();
+            }
+        );
     }
 
     /**

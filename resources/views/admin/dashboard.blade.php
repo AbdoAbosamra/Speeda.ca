@@ -169,23 +169,21 @@
                         </div>
                     </a>
                 </div>
-                <!-- Visitor Analytics - DISABLED TEMPORARILY -->
-                {{--
+                <!-- Reviews Management -->
                 <div class="col-md-4">
-                    <a href="{{ route('admin.visitors') }}" class="action-card text-decoration-none d-block p-4 rounded-4 border bg-white shadow-sm">
+                    <a href="{{ route('admin.reviews') }}" class="action-card text-decoration-none d-block p-4 rounded-4 border bg-white shadow-sm">
                         <div class="d-flex align-items-center">
-                            <span class="icon-circle bg-purple-soft text-purple me-3">
-                                <i class="fas fa-chart-pie"></i>
+                            <span class="icon-circle bg-orange-soft text-orange me-3">
+                                <i class="fas fa-star"></i>
                             </span>
                             <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.visitor_analytics_label') }}</h6>
-                                <small class="text-secondary">{{ __('admin.visitor_analytics_description_short') }}</small>
+                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.reviews_management') }}</h6>
+                                <small class="text-secondary">{{ $stats['totalReviews'] ?? 0 }} {{ __('admin.reviews_total') }}</small>
                             </div>
                             <i class="fas fa-chevron-right text-secondary"></i>
                         </div>
                     </a>
                 </div>
-                --}}
             </div>
         </div>
 

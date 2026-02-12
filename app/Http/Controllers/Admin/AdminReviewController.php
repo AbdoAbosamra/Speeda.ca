@@ -45,7 +45,13 @@ class AdminReviewController extends Controller
                 $query->where('service_provider_id', $request->get('provider_id'));
             }
 
-            $reviews = $query->paginate(20);
+            $perPage = $request->get('per_page', 20);
+            $allowedPerPage = [10, 25, 50, 100];
+            if (!in_array($perPage, $allowedPerPage)) {
+                $perPage = 20;
+            }
+
+            $reviews = $query->paginate($perPage);
 
             // Get statistics for dashboard
             $stats = [

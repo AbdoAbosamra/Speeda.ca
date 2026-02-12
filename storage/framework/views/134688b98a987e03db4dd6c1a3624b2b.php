@@ -168,8 +168,21 @@
                         </div>
                     </a>
                 </div>
-                <!-- Visitor Analytics - DISABLED TEMPORARILY -->
-                
+                <!-- Reviews Management -->
+                <div class="col-md-4">
+                    <a href="<?php echo e(route('admin.reviews')); ?>" class="action-card text-decoration-none d-block p-4 rounded-4 border bg-white shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <span class="icon-circle bg-orange-soft text-orange me-3">
+                                <i class="fas fa-star"></i>
+                            </span>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1 text-dark"><?php echo e(__('admin.reviews_management')); ?></h6>
+                                <small class="text-secondary"><?php echo e($stats['totalReviews'] ?? 0); ?> <?php echo e(__('admin.reviews_total')); ?></small>
+                            </div>
+                            <i class="fas fa-chevron-right text-secondary"></i>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
 

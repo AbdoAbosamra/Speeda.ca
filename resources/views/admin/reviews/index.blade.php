@@ -14,22 +14,38 @@
                 </a>
             </div>
 
-            <!-- Filter Tabs -->
+            <!-- Filter Tabs and Per Page Selector -->
             <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
                 <div class="card-body py-3">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <a href="{{ route('admin.reviews') }}"
-                            class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3">
-                            <i class="fas fa-list me-1"></i>{{ __('admin.all') }}
-                        </a>
-                        <a href="{{ route('admin.reviews', ['status' => 'pending']) }}"
-                            class="btn {{ request('status') === 'pending' ? 'btn-warning' : 'btn-outline-secondary' }} rounded-pill px-3">
-                            <i class="fas fa-clock me-1"></i>{{ __('admin.pending') }}
-                        </a>
-                        <a href="{{ route('admin.reviews', ['status' => 'active']) }}"
-                            class="btn {{ request('status') === 'active' ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3">
-                            <i class="fas fa-check me-1"></i>{{ __('admin.approved') }}
-                        </a>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ route('admin.reviews') }}"
+                                class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3">
+                                <i class="fas fa-list me-1"></i>{{ __('admin.all') }}
+                            </a>
+                            <a href="{{ route('admin.reviews', ['status' => 'pending']) }}"
+                                class="btn {{ request('status') === 'pending' ? 'btn-warning' : 'btn-outline-secondary' }} rounded-pill px-3">
+                                <i class="fas fa-clock me-1"></i>{{ __('admin.pending') }}
+                            </a>
+                            <a href="{{ route('admin.reviews', ['status' => 'active']) }}"
+                                class="btn {{ request('status') === 'active' ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3">
+                                <i class="fas fa-check me-1"></i>{{ __('admin.approved') }}
+                            </a>
+                        </div>
+                        <form method="GET" action="{{ route('admin.reviews') }}" class="d-flex align-items-center gap-2">
+                            @if(request('status'))
+                                <input type="hidden" name="status" value="{{ request('status') }}">
+                            @endif
+                            <label for="per_page" class="text-muted small mb-0">{{ __('admin.show') }}:</label>
+                            <select name="per_page" id="per_page" class="form-select form-select-sm rounded-pill" 
+                                    style="width: auto; min-width: 80px;" onchange="this.form.submit()">
+                                <option value="10" {{ request('per_page', 20) == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('per_page', 20) == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('per_page', 20) == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ request('per_page', 20) == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                            <span class="text-muted small">{{ __('admin.per_page') }}</span>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -49,6 +65,7 @@
                                 <tr>
                                     <th class="fw-bold px-4 py-3">{{ __('admin.client') }}</th>
                                     <th class="fw-bold py-3">{{ __('admin.provider') }}</th>
+                                    <th class="fw-bold py-3">{{ __('admin.review_title') }}</th>
                                     <th class="fw-bold py-3 text-center">{{ __('admin.rating') }}</th>
                                     <th class="fw-bold py-3">{{ __('admin.review_text') }}</th>
                                     <th class="fw-bold py-3">{{ __('admin.status') }}</th>
@@ -72,10 +89,26 @@
                                             </div>
                                         </td>
                                         <td class="py-3">
-                                            @if($review->serviceProviderProfile)
-                                                <strong>{{ $review->serviceProviderProfile->user->name ?? __('admin.unknown') }}</strong>
+                                            @if(isset($review->serviceProvider) && $review->serviceProvider)
+                                                <div class="d-flex align-items-center">
+                                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-2"
+                                                        style="width: 36px; height: 36px; font-size: 0.875rem;">
+                                                        {{ strtoupper(substr($review->serviceProvider->user->name ?? 'P', 0, 1)) }}
+                                                    </div>
+                                                    <div>
+                                                        <strong>{{ $review->serviceProvider->user->name ?? __('admin.unknown') }}</strong>
+                                                        <div class="text-muted small">ID: {{ $review->serviceProvider->id ?? 'N/A' }}</div>
+                                                    </div>
+                                                </div>
                                             @else
-                                                <span class="text-muted">{{ __('admin.not_available') }}</span>
+                                                <span class="text-muted"><i class="fas fa-exclamation-circle me-1"></i>{{ __('admin.not_available') }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="py-3">
+                                            @if(isset($review->title) && $review->title)
+                                                <strong>{{ Str::limit($review->title, 40) }}</strong>
+                                            @else
+                                                <span class="text-muted">-</span>
                                             @endif
                                         </td>
                                         <td class="py-3 text-center">
@@ -87,10 +120,19 @@
                                                 <span class="ms-2 fw-bold">{{ $review->rating }}</span>
                                             </div>
                                         </td>
-                                        <td class="py-3" style="max-width: 250px;">
-                                            <div class="text-truncate" title="{{ $review->review_text }}">
-                                                {{ Str::limit($review->review_text, 80) ?: '-' }}
-                                            </div>
+                                        <td class="py-3" style="max-width: 200px;">
+                                            @if(isset($review->review_text) && $review->review_text)
+                                                <a href="#" class="text-decoration-none"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#reviewModal{{ $review->id }}"
+                                                   style="color: #4361ee;">
+                                                    <i class="fas fa-comment-dots me-1"></i>
+                                                    {{ Str::limit($review->review_text, 60) ?: 'View Review' }}
+                                                    <i class="fas fa-expand-alt ms-1 small"></i>
+                                                </a>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
                                         </td>
                                         <td class="py-3">
                                             @if($review->is_active)
@@ -113,7 +155,7 @@
                                             @endif
                                         </td>
                                         <td class="py-3">
-                                            <small class="text-muted">{{ $review->created_at->format('M d, Y') }}</small>
+                                            <small class="text-muted">{{ isset($review->created_at) && $review->created_at ? $review->created_at->format('M d, Y') : '-' }}</small>
                                         </td>
                                         <td class="py-3 text-center">
                                             <div class="btn-group">
@@ -175,7 +217,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">
+                                        <td colspan="8" class="text-center py-5">
                                             <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
                                             <p class="text-muted">{{ __('admin.no_reviews') }}</p>
                                         </td>
@@ -193,4 +235,65 @@
             </div>
         </div>
     </div>
+
+    <!-- Review Modals -->
+    @foreach($reviews as $review)
+        @if($review->review_text)
+            <div class="modal fade" id="reviewModal{{ $review->id }}" tabindex="-1" aria-labelledby="reviewModalLabel{{ $review->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="border-radius: 16px; border: none;">
+                        <div class="modal-header" style="background: linear-gradient(135deg, #4361ee, #3f37c9); border-radius: 16px 16px 0 0;">
+                            <h5 class="modal-title text-white" id="reviewModalLabel{{ $review->id }}">
+                                <i class="fas fa-comment-dots me-2"></i>{{ __('admin.review_details') }}
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <!-- Review Meta -->
+                            <div class="d-flex align-items-center mb-3 pb-3" style="border-bottom: 1px solid #e2e8f0;">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
+                                     style="width: 40px; height: 40px; font-size: 1rem;">
+                                    {{ strtoupper(substr($review->client->name ?? 'U', 0, 1)) }}
+                                </div>
+                                <div>
+                                    <strong>{{ $review->client->name ?? __('admin.unknown') }}</strong>
+                                    <div class="text-muted small">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star {{ $i <= $review->rating ? 'text-warning' : 'text-muted' }}" style="font-size: 0.75rem;"></i>
+                                        @endfor
+                                        <span class="ms-1">{{ $review->rating }}/5</span>
+                                    </div>
+                                </div>
+                                <div class="ms-auto text-muted small">
+                                    {{ $review->created_at->format('M d, Y') }}
+                                </div>
+                            </div>
+
+                            <!-- Full Review Text -->
+                            <div class="bg-light p-3 rounded-3" style="max-height: 400px; overflow-y: auto;">
+                                <p class="mb-0" style="white-space: pre-wrap; line-height: 1.8;">{{ $review->review_text }}</p>
+                            </div>
+
+                            <!-- Provider Info -->
+                            <div class="mt-3 pt-3" style="border-top: 1px solid #e2e8f0;">
+                                <small class="text-muted">
+                                    <i class="fas fa-briefcase me-1"></i>
+                                    {{ __('admin.provider') }}:
+                                    <strong>{{ $review->serviceProvider->user->name ?? __('admin.not_available') }}</strong>
+                                    @if($review->serviceProvider)
+                                        <span class="text-muted">(ID: {{ $review->serviceProvider->id }})</span>
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="border-top: 1px solid #e2e8f0;">
+                            <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>{{ __('general.close') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 @endsection

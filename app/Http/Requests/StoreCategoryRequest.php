@@ -24,20 +24,35 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
+            // Multi-language name fields
+            'name_ar' => [
                 'required',
                 'string',
                 'max:255',
                 'min:2',
             ],
-            'slug' => [
+            'name_en' => [
                 'nullable',
                 'string',
                 'max:255',
-                'unique:categories,slug',
-                'regex:/^[a-z0-9\-_]+$/'
             ],
-            'description' => [
+            'name_fr' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+            // Multi-language description fields
+            'description_ar' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+            'description_en' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+            'description_fr' => [
                 'nullable',
                 'string',
                 'max:1000',
@@ -94,7 +109,6 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name.required' => __('admin.category_name_required'),
             'name.max' => __('admin.category_name_max'),
-            'slug.unique' => __('admin.category_slug_exists'),
             'slug.regex' => __('admin.category_slug_format'),
             'parent_id.exists' => __('admin.invalid_parent_category'),
             'parent_id.not_in' => __('admin.cannot_set_self_as_parent'),
@@ -107,13 +121,6 @@ class StoreCategoryRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Generate slug from name if not provided
-        if (!$this->input('slug') && $this->input('name')) {
-            $this->merge([
-                'slug' => \Illuminate\Support\Str::slug($this->input('name')),
-            ]);
-        }
-
         // Convert string booleans to actual booleans
         $this->merge([
             'is_section' => $this->boolean('is_section'),

@@ -7,6 +7,7 @@ return [
     'delete_review' => 'Delete Review',
     'view_reviews' => 'View Reviews',
     'no_reviews' => 'No reviews yet',
+    'no_reviews_yet' => 'No reviews yet. Be the first to share your experience!',
     'my_reviews' => 'My Reviews',
 
     'rating' => 'Rating',
@@ -15,6 +16,12 @@ return [
     'review_text_placeholder' => 'Share your experience with this service provider (minimum 10 characters)',
     'review_placeholder' => 'Share your experience with this service provider (minimum 10 characters)',
     'submit_review' => 'Submit Review',
+    'write_review' => 'Write a Review',
+    'be_first_review' => 'Be the First to Review',
+    'your_rating' => 'Your Rating',
+    'your_review' => 'Your Review',
+    'reviews_total' => 'reviews',
+    'anonymous' => 'Anonymous',
     'cannot_edit_approved_reviews' => 'You cannot edit a review that has been approved.',
     'must_login_to_review' => 'You must be logged in to write a review.',
 
@@ -32,7 +39,7 @@ return [
 
     'verified_purchase' => 'Verified Purchase',
     'from_booking' => 'Based on booking',
-    'featured' => 'Featured Review',
+    'featured' => 'Featured',
 
     'pending_approval' => 'Pending Approval',
     'approved' => 'Approved',
@@ -42,6 +49,13 @@ return [
     'not_helpful' => 'Not Helpful',
     'report_review' => 'Report Review',
     'share_review' => 'Share',
+
+    // Rating descriptors
+    'poor' => 'Poor - Need improvement',
+    'fair' => 'Fair - Some issues',
+    'good' => 'Good - Satisfactory service',
+    'very_good' => 'Very Good - Recommend',
+    'excellent' => 'Excellent - Outstanding service!',
 
     'admin_panel' => [
         'title' => 'Reviews Management',

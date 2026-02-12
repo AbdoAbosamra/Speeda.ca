@@ -1275,55 +1275,108 @@
                         @endif
 
                         <!-- Reviews Section -->
-                        {{-- <div class="mt-5">
-                            <h4 class="fw-bold text-primary mb-4">{{ __('service_provider.customer_reviews_title') }}
+                        <div class="mt-5">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="fw-bold text-primary">
+                                    <i class="fas fa-star me-2"></i>{{ __('service_provider.customer_reviews_title') }}
+                                </h4>
+                                @if(auth()->check() && auth()->user()->isClient() && !$hasReviewed)
+                                    <button class="btn btn-primary" onclick="openReviewModal()">
+                                        <i class="fas fa-pen me-2"></i>{{ __('reviews.write_review') }}
+                                    </button>
+                                @endif
+                            </div>
 
-                                @if($serviceProvider->reviews->count() > 0)
-                                <div class="reviews-container">
-                                    @foreach($serviceProvider->reviews->take(3) as $review)
-                                    <div class="review-card">
-                                        <div class="review-header">
-                                            @if($review->user->avatar)
-                                            <img src="{{ asset('storage/' . $review->user->avatar) }}"
-                                                alt="{{ $review->user->name }}" class="review-avatar">
-                                            @else
-                                            <div
-                                                class="review-avatar bg-primary text-white d-flex align-items-center justify-content-center">
-                                                <i class="fas fa-user"></i>
-                                            </div>
-                                            @endif
-                                            <div>
-                                                <h6 class="mb-0 fw-bold">{{ $review->user->name }}</h6>
-                                                <div class="review-rating">
-                                                    @for($i = 1; $i <= 5; $i++) @if($i <=$review->rating)
-                                                        <i class="fas fa-star"></i>
-                                                        @else
-                                                        <i class="far fa-star"></i>
-                                                        @endif
+                            @if($reviewStats['total_count'] > 0)
+                                <!-- Rating Summary -->
+                                <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                    <div class="card-body p-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-4 text-center">
+                                                <div class="rating-big">
+                                                    <span class="display-3 fw-bold text-primary">{{ number_format($reviewStats['average_rating'], 1) }}</span>
+                                                    <div class="stars-large mt-2" style="font-size: 1.5rem; color: #f59e0b;">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            @if($i <= round($reviewStats['average_rating']))
+                                                                <i class="fas fa-star"></i>
+                                                            @else
+                                                                <i class="far fa-star"></i>
+                                                            @endif
                                                         @endfor
+                                                    </div>
+                                                    <p class="text-muted mt-2">{{ $reviewStats['total_count'] }} {{ __('reviews.reviews_total') }}</p>
                                                 </div>
                                             </div>
-                                            <div class="ms-auto text-muted small">
-                                                {{ $review->created_at->diffForHumans() }}
+                                            <div class="col-md-8">
+                                                @foreach([5, 4, 3, 2, 1] as $star)
+                                                    @php
+                                                        $count = $reviewStats[$star . '_star'] ?? 0;
+                                                        $percentage = $reviewStats['total_count'] > 0 ? ($count / $reviewStats['total_count']) * 100 : 0;
+                                                    @endphp
+                                                    <div class="rating-bar d-flex align-items-center mb-2">
+                                                        <span class="me-2" style="min-width: 20px;">{{ $star }}</span>
+                                                        <i class="fas fa-star text-warning me-2" style="font-size: 0.75rem;"></i>
+                                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $percentage }}%"></div>
+                                                        </div>
+                                                        <span class="ms-2 text-muted" style="min-width: 40px; font-size: 0.875rem;">{{ $count }}</span>
+                                                    </div>
+                                                @endforeach
                                             </div>
                                         </div>
-                                        <p>{{ $review->comment }}</p>
                                     </div>
-                                    @endforeach
+                                </div>
 
-                                    @if($serviceProvider->reviews->count() > 3)
-                                    <div class="text-center mt-4">
-                                        <button class="btn btn-outline-primary">View All Reviews</button>
+                                <!-- Reviews List -->
+                                <div class="reviews-container">
+                                    @foreach($reviews as $review)
+                                        <div class="review-card" style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                                            <div class="review-header" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                                <div class="review-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 1rem;">
+                                                    {{ strtoupper(substr($review->client->name ?? 'U', 0, 1)) }}
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold">{{ $review->client->name ?? __('reviews.anonymous') }}</h6>
+                                                    <div class="review-rating" style="color: #f59e0b;">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            @if($i <= $review->rating)
+                                                                <i class="fas fa-star"></i>
+                                                            @else
+                                                                <i class="far fa-star"></i>
+                                                            @endif
+                                                        @endfor
+                                                        <span class="text-muted ms-2" style="font-size: 0.875rem;">{{ $review->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                </div>
+                                                @if($review->is_featured)
+                                                    <span class="badge bg-warning" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+                                                        <i class="fas fa-thumbs-up me-1"></i>{{ __('reviews.featured') }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <p class="mb-0" style="color: #4b5563; line-height: 1.6;">{{ $review->review_text }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <!-- Pagination -->
+                                @if($reviews->hasPages())
+                                    <div class="d-flex justify-content-center mt-4">
+                                        {{ $reviews->links() }}
                                     </div>
+                                @endif
+                            @else
+                                <div class="text-center py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 16px;">
+                                    <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">{{ __('reviews.no_reviews_yet') }}</p>
+                                    @if(auth()->check() && auth()->user()->isClient())
+                                        <button class="btn btn-primary mt-2" onclick="openReviewModal()">
+                                            <i class="fas fa-pen me-2"></i>{{ __('reviews.be_first_review') }}
+                                        </button>
                                     @endif
                                 </div>
-                                @else
-                                <div class="text-center py-4">
-                                    <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
-                                    <p class="text-muted">No reviews yet. Be the first to review!</p>
-                                </div>
-                                @endif
-                        </div> --}}
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1663,9 +1716,102 @@
         </div>
     </div>
 
+    <!-- Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none;">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h5 class="modal-title text-white fw-bold" id="reviewModalLabel">
+                        <i class="fas fa-star me-2"></i>{{ __('reviews.write_review') }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="reviewForm" action="{{ route('reviews.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="service_provider_id" value="{{ $serviceProvider->id }}">
+                    <div class="modal-body p-4">
+                        <!-- Rating -->
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-bold d-block mb-3">{{ __('reviews.your_rating') }}</label>
+                            <div class="star-rating-input" style="font-size: 2rem; color: #d1d5db; cursor: pointer;">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star rating-star" data-rating="{{ $i }}" onclick="setRating({{ $i }})"></i>
+                                @endfor
+                            </div>
+                            <input type="hidden" name="rating" id="ratingInput" value="5" required>
+                            <small class="text-muted rating-text">{{ __('reviews.excellent') }}</small>
+                        </div>
+
+                        <!-- Review Text -->
+                        <div class="mb-3">
+                            <label for="reviewText" class="form-label fw-bold">{{ __('reviews.your_review') }}</label>
+                            <textarea class="form-control" id="reviewText" name="review_text" rows="4"
+                                placeholder="{{ __('reviews.review_placeholder') }}" required minlength="10" maxlength="1000"
+                                style="border-radius: 12px; resize: none;"></textarea>
+                            <small class="text-muted char-count">0 / 1000</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            {{ __('general.cancel') }}
+                        </button>
+                        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                            <i class="fas fa-paper-plane me-2"></i>{{ __('reviews.submit_review') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
+        // Review Modal Functions
+        function openReviewModal() {
+            const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+            modal.show();
+        }
+
+        function setRating(rating) {
+            document.getElementById('ratingInput').value = rating;
+            const stars = document.querySelectorAll('.rating-star');
+            const ratingTexts = {
+                1: '{{ __('reviews.poor') }}',
+                2: '{{ __('reviews.fair') }}',
+                3: '{{ __('reviews.good') }}',
+                4: '{{ __('reviews.very_good') }}',
+                5: '{{ __('reviews.excellent') }}'
+            };
+
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.style.color = '#f59e0b';
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.style.color = '#d1d5db';
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+
+            document.querySelector('.rating-text').textContent = ratingTexts[rating];
+        }
+
+        // Character counter for review
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviewText = document.getElementById('reviewText');
+            if (reviewText) {
+                reviewText.addEventListener('input', function() {
+                    document.querySelector('.char-count').textContent = this.value.length + ' / 1000';
+                });
+            }
+
+            // Initialize rating
+            setRating(5);
+        });
+
         // Validate file size before upload
         function validateFileSize(input, maxSizeMB) {
             if (input.files && input.files[0]) {

@@ -69,4 +69,7 @@ return [
     'reset_password_button' => 'Reset Password',
     'verify_email_instructions' => 'Before continuing, please verify your email address by clicking on the link we just emailed to you.',
     'verification_link_sent' => 'A fresh verification link has been sent to your email address.',
+
+    // Account Status
+    'account_disabled' => 'Your account is disabled. Please contact admin.',
 ];

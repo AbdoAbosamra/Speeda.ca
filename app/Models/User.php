@@ -16,6 +16,7 @@ class User extends Authenticatable
         'password',
         'profession',
         'role', // allow setting role during registration
+        'is_active', // user account status
     ];
 
     protected $hidden = [
@@ -28,6 +29,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -99,6 +101,25 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    /**
+     * Check if user account is active
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active ?? true; // Default to true if column doesn't exist
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', false);
     }
 
     // Legacy cleanup: hasServiceProviderProfile() method removed

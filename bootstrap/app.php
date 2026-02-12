@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TrackVisitor;
+use App\Http\Middleware\CheckUserStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,16 +15,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Add SetLocale and TrackVisitor to web middleware group (runs after StartSession)
+        // Add SetLocale, TrackVisitor, and CheckUserStatus to web middleware group
         $middleware->web(append: [
             SetLocale::class,
             TrackVisitor::class,
+            CheckUserStatus::class, // Check if user account is active
         ]);
 
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'handle.large.uploads' => \App\Http\Middleware\HandleLargeUploads::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'check.user.status' => \App\Http\Middleware\CheckUserStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

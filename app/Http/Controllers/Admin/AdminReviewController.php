@@ -25,14 +25,14 @@ class AdminReviewController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Review::with(['client', 'serviceProviderProfile', 'approvedBy'])
+            $query = Review::with(['client', 'serviceProvider', 'approvedBy'])
                 ->orderByDesc('created_at');
 
             // Filter by status
             if ($request->get('status') === 'active') {
                 $query->where('is_active', true);
             } elseif ($request->get('status') === 'pending') {
-                $query->where('is_active', false);
+                $query->where('is_active', false)->whereNull('admin_approved_at');
             }
 
             // Filter by rating
@@ -42,12 +42,22 @@ class AdminReviewController extends Controller
 
             // Filter by provider
             if ($request->has('provider_id')) {
-                $query->where('service_provider_profile_id', $request->get('provider_id'));
+                $query->where('service_provider_id', $request->get('provider_id'));
             }
 
             $reviews = $query->paginate(20);
 
-            return view('admin.reviews.index', compact('reviews'));
+            // Get statistics for dashboard
+            $stats = [
+                'total' => Review::count(),
+                'pending' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
+                'approved' => Review::where('is_active', true)->count(),
+                'rejected' => Review::where('is_active', false)->whereNotNull('admin_approved_at')->count(),
+                'featured' => Review::where('is_featured', true)->count(),
+                'average_rating' => Review::where('is_active', true)->avg('rating') ?? 0,
+            ];
+
+            return view('admin.reviews.index', compact('reviews', 'stats'));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
@@ -61,7 +71,7 @@ class AdminReviewController extends Controller
     public function show(Review $review)
     {
         try {
-            $review->load(['client', 'serviceProviderProfile.user', 'approvedBy', 'booking']);
+            $review->load(['client', 'serviceProvider.user', 'approvedBy', 'booking']);
             return view('admin.reviews.show', compact('review'));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);

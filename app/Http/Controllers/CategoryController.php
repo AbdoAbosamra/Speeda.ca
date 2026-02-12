@@ -1,79 +1,135 @@
 <?php
 
-// app/Http/Controllers/CategoryController.php
-
 namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class CategoryController extends Controller
 {
     /**
-     * Display all main sections and stats
+     * Display all main sections and stats (Frontend)
      */
     public function index(Request $request)
     {
-        // Get search query if provided
-        $search = $request->input('search');
+        // Use caching for better performance
+        $cacheKey = 'categories_frontend_' . md5($request->fullUrl());
+        
+        $data = Cache::remember($cacheKey, 300, function () use ($request) {
+            // Get search query if provided
+            $search = $request->input('search');
 
-        // Get selected city by id or by name (support ?city_id=3 or ?city=Montreal)
-        if ($request->filled('city_id')) {
-            $selectedCity = Location::find($request->get('city_id'));
-        } elseif ($request->filled('city')) {
-            $selectedCity = Location::where('city', $request->get('city'))->first();
-        } else {
-            $selectedCity = null;
-        }
+            // Get selected city by id or by name (support ?city_id=3 or ?city=Montreal)
+            if ($request->filled('city_id')) {
+                $selectedCity = Location::find($request->get('city_id'));
+            } elseif ($request->filled('city')) {
+                $selectedCity = Location::where('city', $request->get('city'))->first();
+            } else {
+                $selectedCity = null;
+            }
 
-        // For views we prefer passing a simple city name (string) instead of model objects
-        $selectedCityName = $selectedCity ? ($selectedCity->city ?? (string) $selectedCity) : null;
-
-        // Build query for sections
-        $sectionsQuery = Category::with(['children' => function ($query) use ($search) {
-            $query->withCount('serviceProviders')
-                ->active()
+            // Get ONLY ACTIVE categories for frontend visibility
+            $categoriesQuery = Category::with(['parent', 'serviceProviders' => function ($query) {
+                    // Safe filtering: Only apply if is_active column exists
+                    if (Schema::hasColumn('service_providers', 'is_active')) {
+                        $query->where('is_active', true); // Only active service providers
+                    }
+                }])
+                ->where('is_active', true) // Frontend: Only show active categories
+                ->orderBy('sort_order')
                 ->orderBy('name');
 
-            // Apply search filter to subcategories if search term provided
+            // Apply search filter
             if ($search) {
-                $query->where(function($q) use ($search) {
-                    $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('description', 'LIKE', "%{$search}%")
-                      ->orWhere('slug', 'LIKE', "%{$search}%");
+                $categoriesQuery->where('name', 'LIKE', '%' . $search . '%');
+            }
+
+            // Apply city filter with safe filtering
+            if ($selectedCity) {
+                $categoriesQuery->whereHas('serviceProviders', function ($query) use ($selectedCity) {
+                    $query->where('location_id', $selectedCity->id);
+                    // Safe filtering: Only apply if is_active column exists
+                    if (Schema::hasColumn('service_providers', 'is_active')) {
+                        $query->where('is_active', true);
+                    }
                 });
             }
-        }])
-            ->sections()
-            ->active()
-            ->orderBy('sort_order');
 
-        // Apply search filter to sections if search term provided
-        if ($search) {
-            $sectionsQuery->where(function($query) use ($search) {
-                $query->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('description', 'LIKE', "%{$search}%")
-                      ->orWhere('slug', 'LIKE', "%{$search}%")
-                      ->orWhereHas('children', function($q) use ($search) {
-                          $q->where('name', 'LIKE', "%{$search}%")
-                            ->orWhere('description', 'LIKE', "%{$search}%")
-                            ->orWhere('slug', 'LIKE', "%{$search}%");
-                      });
-            });
+            $categories = $categoriesQuery->paginate(20);
+
+            // Get only active locations for frontend
+            $locations = Location::where('is_active', true)
+                ->orderBy('city')
+                ->get();
+
+            // Prepare sections data for the existing view
+            $sections = Category::where('is_section', true)
+                ->where('is_active', true)
+                ->with(['children' => function ($query) {
+                    $query->where('is_active', true)->orderBy('sort_order')->orderBy('name');
+                }])
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+
+            // Calculate stats
+            $stats = [
+                'totalSections' => $sections->count(),
+                'totalCategories' => $categories->total(),
+                'activeCategories' => $categories->count(),
+                'totalProviders' => ServiceProvider::where('is_active', true)->count(),
+            ];
+
+            return [
+                'sections' => $sections,
+                'categories' => $categories,
+                'locations' => $locations,
+                'selectedCity' => $selectedCity,
+                'search' => $search,
+                'stats' => $stats
+            ];
+        });
+
+        return view('categories', $data);
+    }
+
+    /**
+     * Display specified category (Frontend) - SEO-friendly with slug
+     */
+    public function show(Category $category)
+    {
+        // Only show active categories on frontend
+        if (!$category->is_active) {
+            abort(404);
         }
 
-        $sections = $sectionsQuery->get();        // Stats for UI counters
-        $stats = [
-            'totalSections' => Category::sections()->active()->count(),
-            'totalCategories' => Category::subcategories()->active()->count(),
-            'totalProviders' => ServiceProvider::verified()->count(),
-            'totalLocations' => Location::active()->count(),
-        ];
+        // Use caching for category details
+        $cacheKey = 'category_show_' . $category->id;
+        
+        $data = Cache::remember($cacheKey, 300, function () use ($category) {
+            $category->load([
+                'parent',
+                'children' => function ($query) {
+                    $query->where('is_active', true)->orderBy('sort_order')->orderBy('name');
+                },
+                'serviceProviders' => function ($query) {
+                    $query->with('location');
+                    // Safe filtering: Only apply if is_active column exists
+                    if (Schema::hasColumn('service_providers', 'is_active')) {
+                        $query->where('is_active', true); // Only active service providers
+                    }
+                }
+            ]);
 
-        return view('categories', compact('sections', 'stats'))
-            ->with('selectedCity', $selectedCityName)
-            ->with('search', $search);
+            return [
+                'category' => $category
+            ];
+        });
+
+        return view('categories.show', $data);
     }
 }

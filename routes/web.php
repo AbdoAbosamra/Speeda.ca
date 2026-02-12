@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
@@ -40,6 +41,7 @@ Route::get('/test-translations', function () {
 // Static pages
 Route::get('/locations', [LocationController::class, 'index'])->name('location');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::view('/privacy-policy', 'Static.PrivacyPolicy')->name('privacy-policy');
 Route::view('/terms-of-service', 'Static.terms-of-service')->name('terms-of-service');
 Route::view('/help-center', 'Static.help-center')->name('help-center');
@@ -161,13 +163,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Categories
+    // Categories Management (using IDs, no slugs)
     Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
-    Route::put('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
-    Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('categories.delete');
-    Route::patch('/categories/{category}/deactivate', [AdminController::class, 'deactivateCategory'])->name('categories.deactivate');
-    Route::patch('/categories/{category}/activate', [AdminController::class, 'activateCategory'])->name('categories.activate');
+    Route::get('/categories/{category}/edit', [AdminController::class, 'editCategory'])->name('categories.edit');
+    Route::patch('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('categories.destroy');
+    Route::patch('/categories/{category}/toggle', [AdminController::class, 'toggleCategoryStatus'])->name('categories.toggle');
+
+    // Users Management (using IDs, no slugs)
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleUserStatus'])->name('users.toggle');
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
 
     // Locations
     Route::get('/locations', [AdminController::class, 'locations'])->name('locations');

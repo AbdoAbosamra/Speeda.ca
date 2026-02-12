@@ -167,6 +167,7 @@ return [
 
     // Additional error messages
     'image_too_large_dimensions' => 'Image dimensions are too large (max 5000x5000 pixels)',
+    'account_disabled' => 'This service provider account is no longer available.',
 
     // New buttons
     'recommend' => 'Recommend',

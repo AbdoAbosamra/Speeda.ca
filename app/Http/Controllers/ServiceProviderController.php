@@ -10,6 +10,7 @@ use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class ServiceProviderController extends Controller
@@ -21,6 +22,15 @@ class ServiceProviderController extends Controller
     {
         $query = ServiceProvider::with(['user', 'category', 'location']);
         // Remove is_verified filter to show all service providers
+
+        // Safe filtering: Only show providers whose users are active
+        // Using whereHas to filter by user status with safe check
+        $query->whereHas('user', function ($userQuery) {
+            // Safe check: Only filter if is_active column exists
+            if (Schema::hasColumn('users', 'is_active')) {
+                $userQuery->where('is_active', true);
+            }
+        });
 
         // Search filter
         if ($request->filled('search')) {
@@ -143,6 +153,15 @@ class ServiceProviderController extends Controller
     public function show(ServiceProvider $serviceProvider)
     {
         try {
+            // Check if the service provider's user is active (safe check)
+            if (Schema::hasColumn('users', 'is_active')) {
+                $user = $serviceProvider->user;
+                if ($user && !$user->is_active) {
+                    // User is deactivated - show 404
+                    abort(404, __('service_provider.account_disabled'));
+                }
+            }
+
             // Increment views only if not the owner
             if (!auth()->check() || auth()->id() !== $serviceProvider->user_id) {
                 DB::table('service_providers')
@@ -151,8 +170,32 @@ class ServiceProviderController extends Controller
                 $serviceProvider->refresh(); // Reload to get updated views count
             }
 
-            // Eager load relationships
-            $serviceProvider->loadMissing(['user', 'category', 'location']);
+            // Eager load relationships including reviews with client info
+            $serviceProvider->loadMissing([
+                'user',
+                'category',
+                'location',
+                'activeReviews.client',
+                'activeReviews.approvedBy',
+                'endorsements'
+            ]);
+
+            // Get approved reviews with pagination
+            $reviews = $serviceProvider->activeReviews()
+                ->with(['client', 'approvedBy'])
+                ->orderByDesc('created_at')
+                ->paginate(5, ['*'], 'reviews_page');
+
+            // Get review statistics
+            $reviewStats = [
+                'total_count' => $serviceProvider->activeReviews()->count(),
+                'average_rating' => $serviceProvider->rating ?? 0,
+                'five_star' => $serviceProvider->activeReviews()->where('rating', 5)->count(),
+                'four_star' => $serviceProvider->activeReviews()->where('rating', 4)->count(),
+                'three_star' => $serviceProvider->activeReviews()->where('rating', 3)->count(),
+                'two_star' => $serviceProvider->activeReviews()->where('rating', 2)->count(),
+                'one_star' => $serviceProvider->activeReviews()->where('rating', 1)->count(),
+            ];
 
             // Get all locations for dropdown (not needed for public view, only for owner edit)
             $locations = Location::orderBy('city')->get();
@@ -175,13 +218,30 @@ class ServiceProviderController extends Controller
             // Get all categories for dropdown (needed for the search bar in header)
             $categories = Category::orderBy('name')->get();
 
+            // Check if current user has already reviewed this provider
+            $hasReviewed = auth()->check() && auth()->user()->isClient()
+                ? $serviceProvider->reviews()->where('client_id', auth()->id())->exists()
+                : false;
+
+            // Check if current user has rated this provider
+            $userRating = null;
+            if (auth()->check()) {
+                $userRating = \App\Models\Rating::where('user_id', auth()->id())
+                    ->where('service_provider_id', $serviceProvider->id)
+                    ->first();
+            }
+
             return view('service-providers.show', compact(
                 'serviceProvider',
+                'reviews',
+                'reviewStats',
                 'locations',
                 'categories',
                 'similarProviders',
                 'formattedNumber',
-                'isContactRevealed'
+                'isContactRevealed',
+                'hasReviewed',
+                'userRating'
             ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);

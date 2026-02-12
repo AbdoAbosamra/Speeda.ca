@@ -14,8 +14,14 @@ class Category extends Model
 
     protected $fillable = [
         'name',
+        'name_ar',
+        'name_en',
+        'name_fr',
         'slug',
         'description',
+        'description_ar',
+        'description_en',
+        'description_fr',
         'icon',
         'color',
         'is_section',
@@ -110,71 +116,41 @@ class Category extends Model
     // Methods
 
     /**
-     * Get translated category name based on current locale
+     * Get localized name based on current locale
      */
-    public function getTranslatedNameAttribute(): string
+    public function getLocalizedNameAttribute(): string
     {
-        // Convert category name to translation key format
-        // Example: "Car Mechanics" -> "car_mechanics"
-        // Example: "Cars Inspections (Safety) for Uber" -> "cars_inspections_safety_for_uber"
-        // Example: "Accounting & Bookkeeping + Tax Preparation" -> "accounting_bookkeeping_tax_preparation"
-        $translationKey = strtolower($this->name);
-
-        // Remove parentheses and their content
-        $translationKey = preg_replace('/\([^)]+\)/', '', $translationKey);
-
-        // Replace spaces, slashes, ampersands, plus signs, and hyphens with underscores
-        $translationKey = str_replace([' ', '/', '&', '+', '-', '(', ')'], ['_', '_', '_', '_', '_', '', ''], $translationKey);
-
-        // Remove multiple underscores
-        $translationKey = preg_replace('/_+/', '_', $translationKey);
-
-        // Trim underscores from start and end
-        $translationKey = trim($translationKey, '_');
-
-        // Try to get translation from categories file
-        $translated = __('categories.' . $translationKey);
-
-        // If translation not found (returns the key itself), return original name
-        if ($translated === 'categories.' . $translationKey) {
-            return $this->name;
-        }
-
-        return $translated;
+        $locale = app()->getLocale();
+        $field = 'name_' . $locale;
+        
+        return $this->$field ?? $this->name_ar ?? $this->name_en ?? $this->name ?? '';
     }
 
     /**
-     * Get translated category description based on current locale
+     * Get localized description based on current locale
+     */
+    public function getLocalizedDescriptionAttribute(): string
+    {
+        $locale = app()->getLocale();
+        $field = 'description_' . $locale;
+        
+        return $this->$field ?? $this->description_ar ?? $this->description_en ?? $this->description ?? '';
+    }
+
+    /**
+     * Get translated category name based on current locale (legacy method)
+     */
+    public function getTranslatedNameAttribute(): string
+    {
+        return $this->localized_name;
+    }
+
+    /**
+     * Get translated category description based on current locale (legacy method)
      */
     public function getTranslatedDescriptionAttribute(): string
     {
-        // Convert category name to translation key format
-        // Example: "Car Mechanics" -> "car_mechanics_desc"
-        // Example: "Cars Inspections (Safety) for Uber" -> "cars_inspections_safety_for_uber_desc"
-        // Example: "Accounting & Bookkeeping + Tax Preparation" -> "accounting_bookkeeping_tax_preparation_desc"
-        $translationKey = strtolower($this->name);
-
-        // Remove parentheses and their content
-        $translationKey = preg_replace('/\([^)]+\)/', '', $translationKey);
-
-        // Replace spaces, slashes, ampersands, plus signs, and hyphens with underscores
-        $translationKey = str_replace([' ', '/', '&', '+', '-', '(', ')'], ['_', '_', '_', '_', '_', '', ''], $translationKey);
-
-        // Remove multiple underscores
-        $translationKey = preg_replace('/_+/', '_', $translationKey);
-
-        // Trim underscores and add _desc suffix
-        $translationKey = trim($translationKey, '_') . '_desc';
-
-        // Try to get translation from categories file
-        $translated = __('categories.' . $translationKey);
-
-        // If translation not found (returns the key itself), return original description
-        if ($translated === 'categories.' . $translationKey) {
-            return $this->description ?? '';
-        }
-
-        return $translated;
+        return $this->localized_description;
     }
 
     public function isSection(): bool

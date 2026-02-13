@@ -12,8 +12,8 @@
                 <span class="badge bg-soft-indigo text-indigo px-3 py-2 rounded-pill mb-2 fw-semibold">
                     <i class="fas fa-home me-1"></i> Dashboard
                 </span>
-                <h1 class="display-6 fw-bold mb-1" style="color: var(--text-primary);">{{ __('admin.dashboard') }}</h1>
-                <p class="text-secondary fs-5 mb-0">{{ __('admin.welcome_back') }},
+                <h1 class="display-6 fw-bold mb-1" style="color: var(--text-primary);">Admin Dashboard</h1>
+                <p class="text-secondary fs-5 mb-0">Welcome back,
                     <span class="fw-semibold text-dark">{{ auth()->user()->name }}</span> 👋
                 </p>
             </div>
@@ -29,11 +29,11 @@
                             <span class="icon-circle bg-indigo-soft text-indigo">
                                 <i class="fas fa-users"></i>
                             </span>
-                            <span class="text-uppercase small fw-semibold text-secondary">{{ __('admin.live_visitors_label') }}</span>
+                            <span class="text-uppercase small fw-semibold text-secondary">Live Visitors</span>
                         </div>
                         <h2 class="fw-bold mb-0 display-5 live-count" style="color: #4f46e5;">{{ $stats['liveVisitors'] ?? 0 }}</h2>
                         <span class="badge bg-green-soft text-green mt-2">
-                            <i class="fas fa-circle fa-2xs me-1" style="color: #10b981;"></i> {{ __('admin.active_now') }}
+                            <i class="fas fa-circle fa-2xs me-1" style="color: #10b981;"></i> Active Now
                         </span>
                     </div>
                 </div>
@@ -47,10 +47,10 @@
                             <span class="icon-circle bg-pink-soft text-pink">
                                 <i class="fas fa-calendar-day"></i>
                             </span>
-                            <span class="text-uppercase small fw-semibold text-secondary">{{ __('admin.time_period_today') }}</span>
+                            <span class="text-uppercase small fw-semibold text-secondary">Today</span>
                         </div>
                         <h2 class="fw-bold mb-0 display-5" style="color: #db2777;">{{ $stats['visitorsToday'] ?? 0 }}</h2>
-                        <span class="text-secondary small fw-semibold mt-2 d-block">{{ __('admin.unique_visitors_label') }}</span>
+                        <span class="text-secondary small fw-semibold mt-2 d-block">Unique Visitors</span>
                     </div>
                 </div>
             </div>
@@ -63,10 +63,10 @@
                             <span class="icon-circle bg-blue-soft text-blue">
                                 <i class="fas fa-calendar-week"></i>
                             </span>
-                            <span class="text-uppercase small fw-semibold text-secondary">{{ __('admin.time_period_last_7_days') }}</span>
+                            <span class="text-uppercase small fw-semibold text-secondary">Last 7 Days</span>
                         </div>
                         <h2 class="fw-bold mb-0 display-5" style="color: #2563eb;">{{ $stats['last7Days'] ?? 0 }}</h2>
-                        <span class="text-green small fw-semibold mt-2 d-block"><i class="fas fa-check-circle me-1"></i> {{ __('admin.unique_visitors_label') }}</span>
+                        <span class="text-green small fw-semibold mt-2 d-block"><i class="fas fa-check-circle me-1"></i> Unique Visitors</span>
                     </div>
                 </div>
             </div>
@@ -79,10 +79,10 @@
                             <span class="icon-circle bg-green-soft text-green">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <span class="text-uppercase small fw-semibold text-secondary">{{ __('admin.time_period_last_30_days') }}</span>
+                            <span class="text-uppercase small fw-semibold text-secondary">Last 30 Days</span>
                         </div>
                         <h2 class="fw-bold mb-0 display-5" style="color: #059669;">{{ $stats['last30Days'] ?? 0 }}</h2>
-                        <span class="text-secondary small fw-semibold mt-2 d-block">{{ __('admin.unique_visitors_label') }}</span>
+                        <span class="text-secondary small fw-semibold mt-2 d-block">Unique Visitors</span>
                     </div>
                 </div>
             </div>
@@ -95,10 +95,10 @@
                             <span class="icon-circle bg-orange-soft text-orange">
                                 <i class="fas fa-chart-line"></i>
                             </span>
-                            <span class="text-uppercase small fw-semibold text-secondary">{{ __('admin.time_period_last_12_months') }}</span>
+                            <span class="text-uppercase small fw-semibold text-secondary">Last 12 Months</span>
                         </div>
                         <h2 class="fw-bold mb-0 display-5" style="color: #d97706;">{{ $stats['last12Months'] ?? 0 }}</h2>
-                        <span class="text-secondary small fw-semibold mt-2 d-block">{{ __('admin.unique_visitors_label') }}</span>
+                        <span class="text-secondary small fw-semibold mt-2 d-block">Unique Visitors</span>
                     </div>
                 </div>
             </div>
@@ -111,10 +111,10 @@
                             <span class="icon-circle bg-teal-soft text-teal">
                                 <i class="fas fa-infinity"></i>
                             </span>
-                            <span class="text-uppercase small fw-semibold text-secondary">{{ __('admin.time_period_all_time') }}</span>
+                            <span class="text-uppercase small fw-semibold text-secondary">All Time</span>
                         </div>
                         <h2 class="fw-bold mb-0 display-5" style="color: #0891b2;">{{ $stats['totalVisitors'] ?? 0 }}</h2>
-                        <span class="text-secondary small fw-semibold mt-2 d-block">{{ __('admin.total_unique_visitors_label') }}</span>
+                        <span class="text-secondary small fw-semibold mt-2 d-block">Total Unique Visitors</span>
                     </div>
                 </div>
             </div>
@@ -122,7 +122,7 @@
 
         {{-- Quick Actions – premium command cards --}}
         <div class="mb-5">
-            <h5 class="fw-bold mb-3">{{ __('Quick Actions') }}</h5>
+            <h5 class="fw-bold mb-3">Quick Actions</h5>
             <div class="row g-4">
                 <!-- Manage Locations -->
                 <div class="col-md-4">
@@ -132,7 +132,7 @@
                                 <i class="fas fa-map-marker-alt"></i>
                             </span>
                             <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.manage_locations') }}</h6>
+                                <h6 class="fw-bold mb-1 text-dark">Manage Locations</h6>
                                 <small class="text-secondary">{{ $stats['activeLocations'] ?? 0 }} Active / {{ $stats['totalLocations'] ?? 0 }} Total</small>
                             </div>
                             <i class="fas fa-chevron-right text-secondary"></i>
@@ -147,7 +147,7 @@
                                 <i class="fas fa-folder"></i>
                             </span>
                             <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.manage_categories') }}</h6>
+                                <h6 class="fw-bold mb-1 text-dark">Manage Categories</h6>
                                 <small class="text-secondary">{{ $stats['activeCategories'] ?? 0 }} Active / {{ $stats['totalCategories'] ?? 0 }} Total</small>
                             </div>
                             <i class="fas fa-chevron-right text-secondary"></i>
@@ -162,8 +162,8 @@
                                 <i class="fas fa-users-cog"></i>
                             </span>
                             <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.users_management') }}</h6>
-                                <small class="text-secondary">{{ $stats['totalUsers'] ?? 0 }} {{ __('admin.users') }}</small>
+                                <h6 class="fw-bold mb-1 text-dark">Users Management</h6>
+                                <small class="text-secondary">{{ $stats['totalUsers'] ?? 0 }} Users</small>
                             </div>
                             <i class="fas fa-chevron-right text-secondary"></i>
                         </div>
@@ -177,8 +177,8 @@
                                 <i class="fas fa-star"></i>
                             </span>
                             <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.reviews_management') }}</h6>
-                                <small class="text-secondary">{{ $stats['totalReviews'] ?? 0 }} {{ __('admin.reviews_total') }}</small>
+                                <h6 class="fw-bold mb-1 text-dark">Reviews Management</h6>
+                                <small class="text-secondary">{{ $stats['totalReviews'] ?? 0 }} Total Reviews</small>
                             </div>
                             <i class="fas fa-chevron-right text-secondary"></i>
                         </div>
@@ -189,7 +189,7 @@
 
         {{-- Moderation Queue & Alerts --}}
         <div class="mb-5">
-            <h5 class="fw-bold mb-3">{{ __('admin.moderation_queue') }}</h5>
+            <h5 class="fw-bold mb-3">Moderation Queue</h5>
             <div class="row g-4">
                 <!-- Pending Reviews -->
                 <div class="col-md-4">
@@ -199,11 +199,11 @@
                                 <i class="fas fa-star"></i>
                             </span>
                             <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.review_moderation') }}</h6>
+                                <h6 class="fw-bold mb-1 text-dark">Review Moderation</h6>
                                 <small class="text-secondary">
                                     @if(($stats['pendingReviews'] ?? 0) > 0)
                                         <span class="badge bg-warning bg-opacity-20 text-warning me-1">{{ $stats['pendingReviews'] }}</span>
-                                        {{ __('admin.awaiting_approval') }}
+                                        Awaiting Approval
                                     @else
                                         <i class="fas fa-check-circle text-success me-1"></i> No pending reviews
                                     @endif
@@ -245,7 +245,7 @@
                                 <i class="fas fa-user-plus"></i>
                             </span>
                             <div class="flex-grow-1">
-                                <h6 class="fw-bold mb-1 text-dark">{{ __('admin.new_users_today') }}</h6>
+                                <h6 class="fw-bold mb-1 text-dark">New Users Today</h6>
                                 <small class="text-secondary">
                                     <span class="badge bg-success me-1">{{ $stats['newUsersToday'] ?? 0 }}</span>
                                     registered today
@@ -265,11 +265,11 @@
                         <form action="{{ route('admin.clear-cache') }}" method="POST" class="d-flex">
                             @csrf
                             <button type="submit" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 py-3 fw-semibold" style="border: 2px dashed #e2e8f0; border-radius: 1rem;">
-                                <i class="fas fa-broom"></i> {{ __('admin.clear_caches') }}
+                                <i class="fas fa-broom"></i> Clear Caches
                             </button>
                         </form>
                         <small class="text-secondary d-block text-center mt-2 fw-medium" style="font-size: 0.8rem;">
-                            {{ __('admin.clear_cache_help_text') }}
+                            Clears all application caches for fresh data reload
                         </small>
                     </div>
                 </div>

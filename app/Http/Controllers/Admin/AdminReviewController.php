@@ -88,6 +88,7 @@ class AdminReviewController extends Controller
 
     /**
      * Approve a review (make it active/visible on website).
+     * Automatically recalculates provider rating.
      */
     public function approve(Review $review)
     {
@@ -100,21 +101,18 @@ class AdminReviewController extends Controller
             }
 
             return DB::transaction(function () use ($review, $admin) {
-                $review->update([
-                    'is_active' => true,
-                    'admin_approved_by' => $admin->id,
-                    'admin_approved_at' => now(),
-                ]);
+                // Call model's approve method which handles rating recalculation
+                $review->approve($admin);
 
                 Log::info('Review approved by admin', [
                     'review_id' => $review->id,
                     'admin_id' => $admin->id,
                     'client_id' => $review->client_id,
-                    'provider_id' => $review->service_provider_profile_id,
+                    'provider_id' => $review->service_provider_id,
                 ]);
 
                 ErrorHelper::flashNotification(
-                    __('admin.review_approved_successfully'),
+                    'Review approved successfully',
                     'success'
                 );
 
@@ -144,22 +142,19 @@ class AdminReviewController extends Controller
             $reason = $request->input('reason');
 
             return DB::transaction(function () use ($review, $admin, $reason) {
-                $review->update([
-                    'is_active' => false,
-                    'admin_approved_by' => $admin->id,
-                    'admin_approved_at' => now(),
-                ]);
+                // Call model's reject method which handles rating recalculation
+                $review->reject($admin);
 
                 Log::info('Review rejected by admin', [
                     'review_id' => $review->id,
                     'admin_id' => $admin->id,
                     'client_id' => $review->client_id,
-                    'provider_id' => $review->service_provider_profile_id,
+                    'provider_id' => $review->service_provider_id,
                     'reason' => $reason,
                 ]);
 
                 ErrorHelper::flashNotification(
-                    __('admin.review_rejected_successfully'),
+                    'Review rejected successfully',
                     'success'
                 );
 

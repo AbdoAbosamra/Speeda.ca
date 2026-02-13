@@ -38,6 +38,32 @@ Route::get('/test-translations', function () {
     ]);
 });
 
+// === DIAGNOSTIC ROUTE (Temporary for debugging) ===
+Route::get('/diagnostic', function () {
+    $totalSP = \App\Models\ServiceProvider::count();
+    $spWithImages = \App\Models\ServiceProvider::whereNotNull('profile_image')
+        ->where('profile_image', '!=', '')
+        ->count();
+
+    $serviceProviders = \App\Models\ServiceProvider::limit(3)->get();
+
+    $storageDir = storage_path('app/public/profile-images');
+    $storageFiles = [];
+    if (is_dir($storageDir)) {
+        $files = array_diff(scandir($storageDir), ['.', '..', '.gitignore']);
+        $storageFiles = array_values($files);
+    }
+    $storageCount = count($storageFiles);
+
+    return view('diagnostic', compact(
+        'totalSP',
+        'spWithImages',
+        'serviceProviders',
+        'storageFiles',
+        'storageCount'
+    ));
+})->name('diagnostic');
+
 // Static pages
 Route::get('/locations', [LocationController::class, 'index'])->name('location');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');

@@ -1,6 +1,6 @@
 <?php ($user = auth()->user()); ?>
 
-<?php if (! $__env->hasRenderedOnce('266ba0bd-db96-46fa-9dea-e663d3b78048')): $__env->markAsRenderedOnce('266ba0bd-db96-46fa-9dea-e663d3b78048'); ?>
+<?php if (! $__env->hasRenderedOnce('daec1712-c17a-4527-bf9d-42d21cd77189')): $__env->markAsRenderedOnce('daec1712-c17a-4527-bf9d-42d21cd77189'); ?>
     <style>
         /* ===============================================
            النظام اللوني الرباعي المتطور
@@ -209,7 +209,7 @@
         }
 
         .sp-brand img {
-            height: 75px;
+            height: 110px;
             width: auto;
             filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.12));
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
@@ -219,7 +219,7 @@
 
         /* Use transform (no layout change) instead of changing the image height to avoid navbar reflow */
         .sp-nav.scrolled .sp-brand img {
-            transform: scale(0.85);
+            transform: scale(0.94);
         }
 
         .sp-brand:hover img {
@@ -1076,7 +1076,7 @@
                 padding: 1.25rem 1.75rem;
                 gap: 1.25rem;
             }
-            .sp-brand img { height: 56px; }
+            .sp-brand img { height: 67.2px; }
             .sp-nav-toggle { display: flex; margin-left: 0; }
             .sp-nav-links {
                 position: absolute;
@@ -1135,7 +1135,7 @@
     </style>
 <?php endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('ac1a6ee1-3a9f-443b-b5ed-b69fd36887a5')): $__env->markAsRenderedOnce('ac1a6ee1-3a9f-443b-b5ed-b69fd36887a5'); ?>
+<?php if (! $__env->hasRenderedOnce('ad70cbb8-c974-41d5-a66c-a10f74614d6c')): $__env->markAsRenderedOnce('ad70cbb8-c974-41d5-a66c-a10f74614d6c'); ?>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.querySelector('.sp-nav');

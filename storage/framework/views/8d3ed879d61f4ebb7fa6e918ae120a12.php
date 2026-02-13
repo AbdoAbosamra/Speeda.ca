@@ -851,16 +851,9 @@
 
                     <!-- Profile Image -->
                     <div class="profile-image-container">
-                        <?php if($serviceProvider->profile_image): ?>
-                            <img src="<?php echo e(asset('storage/' . $serviceProvider->profile_image)); ?>"
-                                alt="<?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?>"
-                                class="profile-image" loading="lazy">
-                        <?php else: ?>
-                            <div
-                                class="profile-image d-flex align-items-center justify-content-center bg-primary text-white">
-                                <i class="fas fa-user fa-3x"></i>
-                            </div>
-                        <?php endif; ?>
+                        <img src="<?php echo e($serviceProvider->profile_image_url); ?>"
+                            alt="<?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?>"
+                            class="profile-image" loading="lazy">
                     </div>
 
                     <!-- Profile Content -->
@@ -1034,11 +1027,43 @@ unset($__errorArgs, $__bag); ?>
                                             <div class="mb-3">
                                                 <label
                                                     class="form-label fw-bold"><?php echo e(__('service_provider.job_specialization')); ?></label>
-                                                <input type="text" class="form-control bg-light"
-                                                    value="<?php echo e($serviceProvider->category->translated_name ?? __('service_provider.not_specified')); ?>"
-                                                    disabled readonly>
-                                                <small class="text-muted"><i
-                                                        class="fas fa-lock me-1"></i><?php echo e(__('service_provider.cannot_change_job')); ?></small>
+                                                
+                                                <?php
+                                                    $othersNames = ['other', 'others', 'أخرى'];
+                                                    $isOthersCategory = $serviceProvider->category && (
+                                                        in_array(strtolower(trim($serviceProvider->category->name)), $othersNames) ||
+                                                        in_array(strtolower(trim($serviceProvider->category->translated_name)), $othersNames)
+                                                    );
+                                                ?>
+
+                                                <?php if($isOthersCategory): ?>
+                                                    
+                                                    <select name="category_id" class="form-control form-control-lg" required>
+                                                        <option value="">-- <?php echo e(__('service_provider.select_category')); ?> --</option>
+                                                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($cat->id); ?>"
+                                                                <?php echo e(old('category_id', $serviceProvider->category_id) == $cat->id ? 'selected' : ''); ?>>
+                                                                <?php echo e($cat->translated_name ?? $cat->name); ?>
+
+                                                            </option>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                    </select>
+                                                    <small class="text-info d-block mt-2">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        <?php echo e(__('service_provider.you_can_change_category')); ?>
+
+                                                    </small>
+                                                <?php else: ?>
+                                                    
+                                                    <input type="text" class="form-control form-control-lg bg-light"
+                                                        value="<?php echo e($serviceProvider->category->translated_name ?? __('service_provider.not_specified')); ?>"
+                                                        disabled readonly>
+                                                    <small class="text-warning d-block mt-2">
+                                                        <i class="fas fa-lock me-1"></i>
+                                                        <?php echo e(__('service_provider.category_locked_message')); ?>
+
+                                                    </small>
+                                                <?php endif; ?>
                                             </div>
 
                                             <div class="mb-3">
@@ -1256,7 +1281,7 @@ unset($__errorArgs, $__bag); ?>
                                                 </small>
                                                 <?php if($serviceProvider->profile_image): ?>
                                                     <div class="mt-2">
-                                                        <img src="<?php echo e(asset('storage/' . $serviceProvider->profile_image)); ?>"
+                                                        <img src="<?php echo e($serviceProvider->profile_image_url); ?>"
                                                             class="rounded"
                                                             style="width: 80px; height: 80px; object-fit: cover;">
                                                         <small
@@ -1452,13 +1477,14 @@ unset($__errorArgs, $__bag); ?>
                                                 <?php $__currentLoopData = [5, 4, 3, 2, 1]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $star): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                     <?php
                                                         $count = $reviewStats[$star . '_star'] ?? 0;
-                                                        $percentage = $reviewStats['total_count'] > 0 ? ($count / $reviewStats['total_count']) * 100 : 0;
+                                                        $breakdown = $reviewStats['breakdown'][$star] ?? ['count' => 0, 'percentage' => 0];
+                                                        $percentage = $breakdown['percentage'] ?? 0;
                                                     ?>
                                                     <div class="rating-bar d-flex align-items-center mb-2">
                                                         <span class="me-2" style="min-width: 20px;"><?php echo e($star); ?></span>
                                                         <i class="fas fa-star text-warning me-2" style="font-size: 0.75rem;"></i>
                                                         <div class="progress flex-grow-1" style="height: 8px;">
-                                                            <div class="progress-bar bg-warning" role="progressbar" style="width: <?php echo e($percentage); ?>%"></div>
+                                                            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="<?php echo e($percentage); ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo e($percentage); ?>%"></div>
                                                         </div>
                                                         <span class="ms-2 text-muted" style="min-width: 40px; font-size: 0.875rem;"><?php echo e($count); ?></span>
                                                     </div>
@@ -1805,14 +1831,8 @@ unset($__errorArgs, $__bag); ?>
                             <div class="col-md-3 mb-4">
                                 <div class="similar-provider-card">
                                     <div class="similar-provider-image">
-                                        <?php if($similar->profile_image): ?>
-                                            <img src="<?php echo e(asset('storage/' . $similar->profile_image)); ?>"
-                                                alt="<?php echo e($similar->company_name ?? $similar->user->name); ?>" loading="lazy">
-                                        <?php else: ?>
-                                            <div class="h-100 d-flex align-items-center justify-content-center text-white">
-                                                <i class="fas fa-user fa-3x"></i>
-                                            </div>
-                                        <?php endif; ?>
+                                        <img src="<?php echo e($similar->profile_image_url); ?>"
+                                            alt="<?php echo e($similar->company_name ?? $similar->user->name); ?>" loading="lazy">
                                     </div>
                                     <div class="similar-provider-content">
                                         <h6 class="fw-bold mb-2"><?php echo e($similar->company_name ?? $similar->user->name); ?></h6>

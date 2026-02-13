@@ -19,9 +19,27 @@ class UpdateServiceProviderProfileRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
+     * SECURITY: This runs before validation to prepare data and enforce business rules.
      */
     protected function prepareForValidation(): void
     {
+        // === CATEGORY LOCK RULE: Prevent category changes if not "Others" ===
+        // BUSINESS RULE: Service providers can ONLY change category if current category = "Others"
+        $currentServiceProvider = $this->route('serviceProvider');
+        if ($currentServiceProvider && $currentServiceProvider->category) {
+            $currentCategory = $currentServiceProvider->category;
+            $othersNames = ['other', 'others', 'أخرى'];
+            $isOthersCategory = in_array(strtolower(trim($currentCategory->name)), $othersNames) ||
+                                in_array(strtolower(trim($currentCategory->translated_name)), $othersNames);
+
+            // If current category is NOT "Others", force remove category_id from input
+            // This prevents any attempt to change it (even via manual request manipulation)
+            if (!$isOthersCategory && $this->has('category_id')) {
+                // Remove category_id from the request entirely
+                $this->request->remove('category_id');
+            }
+        }
+
         // Get current service provider's phone to avoid unique check issues
         $currentPhone = $this->route('serviceProvider')->phone ?? null;
 

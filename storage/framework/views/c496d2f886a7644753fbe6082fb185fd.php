@@ -6,12 +6,11 @@
         <div class="container py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="h3 fw-bold mb-1"><?php echo e(__('admin.manage_reviews')); ?></h1>
-                    <p class="text-muted mb-0"><?php echo e(__('admin.manage_all_reviews')); ?></p>
+                    <h1 class="h3 fw-bold mb-1">Manage Reviews</h1>
+                    <p class="text-muted mb-0">View and manage all service provider reviews</p>
                 </div>
                 <a href="<?php echo e(route('admin.dashboard')); ?>" class="btn btn-outline-secondary rounded-pill px-3">
-                    <i class="fas fa-arrow-left me-2"></i><?php echo e(__('admin.back_to_dashboard')); ?>
-
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                 </a>
             </div>
 
@@ -22,25 +21,22 @@
                         <div class="d-flex gap-2 flex-wrap">
                             <a href="<?php echo e(route('admin.reviews')); ?>"
                                 class="btn <?php echo e(!request('status') ? 'btn-primary' : 'btn-outline-secondary'); ?> rounded-pill px-3">
-                                <i class="fas fa-list me-1"></i><?php echo e(__('admin.all')); ?>
-
+                                <i class="fas fa-list me-1"></i>All
                             </a>
                             <a href="<?php echo e(route('admin.reviews', ['status' => 'pending'])); ?>"
                                 class="btn <?php echo e(request('status') === 'pending' ? 'btn-warning' : 'btn-outline-secondary'); ?> rounded-pill px-3">
-                                <i class="fas fa-clock me-1"></i><?php echo e(__('admin.pending')); ?>
-
+                                <i class="fas fa-clock me-1"></i>Pending
                             </a>
                             <a href="<?php echo e(route('admin.reviews', ['status' => 'active'])); ?>"
                                 class="btn <?php echo e(request('status') === 'active' ? 'btn-success' : 'btn-outline-secondary'); ?> rounded-pill px-3">
-                                <i class="fas fa-check me-1"></i><?php echo e(__('admin.approved')); ?>
-
+                                <i class="fas fa-check me-1"></i>Approved
                             </a>
                         </div>
                         <form method="GET" action="<?php echo e(route('admin.reviews')); ?>" class="d-flex align-items-center gap-2">
                             <?php if(request('status')): ?>
                                 <input type="hidden" name="status" value="<?php echo e(request('status')); ?>">
                             <?php endif; ?>
-                            <label for="per_page" class="text-muted small mb-0"><?php echo e(__('admin.show')); ?>:</label>
+                            <label for="per_page" class="text-muted small mb-0">Show:</label>
                             <select name="per_page" id="per_page" class="form-select form-select-sm rounded-pill" 
                                     style="width: auto; min-width: 80px;" onchange="this.form.submit()">
                                 <option value="10" <?php echo e(request('per_page', 20) == 10 ? 'selected' : ''); ?>>10</option>
@@ -48,7 +44,7 @@
                                 <option value="50" <?php echo e(request('per_page', 20) == 50 ? 'selected' : ''); ?>>50</option>
                                 <option value="100" <?php echo e(request('per_page', 20) == 100 ? 'selected' : ''); ?>>100</option>
                             </select>
-                            <span class="text-muted small"><?php echo e(__('admin.per_page')); ?></span>
+                            <span class="text-muted small">per page</span>
                         </form>
                     </div>
                 </div>
@@ -58,8 +54,7 @@
             <div class="card border-0 shadow-lg" style="border-radius: 16px; background: white;">
                 <div class="card-header bg-white" style="border-bottom: 2px solid #f1f5f9; border-radius: 16px 16px 0 0;">
                     <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-star me-2 text-warning"></i><?php echo e(__('admin.reviews_list')); ?>
-
+                        <i class="fas fa-star me-2 text-warning"></i>Reviews List
                         <span class="badge bg-secondary ms-2"><?php echo e($reviews->total()); ?></span>
                     </h5>
                 </div>
@@ -68,14 +63,13 @@
                         <table class="table table-hover mb-0">
                             <thead style="background: #f8fafc;">
                                 <tr>
-                                    <th class="fw-bold px-4 py-3"><?php echo e(__('admin.client')); ?></th>
-                                    <th class="fw-bold py-3"><?php echo e(__('admin.provider')); ?></th>
-                                    <th class="fw-bold py-3"><?php echo e(__('admin.review_title')); ?></th>
-                                    <th class="fw-bold py-3 text-center"><?php echo e(__('admin.rating')); ?></th>
-                                    <th class="fw-bold py-3"><?php echo e(__('admin.review_text')); ?></th>
-                                    <th class="fw-bold py-3"><?php echo e(__('admin.status')); ?></th>
-                                    <th class="fw-bold py-3"><?php echo e(__('admin.date')); ?></th>
-                                    <th class="fw-bold py-3 text-center"><?php echo e(__('admin.actions')); ?></th>
+                                    <th class="fw-bold px-4 py-3">Client</th>
+                                    <th class="fw-bold py-3">Provider</th>
+                                    <th class="fw-bold py-3 text-center">Rating</th>
+                                    <th class="fw-bold py-3">Review</th>
+                                    <th class="fw-bold py-3">Status</th>
+                                    <th class="fw-bold py-3">Date</th>
+                                    <th class="fw-bold py-3 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,7 +83,7 @@
 
                                                 </div>
                                                 <div>
-                                                    <strong><?php echo e($review->client->name ?? __('admin.unknown')); ?></strong>
+                                                    <strong><?php echo e($review->client->name ?? 'Unknown'); ?></strong>
                                                     <div class="text-muted small"><?php echo e($review->client->email ?? ''); ?></div>
                                                 </div>
                                             </div>
@@ -103,19 +97,12 @@
 
                                                     </div>
                                                     <div>
-                                                        <strong><?php echo e($review->serviceProvider->user->name ?? __('admin.unknown')); ?></strong>
+                                                        <strong><?php echo e($review->serviceProvider->user->name ?? 'Unknown'); ?></strong>
                                                         <div class="text-muted small">ID: <?php echo e($review->serviceProvider->id ?? 'N/A'); ?></div>
                                                     </div>
                                                 </div>
                                             <?php else: ?>
-                                                <span class="text-muted"><i class="fas fa-exclamation-circle me-1"></i><?php echo e(__('admin.not_available')); ?></span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="py-3">
-                                            <?php if(isset($review->title) && $review->title): ?>
-                                                <strong><?php echo e(Str::limit($review->title, 40)); ?></strong>
-                                            <?php else: ?>
-                                                <span class="text-muted">-</span>
+                                                <span class="text-muted"><i class="fas fa-exclamation-circle me-1"></i>Not Available</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="py-3 text-center">
@@ -145,24 +132,20 @@
                                         <td class="py-3">
                                             <?php if($review->is_active): ?>
                                                 <span class="badge rounded-pill px-3 py-2 bg-success">
-                                                    <i class="fas fa-check-circle me-1"></i><?php echo e(__('admin.approved')); ?>
-
+                                                    <i class="fas fa-check-circle me-1"></i>Approved
                                                 </span>
                                             <?php elseif($review->admin_approved_at): ?>
                                                 <span class="badge rounded-pill px-3 py-2 bg-danger">
-                                                    <i class="fas fa-times-circle me-1"></i><?php echo e(__('admin.rejected')); ?>
-
+                                                    <i class="fas fa-times-circle me-1"></i>Rejected
                                                 </span>
                                             <?php else: ?>
                                                 <span class="badge rounded-pill px-3 py-2 bg-warning text-dark">
-                                                    <i class="fas fa-clock me-1"></i><?php echo e(__('admin.pending')); ?>
-
+                                                    <i class="fas fa-clock me-1"></i>Pending
                                                 </span>
                                             <?php endif; ?>
                                             <?php if($review->is_featured): ?>
                                                 <span class="badge rounded-pill px-3 py-2 bg-info ms-1">
-                                                    <i class="fas fa-star me-1"></i><?php echo e(__('admin.featured')); ?>
-
+                                                    <i class="fas fa-star me-1"></i>Featured
                                                 </span>
                                             <?php endif; ?>
                                         </td>
@@ -177,7 +160,7 @@
                                                         class="d-inline">
                                                         <?php echo csrf_field(); ?>
                                                         <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 me-1"
-                                                            title="<?php echo e(__('admin.approve')); ?>">
+                                                            title="Approve">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
@@ -185,8 +168,8 @@
                                                         class="d-inline">
                                                         <?php echo csrf_field(); ?>
                                                         <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 me-1"
-                                                            title="<?php echo e(__('admin.reject')); ?>"
-                                                            onclick="return confirm('<?php echo e(__('admin.confirm_reject_review')); ?>');">
+                                                            title="Reject"
+                                                            onclick="return confirm('Are you sure you want to reject this review?');">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </form>
@@ -197,7 +180,7 @@
                                                         class="d-inline">
                                                         <?php echo csrf_field(); ?>
                                                         <button type="submit" class="btn btn-sm btn-info rounded-pill px-3 me-1"
-                                                            title="<?php echo e(__('admin.feature')); ?>">
+                                                            title="Feature">
                                                             <i class="fas fa-star"></i>
                                                         </button>
                                                     </form>
@@ -207,7 +190,7 @@
                                                         <?php echo csrf_field(); ?>
                                                         <button type="submit"
                                                             class="btn btn-sm btn-outline-info rounded-pill px-3 me-1"
-                                                            title="<?php echo e(__('admin.unfeature')); ?>">
+                                                            title="Unfeature">
                                                             <i class="far fa-star"></i>
                                                         </button>
                                                     </form>
@@ -215,12 +198,12 @@
 
                                                 <form action="<?php echo e(route('admin.reviews.delete', $review)); ?>" method="POST"
                                                     class="d-inline"
-                                                    onsubmit="return confirm('<?php echo e(__('admin.confirm_delete_review')); ?>');">
+                                                    onsubmit="return confirm('Are you sure you want to delete this review?');">
                                                     <?php echo csrf_field(); ?>
                                                     <?php echo method_field('DELETE'); ?>
                                                     <button type="submit"
                                                         class="btn btn-sm btn-outline-danger rounded-pill px-3"
-                                                        title="<?php echo e(__('admin.delete')); ?>">
+                                                        title="Delete">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -229,9 +212,9 @@
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <tr>
-                                        <td colspan="8" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
-                                            <p class="text-muted"><?php echo e(__('admin.no_reviews')); ?></p>
+                                            <p class="text-muted">No reviews found</p>
                                         </td>
                                     </tr>
                                 <?php endif; ?>
@@ -257,8 +240,7 @@
                     <div class="modal-content" style="border-radius: 16px; border: none;">
                         <div class="modal-header" style="background: linear-gradient(135deg, #4361ee, #3f37c9); border-radius: 16px 16px 0 0;">
                             <h5 class="modal-title text-white" id="reviewModalLabel<?php echo e($review->id); ?>">
-                                <i class="fas fa-comment-dots me-2"></i><?php echo e(__('admin.review_details')); ?>
-
+                                <i class="fas fa-comment-dots me-2"></i>Review Details
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -271,7 +253,7 @@
 
                                 </div>
                                 <div>
-                                    <strong><?php echo e($review->client->name ?? __('admin.unknown')); ?></strong>
+                                    <strong><?php echo e($review->client->name ?? 'Unknown'); ?></strong>
                                     <div class="text-muted small">
                                         <?php for($i = 1; $i <= 5; $i++): ?>
                                             <i class="fas fa-star <?php echo e($i <= $review->rating ? 'text-warning' : 'text-muted'); ?>" style="font-size: 0.75rem;"></i>
@@ -294,8 +276,8 @@
                             <div class="mt-3 pt-3" style="border-top: 1px solid #e2e8f0;">
                                 <small class="text-muted">
                                     <i class="fas fa-briefcase me-1"></i>
-                                    <?php echo e(__('admin.provider')); ?>:
-                                    <strong><?php echo e($review->serviceProvider->user->name ?? __('admin.not_available')); ?></strong>
+                                    Provider:
+                                    <strong><?php echo e($review->serviceProvider->user->name ?? 'Not Available'); ?></strong>
                                     <?php if($review->serviceProvider): ?>
                                         <span class="text-muted">(ID: <?php echo e($review->serviceProvider->id); ?>)</span>
                                     <?php endif; ?>
@@ -304,8 +286,7 @@
                         </div>
                         <div class="modal-footer" style="border-top: 1px solid #e2e8f0;">
                             <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
-                                <i class="fas fa-times me-1"></i><?php echo e(__('general.close')); ?>
-
+                                <i class="fas fa-times me-1"></i>Close
                             </button>
                         </div>
                     </div>

@@ -22,9 +22,16 @@ class ServiceProviderController extends Controller
     public function index(Request $request)
     {
         $query = ServiceProvider::with(['user', 'category', 'location'])
-            ->withCount(['activeReviews as reviews_count'])
-            ->withCount(['endorsements as endorsements_count']);
-        // Remove is_verified filter to show all service providers
+            ->withCount(['activeReviews as reviews_count', 'endorsements as endorsements_count'])
+            // Calculate live average rating from active reviews (SINGLE QUERY PER PROVIDER)
+            ->selectRaw(
+                'service_providers.*,
+                COALESCE(
+                    (SELECT AVG(rating) FROM service_provider_reviews
+                     WHERE service_provider_id = service_providers.id AND is_active = true),
+                    0
+                ) as live_rating'
+            );
 
         // Safe filtering: Only show providers whose users are active
         // Using whereHas to filter by user status with safe check
@@ -73,7 +80,8 @@ class ServiceProviderController extends Controller
             $query->where('location_id', $request->input('location'));
         }
 
-        $serviceProviders = $query->orderBy('rating', 'desc')
+        // Order by LIVE rating (from subquery) instead of stored rating
+        $serviceProviders = $query->orderByRaw('live_rating DESC')
             ->orderBy('views', 'desc')
             ->paginate(12);
 
@@ -188,16 +196,38 @@ class ServiceProviderController extends Controller
                 ')
                 ->first();
 
+            $totalCount = (int) ($activeReviewsData->total_count ?? 0);
+
+            // Build star breakdown with percentages
+            $starCounts = [
+                5 => (int) ($activeReviewsData->five_star ?? 0),
+                4 => (int) ($activeReviewsData->four_star ?? 0),
+                3 => (int) ($activeReviewsData->three_star ?? 0),
+                2 => (int) ($activeReviewsData->two_star ?? 0),
+                1 => (int) ($activeReviewsData->one_star ?? 0),
+            ];
+
+            // Calculate percentages for each star level
+            $starBreakdown = [];
+            foreach ($starCounts as $rating => $count) {
+                $percentage = $totalCount > 0 ? ($count / $totalCount) * 100 : 0;
+                $starBreakdown[$rating] = [
+                    'count' => $count,
+                    'percentage' => round($percentage, 1),
+                ];
+            }
+
             $reviewStats = [
-                'total_count' => (int) ($activeReviewsData->total_count ?? 0),
+                'total_count' => $totalCount,
                 'average_rating' => $activeReviewsData->average_rating
                     ? round($activeReviewsData->average_rating, 1)
                     : 0,
-                'five_star' => (int) ($activeReviewsData->five_star ?? 0),
-                'four_star' => (int) ($activeReviewsData->four_star ?? 0),
-                'three_star' => (int) ($activeReviewsData->three_star ?? 0),
-                'two_star' => (int) ($activeReviewsData->two_star ?? 0),
-                'one_star' => (int) ($activeReviewsData->one_star ?? 0),
+                '5_star' => $starCounts[5],
+                '4_star' => $starCounts[4],
+                '3_star' => $starCounts[3],
+                '2_star' => $starCounts[2],
+                '1_star' => $starCounts[1],
+                'breakdown' => $starBreakdown,
             ];
 
             // === STEP 2: Eager load relationships for display ===
@@ -234,8 +264,12 @@ class ServiceProviderController extends Controller
             $isContactRevealed = session()->has('revealed_contacts') &&
                 in_array($serviceProvider->id, session('revealed_contacts', []));
 
-            // Get all categories for dropdown (needed for the search bar in header)
-            $categories = Category::orderBy('name')->get();
+            // Get all child categories (all professions) for category dropdown in edit form
+            // Must match the categories loaded in profile() method to ensure consistency
+            $categories = Category::whereNotNull('parent_id')
+                ->where('is_active', 1)
+                ->orderBy('name')
+                ->get();
 
             // Check if current user has already reviewed this provider
             $hasReviewed = auth()->check() && auth()->user()->isClient()
@@ -475,8 +509,23 @@ class ServiceProviderController extends Controller
                 'location_id' => $validated['location_id'] ?? $serviceProvider->location_id,
             ];
 
-            // Don't allow category_id change after initial registration
-            // Remove this line to prevent category updates
+            // === CATEGORY LOCK ENFORCEMENT: Backend Rule (Defense in Depth) ===
+            // BUSINESS RULE: Only allow category change if CURRENT category = "Others"
+            // This is the SECOND validation layer - even if FormRequest is bypassed, this catches it
+            if ($serviceProvider->category) {
+                $othersNames = ['other', 'others', 'أخرى'];
+                $isOthersCategory = in_array(strtolower(trim($serviceProvider->category->name)), $othersNames) ||
+                                    in_array(strtolower(trim($serviceProvider->category->translated_name)), $othersNames);
+
+                // If current category is NOT "Others", reject any category_id in the request
+                if (!$isOthersCategory && isset($validated['category_id']) && $validated['category_id'] !== $serviceProvider->category_id) {
+                    throw new \Exception("Category cannot be changed. You can only change category if it is currently set to 'Others'.");
+                }
+            }
+
+            // Don't allow category_id change after initial registration (UNLESS current = "Others")
+            // Only include category_id in update if it came through validation and is allowed
+            // (already filtered by prepareForValidation() in FormRequest)
             // 'category_id' => $validated['category_id'] ?? $serviceProvider->category_id,
 
             // Handle services_offered (convert comma-separated string to array)
@@ -500,6 +549,11 @@ class ServiceProviderController extends Controller
             if (isset($validated['certification'])) {
                 $updateData['certification'] = $validated['certification'];
                 $updateData['is_certified'] = true;
+            }
+
+            // Add category if provided and allowed (FormRequest already filters/removes it if not allowed)
+            if (isset($validated['category_id'])) {
+                $updateData['category_id'] = $validated['category_id'];
             }
 
             // Update the service provider

@@ -1653,7 +1653,7 @@
                                 <div class="rating-display" data-provider-id="<?php echo e($provider->id); ?>">
                                     <div class="stars">
                                         <?php
-                                            $displayRating = $provider->display_rating ?? $provider->rating ?? 0;
+                                            $displayRating = $provider->live_rating ?? $provider->rating ?? 0;
                                             $reviewCount = $provider->reviews_count ?? 0;
                                         ?>
                                         <?php for($i = 1; $i <= 5; $i++): ?>

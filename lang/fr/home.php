@@ -63,4 +63,22 @@ return [
     'cookie_agree' => 'En poursuivant votre navigation, vous acceptez nos',
     'and' => 'et',
     'accept' => 'Accepter',
+
+    // Service Provider Section - Home Page
+    'sp_section_title' => 'Êtes-vous un prestataire de services au Canada?',
+    'sp_hero_intro' => 'Les clients recherchent activement',
+    'sp_hero_highlight' => 'des services comme les vôtres',
+    'sp_hero_cta' => 'Créez votre profil professionnel dès aujourd\'hui et soyez découvert par les clients qui ont besoin de vos services.',
+    'sp_create_profile_btn' => 'Créez votre profil gratuitement maintenant',
+    'sp_no_credit_card' => 'Pas de carte de crédit requise • Configuration en 5 minutes',
+    'sp_benefit1_title' => 'Pas de contrats',
+    'sp_benefit1_desc' => 'Commencez et arrêtez quand vous le souhaitez. Aucun engagement à long terme ou frais cachés.',
+    'sp_benefit2_title' => 'Pas de commissions',
+    'sp_benefit2_desc' => 'Gardez 100% de ce que vous gagnez. Nous ne prenons rien de votre travail acharné.',
+    'sp_benefit3_title' => 'Contrôle total',
+    'sp_benefit3_desc' => 'Vous décidez de vos tarifs, de votre emploi du temps et des clients avec lesquels vous travaillez.',
+    'client_free_forever' => 'Gratuit pour toujours:',
+    'client_free_forever_desc' => 'Accédez à toutes les fonctionnalités de Speeda dans cette version gratuitement, à jamais.',
+    'provider_join_free' => 'Rejoignez gratuitement — Offre limitée dans le temps:',
+    'provider_join_free_desc' => 'Devenez prestataire de services aujourd\'hui et conservez votre compte gratuit avant le lancement des plans d\'abonnement.',
 ];

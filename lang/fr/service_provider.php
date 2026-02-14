@@ -165,4 +165,16 @@ return [
 
     // Additional error messages
     'image_too_large_dimensions' => "Les dimensions de l'image sont trop grandes (max 5000x5000 pixels)",
+    'account_disabled' => 'Le compte de ce prestataire de services n\'est plus disponible.',
+
+    // New buttons
+    'recommend' => 'Recommander',
+    'recommended' => 'Recommandé',
+    'rate' => 'Évaluer',
+    'share' => 'Partager',
+    'rate_provider' => 'Évaluer le prestataire',
+    'view_full_profile' => 'Voir le profil complet',
+    'stat_views' => 'Vues',
+    'stat_recommends' => 'Recommandations',
+    'stat_years' => 'Années',
 ];

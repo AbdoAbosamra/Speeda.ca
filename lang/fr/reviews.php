@@ -1,0 +1,100 @@
+<?php
+
+return [
+    'title' => 'Avis',
+    'add_review' => 'Ajouter un avis',
+    'edit_review' => 'Modifier votre avis',
+    'delete_review' => 'Supprimer l\'avis',
+    'view_reviews' => 'Voir les avis',
+    'no_reviews' => 'Aucun avis pour le moment',
+    'no_reviews_yet' => 'Aucun avis pour le moment. Soyez le premier à partager votre expérience!',
+    'my_reviews' => 'Mes avis',
+
+    'rating' => 'Évaluation',
+    'rating_label' => 'Évaluer ce prestataire de services',
+    'review_text' => 'Votre avis',
+    'review_text_placeholder' => 'Partagez votre expérience avec ce prestataire de services (minimum 10 caractères)',
+    'review_placeholder' => 'Partagez votre expérience avec ce prestataire de services (minimum 10 caractères)',
+    'submit_review' => 'Soumettre l\'avis',
+    'write_review' => 'Ajouter un avis',
+    'be_first_review' => 'Soyez le premier à évaluer',
+    'your_rating' => 'Votre évaluation',
+    'your_review' => 'Votre avis',
+    'reviews_total' => 'avis',
+    'anonymous' => 'Anonyme',
+    'cannot_edit_approved_reviews' => 'Vous ne pouvez pas modifier un avis approuvé.',
+    'must_login_to_review' => 'Vous devez être connecté pour laisser un avis.',
+
+    'stars' => 'étoiles',
+    'average_rating' => 'Évaluation moyenne',
+    'total_reviews' => 'Total des avis',
+    'select_your_rating' => 'Sélectionnez votre évaluation',
+
+    'write_first_review' => 'Soyez le premier à évaluer ce prestataire de services',
+    'review_submitted_pending_approval' => 'Merci! Votre avis a été soumis et sera publié après révision par notre équipe.',
+    'review_updated_pending_reapproval' => 'Votre avis a été mis à jour et sera réexaminé par notre équipe.',
+    'review_deleted_successfully' => 'Votre avis a été supprimé avec succès.',
+    'review_cannot_edit_approved' => 'Vous ne pouvez pas modifier un avis approuvé. Veuillez contacter le support si des modifications sont nécessaires.',
+    'review_already_exists' => 'Vous avez déjà laissé un avis pour ce prestataire de services.',
+    'review_self_not_allowed' => 'Vous ne pouvez pas laisser un avis sur vous-même.',
+
+    'verified_purchase' => 'Achat vérifié',
+    'from_booking' => 'Basé sur la réservation',
+    'featured' => 'Avis vedette',
+
+    'pending_approval' => 'En attente d\'approbation',
+    'approved' => 'Approuvé',
+    'rejected' => 'Rejeté',
+
+    'helpful' => 'Utile',
+    'not_helpful' => 'Pas utile',
+    'report_review' => 'Signaler l\'avis',
+    'share_review' => 'Partager',
+
+    // Rating descriptors
+    'poor' => 'Pauvre - Besoin d\'amélioration',
+    'fair' => 'Acceptable - Quelques problèmes',
+    'good' => 'Bon - Service satisfaisant',
+    'very_good' => 'Très bon - À recommander',
+    'excellent' => 'Excellent - Service exceptionnel!',
+
+    'admin_panel' => [
+        'title' => 'Gestion des avis',
+        'all_reviews' => 'Tous les avis',
+        'pending_reviews' => 'Avis en attente',
+        'approved_reviews' => 'Avis approuvés',
+        'rejected_reviews' => 'Avis rejetés',
+        'featured_reviews' => 'Avis vedettes',
+
+        'review_id' => 'ID d\'avis',
+        'provider' => 'Prestataire',
+        'client' => 'Client',
+        'rating' => 'Évaluation',
+        'created_at' => 'Créé',
+        'status' => 'Statut',
+        'actions' => 'Actions',
+
+        'approve' => 'Approuver',
+        'reject' => 'Rejeter',
+        'feature' => 'Mettre en vedette',
+        'unfeature' => 'Retirer de la vedette',
+        'delete' => 'Supprimer',
+        'view' => 'Voir',
+
+        'rejection_reason' => 'Raison du rejet',
+        'reason_offensive' => 'Contenu offensant',
+        'reason_spam' => 'Spam',
+        'reason_irrelevant' => 'Hors de propos',
+        'reason_fake' => 'Semble faux',
+        'reason_other' => 'Autre',
+
+        'no_pending_reviews' => 'Pas d\'avis en attente',
+        'no_featured_reviews' => 'Pas d\'avis vedettes',
+
+        'review_approved_successfully' => 'Avis approuvé avec succès',
+        'review_rejected_successfully' => 'Avis rejeté avec succès',
+        'review_featured_successfully' => 'Avis mis en vedette avec succès',
+        'review_unfeatured_successfully' => 'Avis retiré de la vedette avec succès',
+        'review_deleted_successfully' => 'Avis supprimé avec succès',
+    ],
+];

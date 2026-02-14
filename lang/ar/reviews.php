@@ -21,6 +21,7 @@ return [
     'stars' => 'نجوم',
     'average_rating' => 'متوسط التقييم',
     'total_reviews' => 'إجمالي التقييمات',
+    'select_your_rating' => 'اختر تقييمك',
 
     'write_first_review' => 'كن أول من يقيّم مزود الخدمة هذا',
     'review_submitted_pending_approval' => 'شكراً! تم إرسال تقييمك وسيتم نشره بعد مراجعته من قبل فريقنا.',

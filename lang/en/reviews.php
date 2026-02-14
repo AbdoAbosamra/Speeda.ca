@@ -28,6 +28,7 @@ return [
     'stars' => 'stars',
     'average_rating' => 'Average Rating',
     'total_reviews' => 'Total Reviews',
+    'select_your_rating' => 'Select your rating',
 
     'write_first_review' => 'Be the first to review this service provider',
     'review_submitted_pending_approval' => 'Thank you! Your review has been submitted and will be published after our team reviews it.',

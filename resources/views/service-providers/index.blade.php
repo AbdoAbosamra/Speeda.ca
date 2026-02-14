@@ -1685,17 +1685,17 @@
                         <div class="stat-item">
                             <i class="fas fa-eye stat-icon"></i>
                             <div class="stat-value">{{ number_format($provider->views) }}</div>
-                            <div class="stat-label">Views</div>
+                            <div class="stat-label">{{ __('service_provider.stat_views') }}</div>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-thumbs-up stat-icon"></i>
                             <div class="stat-value" data-endorsements-count="{{ $provider->id }}">{{ $provider->endorsements_count ?? 0 }}</div>
-                            <div class="stat-label">Recommends</div>
+                            <div class="stat-label">{{ __('service_provider.stat_recommends') }}</div>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-briefcase stat-icon"></i>
                             <div class="stat-value">{{ $provider->experience_years ?? '0' }}</div>
-                            <div class="stat-label">Years</div>
+                            <div class="stat-label">{{ __('service_provider.stat_years') }}</div>
                         </div>
                     </div>
 
@@ -1710,13 +1710,13 @@
                                     @csrf
                                     <button type="submit" class="btn-action btn-recommend {{ $isEndorsed ? 'recommended' : '' }}">
                                         <i class="{{ $isEndorsed ? 'fas' : 'far' }} fa-thumbs-up"></i>
-                                        <span>{{ $isEndorsed ? 'Recommended' : 'Recommend' }}</span>
+                                        <span>{{ $isEndorsed ? __('service_provider.recommended') : __('service_provider.recommend') }}</span>
                                     </button>
                                 </form>
                             @else
                                 <button class="btn-action btn-recommend" disabled>
                                     <i class="far fa-thumbs-up"></i>
-                                    <span>Recommend</span>
+                                    <span>{{ __('service_provider.recommend') }}</span>
                                 </button>
                             @endif
 
@@ -1724,20 +1724,20 @@
                                 <button class="btn-action btn-rate"
                                         onclick="openRateModal({{ $provider->id }}, '{{ addslashes($provider->company_name ?? $provider->user->name) }}')">
                                     <i class="fas fa-star"></i>
-                                    <span>Rate Provider</span>
+                                    <span>{{ __('service_provider.rate_provider') }}</span>
                                 </button>
                             @else
                                 <a href="{{ route('register') }}?redirect={{ urlencode(route('reviews.create', $provider->id)) }}"
                                    class="btn-action btn-rate">
                                     <i class="fas fa-star"></i>
-                                    <span>Rate Provider</span>
+                                    <span>{{ __('service_provider.rate_provider') }}</span>
                                 </a>
                             @endif
                         </div>
 
                         <a href="{{ route('service-providers.show', $provider) }}" class="btn-profile">
                             <i class="fas fa-user-circle"></i>
-                            View Full Profile
+                            {{ __('service_provider.view_full_profile') }}
                         </a>
 
                         @if($provider->experience_years)
@@ -1835,7 +1835,7 @@
                                 </label>
                             @endfor
                         </div>
-                        <p class="rating-text" id="ratingText">Select your rating</p>
+                        <p class="rating-text" id="ratingText">{{ __('reviews.select_your_rating') }}</p>
                     </div>
 
                     <!-- حقل التقييم -->

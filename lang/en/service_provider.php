@@ -174,6 +174,12 @@ return [
 
     // New buttons
     'recommend' => 'Recommend',
+    'recommended' => 'Recommended',
     'rate' => 'Rate',
     'share' => 'Share',
+    'rate_provider' => 'Rate Provider',
+    'view_full_profile' => 'View Full Profile',
+    'stat_views' => 'Views',
+    'stat_recommends' => 'Recommends',
+    'stat_years' => 'Years',
 ];

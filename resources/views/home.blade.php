@@ -986,20 +986,20 @@
     <canvas id="bg-canvas"></canvas>
     <div class="client-search-container">
         <!-- Top Question -->
-        <h3 class="section-preheading">Are you a service provider in Canada?</h3>
+        <h3 class="section-preheading">{{ __('home.sp_section_title') }}</h3>
 
         <!-- Main Heading -->
         <div class="text-center">
             <h1 class="client-hero-title">
-                Clients are actively <br>
-                <span class="highlight-text">searching for services like yours</span>
+                {{ __('home.sp_hero_intro') }} <br>
+                <span class="highlight-text">{{ __('home.sp_hero_highlight') }}</span>
             </h1>
         </div>
 
         <!-- Subheading -->
         <div class="text-center">
             <p class="client-hero-subtitle">
-                Create your professional profile today and get discovered by clients who need your expertise.
+                {{ __('home.sp_hero_cta') }}
             </p>
         </div>
 
@@ -1008,10 +1008,10 @@
             <!-- Button structure updated to match provided code -->
             <button class="btn-3d">
                 <span class="button_top">
-                    <i class="fas fa-user-plus me-2"></i> Create Your Free Profile Now
+                    <i class="fas fa-user-plus me-2"></i> {{ __('home.sp_create_profile_btn') }}
                 </span>
             </button>
-            <div class="client-sub-cta">No credit card required • Setup in 5 minutes</div>
+            <div class="client-sub-cta">{{ __('home.sp_no_credit_card') }}</div>
         </div>
 
         <!-- Benefits Grid (One Line Layout) -->
@@ -1021,8 +1021,8 @@
                 <div class="client-icon-box">
                     <i class="fas fa-file-contract"></i>
                 </div>
-                <h4>No Contracts</h4>
-                <p>Start and stop anytime. No long-term commitments or hidden fees.</p>
+                <h4>{{ __('home.sp_benefit1_title') }}</h4>
+                <p>{{ __('home.sp_benefit1_desc') }}</p>
             </div>
 
             <!-- Card 2 -->
@@ -1030,8 +1030,8 @@
                 <div class="client-icon-box">
                     <i class="fas fa-percentage"></i>
                 </div>
-                <h4>No Commissions</h4>
-                <p>Keep 100% of what you earn. We don't take a cut from your hard work.</p>
+                <h4>{{ __('home.sp_benefit2_title') }}</h4>
+                <p>{{ __('home.sp_benefit2_desc') }}</p>
             </div>
 
             <!-- Card 3 -->
@@ -1039,8 +1039,8 @@
                 <div class="client-icon-box">
                     <i class="fas fa-user-cog"></i>
                 </div>
-                <h4>Full Control</h4>
-                <p>You decide your rates, schedule, and which clients to work with.</p>
+                <h4>{{ __('home.sp_benefit3_title') }}</h4>
+                <p>{{ __('home.sp_benefit3_desc') }}</p>
             </div>
         </div>
     </div>
@@ -1122,7 +1122,7 @@
                     <h3 class="card-title">{{ __('home.client_benefits_title') }}</h3>
                     <div class="promo-badge client-promo">
                         <i class="fas fa-star me-2"></i>
-                        <strong>Free — Forever:</strong> Access Speeda's full features in this version at no cost, for life.
+                        <strong>{{ __('home.client_free_forever') }}</strong> {{ __('home.client_free_forever_desc') }}
                     </div>
                     <ul class="benefit-list">
                         <li>
@@ -1169,7 +1169,7 @@
                     <h3 class="card-title">{{ __('home.provider_benefits_title') }}</h3>
                     <div class="promo-badge provider-promo">
                         <i class="fas fa-clock me-2"></i>
-                        <strong>Join Free — Limited Time Offer:</strong> Become a service provider today and keep your account free before subscription plans launch.
+                        <strong>{{ __('home.provider_join_free') }}</strong> {{ __('home.provider_join_free_desc') }}
                     </div>
                     <ul class="benefit-list">
                         <li>

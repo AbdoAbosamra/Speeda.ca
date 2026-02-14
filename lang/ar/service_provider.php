@@ -170,4 +170,9 @@ return [
     'recommend' => 'يوصى',
     'rate' => 'قيم',
     'share' => 'مشاركة',
+    'rate_provider' => 'قيّم المزود',
+    'view_full_profile' => 'عرض الملف الشخصي كاملاً',
+    'stat_views' => 'المشاهدات',
+    'stat_recommends' => 'التوصيات',
+    'stat_years' => 'السنوات',
 ];

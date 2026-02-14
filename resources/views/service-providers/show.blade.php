@@ -1647,7 +1647,7 @@
                             @if($serviceProvider->category->description)
                                 <div>
                                     <strong>{{ __('general.description') }}:</strong>
-                                    <p class="mt-1 small text-muted">{{ $serviceProvider->category->description }}</p>
+                                    <p class="mt-1 small text-muted">{{ $serviceProvider->category->translated_description }}</p>
                                 </div>
                             @endif
                         </div>

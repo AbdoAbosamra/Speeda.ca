@@ -39,6 +39,17 @@ class Category extends Model
         'metadata' => 'array'
     ];
 
+    /**
+     * Attributes that should be appended to the model's array/JSON representation
+     * These ensure accessors are always called when accessing the model
+     */
+    protected $appends = [
+        'localized_name',
+        'localized_description',
+        'translated_name',
+        'translated_description',
+    ];
+
     // Relationships
     public function parent()
     {
@@ -117,24 +128,48 @@ class Category extends Model
 
     /**
      * Get localized name based on current locale
+     * Fallback: locale-specific → English → default name
      */
     public function getLocalizedNameAttribute(): string
     {
         $locale = app()->getLocale();
-        $field = 'name_' . $locale;
         
-        return $this->$field ?? $this->name_ar ?? $this->name_en ?? $this->name ?? '';
+        // Try locale-specific column first (e.g., name_ar for Arabic)
+        $field = 'name_' . $locale;
+        if (!empty($this->$field)) {
+            return $this->$field;
+        }
+        
+        // Fallback: Try English
+        if (!empty($this->name_en)) {
+            return $this->name_en;
+        }
+        
+        // Last resort: Original name column
+        return $this->name ?? '';
     }
 
     /**
      * Get localized description based on current locale
+     * Fallback: locale-specific → English → default description
      */
     public function getLocalizedDescriptionAttribute(): string
     {
         $locale = app()->getLocale();
-        $field = 'description_' . $locale;
         
-        return $this->$field ?? $this->description_ar ?? $this->description_en ?? $this->description ?? '';
+        // Try locale-specific column first (e.g., description_ar for Arabic)
+        $field = 'description_' . $locale;
+        if (!empty($this->$field)) {
+            return $this->$field;
+        }
+        
+        // Fallback: Try English
+        if (!empty($this->description_en)) {
+            return $this->description_en;
+        }
+        
+        // Last resort: Original description column
+        return $this->description ?? '';
     }
 
     /**

@@ -70,7 +70,7 @@ return [
     'sp_hero_highlight' => 'des services comme les vôtres',
     'sp_hero_cta' => 'Créez votre profil professionnel dès aujourd\'hui et soyez découvert par les clients qui ont besoin de vos services.',
     'sp_create_profile_btn' => 'Créez votre profil gratuitement maintenant',
-    'sp_no_credit_card' => 'Pas de carte de crédit requise • Configuration en 5 minutes',
+    'sp_no_credit_card' => 'Pas de carte de crédit requise • Configuration en 3 minutes',
     'sp_benefit1_title' => 'Pas de contrats',
     'sp_benefit1_desc' => 'Commencez et arrêtez quand vous le souhaitez. Aucun engagement à long terme ou frais cachés.',
     'sp_benefit2_title' => 'Pas de commissions',

@@ -1,6 +1,6 @@
 {{-- resources/views/service-providers/show.blade.php --}}
 <!DOCTYPE html>
-<html lang="en"
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
     x-data="{ saved: @json(auth()->check() && auth()->user()->savedProviders->contains($serviceProvider->id)) }">
 
 <head>
@@ -773,6 +773,62 @@
         .toast-error .toast-icon {
             color: #f44336;
         }
+
+        /* ===== RTL Support ===== */
+        [dir="rtl"] .toast-container {
+            right: auto;
+            left: 20px;
+        }
+
+        [dir="rtl"] .toast-icon {
+            margin-right: 0;
+            margin-left: 1rem;
+        }
+
+        [dir="rtl"] .toast-success {
+            border-left: none;
+            border-right: 4px solid #4CAF50;
+        }
+
+        [dir="rtl"] .toast-error {
+            border-left: none;
+            border-right: 4px solid #f44336;
+        }
+
+        [dir="rtl"] .nav-link.active::after {
+            left: auto;
+            right: 0;
+        }
+
+        [dir="rtl"] .action-buttons {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .btn {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .me-1,
+        [dir="rtl"] .me-2,
+        [dir="rtl"] .me-3 {
+            margin-right: 0 !important;
+            margin-left: 0.25rem !important;
+        }
+
+        [dir="rtl"] .ms-1,
+        [dir="rtl"] .ms-2,
+        [dir="rtl"] .ms-3 {
+            margin-left: 0 !important;
+            margin-right: 0.25rem !important;
+        }
+
+        [dir="rtl"] .text-start {
+            text-align: right !important;
+        }
+
+        [dir="rtl"] .text-end {
+            text-align: left !important;
+        }
     </style>
 </head>
 
@@ -1081,7 +1137,7 @@
                                                         </option>
                                                         @foreach($locations ?? [] as $loc)
                                                             <option value="{{ $loc->id }}" {{ $serviceProvider->location_id == $loc->id ? 'selected' : '' }}>
-                                                                {{ $loc->city ?? $loc->name ?? 'Location ' . $loc->id }}
+                                                                {{ $loc->city ?? $loc->name ?? __('general.location') . ' ' . $loc->id }}
                                                             </option>
                                                         @endforeach
                                                     </select>

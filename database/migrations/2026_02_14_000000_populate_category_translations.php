@@ -1,15 +1,13 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
+     *
      * This migration populates Arabic and French translations for all categories.
      * It performs a safe update without deleting any existing data.
      */
@@ -17,13 +15,13 @@ return new class extends Migration
     {
         // Step 1: Ensure all categories have English translations populated
         $this->populateEnglishTranslations();
-        
+
         // Step 2: Add Arabic translations
         $this->populateArabicTranslations();
-        
+
         // Step 3: Add French translations
         $this->populateFrenchTranslations();
-        
+
         \Illuminate\Support\Facades\Log::info('Category translations populated successfully');
     }
 
@@ -70,7 +68,7 @@ return new class extends Migration
             'Brake Service' => 'خدمة الفرامل',
             'Battery Replacement' => 'استبدال البطارية',
             'Electrical Repair' => 'إصلاح كهربائي',
-            
+
             // Home & Property Services
             'House Cleaning' => 'تنظيف المنزل',
             'Painting & Decoration' => 'الطلاء والزخرفة',
@@ -80,7 +78,7 @@ return new class extends Migration
             'Roofing' => 'الأسقف',
             'Carpentry' => 'النجارة',
             'Landscaping' => 'تنسيق الحدائق',
-            
+
             // Professional & Business Services
             'Consulting' => 'الاستشارات',
             'Accounting' => 'المحاسبة',
@@ -88,7 +86,7 @@ return new class extends Migration
             'Office Support' => 'دعم المكاتب',
             'Business Registration' => 'تسجيل الأعمال',
             'Tax Preparation' => 'تحضير الضرائب',
-            
+
             // Personal & Lifestyle Services
             'Hair Salon' => 'صالون الشعر',
             'Makeup' => 'المكياج',
@@ -96,13 +94,13 @@ return new class extends Migration
             'Fitness Training' => 'تدريب اللياقة البدنية',
             'Yoga' => 'اليوغا',
             'Massage' => 'التدليك',
-            
+
             // Technical & Repair Services
             'Phone Repair' => 'إصلاح الهاتف',
             'Computer Repair' => 'إصلاح الكمبيوتر',
             'Appliance Repair' => 'إصلاح الأجهزة',
             'Electronics Repair' => 'إصلاح الإلكترونيات',
-            
+
             // Event & Entertainment Services
             'DJ Services' => 'خدمات DJ',
             'Photography' => 'التصوير الفوتوغرافي',
@@ -110,7 +108,7 @@ return new class extends Migration
             'Event Planning' => 'تنظيم الفعاليات',
             'Catering' => 'الوجبات الكاملة',
             'Music Lessons' => 'دروس الموسيقى',
-            
+
             // Section names
             'Automotive Services' => 'خدمات السيارات',
             'Home & Property Services' => 'خدمات المنزل والممتلكات',
@@ -163,7 +161,7 @@ return new class extends Migration
             'Brake Service' => 'Service de freinage',
             'Battery Replacement' => 'Remplacement de batterie',
             'Electrical Repair' => 'Réparation électrique',
-            
+
             // Home & Property Services
             'House Cleaning' => 'Nettoyage de maison',
             'Painting & Decoration' => 'Peinture et décoration',
@@ -173,7 +171,7 @@ return new class extends Migration
             'Roofing' => 'Toiture',
             'Carpentry' => 'Menuiserie',
             'Landscaping' => 'Aménagement paysager',
-            
+
             // Professional & Business Services
             'Consulting' => 'Conseil',
             'Accounting' => 'Comptabilité',
@@ -181,7 +179,7 @@ return new class extends Migration
             'Office Support' => 'Support de bureau',
             'Business Registration' => 'Enregistrement commercial',
             'Tax Preparation' => 'Préparation d\'impôts',
-            
+
             // Personal & Lifestyle Services
             'Hair Salon' => 'Salon de coiffure',
             'Makeup' => 'Maquillage',
@@ -189,13 +187,13 @@ return new class extends Migration
             'Fitness Training' => 'Entraînement physique',
             'Yoga' => 'Yoga',
             'Massage' => 'Massage',
-            
+
             // Technical & Repair Services
             'Phone Repair' => 'Réparation de téléphone',
             'Computer Repair' => 'Réparation informatique',
             'Appliance Repair' => 'Réparation d\'appareils',
             'Electronics Repair' => 'Réparation d\'électronique',
-            
+
             // Event & Entertainment Services
             'DJ Services' => 'Services DJ',
             'Photography' => 'Photographie',
@@ -203,7 +201,7 @@ return new class extends Migration
             'Event Planning' => 'Planification d\'événements',
             'Catering' => 'Restauration',
             'Music Lessons' => 'Cours de musique',
-            
+
             // Section names
             'Automotive Services' => 'Services automobiles',
             'Home & Property Services' => 'Services à domicile et immobiliers',

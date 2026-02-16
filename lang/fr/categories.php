@@ -30,7 +30,7 @@ return [
     'email_placeholder' => 'your@email.com',
     'submit_suggestion' => 'Soumettre la suggestion',
     'professional_services_in' => 'Services professionnels à :city',
-    'find_trusted_in_city' => 'Trouvez des professionnels de confiance à :city',
+    'description_template' => 'Services de :category à :cities',
     'stat_service_sections' => 'Sections de services',
     'stat_professions' => 'Professions',
     'stat_service_providers' => 'Prestataires de services',

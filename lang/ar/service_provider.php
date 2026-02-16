@@ -167,7 +167,8 @@ return [
     'image_too_large_dimensions' => 'أبعاد الصورة كبيرة جداً (الحد الأقصى 5000x5000 بكسل)',
 
     // New buttons
-    'recommend' => 'يوصى',
+    'recommend' => 'أوصي',
+    'recommended' => 'موصى به',
     'rate' => 'قيم',
     'share' => 'مشاركة',
     'rate_provider' => 'قيّم المزود',
@@ -175,4 +176,5 @@ return [
     'stat_views' => 'المشاهدات',
     'stat_recommends' => 'التوصيات',
     'stat_years' => 'السنوات',
+    'featured' => 'مميز',
 ];

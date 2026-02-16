@@ -70,7 +70,7 @@ return [
     'sp_hero_highlight' => 'searching for services like yours',
     'sp_hero_cta' => 'Create your professional profile today and get discovered by clients who need your expertise.',
     'sp_create_profile_btn' => 'Create Your Free Profile Now',
-    'sp_no_credit_card' => 'No credit card required • Setup in 5 minutes',
+    'sp_no_credit_card' => 'No credit card required • Setup in 3 minutes',
     'sp_benefit1_title' => 'No Contracts',
     'sp_benefit1_desc' => 'Start and stop anytime. No long-term commitments or hidden fees.',
     'sp_benefit2_title' => 'No Commissions',

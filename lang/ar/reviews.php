@@ -44,6 +44,13 @@ return [
     'report_review' => 'إبلاغ عن التقييم',
     'share_review' => 'شارك',
 
+    // Rating descriptors
+    'poor' => 'ضعيف - يحتاج تحسين',
+    'fair' => 'مقبول - بعض المشاكل',
+    'good' => 'جيد - خدمة مرضية',
+    'very_good' => 'جيد جداً - موصى به',
+    'excellent' => 'ممتاز - خدمة استثنائية!',
+
     'admin_panel' => [
         'title' => 'إدارة التقييمات',
         'all_reviews' => 'جميع التقييمات',

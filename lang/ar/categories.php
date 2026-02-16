@@ -30,7 +30,7 @@ return [
     'email_placeholder' => 'your@email.com',
     'submit_suggestion' => 'إرسال الاقتراح',
     'professional_services_in' => 'خدمات مهنية في :city',
-    'find_trusted_in_city' => 'اعثر على محترفين موثوقين في :city',
+    'description_template' => 'خدمات :category في :cities',
     'stat_service_sections' => 'أقسام الخدمات',
     'stat_professions' => 'المهن',
     'stat_service_providers' => 'مقدمو الخدمات',

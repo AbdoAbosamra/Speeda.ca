@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - Speeda</title>
+    <title>Terms of Service - Speeda</title>
+    <!-- استيراد خط Cairo للغة العربية لضمان الجمالية -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-color: #2c3e50;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --section-border: #e0e0e0;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,148 +23,132 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #2c3e50;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            line-height: 1.7;
+            color: var(--text-color);
+            background: #f0f2f5;
             padding: 40px 20px;
+            min-height: 100vh;
         }
 
-        body[dir="rtl"] {
+        /* تنسيقات خاصة باللغة العربية */
+        body[lang="ar"] {
             font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
         }
 
+        /* حاوية الصفحة */
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
             overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.02);
         }
 
+        /* رأس الصفحة */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
-            padding: 50px 40px;
+            padding: 60px 40px;
             text-align: center;
             position: relative;
         }
 
-
-
         .header h1 {
             font-size: 2.5em;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-weight: 700;
+            line-height: 1.2;
         }
 
         .header h1 .icon {
             font-style: normal;
-            margin-right: 10px;
+            margin-inline-end: 10px; /* يعمل مع RTL و LTR */
         }
 
         .header p {
             font-size: 1.1em;
-            opacity: 0.95;
+            opacity: 0.9;
         }
 
+        /* منطقة تبديل اللغة (للعرض فقط) */
+        .lang-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .lang-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active, .lang-btn:hover {
+            background: white;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        /* المحتوى الرئيسي */
         .content {
-            padding: 50px 40px;
+            padding: 50px 50px;
         }
 
-
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 25px;
+            }
+            .header {
+                padding: 40px 20px;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
 
         .section {
-            margin-bottom: 40px;
+            margin-bottom: 45px;
             padding-bottom: 30px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--section-border);
         }
 
         .section:last-child {
             border-bottom: none;
+            margin-bottom: 0;
         }
 
+        /* عناوين الأقسام */
         .section-title {
             color: #667eea;
             font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 15px;
+            font-weight: 700;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-        }
-
-        body[dir="rtl"] .section-title {
-            flex-direction: row !important;
-            justify-content: flex-start !important;
-            text-align: right !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-
-        /* ترتيب العناصر بشكل صحيح */
-        body[dir="rtl"] .section-title .section-number {
-            order: 0 !important;
-        }
-
-        body[dir="rtl"] .section-title::after {
-            content: '';
-            order: 2 !important;
-            flex: 1;
+            gap: 15px; /* مسافة ذكية تعمل في الاتجاهين */
         }
 
         .section-number {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
-            width: 35px;
-            height: 35px;
+            min-width: 40px;
+            height: 40px;
             border-radius: 50%;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
             font-weight: 700;
+            font-size: 1.1em;
             flex-shrink: 0;
-        }
-
-        /* 7 حلول مختلفة لإجبار الأرقام على اليمين في RTL */
-        body[dir="rtl"] .section-number {
-            /* الحل 1: margin من اليمين فقط */
-            margin-right: 15px !important;
-            margin-left: 0 !important;
-            
-            /* الحل 2: اتجاه LTR للرقم نفسه */
-            direction: ltr !important;
-            unicode-bidi: bidi-override !important;
-            
-            /* الحل 3: order للترتيب */
-            order: -1 !important;
-            
-            /* الحل 4: float لليمين */
-            float: right;
-            clear: right;
-            
-            /* الحل 5: position relative مع right */
-            position: relative;
-            right: auto;
-            left: auto;
-            
-            /* الحل 6: text-align */
-            text-align: center !important;
-            
-            /* الحل 7: transform لإعادة المحاذاة */
-            transform: translateX(0) !important;
-            
-            /* الحل 8: إلغاء أي transform سابق */
-            -webkit-transform: none !important;
-            -moz-transform: none !important;
-        }
-
-        body[dir="rtl"] .section-title > *:not(.section-number) {
-            order: 1 !important;
-            margin-right: 0 !important;
-            margin-left: 0 !important;
-            flex: 1;
-            text-align: right;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
         }
 
         .section-content {
@@ -164,1080 +158,1043 @@
 
         .section-content p {
             margin-bottom: 15px;
+            text-align: justify; /* محاذاة النص */
         }
 
+        /* القوائم الفرعية */
         .subsection {
-            margin: 20px 0;
-            padding-left: 20px;
-            border-left: 3px solid #667eea;
+            margin: 25px 0;
+            padding-inline-start: 25px; /* مسافة ذكية */
+            border-inline-start: 4px solid #667eea; /* حدود جانبية ذكية */
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
         }
 
-        body[dir="rtl"] .subsection {
-            padding-left: 0;
-            padding-right: 20px;
-            border-left: none;
-            border-right: 3px solid #667eea;
+        [dir="ltr"] .subsection {
+            border-radius: 10px 0 0 10px;
         }
 
         .subsection-title {
-            font-weight: 600;
+            font-weight: 700;
             color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .definition-list {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-
-        .definition-item {
             margin-bottom: 12px;
+            font-size: 1.1em;
+            display: block;
         }
 
-        .definition-term {
-            font-weight: 600;
-            color: #667eea;
-        }
-
+        /* قوائم النقاط */
         .bullet-list {
             list-style: none;
-            padding-left: 0;
+            padding: 0;
+            margin: 0;
         }
 
         .bullet-list li {
-            padding: 8px 0 8px 30px;
+            padding: 8px 0;
             position: relative;
+            padding-inline-start: 30px; /* مسافة للنقطة */
         }
 
-        body[dir="rtl"] .bullet-list li {
-            padding: 8px 30px 8px 0;
-        }
-
-        .bullet-list li:before {
+        .bullet-list li::before {
             content: "•";
             color: #667eea;
             font-weight: bold;
-            font-size: 1.3em;
+            font-size: 1.5em;
+            line-height: 1;
             position: absolute;
-            left: 10px;
+            inset-inline-start: 0; /* مكان النقطة ذكي */
+            top: 5px;
         }
 
-        body[dir="rtl"] .bullet-list li:before {
-            left: auto;
-            right: 10px;
+        /* القوائم المرقمة داخل القوائم (مثل 8.1) */
+        .numbered-sublist {
+            list-style: none;
+            counter-reset: sub-section;
+            margin-top: 10px;
+        }
+        
+        .numbered-sublist li {
+            counter-increment: sub-section;
+            margin-bottom: 10px;
+            position: relative;
+            padding-inline-start: 35px;
         }
 
+        .numbered-sublist li::before {
+            content: counter(sub-section) ".";
+            position: absolute;
+            inset-inline-start: 0;
+            font-weight: bold;
+            color: #764ba2;
+            font-size: 1em;
+            top: 9px;
+        }
+
+        /* مربع التنبيه (مهم) */
         .highlight-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
+            background: #fff8e1;
+            border-inline-start: 5px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+            color: #795548;
+        }
+
+        .highlight-box strong {
+            color: #d35400;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* صندوق المعلومات */
+        .info-box {
+            background: #e3f2fd;
+            border-inline-start: 5px solid #2196f3;
             padding: 20px;
             margin: 20px 0;
-            border-radius: 5px;
+            border-radius: 4px;
         }
 
-        body[dir="rtl"] .highlight-box {
-            border-left: none;
-            border-right: 4px solid #ffc107;
+        .info-item {
+            margin-bottom: 10px;
         }
 
+        .info-term {
+            font-weight: 700;
+            color: #1565c0;
+        }
+
+        /* معلومات الاتصال */
         .contact-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
-            padding: 30px;
+            padding: 40px;
             border-radius: 15px;
             text-align: center;
-            margin-top: 40px;
+            margin-top: 50px;
         }
 
         .contact-box h3 {
-            margin-bottom: 15px;
-            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+
+        .contact-box p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
         }
 
         .contact-box a {
             color: white;
             text-decoration: none;
-            font-weight: 600;
-            border-bottom: 2px solid white;
-            transition: opacity 0.3s;
+            border-bottom: 1px dashed rgba(255,255,255,0.6);
+            transition: border-color 0.3s;
         }
 
         .contact-box a:hover {
-            opacity: 0.8;
+            border-bottom-color: white;
         }
 
         .last-updated {
             text-align: center;
             color: #888;
-            font-style: italic;
+            font-size: 0.9em;
             margin-bottom: 30px;
+            background: #f9f9f9;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        /* إخفاء/إظهار اللغات */
+        .lang-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .lang-content.active {
+            display: block;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 20px 10px;
-            }
-
-            .header {
-                padding: 60px 20px 30px;
-            }
-
-
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .content {
-                padding: 30px 20px;
-            }
-
-            .section-title {
-                font-size: 1.3em;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
     </style>
 </head>
-<body dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
-@include('components.main-nav')
+<body>
+
     <div class="container">
         <div class="header">
-            <h1>@if(app()->getLocale() === 'en')<span class="icon">🛡</span> Privacy Policy @elseif(app()->getLocale() === 'ar')<span class="icon">🛡</span> سياسة الخصوصية @else <span class="icon">🛡</span> Politique de Confidentialité @endif</h1>
-            <p>@if(app()->getLocale() === 'en')Speeda.CA Platform Agreement @elseif(app()->getLocale() === 'ar')اتفاقية منصة Speeda.CA @else Contrat de la plateforme Speeda.CA @endif</p>
+            <!-- أزرار تبديل اللغة (للغرض التجريبي) -->
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="switchLang('ar', this)" id="btn-ar">العربية</button>
+                <button class="lang-btn" onclick="switchLang('en', this)" id="btn-en">English</button>
+                <button class="lang-btn" onclick="switchLang('fr', this)" id="btn-fr">Français</button>
+            </div>
+
+            <h1 id="page-title">
+                <span class="icon">📜</span> 
+                <span class="title-text">شروط الخدمة</span>
+            </h1>
+            <p id="page-subtitle">اتفاقية منصة Speeda.CA</p>
         </div>
 
         <div class="content">
-@if(app()->getLocale() === 'en')
-                <p class="last-updated">Last Updated: October 14, 2025</p>
+            <div style="text-align: center;">
+                <p class="last-updated" id="last-updated">آخر تحديث: 23 أكتوبر 2025</p>
+            </div>
 
+            <!-- ================= المحتوى بالعربية ================= -->
+            <div id="content-ar" class="lang-content active">
+                
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">1</span>
-                        Introduction
+                        <span>التعريف والأطراف</span>
                     </h2>
                     <div class="section-content">
-                        <p>This Privacy Policy is issued by Bnine General Trading Inc., a legally registered company in Ottawa, Ontario, Canada, acting as the owner and operator of the Speeda platform ("the Platform", "we", "us", or "our").</p>
-                        <p>This policy explains how we collect, use, and protect the personal information of users of our website https://speeada.ca ("the Website"), our mobile applications, and related digital services.</p>
-                        <p>This policy is an integral part of the Platform's Terms of Use.
-                        By using our site, you confirm that you have read, understood, and agreed to this policy.
-                        If you do not agree with any part of it, please immediately cease using the Platform.</p>
+                        <p>تُشكّل هذه الشروط والأحكام ("الشروط") اتفاقية قانونية مُلزمة بينك وبين شركة Bnine General Trading Inc.، المالكة والمشغّلة لمنصة Speeda ("Speeda"، "نحن"، "لنا"، أو "خاصتنا")، ومقرّها في أوتاوا، أونتاريو، كندا. تُنظّم هذه الشروط استخدامك لموقع www.Speeda.ca وأي خدمات رقمية ذات صلة (يُشار إليها مجتمعة بـ "المنصة").</p>
+                        <div class="info-box">
+                            <div class="info-item"><span class="info-term">العميل:</span> أي فرد أو شركة تبحث عن مزوّد خدمة عبر المنصة.</div>
+                            <div class="info-item"><span class="info-term">مزوّد الخدمة:</span> أي فرد أو شركة تُقدّم خدمات بشكل مستقل عبر المنصة.</div>
+                            <div class="info-item"><span class="info-term">المستخدم:</span> يشمل كلًّا من العملاء ومزوّدي الخدمات.</div>
+                            <div class="info-item"><span class="info-term">اتفاقية الخدمة:</span> العقد أو التفاهم المباشر بين العميل ومزوّد الخدمة بشأن خدمة محددة.</div>
+                            <div class="info-item"><span class="info-term">مزود خدمات الدفع (PSP):</span> أي جهة خارجية لمعالجة المدفوعات (مثل PayPal أو التحويل الإلكتروني أو غيرها).</div>
+                        </div>
+                        <p>من خلال الوصول إلى المنصة أو استخدامها، فإنك توافق على هذه الشروط وعلى سياسة الخصوصية الخاصة بنا. وفي حال عدم موافقتك، يجب عليك التوقف فورًا عن استخدام المنصة.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">2</span>
-                        Legal Definitions
+                        <span>الأهلية وإنشاء الحساب</span>
                     </h2>
                     <div class="section-content">
-                        <p>For the purposes of this policy, the following definitions apply:</p>
-                        <div class="definition-list">
-                            <div class="definition-item">
-                                <span class="definition-term">Bnine General Trading Inc.:</span> The legal entity registered in Canada responsible for operating and managing the Platform.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Speeda / Speeda.ca:</span> The trade name and digital platform owned and managed by Bnine General Trading Inc.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">User:</span> Any person who uses the Website or application, whether as a Client or a Service Provider.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Client:</span> A User who searches for a service or submits a service request via the Platform.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Service Provider:</span> A User who offers services via the Platform, as an independent individual or a business entity.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Personal Information:</span> Any data that can directly or indirectly identify a specific individual, as defined by the Personal Information Protection and Electronic Documents Act (PIPEDA) in Canada.
-                            </div>
-                        </div>
+                        <p>يجب أن يكون المستخدمون قد أتمّوا 18 عامًا على الأقل وأن يكونوا مؤهلين قانونيًا لإبرام العقود. ويُطلب منهم تقديم معلومات دقيقة ومُحدّثة، كما يتحمّلون مسؤولية الحفاظ على سرّية بيانات الدخول وجميع أنشطة الحساب. تحتفظ Speeda بحق تعليق أو رفض أو إنهاء أي حساب لحماية المستخدمين أو الامتثال للقانون.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">3</span>
-                        Scope of Application
+                        <span>طبيعة دور Speeda</span>
                     </h2>
                     <div class="section-content">
-                        <p>This policy applies to all users inside and outside of Canada who access or use the Platform.
-                        By using our services, you consent to your personal data being collected, processed, and stored in Canada or in other countries that have a similar level of data protection.</p>
+                        <div class="highlight-box">
+                            <strong>مهم:</strong> تعمل Speeda كوسيط تكنولوجي فقط يربط بين العملاء ومزوّدي الخدمات. ولا تُقدّم Speeda الخدمات بنفسها، ولا توظّف مزوّدي الخدمات، ولا تحدد الأسعار، ولا تُشرف على جودة الخدمات أو توقيتها أو نتائجها.
+                        </div>
+                        <p>ولا يُنشئ أي بند في هذه الشروط علاقة توظيف أو وكالة أو شراكة بين Speeda وأي مستخدم.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">4</span>
-                        Nature of the Platform
+                        <span>استخدام المنصة واتفاقيات الخدمة</span>
                     </h2>
                     <div class="section-content">
-                        <p>Speeda operates as an intermediary digital platform that connects Clients and Service Providers in a secure and reliable environment.
-                        Speeda does not provide any services directly, nor is it a party to any contract or agreement between Clients and Service Providers.
-                        All dealings and transactions between users are conducted at their own risk.
-                        Our role is limited to providing the technical infrastructure that facilitates communication between parties.</p>
+                        <p>يختار العملاء مزوّدي الخدمات بحرّية استنادًا إلى المعلومات المتاحة على المنصة. وبمجرد توصّل العميل ومزوّد الخدمة إلى اتفاق، تُبرم اتفاقية الخدمة حصريًا بينهما. ولا تُعتبر Speeda طرفًا في أي اتفاقية خدمة، كما لا تتحمّل أي مسؤولية قانونية أو مالية عن أدائها أو نتائجها أو النزاعات المتعلقة بها.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">5</span>
-                        Information We Collect
+                        <span>الاشتراكات والرسوم والمدفوعات والإلغاء</span>
                     </h2>
                     <div class="section-content">
-                        <p>We may collect multiple types of information depending on the nature of your use of the Platform:</p>
-
-                        <div class="subsection">
-                            <p class="subsection-title">A. Information Provided Directly by You:</p>
-                            <ul class="bullet-list">
-                                <li>Full name, email address, and phone number.</li>
-                                <li>City or province, and the type of service required or offered.</li>
-                                <li>Payment or billing data (for subscriptions or transactions).</li>
-                                <li>Professional or personal identification documents (such as a business license or commercial registration number).</li>
-                                <li>Any correspondence or interactions with the support team or other users via the Platform.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">B. Technical and Analytical Data:</p>
-                            <ul class="bullet-list">
-                                <li>Your device's IP address.</li>
-                                <li>Browser type, operating system, and device information.</li>
-                                <li>Approximate location data (city or region).</li>
-                                <li>Access times, pages visited, and browsing patterns.</li>
-                                <li>Cookies and analytics data.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">C. Activity Data:</p>
-                            <ul class="bullet-list">
-                                <li>History of completed services or requests.</li>
-                                <li>Ratings, reviews, and comments exchanged between users.</li>
-                                <li>Transaction history and notifications.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">D. Information Received from Third Parties:</p>
-                            <p>We may receive additional data from our trusted partners such as:</p>
-                            <ul class="bullet-list">
-                                <li>Identity verification services.</li>
-                                <li>Electronic payment service providers.</li>
-                                <li>Social media platforms (when registering through them and with your consent).</li>
-                            </ul>
-                        </div>
+                        <ul class="bullet-list">
+                            <li>تعمل Speeda وفق نظام اشتراك شهري يمنح المستخدمين إمكانية الوصول إلى ميزات وخدمات المنصة.</li>
+                            <li>جميع الرسوم غير قابلة للاسترداد كليًا أو جزئيًا.</li>
+                            <li>يمكن للمستخدمين إلغاء اشتراكهم في أي وقت، ويُصبح الإلغاء ساريًا من بداية دورة الفوترة التالية.</li>
+                            <li>لا تُرد أي مبالغ عن الفترات غير المستخدمة.</li>
+                            <li>يمكن سداد المدفوعات عبر التحويل الإلكتروني أو PayPal أو أي مزود دفع آخر تدعمه Speeda.</li>
+                            <li>باستخدام أي مزود دفع، يوافق المستخدم على شروطه ويُقرّ بأن Speeda ليست بنكًا ولا وكيل ضمان.</li>
+                            <li>قد تُضاف الضرائب المطبقة (مثل HST/GST/PST) حسب القانون.</li>
+                        </ul>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">6</span>
-                        Purposes of Data Collection
+                        <span>التزامات مزوّدي الخدمات</span>
                     </h2>
                     <div class="section-content">
-                        <p>We use personal information for the following purposes:</p>
+                        <p>يُقرّ مزوّدو الخدمات ويضمنون أنهم:</p>
                         <ul class="bullet-list">
-                            <li>Operating and maintaining the Platform and digital services.</li>
-                            <li>Facilitating communication between Clients and Service Providers.</li>
-                            <li>Verifying identity and managing user accounts.</li>
-                            <li>Ensuring the security of the Platform and the integrity of transactions.</li>
-                            <li>Improving performance and user experience.</li>
-                            <li>Communicating with you regarding technical support, notifications, or updates.</li>
-                            <li>Complying with legal and regulatory obligations.</li>
-                            <li>Processing complaints and resolving disputes.</li>
-                            <li>Conducting statistical analysis and research.</li>
-                            <li>Sending promotional offers or marketing messages (with your prior consent).</li>
+                            <li>يعملون بصورة قانونية ومستقلة ضمن نطاقهم القضائي.</li>
+                            <li>يحملون التراخيص والتصاريح اللازمة.</li>
+                            <li>يحتفظون بالتأمينات المطلوبة.</li>
+                            <li>يُقدّمون الخدمات باحترافية وأمان وبشكل قانوني.</li>
+                            <li>يتحمّلون كامل المسؤولية عن موظفيهم أو مساعدينهم أو متعاقدين الفرعيين.</li>
                         </ul>
+                        <div class="highlight-box">
+                            <strong>تنبيه:</strong> لا تتحقق Speeda من مؤهلات مزوّدي الخدمات أو تراخيصهم. ويتعيّن على العملاء توخّي الحذر قبل التعاقد.
+                        </div>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">7</span>
-                        Data Sharing and Disclosure
+                        <span>التزامات العملاء</span>
                     </h2>
                     <div class="section-content">
-                        <p>We may share your information only in the following cases:</p>
-
-                        <div class="subsection">
-                            <p class="subsection-title">A) With Technical Service Providers:</p>
-                            <ul class="bullet-list">
-                                <li>Cloud data hosting services.</li>
-                                <li>Payment processing systems.</li>
-                                <li>Technical support and analytics partners.</li>
-                            </ul>
-                            <p>All these parties are bound by strict confidentiality and data protection agreements.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">B) Legal Obligations:</p>
-                            <p>We may disclose certain information to comply with court orders or requests from government authorities in accordance with the law.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">C) Mergers or Acquisitions:</p>
-                            <p>In the event of a merger, acquisition, or sale of part of our assets, user data may be transferred after prior notification.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">D) Fraud Prevention and Security Risks:</p>
-                            <p>When we believe in good faith that disclosure is necessary to protect our rights, users, or the public from fraudulent or illegal activity.</p>
-                        </div>
-
-                        <div class="highlight-box">
-                            <strong>Note:</strong> We do not sell, rent, or trade personal information under any circumstances.
-                        </div>
+                        <ul class="bullet-list">
+                            <li>تقديم أوصاف دقيقة للخدمات المطلوبة.</li>
+                            <li>ضمان الوصول الآمن والمشروع إلى موقع الخدمة.</li>
+                            <li>الامتناع عن طلب خدمات غير قانونية أو خطرة.</li>
+                            <li>الالتزام بسداد المدفوعات المتفق عليها مباشرة أو عبر مزود الدفع المختار.</li>
+                        </ul>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">8</span>
-                        Data Protection and Information Security
+                        <span>المراجعات والمحتوى الذي ينشئه المستخدم</span>
                     </h2>
                     <div class="section-content">
-                        <p>Bnine General Trading Inc. follows advanced security standards, including:</p>
-                        <ul class="bullet-list">
-                            <li>SSL protocol encryption for communications.</li>
-                            <li>Secure storage on limited-access servers.</li>
-                            <li>Periodic reviews and security vulnerability assessments.</li>
-                            <li>Strict internal policies for data access control.</li>
-                        </ul>
-                        <p>Despite our commitment to the highest security standards, no digital system is 100% secure.
-                        Users are responsible for maintaining the confidentiality of their login credentials.</p>
+                        <p>يجوز للمستخدمين نشر مراجعات أو تقييمات أو صور أو محتوى آخر ("محتوى المستخدم"). وبقيامهم بذلك، يمنحون Speeda ترخيصًا عالميًا غير حصري وخاليًا من الرسوم لاستخدام هذا المحتوى لتشغيل المنصة وترويجها وتحسينها.</p>
+                        <p>يُقرّ المستخدمون بأن محتواهم قانوني ولا ينتهك حقوق الآخرين، وتحتفظ Speeda بالحق في إزالة أي محتوى غير لائق أو تعليق الحسابات المسيئة.</p>
                     </div>
                 </div>
 
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">9</span>
-                        Data Retention
-                    </h2>
-                    <div class="section-content">
-                        <p>We retain your personal information only for the period necessary to fulfill the purposes mentioned in this policy or to comply with laws (such as tax or accounting).
-                        After the retention period ends, the data is deleted or anonymized.</p>
-                        <p>Users can request the deletion of their data at any time via email:
-                        <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">10</span>
-                        User Rights
-                    </h2>
-                    <div class="section-content">
-                        <p>According to PIPEDA, users have the right to:</p>
-                        <ul class="bullet-list">
-                            <li>Access their personal data that we hold.</li>
-                            <li>Request correction of any inaccurate or incomplete data.</li>
-                            <li>Withdraw their consent to data processing at any time.</li>
-                            <li>Request the deletion of their personal data.</li>
-                            <li>Object to any unnecessary use of their data.</li>
-                        </ul>
-                        <p>Please direct requests to the following email:
-                        <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">11</span>
-                        Children's Privacy
-                    </h2>
-                    <div class="section-content">
-                        <p>Our services are directed to adults (18 years and older).
-                        We do not knowingly collect personal data from minors without parental or guardian consent.
-                        If such data is discovered, it will be permanently deleted.</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">12</span>
-                        Limitation of Liability
-                    </h2>
-                    <div class="section-content">
-                        <p>Since Speeda operates only as an intermediary platform:</p>
-                        <ul class="bullet-list">
-                            <li>We are not responsible for any misconduct, negligence, or damages caused by any user or Service Provider.</li>
-                            <li>We do not guarantee the accuracy, reliability, or quality of services provided by Service Providers.</li>
-                            <li>We are not a party to any contract or agreement concluded between Clients and Service Providers.</li>
-                            <li>Any disputes or claims between users are resolved directly without any liability on Bnine General Trading Inc.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">13</span>
-                        Cookies
-                    </h2>
-                    <div class="section-content">
-                        <p>Our site uses cookies in order to:</p>
-                        <ul class="bullet-list">
-                            <li>Improve the user experience.</li>
-                            <li>Analyze traffic and user behavior.</li>
-                            <li>Save language and personal preferences.</li>
-                        </ul>
-                        <p>You can disable cookies from your browser settings, knowing that some features of the site may not function fully as a result.</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">14</span>
-                        International Data Transfer
-                    </h2>
-                    <div class="section-content">
-                        <p>Your data may be stored or processed on secure servers located in Canada or the United States of America.
-                        We adhere to all international data protection standards, including the rules governing data transfer between the European Union and Canada.</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">15</span>
-                        Privacy Policy Updates
-                    </h2>
-                    <div class="section-content">
-                        <p>Bnine General Trading Inc. reserves the right to modify or update this policy at any time.
-                        Any changes will be posted on this page with the last updated date.
-                        Your continued use of the Platform after any modification constitutes an implicit agreement to the updated policy.</p>
-                    </div>
-                </div>
-
-                <div class="contact-box">
-                    <h3>Contact Information</h3>
-                    <p><strong>Bnine General Trading Inc.</strong></p>
-                    <p>Owner and Operator of the Speeda Platform</p>
-                    <p>📍 Headquarters: Ottawa, Ontario, Canada</p>
-                    <p>Email: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
-                    <p>Website: <a href="https://speeada.ca" target="_blank">https://speeada.ca</a></p>
-                </div>
-
-@elseif(app()->getLocale() === 'ar')
-                <p class="last-updated">تاريخ آخر تحديث: 14 أكتوبر 2025</p>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">1</span>
-                        المقدّمة
-                    </h2>
-                    <div class="section-content">
-                        <p>تُصدر هذه سياسة الخصوصية من قبل شركة Bnine General Trading Inc.، وهي شركة مسجلة قانونيًا في مدينة أوتاوا، أونتاريو، كندا، وتعمل بصفتها المالك والمشغّل لمنصة Speeda ("المنصة"، "نحن"، "لنا"، أو "خاصتنا").</p>
-                        <p>توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا للمعلومات الشخصية الخاصة بمستخدمي موقعنا الإلكتروني https://speeada.ca ("الموقع")، وتطبيقاتنا المحمولة، والخدمات الرقمية ذات الصلة.</p>
-                        <p>تُعد هذه السياسة جزءًا لا يتجزأ من شروط استخدام المنصة.
-                        باستخدامك لموقعنا، فإنك تؤكد أنك قد قرأت هذه السياسة وفهمتها ووافقت عليها.
-                        إذا لم توافق على أي جزء منها، يُرجى التوقف فورًا عن استخدام المنصة.</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">2</span>
-                        التعريفات القانونية
-                    </h2>
-                    <div class="section-content">
-                        <p>لأغراض هذه السياسة، تُعتمد التعريفات التالية:</p>
-                        <div class="definition-list">
-                            <div class="definition-item">
-                                <span class="definition-term">شركة Bnine General Trading Inc.:</span> الكيان القانوني المسجّل في كندا والمسؤول عن تشغيل وإدارة المنصة.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Speeda / Speeda.ca:</span> الاسم التجاري والمنصة الرقمية المملوكة والمدارة من قبل شركة Bnine General Trading Inc.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">المستخدم:</span> أي شخص يستخدم الموقع أو التطبيق، سواء بصفته عميلًا أو مزوّد خدمة.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">العميل:</span> المستخدم الذي يبحث عن خدمة أو يقدّم طلب خدمة عبر المنصة.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">مزوّد الخدمة:</span> المستخدم الذي يقدّم خدمات عبر المنصة، بصفته فردًا مستقلاً أو كيانًا تجاريًا.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">المعلومات الشخصية:</span> أي بيانات يمكنها التعريف بشكل مباشر أو غير مباشر بفرد معيّن، وفقًا لتعريف قانون حماية المعلومات الشخصية والوثائق الإلكترونية (PIPEDA) في كندا.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">3</span>
-                        نطاق التطبيق
-                    </h2>
-                    <div class="section-content">
-                        <p>تنطبق هذه السياسة على جميع المستخدمين داخل كندا وخارجها الذين يصلون إلى المنصة أو يستخدمونها.
-                        وباستخدام خدماتنا، فإنك توافق على أن يتم جمع ومعالجة وتخزين بياناتك الشخصية في كندا أو في دول أخرى تتمتع بمستوى مماثل من حماية البيانات.</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">4</span>
-                        طبيعة المنصة
-                    </h2>
-                    <div class="section-content">
-                        <p>تعمل Speeda كمنصة رقمية وسيطة تربط بين العملاء ومزوّدي الخدمات في بيئة آمنة وموثوقة.
-                        لا تُقدّم Speeda أي خدمات مباشرة، كما أنها ليست طرفًا في أي عقد أو اتفاق بين العملاء ومزوّدي الخدمات.
-                        تُجرى جميع التعاملات والمعاملات بين المستخدمين على مسؤوليتهم الخاصة.
-                        ويقتصر دورنا على توفير البنية التقنية التي تُسهّل التواصل بين الأطراف.</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">5</span>
-                        المعلومات التي نجمعها
-                    </h2>
-                    <div class="section-content">
-                        <p>قد نقوم بجمع أنواع متعددة من المعلومات تبعًا لطبيعة استخدامك للمنصة:</p>
-
-                        <div class="subsection">
-                            <p class="subsection-title">أ. المعلومات المقدّمة مباشرة من قبلك:</p>
-                            <ul class="bullet-list">
-                                <li>الاسم الكامل، البريد الإلكتروني، ورقم الهاتف.</li>
-                                <li>المدينة أو المقاطعة، ونوع الخدمة المطلوبة أو المقدّمة.</li>
-                                <li>بيانات الدفع أو الفواتير (للاشتراكات أو المعاملات).</li>
-                                <li>وثائق التعريف المهني أو الشخصي (مثل رخصة العمل أو رقم التسجيل التجاري).</li>
-                                <li>أي مراسلات أو تفاعلات مع فريق الدعم أو المستخدمين الآخرين عبر المنصة.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">ب. البيانات التقنية والتحليلية:</p>
-                            <ul class="bullet-list">
-                                <li>عنوان IP الخاص بجهازك.</li>
-                                <li>نوع المتصفح ونظام التشغيل ومعلومات الجهاز.</li>
-                                <li>بيانات الموقع التقريبية (المدينة أو المنطقة).</li>
-                                <li>أوقات الوصول، الصفحات التي تمت زيارتها، وأنماط التصفح.</li>
-                                <li>بيانات ملفات تعريف الارتباط (Cookies) والتحليلات.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">ج. بيانات النشاط:</p>
-                            <ul class="bullet-list">
-                                <li>سجل الخدمات أو الطلبات المكتملة.</li>
-                                <li>التقييمات والمراجعات والتعليقات المتبادلة بين المستخدمين.</li>
-                                <li>سجل المعاملات والإشعارات.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">د. المعلومات المستلمة من أطراف ثالثة:</p>
-                            <p>قد نتلقى بيانات إضافية من شركائنا الموثوقين مثل:</p>
-                            <ul class="bullet-list">
-                                <li>خدمات التحقق من الهوية.</li>
-                                <li>مزوّدي خدمات الدفع الإلكتروني.</li>
-                                <li>منصات التواصل الاجتماعي (عند التسجيل من خلالها وبموافقتك).</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">6</span>
-                        أهداف جمع البيانات
-                    </h2>
-                    <div class="section-content">
-                        <p>نستخدم المعلومات الشخصية للأغراض التالية:</p>
-                        <ul class="bullet-list">
-                            <li>تشغيل وصيانة المنصة والخدمات الرقمية.</li>
-                            <li>تسهيل التواصل بين العملاء ومزوّدي الخدمات.</li>
-                            <li>التحقق من الهوية وإدارة حسابات المستخدمين.</li>
-                            <li>ضمان سلامة المنصة ونزاهة التعاملات.</li>
-                            <li>تحسين الأداء وتجربة المستخدم.</li>
-                            <li>التواصل معك بشأن الدعم الفني أو الإشعارات أو التحديثات.</li>
-                            <li>الامتثال للالتزامات القانونية والتنظيمية.</li>
-                            <li>معالجة الشكاوى وحل النزاعات.</li>
-                            <li>إجراء التحليلات والأبحاث الإحصائية.</li>
-                            <li>إرسال العروض الترويجية أو الرسائل التسويقية (بموافقتك المسبقة).</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">
-                        <span class="section-number">7</span>
-                        مشاركة البيانات والإفصاح عنها
-                    </h2>
-                    <div class="section-content">
-                        <p>يجوز لنا مشاركة معلوماتك فقط في الحالات التالية:</p>
-
-                        <div class="subsection">
-                            <p class="subsection-title">أ) مع مزوّدي الخدمات التقنية:</p>
-                            <ul class="bullet-list">
-                                <li>خدمات استضافة البيانات السحابية.</li>
-                                <li>أنظمة معالجة المدفوعات.</li>
-                                <li>شركاء الدعم الفني والتحليلات.</li>
-                            </ul>
-                            <p>تلتزم جميع هذه الجهات باتفاقيات صارمة للسرية وحماية البيانات.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">ب) الالتزامات القانونية:</p>
-                            <p>قد نُفصح عن معلومات معينة للامتثال لأوامر قضائية أو طلبات من السلطات الحكومية وفقًا للقانون.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">ج) عمليات الدمج أو الاستحواذ:</p>
-                            <p>في حال حدوث دمج أو استحواذ أو بيع جزء من أصولنا، قد يتم نقل بيانات المستخدمين بعد إشعارهم المسبق.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">د) مكافحة الاحتيال والمخاطر الأمنية:</p>
-                            <p>عندما نعتقد بحسن نية أن الإفصاح ضروري لحماية حقوقنا أو المستخدمين أو الجمهور من نشاط احتيالي أو غير قانوني.</p>
-                        </div>
-
-                        <div class="highlight-box">
-                            <strong>ملاحظة:</strong> لا نقوم ببيع أو تأجير أو المتاجرة بالمعلومات الشخصية تحت أي ظرف.
-                        </div>
-                    </div>
-                </div>
-
+                <!-- القسم 8 مكرر - نظام التقييمات -->
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">8</span>
-                        حماية البيانات وأمن المعلومات
+                        <span>نظام التقييمات والتعليقات</span>
                     </h2>
                     <div class="section-content">
-                        <p>تتّبع شركة Bnine General Trading Inc. معايير أمان متقدمة تشمل:</p>
-                        <ul class="bullet-list">
-                            <li>تشفير الاتصالات عبر بروتوكول SSL.</li>
-                            <li>تخزين آمن على خوادم محدودة الوصول.</li>
-                            <li>مراجعات دورية وتقييمات للثغرات الأمنية.</li>
-                            <li>سياسات داخلية صارمة للتحكم في الوصول إلى البيانات.</li>
+                        <p>توفر منصة Speeda خاصية التقييمات والتعليقات كوسيلة تواصل بين المستخدمين فقط.</p>
+                        <ul class="numbered-sublist">
+                            <li>يتحمّل المستخدم وحده كامل المسؤولية القانونية عن أي تقييم أو تعليق أو محتوى ينشره عبر المنصة، سواء كان مكتوبًا أو مرئيًا أو بأي صيغة أخرى.</li>
+                            <li>لا تتحمّل Speeda أي مسؤولية قانونية أو مدنية أو جزائية عن محتوى التقييمات أو التعليقات أو دقتها أو آثارها أو أي أضرار قد تنشأ عنها، ويقع عبء التحقق وصحة المحتوى على عاتق ناشره فقط.</li>
+                            <li>يُحظر نشر أي تعليقات أو تقييمات تتضمن، على سبيل المثال لا الحصر: إساءة أو تشهيرًا أو ألفاظًا نابية أو محتوى غير لائق، معلومات كاذبة أو مضلّلة، تهديدات أو تحريضًا أو كراهية، أو أي انتهاك للقوانين المعمول بها أو لحقوق الغير.</li>
+                            <li>تحتفظ Speeda بالحق المطلق، دون أي التزام أو إشعار مسبق، في: حذف أو تعديل أو إخفاء أي تعليق أو تقييم مخالف، تعليق أو إنهاء حساب المستخدم المخالف، أو الاحتفاظ بنسخ من المحتوى لأغراض قانونية أو تنظيمية.</li>
+                            <li>يوافق المستخدم صراحةً على أن لـ Speeda الحق في اتخاذ الإجراءات القانونية المناسبة، بما في ذلك ملاحقة المستخدم قضائيًا أو التعاون مع الجهات المختصة، في حال نشر أي تعليق أو تقييم مخالف للقانون أو مُسيء أو يُلحق ضررًا بالمنصة أو بمستخدميها أو بأي طرف ثالث.</li>
+                            <li>لا يُعتبر السماح بنشر التقييمات أو التعليقات موافقةً أو تبنّيًا أو تصديقًا من Speeda على محتواها بأي شكل من الأشكال.</li>
                         </ul>
-                        <p>ورغم التزامنا بأعلى معايير الأمان، لا يوجد نظام رقمي آمن بنسبة 100%.
-                        ويتحمل المستخدمون مسؤولية الحفاظ على سرّية بيانات الدخول الخاصة بهم.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">9</span>
-                        الاحتفاظ بالبيانات
+                        <span>الاستخدام المقبول</span>
                     </h2>
                     <div class="section-content">
-                        <p>نحتفظ بمعلوماتك الشخصية فقط للمدة اللازمة لتحقيق الأغراض المذكورة في هذه السياسة أو للامتثال للقوانين (مثل الضرائب أو المحاسبة).
-                        وبعد انتهاء فترة الاحتفاظ، تُحذف البيانات أو تُحوّل إلى صيغة مجهولة الهوية.</p>
-                        <p>يمكن للمستخدمين طلب حذف بياناتهم في أي وقت عبر البريد الإلكتروني:
-                        <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                        <p>يُحظر على المستخدمين:</p>
+                        <ul class="bullet-list">
+                            <li>انتهاك القوانين أو حقوق الغير.</li>
+                            <li>نشر أو طلب محتوى غير قانوني أو مسيء أو خطير.</li>
+                            <li>انتحال هوية الآخرين أو تقديم مؤهلات مضلّلة.</li>
+                            <li>التحايل على رسوم Speeda أو نظام الدفع الخاص بها.</li>
+                            <li>تحميل برمجيات ضارة أو استخدام تقنيات جمع بيانات تلقائية.</li>
+                        </ul>
+                        <p>يجوز لـ Speeda اتخاذ إجراءات تقنية أو قانونية لمنع أي نشاط محظور.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">10</span>
-                        حقوق المستخدم
+                        <span>الملكية الفكرية</span>
                     </h2>
                     <div class="section-content">
-                        <p>وفقًا لقانون PIPEDA، يحق للمستخدمين ما يلي:</p>
-                        <ul class="bullet-list">
-                            <li>الوصول إلى بياناتهم الشخصية التي نحتفظ بها.</li>
-                            <li>طلب تصحيح أي بيانات غير دقيقة أو غير مكتملة.</li>
-                            <li>سحب موافقتهم على معالجة البيانات في أي وقت.</li>
-                            <li>طلب حذف بياناتهم الشخصية.</li>
-                            <li>الاعتراض على أي استخدام غير ضروري لبياناتهم.</li>
-                        </ul>
-                        <p>يُرجى توجيه الطلبات إلى البريد التالي:
-                        <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
+                        <p>جميع محتويات المنصة (النصوص، التصاميم، البرامج، الشعارات، الرسومات، إلخ) مملوكة أو مرخّصة لـ Speeda ومحمية بموجب القوانين المعمول بها. ولا يجوز للمستخدمين نسخ أو تعديل أو إعادة توزيع أي جزء منها دون موافقة كتابية مسبقة.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">11</span>
-                        خصوصية الأطفال
+                        <span>الروابط والخدمات التابعة لجهات خارجية</span>
                     </h2>
                     <div class="section-content">
-                        <p>خدماتنا موجهة للبالغين (18 سنة فما فوق).
-                        ولا نقوم بجمع بيانات شخصية من القاصرين دون موافقة الوالدين أو الأوصياء.
-                        وفي حال اكتشاف بيانات من هذا النوع، سيتم حذفها نهائيًا.</p>
+                        <p>قد تحتوي المنصة على روابط أو تكاملات مع خدمات أطراف ثالثة (مثل مزوّدي الدفع أو التحليلات أو الخرائط). ولا تتحمّل Speeda أي مسؤولية عن تلك الخدمات أو محتواها، ويخضع استخدامها لشروطها وسياسات الخصوصية الخاصة بها.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">12</span>
-                        تحديد المسؤولية
+                        <span>إخلاء المسؤولية عن الضمانات</span>
                     </h2>
                     <div class="section-content">
-                        <p>نظرًا لأن Speeda تعمل فقط كمنصة وسيطة:</p>
-                        <ul class="bullet-list">
-                            <li>فإننا غير مسؤولين عن أي سوء تصرّف أو إهمال أو أضرار ناتجة عن أي مستخدم أو مزوّد خدمة.</li>
-                            <li>لا نضمن دقة أو موثوقية أو جودة الخدمات التي يقدّمها مزوّدو الخدمات.</li>
-                            <li>لسنا طرفًا في أي عقد أو اتفاق مبرم بين العملاء ومزوّدي الخدمات.</li>
-                            <li>تُحلّ أي نزاعات أو مطالبات بين المستخدمين مباشرة دون أي مسؤولية على شركة Bnine General Trading Inc..</li>
-                        </ul>
+                        <p>تُقدَّم المنصة "كما هي" و"حسب التوافر"، دون أي ضمانات صريحة أو ضمنية. لا تضمن Speeda دقة المعلومات أو توافر المنصة أو ملاءمتها لأي غرض. كما لا تتحمّل مسؤولية جودة أو توقيت أو نتائج الخدمات المقدَّمة من مزوّدي الخدمات.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">13</span>
-                        ملفات تعريف الارتباط (Cookies)
+                        <span>إخلاء المسؤولية الكاملة</span>
                     </h2>
                     <div class="section-content">
-                        <p>يستخدم موقعنا ملفات تعريف الارتباط من أجل:</p>
                         <ul class="bullet-list">
-                            <li>تحسين تجربة المستخدم.</li>
-                            <li>تحليل حركة الزيارات وسلوك المستخدمين.</li>
-                            <li>حفظ اللغة والتفضيلات الشخصية.</li>
+                            <li>تعمل Speeda فقط كوسيط تكنولوجي بين العملاء ومزوّدي الخدمات، ولا تُقدّم أي خدمات بنفسها، ولا تُعد طرفًا في أي اتفاق أو معاملة بين المستخدمين.</li>
+                            <li>تُخلي Speeda مسؤوليتها عن أي أضرار مباشرة أو غير مباشرة أو مالية أو معنوية ناجمة عن: أي اتفاق أو نزاع بين العميل ومزوّد الخدمة، أداء الخدمة أو تأخرها أو جودتها، أي بيانات أو محتوى أو تواصل بين المستخدمين، أو أي عطل تقني أو صيانة أو توقف مؤقت أو دائم للمنصة.</li>
+                            <li>لا تتحمّل Speeda أي التزامات مالية أو قانونية تجاه أي مستخدم أو طرف ثالث تحت أي نظرية قانونية.</li>
+                            <li>يقرّ المستخدمون بأنهم يستخدمون المنصة على مسؤوليتهم الخاصة، وأن دور Speeda يقتصر على تسهيل التواصل.</li>
+                            <li>تحتفظ Speeda بالحق الكامل في تعليق أو إيقاف أو إنهاء المنصة في أي وقت ولأي سبب دون إشعار مسبق أو تعويض.</li>
                         </ul>
-                        <p>يمكنك تعطيل ملفات تعريف الارتباط من إعدادات المتصفح، مع العلم أن بعض ميزات الموقع قد لا تعمل بشكل كامل نتيجة لذلك.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">14</span>
-                        نقل البيانات الدولي
+                        <span>التعويض</span>
                     </h2>
                     <div class="section-content">
-                        <p>قد تُخزّن بياناتك أو تُعالَج على خوادم آمنة تقع في كندا أو الولايات المتحدة الأمريكية.
-                        ونحن نلتزم بجميع معايير حماية البيانات الدولية، بما في ذلك القواعد المنظمة لنقل البيانات بين الاتحاد الأوروبي وكندا.</p>
+                        <p>يوافق المستخدمون على تعويض وحماية Speeda وموظفيها ووكلائها من أي مطالبات أو خسائر أو نفقات ناتجة عن استخدامهم للمنصة أو مخالفتهم لهذه الشروط أو نزاعاتهم مع مستخدمين آخرين.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">15</span>
-                        تحديثات سياسة الخصوصية
+                        <span>القانون الواجب التطبيق والاختصاص القضائي</span>
                     </h2>
                     <div class="section-content">
-                        <p>تحتفظ شركة Bnine General Trading Inc. بالحق في تعديل أو تحديث هذه السياسة في أي وقت.
-                        سيتم نشر أي تغييرات على هذه الصفحة مع ذكر تاريخ آخر تحديث.
-                        يُعد استمرارك في استخدام المنصة بعد أي تعديل موافقة ضمنية على السياسة المُحدّثة.</p>
+                        <p>تخضع هذه الشروط لقوانين مقاطعة أونتاريو والقوانين الفيدرالية الكندية السارية. وتتمتع محاكم أوتاوا، أونتاريو بالاختصاص الحصري في أي نزاعات قانونية متعلقة بهذه الشروط.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">16</span>
+                        <span>الإشعارات والتواصل</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>يوافق المستخدمون على تلقي الإشعارات إلكترونيًا عبر البريد الإلكتروني أو داخل المنصة، وتُعدّ الإجراءات والموافقات الإلكترونية توقيعات قانونية مُلزمة.</p>
+                        <p><strong>عنوان البريد الرسمي:</strong> support@speeda.ca</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">17</span>
+                        <span>التعديلات</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>يجوز لـ Speeda تعديل هذه الشروط أو تحديث المنصة في أي وقت. ويُعدّ استمرار استخدام المنصة بعد نشر التحديثات موافقة على الشروط المعدّلة.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">18</span>
+                        <span>اللغات</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>تتوفر المنصة باللغات الإنجليزية والفرنسية والعربية. وفي حال وجود أي تعارض بين النسخ، تكون النسخة الإنجليزية هي المعتمدة ما لم ينص القانون على خلاف ذلك.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">19</span>
+                        <span>أحكام عامة</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>تُشكّل هذه الشروط وسياسة الخصوصية كامل الاتفاق بين المستخدمين وSpeeda. لا يُعتبر أي تنازل عن بندٍ ما تنازلاً مستمرًا عن غيره. إذا ثبت بطلان أي بند، يُعدّل بالحد الأدنى اللازم مع بقاء باقي البنود سارية. لا يجوز للمستخدمين التنازل عن هذه الشروط دون موافقة كتابية، بينما يجوز لـ Speeda نقلها إلى كيان تابع أو خلف قانوني.</p>
                     </div>
                 </div>
 
                 <div class="contact-box">
                     <h3>معلومات الاتصال</h3>
-                    <p><strong>Bnine General Trading Inc.</strong></p>
-                    <p>المالك والمشغّل لمنصة Speeda</p>
-                    <p>📍 المقر الرئيسي: أوتاوا، أونتاريو، كندا</p>
+                    <p><strong>Bnine General Trading Inc. (Speeda)</strong></p>
+                    <p>📍 أوتاوا، أونتاريو، كندا</p>
                     <p>البريد الإلكتروني: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
-                    <p>الموقع الإلكتروني: <a href="https://speeada.ca" target="_blank">https://speeada.ca</a></p>
+                    <p>الموقع الإلكتروني: <a href="https://www.Speeda.ca" target="_blank">www.Speeda.ca</a></p>
                 </div>
 
-@else
-                <p class="last-updated">Dernière mise à jour : 14 octobre 2025</p>
+            </div>
 
+            <!-- ================= المحتوى بالإنجليزية ================= -->
+            <div id="content-en" class="lang-content">
+                
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">1</span>
-                        Introduction
+                        <span>Definitions and Parties</span>
                     </h2>
                     <div class="section-content">
-                        <p>Cette Politique de Confidentialité est émise par Bnine General Trading Inc., une société légalement enregistrée à Ottawa, Ontario, Canada, agissant en tant que propriétaire et exploitant de la plateforme Speeda (« la Plateforme », « nous », « notre » ou « nos »).</p>
-                        <p>Cette politique explique comment nous collectons, utilisons et protégeons les informations personnelles des utilisateurs de notre site Web https://speeada.ca (« le Site Web »), de nos applications mobiles et des services numériques associés.</p>
-                        <p>Cette politique fait partie intégrante des Conditions d'utilisation de la Plateforme.
-                        En utilisant notre site, vous confirmez avoir lu, compris et accepté cette politique.
-                        Si vous n'êtes pas d'accord avec une partie de celle-ci, veuillez cesser immédiatement d'utiliser la Plateforme.</p>
+                        <p>These Terms and Conditions ("Terms") constitute a legally binding agreement between you and Bnine General Trading Inc., the owner and operator of the Speeda platform ("Speeda", "we", "us", or "our"), headquartered in Ottawa, Ontario, Canada. These Terms govern your use of the website www.Speeda.ca and any related digital services (collectively referred to as the "Platform").</p>
+                        <div class="info-box">
+                            <div class="info-item"><span class="info-term">Client:</span> Any individual or company seeking a service provider via the Platform.</div>
+                            <div class="info-item"><span class="info-term">Service Provider:</span> Any individual or company offering services independently via the Platform.</div>
+                            <div class="info-item"><span class="info-term">User:</span> Includes both Clients and Service Providers.</div>
+                            <div class="info-item"><span class="info-term">Service Agreement:</span> The direct contract or understanding between the Client and the Service Provider regarding a specific service.</div>
+                            <div class="info-item"><span class="info-term">Payment Service Provider (PSP):</span> Any third-party entity for payment processing (e.g., PayPal, E-Transfer, etc.).</div>
+                        </div>
+                        <p>By accessing or using the Platform, you agree to these Terms and our Privacy Policy. If you do not agree, you must immediately stop using the Platform.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">2</span>
-                        Définitions Légales
+                        <span>Eligibility and Account Creation</span>
                     </h2>
                     <div class="section-content">
-                        <p>Aux fins de cette politique, les définitions suivantes s'appliquent :</p>
-                        <div class="definition-list">
-                            <div class="definition-item">
-                                <span class="definition-term">Bnine General Trading Inc. :</span> L'entité juridique enregistrée au Canada, responsable de l'exploitation et de la gestion de la Plateforme.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Speeda / Speeda.ca :</span> Le nom commercial et la plateforme numérique détenus et gérés par Bnine General Trading Inc.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Utilisateur :</span> Toute personne qui utilise le Site Web ou l'application, que ce soit en tant que Client ou Prestataire de services.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Client :</span> Un Utilisateur qui recherche un service ou soumet une demande de service via la Plateforme.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Prestataire de services :</span> Un Utilisateur qui propose des services via la Plateforme, en tant qu'individu indépendant ou entité commerciale.
-                            </div>
-                            <div class="definition-item">
-                                <span class="definition-term">Informations Personnelles :</span> Toute donnée pouvant identifier directement ou indirectement un individu spécifique, telle que définie par la Loi sur la protection des renseignements personnels et les documents électroniques (LPRPDE) au Canada.
-                            </div>
-                        </div>
+                        <p>Users must be at least 18 years old and legally eligible to enter into contracts. They are required to provide accurate and up-to-date information, and are responsible for maintaining the confidentiality of their login credentials and all account activities. Speeda reserves the right to suspend, refuse, or terminate any account to protect users or comply with the law.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">3</span>
-                        Champ d'Application
+                        <span>Nature of Speeda's Role</span>
                     </h2>
                     <div class="section-content">
-                        <p>Cette politique s'applique à tous les utilisateurs, à l'intérieur et à l'extérieur du Canada, qui accèdent ou utilisent la Plateforme.
-                        En utilisant nos services, vous consentez à ce que vos données personnelles soient collectées, traitées et stockées au Canada ou dans d'autres pays bénéficiant d'un niveau similaire de protection des données.</p>
+                        <div class="highlight-box">
+                            <strong>Important:</strong> Speeda acts solely as a technology intermediary connecting Clients and Service Providers. Speeda does not provide the services itself, does not employ Service Providers, does not set prices, and does not supervise the quality, timing, or results of the services.
+                        </div>
+                        <p>No provision in these Terms creates an employment, agency, or partnership relationship between Speeda and any User.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">4</span>
-                        Nature de la Plateforme
+                        <span>Platform Use and Service Agreements</span>
                     </h2>
                     <div class="section-content">
-                        <p>Speeda fonctionne comme une plateforme numérique intermédiaire qui met en relation les Clients et les Prestataires de services dans un environnement sécurisé et fiable.
-                        Speeda ne fournit aucun service directement et n'est partie à aucun contrat ou accord entre les Clients et les Prestataires de services.
-                        Toutes les interactions et transactions entre les utilisateurs sont effectuées à leurs propres risques.
-                        Notre rôle se limite à fournir l'infrastructure technique qui facilite la communication entre les parties.</p>
+                        <p>Clients choose Service Providers freely based on information available on the Platform. Once a Client and a Service Provider reach an agreement, a Service Agreement is concluded exclusively between them. Speeda is not a party to any Service Agreement and assumes no legal or financial liability for its performance, results, or related disputes.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">5</span>
-                        Informations que nous collectons
+                        <span>Subscriptions, Fees, Payments, and Cancellation</span>
                     </h2>
                     <div class="section-content">
-                        <p>Nous pouvons collecter plusieurs types d'informations en fonction de la nature de votre utilisation de la Plateforme :</p>
-
-                        <div class="subsection">
-                            <p class="subsection-title">A. Informations fournies directement par vous :</p>
-                            <ul class="bullet-list">
-                                <li>Nom complet, adresse e-mail et numéro de téléphone.</li>
-                                <li>Ville ou province, et le type de service requis ou offert.</li>
-                                <li>Données de paiement ou de facturation (pour les abonnements ou transactions).</li>
-                                <li>Documents d'identification professionnelle ou personnelle (tels qu'une licence commerciale ou un numéro d'enregistrement commercial).</li>
-                                <li>Toute correspondance ou interaction avec l'équipe de support ou d'autres utilisateurs via la Plateforme.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">B. Données techniques et analytiques :</p>
-                            <ul class="bullet-list">
-                                <li>L'adresse IP de votre appareil.</li>
-                                <li>Type de navigateur, système d'exploitation et informations sur l'appareil.</li>
-                                <li>Données de localisation approximative (ville ou région).</li>
-                                <li>Heures d'accès, pages visitées et habitudes de navigation.</li>
-                                <li>Données de témoins (Cookies) et d'analyse.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">C. Données d'activité :</p>
-                            <ul class="bullet-list">
-                                <li>Historique des services complétés ou des demandes.</li>
-                                <li>Évaluations, avis et commentaires échangés entre utilisateurs.</li>
-                                <li>Historique des transactions et notifications.</li>
-                            </ul>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">D. Informations reçues de tiers :</p>
-                            <p>Nous pouvons recevoir des données supplémentaires de nos partenaires de confiance tels que :</p>
-                            <ul class="bullet-list">
-                                <li>Services de vérification d'identité.</li>
-                                <li>Fournisseurs de services de paiement électronique.</li>
-                                <li>Plateformes de médias sociaux (lors de l'inscription via celles-ci et avec votre consentement).</li>
-                            </ul>
-                        </div>
+                        <ul class="bullet-list">
+                            <li>Speeda operates on a monthly subscription system granting users access to Platform features and services.</li>
+                            <li>All fees are non-refundable, in whole or in part.</li>
+                            <li>Users may cancel their subscription at any time; cancellation becomes effective at the start of the next billing cycle.</li>
+                            <li>No refunds are issued for unused periods.</li>
+                            <li>Payments can be made via E-Transfer, PayPal, or any other payment provider supported by Speeda.</li>
+                            <li>By using any payment provider, the User agrees to its terms and acknowledges that Speeda is not a bank or escrow agent.</li>
+                            <li>Applicable taxes (such as HST/GST/PST) may be added as required by law.</li>
+                        </ul>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">6</span>
-                        Objectifs de la collecte de données
+                        <span>Service Provider Obligations</span>
                     </h2>
                     <div class="section-content">
-                        <p>Nous utilisons les informations personnelles aux fins suivantes :</p>
+                        <p>Service Providers acknowledge and warrant that they:</p>
                         <ul class="bullet-list">
-                            <li>Exploiter et maintenir la Plateforme et les services numériques.</li>
-                            <li>Faciliter la communication entre les Clients et les Prestataires de services.</li>
-                            <li>Vérifier l'identité et gérer les comptes utilisateurs.</li>
-                            <li>Assurer la sécurité de la Plateforme et l'intégrité des transactions.</li>
-                            <li>Améliorer la performance et l'expérience utilisateur.</li>
-                            <li>Communiquer avec vous concernant le support technique, les notifications ou les mises à jour.</li>
-                            <li>Se conformer aux obligations légales et réglementaires.</li>
-                            <li>Traiter les réclamations et résoudre les litiges.</li>
-                            <li>Effectuer des analyses statistiques et des recherches.</li>
-                            <li>Envoyer des offres promotionnelles ou des messages marketing (avec votre consentement préalable).</li>
+                            <li>Operate legally and independently within their jurisdiction.</li>
+                            <li>Hold necessary licenses and permits.</li>
+                            <li>Maintain required insurance.</li>
+                            <li>Provide services professionally, safely, and legally.</li>
+                            <li>Assume full responsibility for their employees, assistants, or subcontractors.</li>
                         </ul>
+                        <div class="highlight-box">
+                            <strong>Notice:</strong> Speeda does not verify the qualifications or licenses of Service Providers. Clients should exercise caution before contracting.
+                        </div>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">7</span>
-                        Partage et divulgation des données
+                        <span>Client Obligations</span>
                     </h2>
                     <div class="section-content">
-                        <p>Nous ne pouvons partager vos informations que dans les cas suivants :</p>
-
-                        <div class="subsection">
-                            <p class="subsection-title">A) Avec les fournisseurs de services techniques :</p>
-                            <ul class="bullet-list">
-                                <li>Services d'hébergement de données en nuage.</li>
-                                <li>Systèmes de traitement des paiements.</li>
-                                <li>Partenaires de support technique et d'analyse.</li>
-                            </ul>
-                            <p>Toutes ces parties sont liées par des accords stricts de confidentialité et de protection des données.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">B) Obligations légales :</p>
-                            <p>Nous pouvons divulguer certaines informations pour nous conformer à des ordonnances judiciaires ou à des demandes des autorités gouvernementales conformément à la loi.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">C) Fusions ou acquisitions :</p>
-                            <p>En cas de fusion, d'acquisition ou de vente d'une partie de nos actifs, les données des utilisateurs peuvent être transférées après notification préalable.</p>
-                        </div>
-
-                        <div class="subsection">
-                            <p class="subsection-title">D) Prévention de la fraude et risques de sécurité :</p>
-                            <p>Lorsque nous estimons de bonne foi que la divulgation est nécessaire pour protéger nos droits, ceux des utilisateurs ou le public contre une activité frauduleuse ou illégale.</p>
-                        </div>
-
-                        <div class="highlight-box">
-                            <strong>Remarque :</strong> Nous ne vendons, ne louons et n'échangeons en aucun cas les informations personnelles.
-                        </div>
+                        <ul class="bullet-list">
+                            <li>Provide accurate descriptions of requested services.</li>
+                            <li>Ensure safe and lawful access to the service location.</li>
+                            <li>Refrain from requesting illegal or dangerous services.</li>
+                            <li>Commit to paying agreed amounts directly or via the selected payment provider.</li>
+                        </ul>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">8</span>
-                        Protection des données et sécurité de l'information
+                        <span>Reviews and User-Generated Content</span>
                     </h2>
                     <div class="section-content">
-                        <p>Bnine General Trading Inc. respecte des normes de sécurité avancées, notamment :</p>
-                        <ul class="bullet-list">
-                            <li>Cryptage des communications par protocole SSL.</li>
-                            <li>Stockage sécurisé sur des serveurs à accès limité.</li>
-                            <li>Examens périodiques et évaluations des vulnérabilités de sécurité.</li>
-                            <li>Politiques internes strictes pour le contrôle d'accès aux données.</li>
+                        <p>Users may post reviews, ratings, photos, or other content ("User Content"). By doing so, they grant Speeda a worldwide, non-exclusive, royalty-free license to use this content to operate, promote, and improve the Platform.</p>
+                        <p>Users acknowledge that their content is lawful and does not infringe on the rights of others. Speeda reserves the right to remove any inappropriate content or suspend offending accounts.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">8</span>
+                        <span>Rating and Comment System</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Speeda provides the rating and comment feature solely as a means of communication between Users.</p>
+                        <ul class="numbered-sublist">
+                            <li>The User alone bears full legal responsibility for any rating, comment, or content published via the Platform, whether written, visual, or in any other format.</li>
+                            <li>Speeda assumes no legal, civil, or criminal liability for the content of ratings or comments, their accuracy, their effects, or any damages arising from them; the burden of verification and content accuracy lies solely with the publisher.</li>
+                            <li>It is prohibited to post any comments or ratings containing, but not limited to: abuse, defamation, profanity, inappropriate content, false or misleading information, threats, incitement, hatred, or any violation of applicable laws or third-party rights.</li>
+                            <li>Speeda reserves the absolute right, without any obligation or prior notice, to: delete, modify, or hide any violating comment or rating, suspend or terminate the offending user's account, and retain copies of content for legal or regulatory purposes.</li>
+                            <li>The User explicitly agrees that Speeda has the right to take appropriate legal action, including suing the User or cooperating with authorities, if any comment or rating violates the law, is offensive, or causes harm to the Platform, its users, or any third party.</li>
+                            <li>Allowing the posting of ratings or comments does not constitute Speeda's approval, adoption, or endorsement of their content in any way.</li>
                         </ul>
-                        <p>Malgré notre engagement envers les normes de sécurité les plus élevées, aucun système numérique n'est sécurisé à 100 %.
-                        Les utilisateurs sont responsables du maintien de la confidentialité de leurs identifiants de connexion.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">9</span>
-                        Conservation des données
+                        <span>Acceptable Use</span>
                     </h2>
                     <div class="section-content">
-                        <p>Nous ne conservons vos informations personnelles que pour la durée nécessaire à la réalisation des objectifs mentionnés dans cette politique ou pour nous conformer aux lois (telles que fiscales ou comptables).
-                        À l'expiration de la période de conservation, les données sont supprimées ou anonymisées.</p>
-                        <p>Les utilisateurs peuvent demander la suppression de leurs données à tout moment par e-mail :
-                        <a href="mailto:support@Speeda.ca">support@Speeda.ca</a></p>
+                        <p>Users are prohibited from:</p>
+                        <ul class="bullet-list">
+                            <li>Violating laws or third-party rights.</li>
+                            <li>Posting or requesting illegal, offensive, or dangerous content.</li>
+                            <li>Impersonating others or providing misleading qualifications.</li>
+                            <li>Circumventing Speeda's fees or payment system.</li>
+                            <li>Uploading malicious software or using automatic data collection techniques.</li>
+                        </ul>
+                        <p>Speeda may take technical or legal action to prevent any prohibited activity.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">10</span>
-                        Droits des utilisateurs
+                        <span>Intellectual Property</span>
                     </h2>
                     <div class="section-content">
-                        <p>Conformément à la LPRPDE, les utilisateurs ont le droit de :</p>
-                        <ul class="bullet-list">
-                            <li>Accéder à leurs données personnelles que nous détenons.</li>
-                            <li>Demander la correction de toute donnée inexacte ou incomplète.</li>
-                            <li>Retirer leur consentement au traitement des données à tout moment.</li>
-                            <li>Demander la suppression de leurs données personnelles.</li>
-                            <li>S'opposer à toute utilisation non nécessaire de leurs données.</li>
-                        </ul>
-                        <p>Veuillez adresser vos demandes à l'adresse e-mail suivante :
-                        <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
+                        <p>All Platform content (texts, designs, software, logos, graphics, etc.) is owned or licensed by Speeda and protected by applicable laws. Users may not copy, modify, or redistribute any part of it without prior written consent.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">11</span>
-                        Confidentialité des enfants
+                        <span>Third-Party Links and Services</span>
                     </h2>
                     <div class="section-content">
-                        <p>Nos services sont destinés aux adultes (18 ans et plus).
-                        Nous ne collectons pas sciemment de données personnelles auprès de mineurs sans le consentement des parents ou tuteurs.
-                        Si de telles données sont découvertes, elles seront définitivement supprimées.</p>
+                        <p>The Platform may contain links or integrations with third-party services (such as payment providers, analytics, or maps). Speeda assumes no responsibility for those services or their content; their use is subject to their own terms and privacy policies.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">12</span>
-                        Limitation de responsabilité
+                        <span>Disclaimer of Warranties</span>
                     </h2>
                     <div class="section-content">
-                        <p>Étant donné que Speeda n'agit qu'en tant que plateforme intermédiaire :</p>
-                        <ul class="bullet-list">
-                            <li>Nous ne sommes pas responsables de toute faute, négligence ou dommage causé par un utilisateur ou un Prestataire de services.</li>
-                            <li>Nous ne garantissons pas l'exactitude, la fiabilité ou la qualité des services fournis par les Prestataires de services.</li>
-                            <li>Nous ne sommes partie à aucun contrat ou accord conclu entre les Clients et les Prestataires de services.</li>
-                            <li>Tout litige ou réclamation entre utilisateurs est résolu directement sans aucune responsabilité de Bnine General Trading Inc.</li>
-                        </ul>
+                        <p>The Platform is provided "as is" and "as available," without any express or implied warranties. Speeda does not guarantee the accuracy of information, the availability of the Platform, or its fitness for any purpose. Speeda also assumes no responsibility for the quality, timing, or results of services provided by Service Providers.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">13</span>
-                        Témoins (Cookies)
+                        <span>General Disclaimer</span>
                     </h2>
                     <div class="section-content">
-                        <p>Notre site utilise des témoins afin de :</p>
                         <ul class="bullet-list">
-                            <li>Améliorer l'expérience utilisateur.</li>
-                            <li>Analyser le trafic et le comportement des utilisateurs.</li>
-                            <li>Enregistrer la langue et les préférences personnelles.</li>
+                            <li>Speeda acts only as a technology intermediary between Clients and Service Providers, does not provide any services itself, and is not a party to any agreement or transaction between Users.</li>
+                            <li>Speeda disclaims liability for any direct, indirect, financial, or moral damages arising from: any agreement or dispute between Client and Service Provider, the performance, delay, or quality of the service, any data or content or communication between Users, or any technical fault, maintenance, or temporary or permanent suspension of the Platform.</li>
+                            <li>Speeda assumes no financial or legal obligations to any User or third party under any legal theory.</li>
+                            <li>Users acknowledge that they use the Platform at their own risk and that Speeda's role is limited to facilitating communication.</li>
+                            <li>Speeda reserves the full right to suspend, stop, or terminate the Platform at any time and for any reason without prior notice or compensation.</li>
                         </ul>
-                        <p>Vous pouvez désactiver les témoins dans les paramètres de votre navigateur, sachant que certaines fonctionnalités du site pourraient ne pas fonctionner pleinement en conséquence.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">14</span>
-                        Transfert international de données
+                        <span>Indemnification</span>
                     </h2>
                     <div class="section-content">
-                        <p>Vos données peuvent être stockées ou traitées sur des serveurs sécurisés situés au Canada ou aux États-Unis d'Amérique.
-                        Nous adhérons à toutes les normes internationales de protection des données, y compris les règles régissant le transfert de données entre l'Union européenne et le Canada.</p>
+                        <p>Users agree to indemnify and hold harmless Speeda, its employees, and agents from any claims, losses, or expenses resulting from their use of the Platform, violation of these Terms, or disputes with other users.</p>
                     </div>
                 </div>
 
                 <div class="section">
                     <h2 class="section-title">
                         <span class="section-number">15</span>
-                        Mises à jour de la politique de confidentialité
+                        <span>Governing Law and Jurisdiction</span>
                     </h2>
                     <div class="section-content">
-                        <p>Bnine General Trading Inc. se réserve le droit de modifier ou de mettre à jour cette politique à tout moment.
-                        Toute modification sera publiée sur cette page avec la date de la dernière mise à jour.
-                        Votre utilisation continue de la Plateforme après toute modification constitue un accord implicite avec la politique mise à jour.</p>
+                        <p>These Terms are subject to the laws of the Province of Ontario and the applicable federal laws of Canada. The courts of Ottawa, Ontario have exclusive jurisdiction over any legal disputes related to these Terms.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">16</span>
+                        <span>Notices and Communication</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Users agree to receive notifications electronically via email or within the Platform. Electronic actions and consents are considered legally binding signatures.</p>
+                        <p><strong>Official Email Address:</strong> support@speeda.ca</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">17</span>
+                        <span>Amendments</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Speeda may amend these Terms or update the Platform at any time. Continued use of the Platform after posting updates constitutes acceptance of the modified Terms.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">18</span>
+                        <span>Languages</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>The Platform is available in English, French, and Arabic. In case of any conflict between versions, the English version shall prevail unless the law provides otherwise.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">19</span>
+                        <span>General Provisions</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>These Terms and the Privacy Policy constitute the entire agreement between Users and Speeda. No waiver of any provision shall be a continuing waiver of any other. If any provision is found invalid, it shall be amended to the minimum extent necessary with the remaining provisions staying in effect. Users may not waive these Terms without written consent, while Speeda may assign them to an affiliate or legal successor.</p>
                     </div>
                 </div>
 
                 <div class="contact-box">
-                    <h3>Coordonnées</h3>
-                    <p><strong>Bnine General Trading Inc.</strong></p>
-                    <p>Propriétaire et exploitant de la plateforme Speeda</p>
-                    <p>📍 Siège social : Ottawa, Ontario, Canada</p>
+                    <h3>Contact Information</h3>
+                    <p><strong>Bnine General Trading Inc. (Speeda)</strong></p>
+                    <p>📍 Ottawa, Ontario, Canada</p>
                     <p>Email: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
-                    <p>Site Web: <a href="https://speeada.ca" target="_blank">https://speeada.ca</a></p>
+                    <p>Website: <a href="https://www.Speeda.ca" target="_blank">www.Speeda.ca</a></p>
                 </div>
 
-@endif
+            </div>
+
+            <!-- ================= المحتوى بالفرنسية ================= -->
+            <div id="content-fr" class="lang-content">
+                
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">1</span>
+                        <span>Définitions et Parties</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les présentes Conditions Générales ("Conditions") constituent un accord juridique contraignant entre vous et Bnine General Trading Inc., propriétaire et exploitant de la plateforme Speeda ("Speeda", "nous", "notre" ou "nos"), dont le siège est à Ottawa, Ontario, Canada. Ces Conditions régissent votre utilisation du site www.Speeda.ca et de tous services numériques connexes (collectivement appelés la "Plateforme").</p>
+                        <div class="info-box">
+                            <div class="info-item"><span class="info-term">Client :</span> Toute personne physique ou morale recherchant un prestataire de services via la Plateforme.</div>
+                            <div class="info-item"><span class="info-term">Prestataire de services :</span> Toute personne physique ou morale offrant des services de manière indépendante via la Plateforme.</div>
+                            <div class="info-item"><span class="info-term">Utilisateur :</span> Inclut à la fois les Clients et les Prestataires de services.</div>
+                            <div class="info-item"><span class="info-term">Accord de service :</span> Le contrat direct ou l'entente entre le Client et le Prestataire de services concernant un service spécifique.</div>
+                            <div class="info-item"><span class="info-term">Prestataire de services de paiement (PSP) :</span> Toute tierce partie pour le traitement des paiements (ex: PayPal, virement électronique, etc.).</div>
+                        </div>
+                        <p>En accédant à la Plateforme ou en l'utilisant, vous acceptez ces Conditions et notre Politique de Confidentialité. Si vous n'acceptez pas ces Conditions, vous devez cesser immédiatement d'utiliser la Plateforme.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">2</span>
+                        <span>Éligibilité et Création de Compte</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les utilisateurs doivent avoir au moins 18 ans et être juridiquement capables de conclure des contrats. Ils sont tenus de fournir des informations exactes et à jour, et sont responsables de maintenir la confidentialité de leurs identifiants de connexion et de toutes les activités du compte. Speeda se réserve le droit de suspendre, refuser ou résilier tout compte pour protéger les utilisateurs ou se conformer à la loi.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">3</span>
+                        <span>Nature du Rôle de Speeda</span>
+                    </h2>
+                    <div class="section-content">
+                        <div class="highlight-box">
+                            <strong>Important :</strong> Speeda agit uniquement en tant qu'intermédiaire technologique mettant en relation les Clients et les Prestataires de services. Speeda ne fournit pas les services elle-même, n'emploie pas les Prestataires de services, ne fixe pas les prix et ne supervise pas la qualité, le calendrier ou les résultats des services.
+                        </div>
+                        <p>Aucune disposition de ces Conditions ne crée une relation de travail, d'agence ou de partenariat entre Speeda et tout Utilisateur.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">4</span>
+                        <span>Utilisation de la Plateforme et Accords de Service</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les Clients choisissent librement les Prestataires de services en fonction des informations disponibles sur la Plateforme. Une fois qu'un Client et un Prestataire de services parviennent à un accord, l'Accord de Service est conclu exclusivement entre eux. Speeda n'est pas partie à un Accord de Service et n'assume aucune responsabilité juridique ou financière pour son exécution, ses résultats ou les litiges connexes.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">5</span>
+                        <span>Abonnements, Frais, Paiements et Annulation</span>
+                    </h2>
+                    <div class="section-content">
+                        <ul class="bullet-list">
+                            <li>Speeda fonctionne sur un système d'abonnement mensuel donnant aux utilisateurs accès aux fonctionnalités et services de la Plateforme.</li>
+                            <li>Tous les frais sont non remboursables, en tout ou en partie.</li>
+                            <li>Les utilisateurs peuvent annuler leur abonnement à tout moment ; l'annulation prend effet au début du prochain cycle de facturation.</li>
+                            <li>Aucun remboursement n'est émis pour les périodes non utilisées.</li>
+                            <li>Les paiements peuvent être effectués par virement électronique, PayPal ou tout autre fournisseur de paiement pris en charge par Speeda.</li>
+                            <li>En utilisant un fournisseur de paiement, l'Utilisateur accepte ses conditions et reconnaît que Speeda n'est pas une banque ou un agent de séquestre.</li>
+                            <li>Les taxes applicables (telles que TVH/TPS/TVP) peuvent être ajoutées conformément à la loi.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">6</span>
+                        <span>Obligations des Prestataires de Services</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les Prestataires de services reconnaissent et garantissent qu'ils :</p>
+                        <ul class="bullet-list">
+                            <li>Agissent légalement et de manière indépendante dans leur juridiction.</li>
+                            <li>Détiennent les licences et permis nécessaires.</li>
+                            <li>Maintiennent les assurances requises.</li>
+                            <li>Fournissent les services de manière professionnelle, sûre et légale.</li>
+                            <li>Assument l'entière responsabilité de leurs employés, assistants ou sous-traitants.</li>
+                        </ul>
+                        <div class="highlight-box">
+                            <strong>Remarque :</strong> Speeda ne vérifie pas les qualifications ou les licences des Prestataires de services. Les Clients doivent faire preuve de prudence avant de contracter.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">7</span>
+                        <span>Obligations des Clients</span>
+                    </h2>
+                    <div class="section-content">
+                        <ul class="bullet-list">
+                            <li>Fournir des descriptions précises des services demandés.</li>
+                            <li>Garantir un accès sûr et légal au lieu du service.</li>
+                            <li>S'abstenir de demander des services illégaux ou dangereux.</li>
+                            <li>S'engager à payer les montants convenus directement ou via le fournisseur de paiement choisi.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">8</span>
+                        <span>Avis et Contenu Généré par l'Utilisateur</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les utilisateurs peuvent publier des avis, des évaluations, des photos ou d'autres contenus ("Contenu de l'Utilisateur"). Ce faisant, ils accordent à Speeda une licence mondiale, non exclusive et gratuite d'utiliser ce contenu pour exploiter, promouvoir et améliorer la Plateforme.</p>
+                        <p>Les utilisateurs reconnaissent que leur contenu est licite et ne porte pas atteinte aux droits d'autrui. Speeda se réserve le droit de supprimer tout contenu inapproprié ou de suspendre les comptes contrevenants.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">8</span>
+                        <span>Système de Notation et de Commentaires</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Speeda fournit la fonctionnalité de notation et de commentaires uniquement comme moyen de communication entre les Utilisateurs.</p>
+                        <ul class="numbered-sublist">
+                            <li>L'Utilisateur porte seul l'entière responsabilité juridique de toute note, commentaire ou contenu publié via la Plateforme, qu'il soit écrit, visuel ou sous tout autre format.</li>
+                            <li>Speeda n'assume aucune responsabilité juridique, civile ou pénale pour le contenu des notes ou commentaires, leur exactitude, leurs effets ou tout dommage en découlant ; la charge de la vérification et de l'exactitude du contenu incombe uniquement à l'éditeur.</li>
+                            <li>Il est interdit de publier des commentaires ou notes contenant, notamment : des abus, de la diffamation, des grossièretés, un contenu inapproprié, des informations fausses ou trompeuses, des menaces, de l'incitation, de la haine ou toute violation des lois applicables ou des droits de tiers.</li>
+                            <li>Speeda se réserve le droit absolu, sans obligation ni préavis, de : supprimer, modifier ou masquer tout commentaire ou note contrevenant, suspendre ou résilier le compte de l'utilisateur contrevenant, et conserver des copies du contenu à des fins juridiques ou réglementaires.</li>
+                            <li>L'Utilisateur convient expressément que Speeda a le droit de prendre toute mesure juridique appropriée, y compris poursuivre l'Utilisateur en justice ou coopérer avec les autorités, si tout commentaire ou note enfreint la loi, est offensant ou cause des préjudices à la Plateforme, à ses utilisateurs ou à un tiers.</li>
+                            <li>Le fait d'autoriser la publication de notes ou de commentaires ne constitue pas une approbation, une adoption ou une endorsement par Speeda de leur contenu de quelque manière que ce soit.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">9</span>
+                        <span>Usage Acceptable</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Il est interdit aux Utilisateurs de :</p>
+                        <ul class="bullet-list">
+                            <li>Violenter les lois ou les droits d'autrui.</li>
+                            <li>Publier ou demander du contenu illégal, offensant ou dangereux.</li>
+                            <li>Usurper l'identité d'autrui ou fournir des qualifications trompeuses.</li>
+                            <li>Contourner les frais de Speeda ou son système de paiement.</li>
+                            <li>Télécharger des logiciels malveillants ou utiliser des techniques de collecte de données automatiques.</li>
+                        </ul>
+                        <p>Speeda peut prendre des mesures techniques ou juridiques pour empêcher toute activité interdite.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">10</span>
+                        <span>Propriété Intellectuelle</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Tout le contenu de la Plateforme (textes, designs, logiciels, logos, graphiques, etc.) est la propriété de Speeda ou sous licence par elle, et est protégé par les lois applicables. Les utilisateurs ne peuvent pas copier, modifier ou redistribuer une partie de celui-ci sans consentement écrit préalable.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">11</span>
+                        <span>Liens et Services Tiers</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>La Plateforme peut contenir des liens ou des intégrations avec des services tiers (tels que des fournisseurs de paiement, des analyses ou des cartes). Speeda n'assume aucune responsabilité pour ces services ou leur contenu ; leur utilisation est soumise à leurs propres conditions et politiques de confidentialité.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">12</span>
+                        <span>Exonération de Garantie</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>La Plateforme est fournie "telle quelle" et "selon disponibilité", sans garantie expresse ou implicite. Speeda ne garantit pas l'exactitude des informations, la disponibilité de la Plateforme ou sa pertinence pour un usage particulier. Speeda n'assume également aucune responsabilité pour la qualité, le calendrier ou les résultats des services fournis par les Prestataires de services.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">13</span>
+                        <span>Exonération de Responsabilité Générale</span>
+                    </h2>
+                    <div class="section-content">
+                        <ul class="bullet-list">
+                            <li>Speeda agit uniquement en tant qu'intermédiaire technologique entre les Clients et les Prestataires de services, ne fournit aucun service elle-même et n'est partie à aucun accord ou transaction entre les Utilisateurs.</li>
+                            <li>Speeda décline toute responsabilité pour les dommages directs, indirects, financiers ou moraux résultant de : tout accord ou litige entre le Client et le Prestataire de services, de l'exécution, du retard ou de la qualité du service, de toute donnée ou contenu ou communication entre les Utilisateurs, ou de tout dysfonctionnement technique, maintenance ou suspension temporaire ou définitive de la Plateforme.</li>
+                            <li>Speeda n'assume aucune obligation financière ou juridique envers tout Utilisateur ou tiers en vertu de toute théorie juridique.</li>
+                            <li>Les utilisateurs reconnaissent qu'ils utilisent la Plateforme à leurs propres risques et que le rôle de Speeda se limite à faciliter la communication.</li>
+                            <li>Speeda se réserve le droit complet de suspendre, arrêter ou résilier la Plateforme à tout moment et pour toute raison sans préavis ni compensation.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">14</span>
+                        <span>Indemnisation</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les utilisateurs conviennent d'indemniser et de dégager Speeda, ses employés et ses agents de toute réclamation, perte ou dépense résultant de leur utilisation de la Plateforme, de la violation des présentes Conditions ou de litiges avec d'autres utilisateurs.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">15</span>
+                        <span>Loi Applicable et Juridiction</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les présentes Conditions sont régies par les lois de la province de l'Ontario et les lois fédérales applicables du Canada. Les tribunaux d'Ottawa, Ontario ont la compétence exclusive pour tout litige juridique lié aux présentes Conditions.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">16</span>
+                        <span>Notifications et Communication</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les utilisateurs acceptent de recevoir les notifications électroniquement par email ou dans la Plateforme. Les actions et consentements électroniques sont considérés comme des signatures juridiquement contraignantes.</p>
+                        <p><strong>Adresse Email Officielle :</strong> support@speeda.ca</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">17</span>
+                        <span>Modifications</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Speeda peut modifier les présentes Conditions ou mettre à jour la Plateforme à tout moment. L'utilisation continue de la Plateforme après la publication des mises à jour constitue une acceptation des Conditions modifiées.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">18</span>
+                        <span>Langues</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>La Plateforme est disponible en anglais, français et arabe. En cas de conflit entre les versions, la version anglaise prévaudra, sauf si la loi en dispose autrement.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span class="section-number">19</span>
+                        <span>Dispositions Générales</span>
+                    </h2>
+                    <div class="section-content">
+                        <p>Les présentes Conditions et la Politique de Confidentialité constituent l'intégralité de l'accord entre les Utilisateurs et Speeda. Aucune renonciation à une disposition ne constitue une renonciation continue à une autre. Si une disposition est jugée invalide, elle sera modifiée dans la mesure minimale nécessaire, les autres dispositions restant en vigueur. Les utilisateurs ne peuvent renoncer aux présentes Conditions sans consentement écrit, tandis que Speeda peut les céder à une filiale ou un successeur juridique.</p>
+                    </div>
+                </div>
+
+                <div class="contact-box">
+                    <h3>Informations de Contact</h3>
+                    <p><strong>Bnine General Trading Inc. (Speeda)</strong></p>
+                    <p>📍 Ottawa, Ontario, Canada</p>
+                    <p>Email: <a href="mailto:support@speeda.ca">support@speeda.ca</a></p>
+                    <p>Site Web: <a href="https://www.Speeda.ca" target="_blank">www.Speeda.ca</a></p>
+                </div>
+
+            </div>
+
         </div>
     </div>
-    </body>
+
+    <script>
+        // سكربت بسيط لتبديل اللغات في الملف التجريبي فقط
+        function switchLang(lang, btn) {
+            // تحديث الاتجاه
+            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+            // تحديث الأزرار النشطة
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // إخفاء/إظهار المحتوى
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('content-' + lang).classList.add('active');
+
+            // تحديث العناوين
+            const titles = {
+                'ar': { main: 'شروط الخدمة', sub: 'اتفاقية منصة Speeda.CA', date: 'آخر تحديث: 23 أكتوبر 2025' },
+                'en': { main: 'Terms of Service', sub: 'Speeda.CA Platform Agreement', date: 'Last Updated: October 23, 2025' },
+                'fr': { main: "Conditions d'Utilisation", sub: "Contrat de la plateforme Speeda.CA", date: 'Dernière mise à jour : 23 octobre 2025' }
+            };
+
+            document.querySelector('.title-text').textContent = titles[lang].main;
+            document.getElementById('page-subtitle').textContent = titles[lang].sub;
+            document.getElementById('last-updated').textContent = titles[lang].date;
+        }
+
+        // تفعيل العربية افتراضياً
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-ar').click();
+        });
+    </script>
+</body>
 </html>

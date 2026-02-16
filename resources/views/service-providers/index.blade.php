@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 
 <head>
     <meta charset="utf-8">
@@ -256,10 +256,12 @@
             background: white;
             border-radius: 24px;
             border: 1px solid var(--gray-200);
-            overflow: hidden;
+            overflow: visible;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            height: 100%;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
             animation: cardSlideIn 0.6s ease-out;
         }
 
@@ -350,6 +352,8 @@
             color: var(--gray-900);
             margin-bottom: 0.375rem;
             line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .provider-category {
@@ -357,6 +361,8 @@
             font-size: 0.9375rem;
             font-weight: 500;
             margin-bottom: 0.5rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .rating-display {
@@ -414,6 +420,8 @@
             font-size: 0.9375rem;
             color: var(--gray-700);
             font-weight: 500;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .hidden-address {
@@ -472,6 +480,7 @@
         .card-footer {
             padding: 1.75rem;
             border-top: 1px solid var(--gray-100);
+            margin-top: auto;
         }
 
         .action-buttons {
@@ -1500,6 +1509,73 @@
             }
         }
 
+        /* ===== RTL Support ===== */
+        [dir="rtl"] .provider-badge {
+            right: auto;
+            left: 1.75rem;
+        }
+
+        [dir="rtl"] .provider-header {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .verified-check {
+            right: auto;
+            left: -5px;
+        }
+
+        [dir="rtl"] .provider-info {
+            text-align: right;
+        }
+
+        [dir="rtl"] .location-info {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .address-text {
+            text-align: right;
+        }
+
+        [dir="rtl"] .action-buttons {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .experience-badge {
+            right: auto;
+            left: 1.75rem;
+        }
+
+        [dir="rtl"] .rating-display {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .stats-grid {
+            direction: rtl;
+        }
+
+        [dir="rtl"] .btn-action {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .btn-profile {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .select-arrow {
+            right: auto;
+            left: 1.25rem;
+            transform: translateY(-50%) scaleX(-1);
+        }
+
+        [dir="rtl"] .search-icon {
+            left: auto;
+            right: 1.25rem;
+        }
+
+        [dir="rtl"] .filter-select {
+            padding: 0 1.25rem 0 2.5rem;
+        }
+
         /* ===== تأثيرات التحميل المتتالية ===== */
         .provider-card:nth-child(1) { animation-delay: 0.1s; }
         .provider-card:nth-child(2) { animation-delay: 0.2s; }
@@ -1615,7 +1691,7 @@
                     <div class="card-header">
                         @if($provider->featured)
                             <div class="provider-badge">
-                                <i class="fas fa-crown me-1"></i> Featured
+                                <i class="fas fa-crown me-1"></i> {{ __('service_provider.featured') }}
                             </div>
                         @endif
 
@@ -2043,11 +2119,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // ======================
     const starContainers = document.querySelectorAll('.star-rating');
     const ratingTexts = {
-        '1': 'Poor - Need improvement',
-        '2': 'Fair - Some issues',
-        '3': 'Good - Satisfactory service',
-        '4': 'Very Good - Recommend',
-        '5': 'Excellent - Outstanding service!'
+        '1': @json(__('reviews.poor')),
+        '2': @json(__('reviews.fair')),
+        '3': @json(__('reviews.good')),
+        '4': @json(__('reviews.very_good')),
+        '5': @json(__('reviews.excellent'))
     };
 
     starContainers.forEach(container => {

@@ -997,12 +997,11 @@
         </div>
 
         <!-- Subheading -->
-        <div class="text-center">
-            <p class="client-hero-subtitle">
-                {{ __('home.sp_hero_cta') }}
-            </p>
-        </div>
-
+<div class="text-center">
+    <p class="client-hero-subtitle" style="font-size: 1rem; font-weight: 700; background: linear-gradient(145deg, #4f46e5, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-color: #eef2ff; display: inline-block; padding: 0.5rem 1.8rem; border-radius: 40px; box-shadow: 0 6px 15px -3px rgba(79,70,229,0.3); letter-spacing: 0.3px; transition: all 0.3s ease; cursor: default;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 12px 25px -5px rgba(79,70,229,0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 6px 15px -3px rgba(79,70,229,0.3)';">
+        {{ __('home.sp_hero_cta') }}
+    </p>
+</div>
         <!-- Primary CTA Button (3D CSS) -->
         <div class="client-cta-container">
             <!-- Button structure updated to match provided code -->

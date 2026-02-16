@@ -182,4 +182,5 @@ return [
     'stat_views' => 'Views',
     'stat_recommends' => 'Recommends',
     'stat_years' => 'Years',
+    'featured' => 'Featured',
 ];

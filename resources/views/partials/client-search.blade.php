@@ -36,7 +36,7 @@
                 </span>
                 <span class="btn-hover-effect"></span>
             </a>
-            <p class="text-muted small mt-3">No credit card required • Setup in 5 minutes</p>
+            <p class="text-muted small mt-3">No credit card required • Setup in 3 minutes</p>
         </div>
 
         <!-- Benefits Grid -->

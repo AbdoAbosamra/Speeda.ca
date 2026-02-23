@@ -16,7 +16,7 @@
                 <a href="{{ route('location') }}" class="hero-btn hero-btn-primary">
                     <i class="fas fa-search me-2"></i> Find a Provider
                 </a>
-                <a href="{{ route('register') }}" class="hero-btn hero-btn-outline">
+                <a href="{{ route('register', ['type' => 'service-provider']) }}" class="hero-btn hero-btn-outline">
                     <i class="fas fa-user-tie me-2"></i> Join as Provider
                 </a>
             </div>

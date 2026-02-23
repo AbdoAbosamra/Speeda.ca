@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Toronto',
 
     /*
     |--------------------------------------------------------------------------
@@ -95,28 +95,28 @@ return [
     |
     */
     'supported_locales' => [
-    'en' => [
-        'name' => 'English', 
-        'script' => 'Latn', 
-        'native' => 'English', 
-        'regional' => 'en_US',
-        'flag' => '🇬🇧', // أضفنا العلم
+        'en' => [
+            'name' => 'English',
+            'script' => 'Latn',
+            'native' => 'English',
+            'regional' => 'en_US',
+            'flag' => '🇬🇧', // أضفنا العلم
+        ],
+        'ar' => [
+            'name' => 'Arabic',
+            'script' => 'Arab',
+            'native' => 'العربية',
+            'regional' => 'ar_SA',
+            'flag' => '🇸🇦', // أضفنا العلم
+        ],
+        'fr' => [
+            'name' => 'French',
+            'script' => 'Latn',
+            'native' => 'Français',
+            'regional' => 'fr_FR',
+            'flag' => '🇫🇷', // أضفنا العلم
+        ],
     ],
-    'ar' => [
-        'name' => 'Arabic', 
-        'script' => 'Arab', 
-        'native' => 'العربية', 
-        'regional' => 'ar_SA',
-        'flag' => '🇸🇦', // أضفنا العلم
-    ],
-    'fr' => [
-        'name' => 'French', 
-        'script' => 'Latn', 
-        'native' => 'Français', 
-        'regional' => 'fr_FR',
-        'flag' => '🇫🇷', // أضفنا العلم
-    ],
-],
 
     'cipher' => 'AES-256-CBC',
 

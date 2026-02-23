@@ -53,15 +53,7 @@ class StoreReviewRequest extends FormRequest
         ];
     }
 
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'service_provider_id' => $this->input('provider_id'),
-        ]);
-    }
+
 
     /**
      * Get custom error messages.

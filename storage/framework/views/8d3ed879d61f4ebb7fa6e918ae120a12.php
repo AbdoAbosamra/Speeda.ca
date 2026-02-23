@@ -1,15 +1,15 @@
-{{-- resources/views/service-providers/show.blade.php --}}
+
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
-    x-data="{ saved: @json(auth()->check() && auth()->user()->savedProviders->contains($serviceProvider->id)) }">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" dir="<?php echo e(app()->getLocale() === 'ar' ? 'rtl' : 'ltr'); ?>"
+    x-data="{ saved: <?php echo json_encode(auth()->check() && auth()->user()->savedProviders->contains($serviceProvider->id), 15, 512) ?> }">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
-    <title>{{ $serviceProvider->company_name ?? $serviceProvider->user->name }} - Speeda</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <title><?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?> - Speeda</title>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/main-logo.png')); ?>">
 
     <!-- Preconnect to CDNs for faster loading -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -213,7 +213,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('{{ asset('images/pattern.svg') }}') repeat;
+            background: url('<?php echo e(asset('images/pattern.svg')); ?>') repeat;
             opacity: 0.1;
         }
 
@@ -847,35 +847,56 @@
         </div>
     </div>
 
-    @include('components.main-nav')
+    <?php echo $__env->make('components.main-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- Notification Card --}}
-    @include('components.notification-card')
+    
+    <?php echo $__env->make('components.notification-card', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="container mt-4">
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('home') }}"><i
-                            class="fas fa-home me-1"></i>{{ __('general.home') }}</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('service-providers.index') }}"><i
-                            class="fas fa-list me-1"></i>{{ __('service_provider.providers_label') }}</a></li>
+                <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>"><i
+                            class="fas fa-home me-1"></i><?php echo e(__('general.home')); ?></a></li>
+                <li class="breadcrumb-item"><a href="<?php echo e(route('service-providers.index')); ?>"><i
+                            class="fas fa-list me-1"></i><?php echo e(__('service_provider.providers_label')); ?></a></li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                    <?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?>
+
                 </li>
             </ol>
         </nav>
 
         <!-- Flash Messages -->
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                <i class="fas fa-check-circle me-2"></i> <?php echo e(session('success')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
 
-        {{-- Unified Error Handler --}}
-        <x-error-handler />
+        
+        <?php if (isset($component)) { $__componentOriginalb73145fe1614d50b3151d575d31121ae = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb73145fe1614d50b3151d575d31121ae = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.error-handler','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('error-handler'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb73145fe1614d50b3151d575d31121ae)): ?>
+<?php $attributes = $__attributesOriginalb73145fe1614d50b3151d575d31121ae; ?>
+<?php unset($__attributesOriginalb73145fe1614d50b3151d575d31121ae); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb73145fe1614d50b3151d575d31121ae)): ?>
+<?php $component = $__componentOriginalb73145fe1614d50b3151d575d31121ae; ?>
+<?php unset($__componentOriginalb73145fe1614d50b3151d575d31121ae); ?>
+<?php endif; ?>
 
         <div class="row">
             <!-- Main Provider Information -->
@@ -886,16 +907,16 @@
 
                     <!-- Profile Image -->
                     <div class="profile-image-container">
-                        @if($serviceProvider->profile_image)
-                            <img src="{{ Storage::url($serviceProvider->profile_image) }}"
-                                alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
+                        <?php if($serviceProvider->profile_image): ?>
+                            <img src="<?php echo e(Storage::url($serviceProvider->profile_image)); ?>"
+                                alt="<?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?>"
                                 class="profile-image" loading="lazy">
-                        @else
+                        <?php else: ?>
                             <div class="profile-image d-flex align-items-center justify-content-center"
                                 style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">
                                 <i class="fas fa-user fa-4x text-white"></i>
                             </div>
-                        @endif
+                        <?php endif; ?>
                     </div>
 
                     <!-- Profile Content -->
@@ -903,53 +924,75 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <h1 class="fw-bold mb-2">
-                                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                                    <?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?>
+
                                 </h1>
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-briefcase me-1"></i>
-                                    {{ $serviceProvider->category->translated_name ?? __('service_provider.uncategorized') }}
+                                    <?php echo e($serviceProvider->category->translated_name ?? __('service_provider.uncategorized')); ?>
+
                                 </p>
                             </div>
                             <div class="d-flex align-items-center gap-3">
-                                {{-- Endorsement Button - visible to all (component handles auth) --}}
-                                @if(!auth()->check() || auth()->id() !== $serviceProvider->user_id)
-                                    <x-endorsement-button :service-provider="$serviceProvider" />
-                                @endif
+                                
+                                <?php if(!auth()->check() || auth()->id() !== $serviceProvider->user_id): ?>
+                                    <?php if (isset($component)) { $__componentOriginal0687486ebb43e4ac695125e22d5c874c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0687486ebb43e4ac695125e22d5c874c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.endorsement-button','data' => ['serviceProvider' => $serviceProvider]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('endorsement-button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['service-provider' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($serviceProvider)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0687486ebb43e4ac695125e22d5c874c)): ?>
+<?php $attributes = $__attributesOriginal0687486ebb43e4ac695125e22d5c874c; ?>
+<?php unset($__attributesOriginal0687486ebb43e4ac695125e22d5c874c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0687486ebb43e4ac695125e22d5c874c)): ?>
+<?php $component = $__componentOriginal0687486ebb43e4ac695125e22d5c874c; ?>
+<?php unset($__componentOriginal0687486ebb43e4ac695125e22d5c874c); ?>
+<?php endif; ?>
+                                <?php endif; ?>
 
                                 <!-- Certified Badge (only visible to owner) -->
-                                @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->certification)
+                                <?php if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->certification): ?>
                                     <div class="verification-badge"
                                         style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                                         <i class="fas fa-certificate"></i>
-                                        <span>{{ __('service_provider.certified') }}</span>
+                                        <span><?php echo e(__('service_provider.certified')); ?></span>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
 
-                        @if(auth()->id() === $serviceProvider->user_id)
+                        <?php if(auth()->id() === $serviceProvider->user_id): ?>
                             <!-- Owner-only Edit Section -->
                             <div class="mb-4">
                                 <h4 class="fw-bold text-secondary mb-3"><i
-                                        class="fas fa-edit me-2"></i>{{ __('service_provider.edit_profile') }}</h4>
+                                        class="fas fa-edit me-2"></i><?php echo e(__('service_provider.edit_profile')); ?></h4>
 
-                                <form action="{{ route('service-providers.profile.update', $serviceProvider->id) }}"
+                                <form action="<?php echo e(route('service-providers.profile.update', $serviceProvider->id)); ?>"
                                     method="POST" enctype="multipart/form-data" id="profileUpdateForm">
-                                    @csrf
-                                    @method('PUT')
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('PUT'); ?>
 
-                                    {{-- Basic Information --}}
+                                    
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-primary text-white">
                                             <h6 class="mb-0"><i
-                                                    class="fas fa-info-circle me-2"></i>{{ __('service_provider.basic_information') }}
+                                                    class="fas fa-info-circle me-2"></i><?php echo e(__('service_provider.basic_information')); ?>
+
                                             </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-building text-primary me-1"></i>
-                                                    {{ __('service_provider.company_activity_name') }} <span
+                                                    <?php echo e(__('service_provider.company_activity_name')); ?> <span
                                                         class="text-danger">*</span>
                                                 </label>
                                                 <div class="input-group">
@@ -958,37 +1001,54 @@
                                                     </span>
                                                     <input type="text" name="business_name"
                                                         class="form-control form-control-lg border-start-0"
-                                                        value="{{ old('business_name', $serviceProvider->company_name) }}"
+                                                        value="<?php echo e(old('business_name', $serviceProvider->company_name)); ?>"
                                                         placeholder="مثال: ورشة السلام للسباكة" required>
                                                 </div>
-                                                @error('business_name')
+                                                <?php $__errorArgs = ['business_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                     <small class="text-danger"><i
-                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
-                                                @enderror
+                                                            class="fas fa-exclamation-circle me-1"></i><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-align-left text-primary me-1"></i>
-                                                    {{ __('general.description') }}
+                                                    <?php echo e(__('general.description')); ?>
+
                                                 </label>
                                                 <textarea name="bio" class="form-control form-control-lg" rows="5"
-                                                    placeholder="{{ __('service_provider.description_hint') }}"
-                                                    style="resize: vertical; min-height: 120px;">{{ old('bio', $serviceProvider->bio) }}</textarea>
+                                                    placeholder="<?php echo e(__('service_provider.description_hint')); ?>"
+                                                    style="resize: vertical; min-height: 120px;"><?php echo e(old('bio', $serviceProvider->bio)); ?></textarea>
                                                 <small class="text-muted">
                                                     <i class="fas fa-lightbulb text-warning me-1"></i>
-                                                    {{ __('service_provider.description_helper') }}
+                                                    <?php echo e(__('service_provider.description_helper')); ?>
+
                                                 </small>
-                                                @error('bio')
+                                                <?php $__errorArgs = ['bio'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                     <small class="text-danger d-block mt-1"><i
-                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
-                                                @enderror
+                                                            class="fas fa-exclamation-circle me-1"></i><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-award text-primary me-1"></i>
-                                                    {{ __('service_provider.experience_years_label') }}
+                                                    <?php echo e(__('service_provider.experience_years_label')); ?>
+
                                                 </label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-light border-end-0">
@@ -996,72 +1056,83 @@
                                                     </span>
                                                     <input type="number" name="experience_years"
                                                         class="form-control form-control-lg border-start-0"
-                                                        value="{{ old('experience_years', $serviceProvider->experience_years) }}"
-                                                        min="0" max="50" placeholder="{{ __('general.example') }}: 5">
+                                                        value="<?php echo e(old('experience_years', $serviceProvider->experience_years)); ?>"
+                                                        min="0" max="50" placeholder="<?php echo e(__('general.example')); ?>: 5">
                                                     <span class="input-group-text bg-light">
                                                         <span
-                                                            class="badge bg-primary">{{ __('service_provider.years') }}</span>
+                                                            class="badge bg-primary"><?php echo e(__('service_provider.years')); ?></span>
                                                     </span>
                                                 </div>
-                                                @error('experience_years')
+                                                <?php $__errorArgs = ['experience_years'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                     <small class="text-danger"><i
-                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
-                                                @enderror
+                                                            class="fas fa-exclamation-circle me-1"></i><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Contact Information - Category is READ-ONLY --}}
+                                    
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-success text-white">
                                             <h6 class="mb-0"><i
-                                                    class="fas fa-phone me-2"></i>{{ __('service_provider.contact_info') }}
+                                                    class="fas fa-phone me-2"></i><?php echo e(__('service_provider.contact_info')); ?>
+
                                             </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
                                                 <label
-                                                    class="form-label fw-bold">{{ __('service_provider.job_specialization') }}</label>
+                                                    class="form-label fw-bold"><?php echo e(__('service_provider.job_specialization')); ?></label>
 
-                                                @php
+                                                <?php
                                                     $othersNames = ['other', 'others', 'أخرى'];
                                                     $isOthersCategory = $serviceProvider->category && (
                                                         in_array(strtolower(trim($serviceProvider->category->name)), $othersNames) ||
                                                         in_array(strtolower(trim($serviceProvider->category->translated_name)), $othersNames)
                                                     );
-                                                @endphp
+                                                ?>
 
-                                                @if($isOthersCategory)
-                                                    {{-- EDITABLE DROPDOWN: Only for "Others" category --}}
+                                                <?php if($isOthersCategory): ?>
+                                                    
                                                     <select name="category_id" class="form-control form-control-lg" required>
-                                                        <option value="">-- {{ __('service_provider.select_category') }} --
+                                                        <option value="">-- <?php echo e(__('service_provider.select_category')); ?> --
                                                         </option>
-                                                        @foreach($categories as $cat)
-                                                            <option value="{{ $cat->id }}" {{ old('category_id', $serviceProvider->category_id) == $cat->id ? 'selected' : '' }}>
-                                                                {{ $cat->translated_name ?? $cat->name }}
+                                                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($cat->id); ?>" <?php echo e(old('category_id', $serviceProvider->category_id) == $cat->id ? 'selected' : ''); ?>>
+                                                                <?php echo e($cat->translated_name ?? $cat->name); ?>
+
                                                             </option>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </select>
                                                     <small class="text-info d-block mt-2">
                                                         <i class="fas fa-check-circle me-1"></i>
-                                                        {{ __('service_provider.you_can_change_category') }}
+                                                        <?php echo e(__('service_provider.you_can_change_category')); ?>
+
                                                     </small>
-                                                @else
-                                                    {{-- READ-ONLY TEXT: For locked categories --}}
+                                                <?php else: ?>
+                                                    
                                                     <input type="text" class="form-control form-control-lg bg-light"
-                                                        value="{{ $serviceProvider->category->translated_name ?? __('service_provider.not_specified') }}"
+                                                        value="<?php echo e($serviceProvider->category->translated_name ?? __('service_provider.not_specified')); ?>"
                                                         disabled readonly>
                                                     <small class="text-warning d-block mt-2">
                                                         <i class="fas fa-lock me-1"></i>
-                                                        {{ __('service_provider.category_locked_message') }}
+                                                        <?php echo e(__('service_provider.category_locked_message')); ?>
+
                                                     </small>
-                                                @endif
+                                                <?php endif; ?>
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-phone-alt text-primary me-1"></i>
-                                                    {{ __('general.phone') }} <span class="text-danger">*</span>
+                                                    <?php echo e(__('general.phone')); ?> <span class="text-danger">*</span>
                                                 </label>
                                                 <div class="row g-2">
                                                     <div class="col-md-4">
@@ -1074,24 +1145,33 @@
                                                     </div>
                                                     <div class="col-md-8">
                                                         <input type="text" name="phone" class="form-control form-control-lg"
-                                                            value="{{ old('phone', preg_replace('/^\+1/', '', $serviceProvider->phone)) }}"
+                                                            value="<?php echo e(old('phone', preg_replace('/^\+1/', '', $serviceProvider->phone))); ?>"
                                                             placeholder="6135204877" pattern="[0-9]{10,15}" minlength="10"
                                                             maxlength="15" required>
                                                         <small class="text-muted d-block mt-1">
                                                             <i
-                                                                class="fas fa-info-circle me-1"></i>{{ __('service_provider.enter_10_digit_number') }}
+                                                                class="fas fa-info-circle me-1"></i><?php echo e(__('service_provider.enter_10_digit_number')); ?>
+
                                                         </small>
                                                     </div>
                                                 </div>
-                                                @error('phone')
+                                                <?php $__errorArgs = ['phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                     <small class="text-danger d-block mt-1"><i
-                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
-                                                @enderror
+                                                            class="fas fa-exclamation-circle me-1"></i><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <div class="mb-3">
                                                 <label
-                                                    class="form-label fw-bold">{{ __('service_provider.whatsapp_number') }}
+                                                    class="form-label fw-bold"><?php echo e(__('service_provider.whatsapp_number')); ?>
+
                                                     <span class="text-danger">*</span></label>
                                                 <div class="row g-2">
                                                     <div class="col-md-4">
@@ -1105,34 +1185,44 @@
                                                     <div class="col-md-8">
                                                         <input type="text" name="whatsapp_number"
                                                             class="form-control form-control-lg"
-                                                            value="{{ old('whatsapp_number', preg_replace('/^\+1/', '', $serviceProvider->whatsapp_number)) }}"
+                                                            value="<?php echo e(old('whatsapp_number', preg_replace('/^\+1/', '', $serviceProvider->whatsapp_number))); ?>"
                                                             placeholder="6135204877" pattern="[0-9]{10,15}" minlength="10"
                                                             maxlength="15" required>
                                                         <small class="text-muted d-block mt-1">
                                                             <i
-                                                                class="fas fa-info-circle me-1"></i>{{ __('service_provider.enter_10_digit_number') }}
+                                                                class="fas fa-info-circle me-1"></i><?php echo e(__('service_provider.enter_10_digit_number')); ?>
+
                                                         </small>
                                                     </div>
                                                 </div>
-                                                @error('whatsapp_number')
-                                                    <small class="text-danger d-block mt-1">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['whatsapp_number'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger d-block mt-1"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Location Information --}}
+                                    
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-info text-white">
                                             <h6 class="mb-0"><i
-                                                    class="fas fa-map-marker-alt me-2"></i>{{ __('service_provider.location_section') }}
+                                                    class="fas fa-map-marker-alt me-2"></i><?php echo e(__('service_provider.location_section')); ?>
+
                                             </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-map-marked-alt text-primary me-1"></i>
-                                                    {{ __('general.location') }}
+                                                    <?php echo e(__('general.location')); ?>
+
                                                 </label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-light border-end-0">
@@ -1140,25 +1230,35 @@
                                                     </span>
                                                     <select name="location_id"
                                                         class="form-select form-select-lg border-start-0">
-                                                        <option value="">{{ __('general.select_location_placeholder') }}
+                                                        <option value=""><?php echo e(__('general.select_location_placeholder')); ?>
+
                                                         </option>
-                                                        @foreach($locations ?? [] as $loc)
-                                                            <option value="{{ $loc->id }}" {{ $serviceProvider->location_id == $loc->id ? 'selected' : '' }}>
-                                                                {{ $loc->city ?? $loc->name ?? __('general.location') . ' ' . $loc->id }}
+                                                        <?php $__currentLoopData = $locations ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $loc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($loc->id); ?>" <?php echo e($serviceProvider->location_id == $loc->id ? 'selected' : ''); ?>>
+                                                                <?php echo e($loc->city ?? $loc->name ?? __('general.location') . ' ' . $loc->id); ?>
+
                                                             </option>
-                                                        @endforeach
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </select>
                                                 </div>
-                                                @error('location_id')
+                                                <?php $__errorArgs = ['location_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                     <small class="text-danger"><i
-                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
-                                                @enderror
+                                                            class="fas fa-exclamation-circle me-1"></i><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-map-pin text-primary me-1"></i>
-                                                    {{ __('general.address') }}
+                                                    <?php echo e(__('general.address')); ?>
+
                                                 </label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-light border-end-0">
@@ -1166,33 +1266,43 @@
                                                     </span>
                                                     <input type="text" name="address"
                                                         class="form-control form-control-lg border-start-0"
-                                                        value="{{ old('address', $serviceProvider->address) }}"
-                                                        placeholder="{{ __('general.example') }}: {{ __('general.address_placeholder') }}">
+                                                        value="<?php echo e(old('address', $serviceProvider->address)); ?>"
+                                                        placeholder="<?php echo e(__('general.example')); ?>: <?php echo e(__('general.address_placeholder')); ?>">
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-info-circle text-info me-1"></i>
-                                                    {{ __('service_provider.detailed_work_address') }}
+                                                    <?php echo e(__('service_provider.detailed_work_address')); ?>
+
                                                 </small>
-                                                @error('address')
+                                                <?php $__errorArgs = ['address'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                     <small class="text-danger d-block mt-1"><i
-                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
-                                                @enderror
+                                                            class="fas fa-exclamation-circle me-1"></i><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Services & Files --}}
+                                    
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-warning text-dark">
                                             <h6 class="mb-0"><i
-                                                    class="fas fa-briefcase me-2"></i>{{ __('service_provider.services_files') }}
+                                                    class="fas fa-briefcase me-2"></i><?php echo e(__('service_provider.services_files')); ?>
+
                                             </h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">
                                                     <i class="fas fa-list-check text-primary me-1"></i>
-                                                    {{ __('service_provider.services_provided') }}
+                                                    <?php echo e(__('service_provider.services_provided')); ?>
+
                                                 </label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-light border-end-0">
@@ -1200,93 +1310,121 @@
                                                     </span>
                                                     <input type="text" name="services_offered"
                                                         class="form-control form-control-lg border-start-0"
-                                                        value="{{ old('services_offered', is_array($serviceProvider->services_offered) ? implode(', ', $serviceProvider->services_offered) : $serviceProvider->services_offered) }}"
-                                                        placeholder="{{ __('general.example') }}: {{ __('service_provider.services_offered_input_hint') }}">
+                                                        value="<?php echo e(old('services_offered', is_array($serviceProvider->services_offered) ? implode(', ', $serviceProvider->services_offered) : $serviceProvider->services_offered)); ?>"
+                                                        placeholder="<?php echo e(__('general.example')); ?>: <?php echo e(__('service_provider.services_offered_input_hint')); ?>">
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-lightbulb text-warning me-1"></i>
-                                                    {{ __('service_provider.separate_services_comma') }}
+                                                    <?php echo e(__('service_provider.separate_services_comma')); ?>
+
                                                 </small>
-                                                @error('services_offered')
+                                                <?php $__errorArgs = ['services_offered'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                                                     <small class="text-danger d-block mt-1"><i
-                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
-                                                @enderror
+                                                            class="fas fa-exclamation-circle me-1"></i><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label class="form-label fw-bold">{{ __('general.profile_image') }}</label>
+                                                <label class="form-label fw-bold"><?php echo e(__('general.profile_image')); ?></label>
                                                 <input type="file" name="profile_image" id="profileImageInput"
                                                     class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp"
                                                     onchange="validateFileSize(this, 2)">
                                                 <small class="text-muted d-block">
                                                     <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.profile_logo_image') }} -
-                                                    {{ __('service_provider.max_size_2mb') }}
+                                                    <?php echo e(__('service_provider.profile_logo_image')); ?> -
+                                                    <?php echo e(__('service_provider.max_size_2mb')); ?>
+
                                                 </small>
-                                                @if($serviceProvider->profile_image)
+                                                <?php if($serviceProvider->profile_image): ?>
                                                     <div class="mt-2">
-                                                        <img src="{{ $serviceProvider->profile_image_url }}" class="rounded"
+                                                        <img src="<?php echo e($serviceProvider->profile_image_url); ?>" class="rounded"
                                                             style="width: 80px; height: 80px; object-fit: cover;">
                                                         <small
-                                                            class="text-muted d-block">{{ __('service_provider.current_image') }}</small>
+                                                            class="text-muted d-block"><?php echo e(__('service_provider.current_image')); ?></small>
                                                     </div>
-                                                @endif
-                                                @error('profile_image')
-                                                    <small class="text-danger d-block">{{ $message }}</small>
-                                                @enderror
+                                                <?php endif; ?>
+                                                <?php $__errorArgs = ['profile_image'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger d-block"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <div class="mb-3">
                                                 <label
-                                                    class="form-label fw-bold">{{ __('service_provider.certification') }}</label>
+                                                    class="form-label fw-bold"><?php echo e(__('service_provider.certification')); ?></label>
                                                 <input type="file" name="certification" id="certificationInput"
                                                     class="form-control"
                                                     accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
                                                     onchange="validateFileSize(this, 2)">
                                                 <small class="text-muted d-block">
                                                     <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.certificate_or_license') }} -
-                                                    {{ __('service_provider.max_size_2mb') }}
+                                                    <?php echo e(__('service_provider.certificate_or_license')); ?> -
+                                                    <?php echo e(__('service_provider.max_size_2mb')); ?>
+
                                                 </small>
-                                                @if($serviceProvider->certification)
+                                                <?php if($serviceProvider->certification): ?>
                                                     <div class="mt-2">
                                                         <span class="badge bg-success"><i class="fas fa-check-circle"></i>
-                                                            {{ __('service_provider.certificate_uploaded') }}</span>
-                                                        <a href="{{ asset('storage/' . $serviceProvider->certification) }}"
+                                                            <?php echo e(__('service_provider.certificate_uploaded')); ?></span>
+                                                        <a href="<?php echo e(asset('storage/' . $serviceProvider->certification)); ?>"
                                                             target="_blank" class="badge bg-primary"><i class="fas fa-eye"></i>
-                                                            {{ __('service_provider.view') }}</a>
+                                                            <?php echo e(__('service_provider.view')); ?></a>
                                                     </div>
-                                                @endif
-                                                @error('certification')
-                                                    <small class="text-danger d-block">{{ $message }}</small>
-                                                @enderror
+                                                <?php endif; ?>
+                                                <?php $__errorArgs = ['certification'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger d-block"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Action Buttons --}}
+                                    
                                     <div class="card border-0 shadow-sm bg-light">
                                         <div class="card-body">
                                             <div class="d-flex gap-3 justify-content-between align-items-center flex-wrap">
                                                 <div>
                                                     <h6 class="mb-1 fw-bold text-dark">
                                                         <i class="fas fa-check-circle text-success me-2"></i>
-                                                        {{ __('service_provider.ready_to_save') }}
+                                                        <?php echo e(__('service_provider.ready_to_save')); ?>
+
                                                     </h6>
                                                     <small class="text-muted">
                                                         <i class="fas fa-info-circle me-1"></i>
-                                                        {{ __('service_provider.verify_info_before_save') }}
+                                                        <?php echo e(__('service_provider.verify_info_before_save')); ?>
+
                                                     </small>
                                                 </div>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('service-providers.show', $serviceProvider->id) }}"
+                                                    <a href="<?php echo e(route('service-providers.show', $serviceProvider->id)); ?>"
                                                         class="btn btn-outline-secondary btn-lg px-4"
                                                         style="border-radius: 12px;">
-                                                        <i class="fas fa-times-circle me-2"></i>{{ __('general.cancel') }}
+                                                        <i class="fas fa-times-circle me-2"></i><?php echo e(__('general.cancel')); ?>
+
                                                     </a>
                                                     <button type="submit" class="btn btn-primary btn-lg px-5"
                                                         style="border-radius: 12px; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);">
-                                                        <i class="fas fa-save me-2"></i>{{ __('general.save_changes') }}
+                                                        <i class="fas fa-save me-2"></i><?php echo e(__('general.save_changes')); ?>
+
                                                         <i class="fas fa-arrow-left ms-2"></i>
                                                     </button>
                                                 </div>
@@ -1295,83 +1433,89 @@
                                     </div>
                                 </form>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <!-- Business Description -->
                         <div class="mb-4">
                             <h4 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-info-circle me-2"></i>{{ __('service_provider.about_us') }}
+                                <i class="fas fa-info-circle me-2"></i><?php echo e(__('service_provider.about_us')); ?>
+
                             </h4>
-                            <p class="fs-6">{{ $serviceProvider->bio ?? __('service_provider.no_description') }}</p>
+                            <p class="fs-6"><?php echo e($serviceProvider->bio ?? __('service_provider.no_description')); ?></p>
                         </div>
 
                         <!-- Services Offered -->
                         <div class="mb-4">
                             <h4 class="fw-bold text-primary mb-3">
                                 <i
-                                    class="fas fa-list-check me-2"></i>{{ __('service_provider.services_offered_title') }}
+                                    class="fas fa-list-check me-2"></i><?php echo e(__('service_provider.services_offered_title')); ?>
+
                             </h4>
-                            @php
+                            <?php
                                 $services = $serviceProvider->services_offered;
                                 if (is_string($services)) {
                                     $services = json_decode($services, true) ?? explode(',', $services);
                                 }
                                 $services = is_array($services) ? array_filter(array_map('trim', $services)) : [];
-                            @endphp
-                            @if(!empty($services))
+                            ?>
+                            <?php if(!empty($services)): ?>
                                 <div class="d-flex flex-wrap">
-                                    @foreach ($services as $service)
+                                    <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <span class="service-badge">
-                                            <i class="fas fa-check-circle"></i>{{ $service }}
+                                            <i class="fas fa-check-circle"></i><?php echo e($service); ?>
+
                                         </span>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
-                            @else
-                                <p class="text-muted">{{ __('service_provider.no_services_listed') }}</p>
-                            @endif
+                            <?php else: ?>
+                                <p class="text-muted"><?php echo e(__('service_provider.no_services_listed')); ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Gallery Section -->
-                        @if($serviceProvider->images && $serviceProvider->images->count() > 0)
+                        <?php if($serviceProvider->images && $serviceProvider->images->count() > 0): ?>
                             <div class="gallery-container">
-                                <h4 class="fw-bold text-primary mb-3">{{ __('service_provider.gallery_title') }}
+                                <h4 class="fw-bold text-primary mb-3"><?php echo e(__('service_provider.gallery_title')); ?>
+
                                     <div class="row g-3">
-                                        @foreach($serviceProvider->images->take(6) as $image)
+                                        <?php $__currentLoopData = $serviceProvider->images->take(6); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div class="col-md-4">
                                                 <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                                    data-image="{{ asset('storage/' . $image->image_path) }}">
-                                                    <img src="{{ asset('storage/' . $image->image_path) }}"
-                                                        alt="{{ __('service_provider.gallery_image_alt') }}" loading="lazy">
+                                                    data-image="<?php echo e(asset('storage/' . $image->image_path)); ?>">
+                                                    <img src="<?php echo e(asset('storage/' . $image->image_path)); ?>"
+                                                        alt="<?php echo e(__('service_provider.gallery_image_alt')); ?>" loading="lazy">
                                                     <div class="gallery-overlay">
                                                         <i class="fas fa-search-plus text-white fa-2x"></i>
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </div>
-                                    @if($serviceProvider->images->count() > 6)
+                                    <?php if($serviceProvider->images->count() > 6): ?>
                                         <div class="text-center mt-3">
                                             <button
-                                                class="btn btn-outline-primary">{{ __('service_provider.view_all_images') }}</button>
+                                                class="btn btn-outline-primary"><?php echo e(__('service_provider.view_all_images')); ?></button>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <!-- Reviews Section -->
                         <div class="mt-5">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h4 class="fw-bold text-primary">
-                                    <i class="fas fa-star me-2"></i>{{ __('service_provider.customer_reviews_title') }}
+                                    <i class="fas fa-star me-2"></i><?php echo e(__('service_provider.customer_reviews_title')); ?>
+
                                 </h4>
-                                @if(auth()->check() && auth()->user()->isClient() && !$hasReviewed)
+                                <?php if(auth()->check() && auth()->user()->isClient() && !$hasReviewed): ?>
                                     <button class="btn btn-primary" onclick="openReviewModal()">
-                                        <i class="fas fa-pen me-2"></i>{{ __('reviews.write_review') }}
+                                        <i class="fas fa-pen me-2"></i><?php echo e(__('reviews.write_review')); ?>
+
                                     </button>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
-                            @if($reviewStats['total_count'] > 0)
+                            <?php if($reviewStats['total_count'] > 0): ?>
                                 <!-- Rating Summary -->
                                 <div class="card border-0 shadow-sm mb-4"
                                     style="border-radius: 16px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
@@ -1380,42 +1524,44 @@
                                             <div class="col-md-4 text-center">
                                                 <div class="rating-big">
                                                     <span
-                                                        class="display-3 fw-bold text-primary">{{ number_format($reviewStats['average_rating'], 1) }}</span>
+                                                        class="display-3 fw-bold text-primary"><?php echo e(number_format($reviewStats['average_rating'], 1)); ?></span>
                                                     <div class="stars-large mt-2"
                                                         style="font-size: 1.5rem; color: #f59e0b;">
-                                                        @for($i = 1; $i <= 5; $i++)
-                                                            @if($i <= round($reviewStats['average_rating']))
+                                                        <?php for($i = 1; $i <= 5; $i++): ?>
+                                                            <?php if($i <= round($reviewStats['average_rating'])): ?>
                                                                 <i class="fas fa-star"></i>
-                                                            @else
+                                                            <?php else: ?>
                                                                 <i class="far fa-star"></i>
-                                                            @endif
-                                                        @endfor
+                                                            <?php endif; ?>
+                                                        <?php endfor; ?>
                                                     </div>
-                                                    <p class="text-muted mt-2">{{ $reviewStats['total_count'] }}
-                                                        {{ __('reviews.reviews_total') }}
+                                                    <p class="text-muted mt-2"><?php echo e($reviewStats['total_count']); ?>
+
+                                                        <?php echo e(__('reviews.reviews_total')); ?>
+
                                                     </p>
                                                 </div>
                                             </div>
                                             <div class="col-md-8">
-                                                @foreach([5, 4, 3, 2, 1] as $star)
-                                                    @php
+                                                <?php $__currentLoopData = [5, 4, 3, 2, 1]; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $star): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <?php
                                                         $count = $reviewStats[$star . '_star'] ?? 0;
                                                         $breakdown = $reviewStats['breakdown'][$star] ?? ['count' => 0, 'percentage' => 0];
                                                         $percentage = $breakdown['percentage'] ?? 0;
-                                                    @endphp
+                                                    ?>
                                                     <div class="rating-bar d-flex align-items-center mb-2">
-                                                        <span class="me-2" style="min-width: 20px;">{{ $star }}</span>
+                                                        <span class="me-2" style="min-width: 20px;"><?php echo e($star); ?></span>
                                                         <i class="fas fa-star text-warning me-2"
                                                             style="font-size: 0.75rem;"></i>
                                                         <div class="progress flex-grow-1" style="height: 8px;">
                                                             <div class="progress-bar bg-warning" role="progressbar"
-                                                                aria-valuenow="{{ $percentage }}" aria-valuemin="0"
-                                                                aria-valuemax="100" style="width: {{ $percentage }}%"></div>
+                                                                aria-valuenow="<?php echo e($percentage); ?>" aria-valuemin="0"
+                                                                aria-valuemax="100" style="width: <?php echo e($percentage); ?>%"></div>
                                                         </div>
                                                         <span class="ms-2 text-muted"
-                                                            style="min-width: 40px; font-size: 0.875rem;">{{ $count }}</span>
+                                                            style="min-width: 40px; font-size: 0.875rem;"><?php echo e($count); ?></span>
                                                     </div>
-                                                @endforeach
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -1423,62 +1569,68 @@
 
                                 <!-- Reviews List -->
                                 <div class="reviews-container">
-                                    @foreach($reviews as $review)
+                                    <?php $__currentLoopData = $reviews; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $review): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <div class="review-card"
                                             style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
                                             <div class="review-header"
                                                 style="display: flex; align-items: center; margin-bottom: 1rem;">
                                                 <div class="review-avatar"
                                                     style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 1rem;">
-                                                    {{ strtoupper(substr($review->client->name ?? 'U', 0, 1)) }}
+                                                    <?php echo e(strtoupper(substr($review->client->name ?? 'U', 0, 1))); ?>
+
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-1 fw-bold">
-                                                        {{ $review->client->name ?? __('reviews.anonymous') }}
+                                                        <?php echo e($review->client->name ?? __('reviews.anonymous')); ?>
+
                                                     </h6>
                                                     <div class="review-rating" style="color: #f59e0b;">
-                                                        @for($i = 1; $i <= 5; $i++)
-                                                            @if($i <= $review->rating)
+                                                        <?php for($i = 1; $i <= 5; $i++): ?>
+                                                            <?php if($i <= $review->rating): ?>
                                                                 <i class="fas fa-star"></i>
-                                                            @else
+                                                            <?php else: ?>
                                                                 <i class="far fa-star"></i>
-                                                            @endif
-                                                        @endfor
+                                                            <?php endif; ?>
+                                                        <?php endfor; ?>
                                                         <span class="text-muted ms-2"
-                                                            style="font-size: 0.875rem;">{{ $review->created_at->diffForHumans() }}</span>
+                                                            style="font-size: 0.875rem;"><?php echo e($review->created_at->diffForHumans()); ?></span>
                                                     </div>
                                                 </div>
-                                                @if($review->is_featured)
+                                                <?php if($review->is_featured): ?>
                                                     <span class="badge bg-warning"
                                                         style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
-                                                        <i class="fas fa-thumbs-up me-1"></i>{{ __('reviews.featured') }}
+                                                        <i class="fas fa-thumbs-up me-1"></i><?php echo e(__('reviews.featured')); ?>
+
                                                     </span>
-                                                @endif
+                                                <?php endif; ?>
                                             </div>
-                                            <p class="mb-0" style="color: #4b5563; line-height: 1.6;">{{ $review->review_text }}
+                                            <p class="mb-0" style="color: #4b5563; line-height: 1.6;"><?php echo e($review->review_text); ?>
+
                                             </p>
                                         </div>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
 
                                 <!-- Pagination -->
-                                @if($reviews->hasPages())
+                                <?php if($reviews->hasPages()): ?>
                                     <div class="d-flex justify-content-center mt-4">
-                                        {{ $reviews->links() }}
+                                        <?php echo e($reviews->links()); ?>
+
                                     </div>
-                                @endif
-                            @else
+                                <?php endif; ?>
+                            <?php else: ?>
                                 <div class="text-center py-5"
                                     style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 16px;">
                                     <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
-                                    <p class="text-muted">{{ __('reviews.no_reviews_yet') }}</p>
-                                    @if(auth()->check() && auth()->user()->isClient())
+                                    <p class="text-muted"><?php echo e(__('reviews.no_reviews_yet')); ?></p>
+                                    <?php if(auth()->check() && auth()->user()->isClient()): ?>
                                         <button class="btn btn-primary mt-2" onclick="openReviewModal()">
-                                            <i class="fas fa-pen me-2"></i>{{ __('reviews.be_first_review') }}
+                                            <i class="fas fa-pen me-2"></i><?php echo e(__('reviews.be_first_review')); ?>
+
                                         </button>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -1489,12 +1641,13 @@
                 <div class="contact-card mb-4">
                     <div class="p-4">
                         <h4 class="fw-bold text-primary mb-4 text-center">
-                            <i class="fas fa-address-card me-2"></i>{{ __('service_provider.contact_information') }}
+                            <i class="fas fa-address-card me-2"></i><?php echo e(__('service_provider.contact_information')); ?>
+
                         </h4>
 
                         <!-- Phone (Hidden until button click) -->
-                        @if($serviceProvider->phone)
-                            @php
+                        <?php if($serviceProvider->phone): ?>
+                            <?php
                                 $phoneDisplay = $serviceProvider->phone;
                                 if ($isContactRevealed) {
                                     // Show full number if already revealed
@@ -1509,26 +1662,26 @@
                                     }
                                     $phoneClass = 'text-muted';
                                 }
-                            @endphp
+                            ?>
                             <div class="contact-item">
                                 <div class="d-flex align-items-center">
                                     <div class="contact-icon phone-icon">
                                         <i class="fas fa-phone"></i>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <h6 class="mb-1 fw-bold">{{ __('general.phone_number') }}</h6>
-                                        <span id="phoneNumber" class="{{ $phoneClass }}">{{ $displayPhone }}</span>
-                                        @if(!$isContactRevealed)
+                                        <h6 class="mb-1 fw-bold"><?php echo e(__('general.phone_number')); ?></h6>
+                                        <span id="phoneNumber" class="<?php echo e($phoneClass); ?>"><?php echo e($displayPhone); ?></span>
+                                        <?php if(!$isContactRevealed): ?>
                                             <small class="d-block text-muted" style="font-size: 0.75rem;"><i
-                                                    class="fas fa-lock me-1"></i>{{ __('service_provider.phone_reveal_hint') }}</small>
-                                        @endif
+                                                    class="fas fa-lock me-1"></i><?php echo e(__('service_provider.phone_reveal_hint')); ?></small>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <!-- WhatsApp Number (Hidden until button click) -->
-                        @php
+                        <?php
                             $whatsappDisplay = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
                             if ($isContactRevealed) {
                                 // Show full number if already revealed
@@ -1543,7 +1696,7 @@
                                 }
                                 $whatsappClass = 'text-muted';
                             }
-                        @endphp
+                        ?>
                         <div class="contact-item">
                             <div class="d-flex align-items-center">
                                 <div class="contact-icon"
@@ -1551,12 +1704,12 @@
                                     <i class="fab fa-whatsapp"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-1 fw-bold">{{ __('service_provider.whatsapp_number') }}</h6>
-                                    <span id="whatsappNumber" class="{{ $whatsappClass }}">{{ $displayWhatsapp }}</span>
-                                    @if(!$isContactRevealed)
+                                    <h6 class="mb-1 fw-bold"><?php echo e(__('service_provider.whatsapp_number')); ?></h6>
+                                    <span id="whatsappNumber" class="<?php echo e($whatsappClass); ?>"><?php echo e($displayWhatsapp); ?></span>
+                                    <?php if(!$isContactRevealed): ?>
                                         <small class="d-block text-muted" style="font-size: 0.75rem;"><i
-                                                class="fas fa-lock me-1"></i>{{ __('service_provider.contact_reveal_hint') }}</small>
-                                    @endif
+                                                class="fas fa-lock me-1"></i><?php echo e(__('service_provider.contact_reveal_hint')); ?></small>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -1568,16 +1721,17 @@
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-1 fw-bold">{{ __('general.location') }}</h6>
+                                    <h6 class="mb-1 fw-bold"><?php echo e(__('general.location')); ?></h6>
                                     <p class="mb-0">
-                                        {{ $serviceProvider->location->city ?? __('service_provider.location_not_specified') }}
+                                        <?php echo e($serviceProvider->location->city ?? __('service_provider.location_not_specified')); ?>
+
                                     </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Address (Hidden numbers until WhatsApp button clicked) -->
-                        @if($serviceProvider->address)
+                        <?php if($serviceProvider->address): ?>
                             <div class="contact-item">
                                 <div class="d-flex align-items-center">
                                     <div class="contact-icon"
@@ -1585,8 +1739,8 @@
                                         <i class="fas fa-map-pin"></i>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <h6 class="mb-1 fw-bold">{{ __('general.address') }}</h6>
-                                        @php
+                                        <h6 class="mb-1 fw-bold"><?php echo e(__('general.address')); ?></h6>
+                                        <?php
                                             if ($isContactRevealed) {
                                                 // Show full address if already revealed
                                                 $displayAddress = $serviceProvider->address;
@@ -1596,16 +1750,16 @@
                                                 $displayAddress = preg_replace('/\d/', '*', $serviceProvider->address);
                                                 $addressClass = '';
                                             }
-                                        @endphp
-                                        <p class="mb-0 small {{ $addressClass }}" id="addressText">{{ $displayAddress }}</p>
-                                        @if(!$isContactRevealed)
+                                        ?>
+                                        <p class="mb-0 small <?php echo e($addressClass); ?>" id="addressText"><?php echo e($displayAddress); ?></p>
+                                        <?php if(!$isContactRevealed): ?>
                                             <small class="text-muted" style="font-size: 0.7rem;"><i
-                                                    class="fas fa-lock me-1"></i>{{ __('service_provider.address_reveal_hint') }}</small>
-                                        @endif
+                                                    class="fas fa-lock me-1"></i><?php echo e(__('service_provider.address_reveal_hint')); ?></small>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <!-- Email -->
                         <div class="contact-item">
@@ -1614,17 +1768,19 @@
                                     <i class="fas fa-envelope"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-1 fw-bold">{{ __('general.email_address') }}
-                                        <a href="mailto:{{ $serviceProvider->user->email }}"
+                                    <h6 class="mb-1 fw-bold"><?php echo e(__('general.email_address')); ?>
+
+                                        <a href="mailto:<?php echo e($serviceProvider->user->email); ?>"
                                             class="text-decoration-none">
-                                            {{ $serviceProvider->user->email }}
+                                            <?php echo e($serviceProvider->user->email); ?>
+
                                         </a>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Certification (Only visible to owner) -->
-                        @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->is_certified && $serviceProvider->certification)
+                        <?php if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->is_certified && $serviceProvider->certification): ?>
                             <div class="contact-item">
                                 <div class="d-flex align-items-center">
                                     <div class="contact-icon"
@@ -1632,24 +1788,26 @@
                                         <i class="fas fa-certificate"></i>
                                     </div>
                                     <div>
-                                        <h6 class="mb-1 fw-bold">{{ __('service_provider.certification') }}</h6>
-                                        @if(Str::endsWith($serviceProvider->certification, '.pdf'))
-                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank"
+                                        <h6 class="mb-1 fw-bold"><?php echo e(__('service_provider.certification')); ?></h6>
+                                        <?php if(Str::endsWith($serviceProvider->certification, '.pdf')): ?>
+                                            <a href="<?php echo e(asset('storage/' . $serviceProvider->certification)); ?>" target="_blank"
                                                 class="text-decoration-none">
                                                 <i class="fas fa-file-pdf text-danger"></i>
-                                                {{ __('service_provider.view_certificate_pdf') }}
+                                                <?php echo e(__('service_provider.view_certificate_pdf')); ?>
+
                                             </a>
-                                        @else
-                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank"
+                                        <?php else: ?>
+                                            <a href="<?php echo e(asset('storage/' . $serviceProvider->certification)); ?>" target="_blank"
                                                 class="text-decoration-none">
                                                 <i class="fas fa-image text-primary"></i>
-                                                {{ __('service_provider.view_certificate') }}
+                                                <?php echo e(__('service_provider.view_certificate')); ?>
+
                                             </a>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <!-- Business Views -->
                         <div class="contact-item">
@@ -1658,9 +1816,11 @@
                                     <i class="fas fa-eye"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-1 fw-bold">{{ __('service_provider.profile_views') }}</h6>
-                                    <p class="mb-0">{{ number_format($serviceProvider->views) }}
-                                        {{ __('service_provider.views_label') }}
+                                    <h6 class="mb-1 fw-bold"><?php echo e(__('service_provider.profile_views')); ?></h6>
+                                    <p class="mb-0"><?php echo e(number_format($serviceProvider->views)); ?>
+
+                                        <?php echo e(__('service_provider.views_label')); ?>
+
                                     </p>
                                 </div>
                             </div>
@@ -1669,7 +1829,7 @@
 
                     <!-- Quick Action Buttons -->
                     <div class="p-4 bg-light">
-                        @php
+                        <?php
                             $whatsappNumber = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
                             // Clean number - remove all non-digit and non-plus characters
                             $whatsappNumber = preg_replace('/[^0-9+]/', '', $whatsappNumber);
@@ -1691,49 +1851,55 @@
 
                             // Clean version for API (no +)
                             $whatsappNumberClean = str_replace('+', '', $whatsappNumber);
-                        @endphp
+                        ?>
 
-                        {{-- WhatsApp Button with reveal functionality --}}
+                        
                         <button
-                            onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
+                            onclick="revealContactInfo('<?php echo e($whatsappNumberClean); ?>', '<?php echo e($serviceProvider->whatsapp_number ?? $serviceProvider->phone); ?>', '<?php echo e($serviceProvider->address ?? ''); ?>')"
                             class="btn w-100 mb-3"
                             style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
-                            <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
+                            <i class="fab fa-whatsapp me-2"></i> <?php echo e(__('service_provider.contact_whatsapp')); ?>
+
                         </button>
 
-                        <a href="mailto:{{ $serviceProvider->user->email }}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-envelope me-2"></i> {{ __('service_provider.send_email') }}
+                        <a href="mailto:<?php echo e($serviceProvider->user->email); ?>" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-envelope me-2"></i> <?php echo e(__('service_provider.send_email')); ?>
+
                         </a>
                     </div>
                 </div>
 
                 <!-- Category Info Card -->
-                @if($serviceProvider->category)
+                <?php if($serviceProvider->category): ?>
                     <div class="card shadow-sm border-0 rounded-4 mt-4">
                         <div class="card-body p-4">
                             <h6 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-info-circle me-2"></i>{{ __('service_provider.category_info_title') }}
+                                <i class="fas fa-info-circle me-2"></i><?php echo e(__('service_provider.category_info_title')); ?>
+
                             </h6>
                             <div class="mb-2">
-                                <strong>{{ __('service_provider.category_label') }}</strong>
-                                {{ $serviceProvider->category->translated_name }}
+                                <strong><?php echo e(__('service_provider.category_label')); ?></strong>
+                                <?php echo e($serviceProvider->category->translated_name); ?>
+
                             </div>
-                            @if($serviceProvider->category->parent)
+                            <?php if($serviceProvider->category->parent): ?>
                                 <div class="mb-2">
-                                    <strong>{{ __('service_provider.main_category_label') }}</strong>
-                                    {{ $serviceProvider->category->parent->translated_name }}
+                                    <strong><?php echo e(__('service_provider.main_category_label')); ?></strong>
+                                    <?php echo e($serviceProvider->category->parent->translated_name); ?>
+
                                 </div>
-                            @endif
-                            @if($serviceProvider->category->description)
+                            <?php endif; ?>
+                            <?php if($serviceProvider->category->description): ?>
                                 <div>
-                                    <strong>{{ __('general.description') }}:</strong>
-                                    <p class="mt-1 small text-muted">{{ $serviceProvider->category->translated_description }}
+                                    <strong><?php echo e(__('general.description')); ?>:</strong>
+                                    <p class="mt-1 small text-muted"><?php echo e($serviceProvider->category->translated_description); ?>
+
                                     </p>
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
@@ -1741,60 +1907,65 @@
         <div class="row mt-5">
             <div class="col-12">
                 <h3 class="fw-bold mb-4 text-primary">
-                    <i class="fas fa-users me-2"></i>{{ __('service_provider.similar_providers') }}
+                    <i class="fas fa-users me-2"></i><?php echo e(__('service_provider.similar_providers')); ?>
+
                 </h3>
 
-                @if($similarProviders->count())
+                <?php if($similarProviders->count()): ?>
                     <div class="row">
-                        @foreach ($similarProviders as $similar)
+                        <?php $__currentLoopData = $similarProviders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $similar): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="col-md-3 mb-4">
                                 <div class="similar-provider-card">
                                     <div class="similar-provider-image">
-                                        <img src="{{ $similar->profile_image_url }}"
-                                            alt="{{ $similar->company_name ?? $similar->user->name }}" loading="lazy">
+                                        <img src="<?php echo e($similar->profile_image_url); ?>"
+                                            alt="<?php echo e($similar->company_name ?? $similar->user->name); ?>" loading="lazy">
                                     </div>
                                     <div class="similar-provider-content">
-                                        <h6 class="fw-bold mb-2">{{ $similar->company_name ?? $similar->user->name }}</h6>
-                                        <p class="text-muted small mb-3">{{ Str::limit($similar->bio ?? '', 60) }}</p>
+                                        <h6 class="fw-bold mb-2"><?php echo e($similar->company_name ?? $similar->user->name); ?></h6>
+                                        <p class="text-muted small mb-3"><?php echo e(Str::limit($similar->bio ?? '', 60)); ?></p>
 
                                         <!-- Display category and rating -->
                                         <div class="mb-3">
                                             <span class="badge bg-primary small">
                                                 <i class="fas fa-briefcase me-1"></i>
-                                                {{ $similar->category->translated_name ?? __('service_provider.uncategorized') }}
+                                                <?php echo e($similar->category->translated_name ?? __('service_provider.uncategorized')); ?>
+
                                             </span>
-                                            @if($similar->rating > 0)
+                                            <?php if($similar->rating > 0): ?>
                                                 <span class="badge bg-warning text-dark small">
-                                                    <i class="fas fa-star"></i> {{ number_format($similar->rating, 1) }}
+                                                    <i class="fas fa-star"></i> <?php echo e(number_format($similar->rating, 1)); ?>
+
                                                 </span>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
 
-                                        <a href="{{ route('service-providers.show', $similar->id) }}"
+                                        <a href="<?php echo e(route('service-providers.show', $similar->id)); ?>"
                                             class="btn btn-outline-primary btn-sm rounded-pill w-100"
                                             style="transition: var(--transition);"
                                             onmouseover="this.style.transform='translateY(-2px)'"
                                             onmouseout="this.style.transform='translateY(0)'">
-                                            <i class="fas fa-eye me-1"></i> {{ __('service_provider.view_profile') }}
+                                            <i class="fas fa-eye me-1"></i> <?php echo e(__('service_provider.view_profile')); ?>
+
                                         </a>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
-                @else
+                <?php else: ?>
                     <div class="text-center py-4">
                         <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
-                        <p class="text-muted">{{ __('service_provider.no_similar_providers') }}</p>
+                        <p class="text-muted"><?php echo e(__('service_provider.no_similar_providers')); ?></p>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
         <!-- Back Button -->
         <div class="text-center mt-4 mb-5">
-            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary rounded-pill px-4">
-                <i class="fas fa-arrow-left me-2"></i> {{ __('general.back') }}
+            <a href="<?php echo e(url()->previous()); ?>" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i> <?php echo e(__('general.back')); ?>
+
             </a>
         </div>
     </div>
@@ -1804,11 +1975,11 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">{{ __('service_provider.gallery_image_title') }}</h5>
+                    <h5 class="modal-title" id="imageModalLabel"><?php echo e(__('service_provider.gallery_image_title')); ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="{{ __('service_provider.gallery_image_alt') }}" class="img-fluid">
+                    <img id="modalImage" src="" alt="<?php echo e(__('service_provider.gallery_image_alt')); ?>" class="img-fluid">
                 </div>
             </div>
         </div>
@@ -1821,44 +1992,47 @@
                 <div class="modal-header border-0"
                     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h5 class="modal-title text-white fw-bold" id="reviewModalLabel">
-                        <i class="fas fa-star me-2"></i>{{ __('reviews.write_review') }}
+                        <i class="fas fa-star me-2"></i><?php echo e(__('reviews.write_review')); ?>
+
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <form id="reviewForm" action="{{ route('reviews.store') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="service_provider_id" value="{{ $serviceProvider->id }}">
+                <form id="reviewForm" action="<?php echo e(route('reviews.store')); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="service_provider_id" value="<?php echo e($serviceProvider->id); ?>">
                     <div class="modal-body p-4">
                         <!-- Rating -->
                         <div class="mb-4 text-center">
-                            <label class="form-label fw-bold d-block mb-3">{{ __('reviews.your_rating') }}</label>
+                            <label class="form-label fw-bold d-block mb-3"><?php echo e(__('reviews.your_rating')); ?></label>
                             <div class="star-rating-input" style="font-size: 2rem; color: #d1d5db; cursor: pointer;">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star rating-star" data-rating="{{ $i }}"
-                                        onclick="setRating({{ $i }})"></i>
-                                @endfor
+                                <?php for($i = 1; $i <= 5; $i++): ?>
+                                    <i class="fas fa-star rating-star" data-rating="<?php echo e($i); ?>"
+                                        onclick="setRating(<?php echo e($i); ?>)"></i>
+                                <?php endfor; ?>
                             </div>
                             <input type="hidden" name="rating" id="ratingInput" value="5" required>
-                            <small class="text-muted rating-text">{{ __('reviews.excellent') }}</small>
+                            <small class="text-muted rating-text"><?php echo e(__('reviews.excellent')); ?></small>
                         </div>
 
                         <!-- Review Text -->
                         <div class="mb-3">
-                            <label for="reviewText" class="form-label fw-bold">{{ __('reviews.your_review') }}</label>
+                            <label for="reviewText" class="form-label fw-bold"><?php echo e(__('reviews.your_review')); ?></label>
                             <textarea class="form-control" id="reviewText" name="review_text" rows="4"
-                                placeholder="{{ __('reviews.review_placeholder') }}" required minlength="10"
+                                placeholder="<?php echo e(__('reviews.review_placeholder')); ?>" required minlength="10"
                                 maxlength="1000" style="border-radius: 12px; resize: none;"></textarea>
                             <small class="text-muted char-count">0 / 1000</small>
                         </div>
                     </div>
                     <div class="modal-footer border-0">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            {{ __('general.cancel') }}
+                            <?php echo e(__('general.cancel')); ?>
+
                         </button>
                         <button type="submit" class="btn btn-primary"
                             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                            <i class="fas fa-paper-plane me-2"></i>{{ __('reviews.submit_review') }}
+                            <i class="fas fa-paper-plane me-2"></i><?php echo e(__('reviews.submit_review')); ?>
+
                         </button>
                     </div>
                 </form>
@@ -1879,11 +2053,11 @@
             document.getElementById('ratingInput').value = rating;
             const stars = document.querySelectorAll('.rating-star');
             const ratingTexts = {
-                1: '{{ __('reviews.poor') }}',
-                2: '{{ __('reviews.fair') }}',
-                3: '{{ __('reviews.good') }}',
-                4: '{{ __('reviews.very_good') }}',
-                5: '{{ __('reviews.excellent') }}'
+                1: '<?php echo e(__('reviews.poor')); ?>',
+                2: '<?php echo e(__('reviews.fair')); ?>',
+                3: '<?php echo e(__('reviews.good')); ?>',
+                4: '<?php echo e(__('reviews.very_good')); ?>',
+                5: '<?php echo e(__('reviews.excellent')); ?>'
             };
 
             stars.forEach((star, index) => {
@@ -1923,7 +2097,7 @@
 
                 // Check file size
                 if (fileSize > maxSizeMB) {
-                    alert(`{{ __('service_provider.file_too_large') }} ${fileName} (${fileSize.toFixed(2)}MB). {{ __('service_provider.max_allowed') }}: ${maxSizeMB}MB`);
+                    alert(`<?php echo e(__('service_provider.file_too_large')); ?> ${fileName} (${fileSize.toFixed(2)}MB). <?php echo e(__('service_provider.max_allowed')); ?>: ${maxSizeMB}MB`);
                     input.value = ''; // Clear the input
                     return false;
                 }
@@ -1985,7 +2159,7 @@
         function revealContactInfo(phoneClean, phoneDisplay, address) {
             // Store reveal in SESSION (server-side) instead of localStorage
             // This ensures only the user who clicked can see the info
-            const providerId = {{ $serviceProvider->id }};
+            const providerId = <?php echo e($serviceProvider->id); ?>;
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             // Store reveal in session via AJAX request
@@ -2024,9 +2198,9 @@
             }
 
             // Prepare WhatsApp message
-            const businessName = {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!};
-            const whatsappMessage = {!! json_encode(__("service_provider.whatsapp_message")) !!};
-            const businessLabel = {!! json_encode(__("service_provider.business_name")) !!};
+            const businessName = <?php echo json_encode($serviceProvider->company_name ?? $serviceProvider->user->name); ?>;
+            const whatsappMessage = <?php echo json_encode(__("service_provider.whatsapp_message")); ?>;
+            const businessLabel = <?php echo json_encode(__("service_provider.business_name")); ?>;
 
             // Validate that we have required data
             if (!businessName || !whatsappMessage) {
@@ -2034,7 +2208,7 @@
                     businessName: businessName,
                     whatsappMessage: whatsappMessage
                 });
-                alert('{{ __("general.error") }}: Cannot send WhatsApp message. Missing information.');
+                alert('<?php echo e(__("general.error")); ?>: Cannot send WhatsApp message. Missing information.');
                 return;
             }
 
@@ -2086,7 +2260,7 @@
                     if (file) {
                         // Validate file size (5MB)
                         if (file.size > 5 * 1024 * 1024) {
-                            alert('{{ __("sp_validation.sp_image_size") }}');
+                            alert('<?php echo e(__("sp_validation.sp_image_size")); ?>');
                             e.target.value = '';
                             return;
                         }
@@ -2094,7 +2268,7 @@
                         // Validate file type
                         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
                         if (!validTypes.includes(file.type)) {
-                            alert('{{ __("sp_validation.sp_image_mimes") }}');
+                            alert('<?php echo e(__("sp_validation.sp_image_mimes")); ?>');
                             e.target.value = '';
                             return;
                         }
@@ -2147,7 +2321,7 @@
                     if (file) {
                         // Validate file size (10MB)
                         if (file.size > 10 * 1024 * 1024) {
-                            alert('{{ __("sp_validation.sp_cert_size") }}');
+                            alert('<?php echo e(__("sp_validation.sp_cert_size")); ?>');
                             e.target.value = '';
                             return;
                         }
@@ -2155,7 +2329,7 @@
                         // Validate file type
                         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
                         if (!validTypes.includes(file.type)) {
-                            alert('{{ __("sp_validation.sp_cert_mimes") }}');
+                            alert('<?php echo e(__("sp_validation.sp_cert_mimes")); ?>');
                             e.target.value = '';
                             return;
                         }
@@ -2164,7 +2338,7 @@
                         const fileName = file.name;
                         const fileInfo = certInput.parentElement.querySelector('.file-info') || document.createElement('small');
                         fileInfo.className = 'file-info text-success d-block mt-1';
-                        fileInfo.innerHTML = '<i class="fas fa-check-circle me-1"></i>{{ __("general.selected") }}: ' + fileName;
+                        fileInfo.innerHTML = '<i class="fas fa-check-circle me-1"></i><?php echo e(__("general.selected")); ?>: ' + fileName;
                         if (!certInput.parentElement.querySelector('.file-info')) {
                             certInput.parentElement.appendChild(fileInfo);
                         }
@@ -2182,7 +2356,7 @@
 
                 function updateCounter() {
                     const remaining = maxLength - bioTextarea.value.length;
-                    counter.textContent = remaining + ' {{ __("general.characters_remaining") }}';
+                    counter.textContent = remaining + ' <?php echo e(__("general.characters_remaining")); ?>';
                     counter.className = remaining < 100 ? 'char-counter text-warning d-block text-end mt-1' : 'char-counter text-muted d-block text-end mt-1';
                 }
 
@@ -2200,7 +2374,7 @@
 
                 function updateCounter() {
                     const remaining = maxLength - servicesInput.value.length;
-                    counter.textContent = remaining + ' {{ __("general.characters_remaining") }}';
+                    counter.textContent = remaining + ' <?php echo e(__("general.characters_remaining")); ?>';
                     counter.className = remaining < 50 ? 'char-counter text-warning d-block text-end mt-1' : 'char-counter text-muted d-block text-end mt-1';
                 }
 
@@ -2239,7 +2413,7 @@
                 const businessName = profileForm.querySelector('input[name="business_name"]');
                 if (businessName && businessName.value.trim().length < 3) {
                     e.preventDefault();
-                    alert('{{ __("sp_validation.sp_business_name_min") }}');
+                    alert('<?php echo e(__("sp_validation.sp_business_name_min")); ?>');
                     businessName.focus();
                     return false;
                 }
@@ -2247,7 +2421,7 @@
                 const phone = profileForm.querySelector('input[name="phone"]');
                 if (phone && phone.value.trim().length < 10) {
                     e.preventDefault();
-                    alert('{{ __("sp_validation.sp_phone_min") }}');
+                    alert('<?php echo e(__("sp_validation.sp_phone_min")); ?>');
                     phone.focus();
                     return false;
                 }
@@ -2255,7 +2429,7 @@
                 const email = profileForm.querySelector('input[name="contact_email"]');
                 if (email && email.value && !isValidEmail(email.value)) {
                     e.preventDefault();
-                    alert('{{ __("sp_validation.sp_email_format") }}');
+                    alert('<?php echo e(__("sp_validation.sp_email_format")); ?>');
                     email.focus();
                     return false;
                 }
@@ -2273,7 +2447,7 @@
                     submitBtn.innerHTML = `
                         <div class="d-flex align-items-center justify-content-center">
                             <span class="spinner-border spinner-border-sm me-2"></span>
-                            <span>{{ __("general.saving") }}...</span>
+                            <span><?php echo e(__("general.saving")); ?>...</span>
                         </div>
                     `;
 
@@ -2297,8 +2471,8 @@
                             <div class="spinner-border text-primary mb-3" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <h6 class="mb-2">{{ __("general.saving") }}...</h6>
-                            <p class="small text-muted mb-0">{{ __("service_provider.please_wait_updating") }}</p>
+                            <h6 class="mb-2"><?php echo e(__("general.saving")); ?>...</h6>
+                            <p class="small text-muted mb-0"><?php echo e(__("service_provider.please_wait_updating")); ?></p>
                         </div>
                     `;
                     document.body.appendChild(progressOverlay);
@@ -2325,7 +2499,7 @@
         }
 
         // Show validation errors prominently
-        @if($errors->any())
+        <?php if($errors->any()): ?>
             window.addEventListener('DOMContentLoaded', function () {
                 // Scroll to first error
                 const firstError = document.querySelector('.text-danger');
@@ -2335,7 +2509,7 @@
                 }
 
                 // Show error summary alert
-                const errorList = @json($errors->all());
+                const errorList = <?php echo json_encode($errors->all(), 15, 512) ?>;
                 if (errorList.length > 0) {
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
@@ -2343,7 +2517,7 @@
                     alertDiv.style.maxWidth = '500px';
                     alertDiv.innerHTML = `
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>{{ __("validation.please_correct_errors") }}</h6>
+                                    <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i><?php echo e(__("validation.please_correct_errors")); ?></h6>
                                     <ul class="mb-0 small">
                                         ${errorList.map(error => '<li>' + error + '</li>').join('')}
                                     </ul>
@@ -2356,13 +2530,13 @@
                     }, 10000);
                 }
             });
-        @endif
+        <?php endif; ?>
 
-        @if(session('success'))
+        <?php if(session('success')): ?>
             window.addEventListener('DOMContentLoaded', function () {
-                showToast('{{ session("success") }}', 'success');
+                showToast('<?php echo e(session("success")); ?>', 'success');
             });
-        @endif
+        <?php endif; ?>
     </script>
 
     <style>
@@ -2409,4 +2583,4 @@
     </style>
 </body>
 
-</html>
+</html><?php /**PATH Y:\Speeda - Versions\Speeda\resources\views/service-providers/show.blade.php ENDPATH**/ ?>

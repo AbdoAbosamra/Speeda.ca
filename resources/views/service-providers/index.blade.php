@@ -11,7 +11,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         /* ===== نظام التصميم الأساسي ===== */
@@ -62,7 +63,12 @@
         }
 
         /* ===== تنسيقات النصوص الأساسية ===== */
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-weight: 700;
             line-height: 1.2;
         }
@@ -87,6 +93,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -270,6 +277,7 @@
                 opacity: 0;
                 transform: translateY(30px) scale(0.95);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -619,8 +627,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
         .empty-title {
@@ -716,674 +731,695 @@
             color: var(--gray-800);
         }
 
-/* ===== Modal Container ===== */
-.rate-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(17, 24, 39, 0.98) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    overflow-y: auto;
-    padding: 2rem;
-}
+        /* ===== Modal Container ===== */
+        .rate-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(17, 24, 39, 0.98) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            overflow-y: auto;
+            padding: 2rem;
+        }
 
-.rate-modal.active {
-    opacity: 1;
-    pointer-events: all;
-    animation: modalFadeIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
+        .rate-modal.active {
+            opacity: 1;
+            pointer-events: all;
+            animation: modalFadeIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
 
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        backdrop-filter: blur(0px);
-    }
-    to {
-        opacity: 1;
-        backdrop-filter: blur(12px);
-    }
-}
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
 
-/* ===== Modal Content - Glassmorphism Design ===== */
-.rate-modal-content {
-    background: linear-gradient(145deg, #f9fafb, #ffffff);
-    border-radius: 28px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+            to {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+            }
+        }
+
+        /* ===== Modal Content - Glassmorphism Design ===== */
+        .rate-modal-content {
+            background: linear-gradient(145deg, #f9fafb, #ffffff);
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
                 0 0 0 1px rgba(255, 255, 255, 0.1),
                 inset 0 -5px 20px rgba(0, 0, 0, 0.05);
-    max-width: 550px;
-    width: 95%;
-    max-height: 90vh;
-    overflow-y: auto;
-    transform: scale(0.9);
-    opacity: 0;
-    animation: modalContentSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    animation-delay: 0.1s;
-    position: relative;
-    border: 1px solid #e5e7eb;
-}
+            max-width: 550px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            opacity: 0;
+            animation: modalContentSlideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation-delay: 0.1s;
+            position: relative;
+            border: 1px solid #e5e7eb;
+        }
 
-@keyframes modalContentSlideUp {
-    from {
-        transform: scale(0.9) translateY(30px);
-        opacity: 0;
-        filter: blur(5px);
-    }
-    to {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-        filter: blur(0);
-    }
-}
+        @keyframes modalContentSlideUp {
+            from {
+                transform: scale(0.9) translateY(30px);
+                opacity: 0;
+                filter: blur(5px);
+            }
 
-/* ===== Modal Header ===== */
-.rate-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2.5rem 2.5rem 1.5rem;
-    border-bottom: 2px solid #f3f4f6;
-    background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.08) 0%,
-        rgba(245, 158, 11, 0.08) 100%);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+                filter: blur(0);
+            }
+        }
 
-.rate-modal-header h2 {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #111827;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    position: relative;
-}
+        /* ===== Modal Header ===== */
+        .rate-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2.5rem 2.5rem 1.5rem;
+            border-bottom: 2px solid #f3f4f6;
+            background: linear-gradient(135deg,
+                    rgba(99, 102, 241, 0.08) 0%,
+                    rgba(245, 158, 11, 0.08) 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
 
-.rate-modal-header h2::before {
-    content: '⭐';
-    font-size: 1.6rem;
-    animation: starPulse 2s ease-in-out infinite;
-}
+        .rate-modal-header h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #111827;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
 
-@keyframes starPulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.2);
-        opacity: 0.8;
-    }
-}
+        .rate-modal-header h2::before {
+            content: '⭐';
+            font-size: 1.6rem;
+            animation: starPulse 2s ease-in-out infinite;
+        }
 
-.rate-modal-close {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-    border: 2px solid #e5e7eb;
-    font-size: 1.8rem;
-    color: #6b7280;
-    cursor: pointer;
-    padding: 0.8rem 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 14px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    position: relative;
-    overflow: hidden;
-}
+        @keyframes starPulse {
 
-.rate-modal-close::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s ease;
-}
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
 
-.rate-modal-close:hover::before {
-    left: 100%;
-}
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
 
-.rate-modal-close:hover {
-    background: linear-gradient(135deg, #e5e7eb, #d1d5db);
-    color: #374151;
-    transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    border-color: #d1d5db;
-}
+        .rate-modal-close {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border: 2px solid #e5e7eb;
+            font-size: 1.8rem;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
 
-/* ===== Modal Body ===== */
-.rate-modal-body {
-    padding: 2rem 2.5rem 2.5rem;
-}
+        .rate-modal-close::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
 
-/* ===== Rating Section ===== */
-.rating-section {
-    margin-bottom: 2.5rem;
-    text-align: center;
-}
+        .rate-modal-close:hover::before {
+            left: 100%;
+        }
 
-.rating-label {
-    display: block;
-    font-weight: 800;
-    color: #111827;
-    margin-bottom: 1.5rem;
-    font-size: 1.2rem;
-    position: relative;
-    padding-bottom: 0.5rem;
-}
+        .rate-modal-close:hover {
+            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+            color: #374151;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-color: #d1d5db;
+        }
 
-.rating-label::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #6366f1, #f59e0b);
-    border-radius: 3px;
-}
+        /* ===== Modal Body ===== */
+        .rate-modal-body {
+            padding: 2rem 2.5rem 2.5rem;
+        }
 
-/* ===== Star Rating - Advanced Design ===== */
-.star-rating {
-    display: flex;
-    gap: 1.2rem;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    position: relative;
-    padding: 1rem;
-    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
-    border-radius: 20px;
-    border: 2px solid #e5e7eb;
-    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
-}
+        /* ===== Rating Section ===== */
+        .rating-section {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
 
-.star-rating::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    right: -8px;
-    bottom: -8px;
-    background: linear-gradient(45deg, #6366f1, #f59e0b, #10b981);
-    border-radius: 28px;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    filter: blur(15px);
-}
+        .rating-label {
+            display: block;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
 
-.star-rating:hover::before {
-    opacity: 0.3;
-}
+        .rating-label::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #f59e0b);
+            border-radius: 3px;
+        }
 
-.star-rating input {
-    display: none;
-}
+        /* ===== Star Rating - Advanced Design ===== */
+        .star-rating {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            border-radius: 20px;
+            border: 2px solid #e5e7eb;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
 
-.star-label {
-    font-size: 3.2rem;
-    color: #d1d5db;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0.8rem;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    background: transparent;
-    border: 2px solid transparent;
-}
+        .star-rating::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            background: linear-gradient(45deg, #6366f1, #f59e0b, #10b981);
+            border-radius: 28px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            filter: blur(15px);
+        }
 
-.star-label::before {
-    content: '★';
-    position: absolute;
-    font-size: 3.2rem;
-    color: transparent;
-    -webkit-text-stroke: 1px #d1d5db;
-    transition: all 0.3s ease;
-}
+        .star-rating:hover::before {
+            opacity: 0.3;
+        }
 
-.star-label:hover::before,
-.star-label:hover ~ .star-label::before {
-    -webkit-text-stroke: 1px #f59e0b;
-    text-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
-}
+        .star-rating input {
+            display: none;
+        }
 
-.star-label.active::before {
-    color: #f59e0b;
-    -webkit-text-stroke: 0;
-    text-shadow: 0 0 20px rgba(245, 158, 11, 0.8),
-                 0 0 40px rgba(245, 158, 11, 0.6);
-    animation: starGlow 1.5s ease-in-out infinite alternate;
-}
+        .star-label {
+            font-size: 3.2rem;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.8rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: transparent;
+            border: 2px solid transparent;
+        }
 
-@keyframes starGlow {
-    from {
-        text-shadow: 0 0 10px rgba(245, 158, 11, 0.5),
-                     0 0 20px rgba(245, 158, 11, 0.3);
-    }
-    to {
-        text-shadow: 0 0 25px rgba(245, 158, 11, 1),
-                     0 0 50px rgba(245, 158, 11, 0.8);
-    }
-}
+        .star-label::before {
+            content: '★';
+            position: absolute;
+            font-size: 3.2rem;
+            color: transparent;
+            -webkit-text-stroke: 1px #d1d5db;
+            transition: all 0.3s ease;
+        }
 
-.star-label:hover {
-    transform: scale(1.3) translateY(-5px);
-    z-index: 10;
-    color: #f59e0b;
-}
+        .star-label:hover::before,
+        .star-label:hover~.star-label::before {
+            -webkit-text-stroke: 1px #f59e0b;
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+        }
 
-.star-label:hover::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 120%;
-    height: 120%;
-    background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: pulse 1s ease-out;
-}
+        .star-label.active::before {
+            color: #f59e0b;
+            -webkit-text-stroke: 0;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.8),
+                0 0 40px rgba(245, 158, 11, 0.6);
+            animation: starGlow 1.5s ease-in-out infinite alternate;
+        }
 
-@keyframes pulse {
-    0% {
-        opacity: 0.8;
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(1.5);
-    }
-}
+        @keyframes starGlow {
+            from {
+                text-shadow: 0 0 10px rgba(245, 158, 11, 0.5),
+                    0 0 20px rgba(245, 158, 11, 0.3);
+            }
 
-/* ===== Rating Text Display ===== */
-.rating-text {
-    text-align: center;
-    color: #6b7280;
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0;
-    padding: 1rem;
-    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
-    border-radius: 12px;
-    border-left: 4px solid #f59e0b;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
+            to {
+                text-shadow: 0 0 25px rgba(245, 158, 11, 1),
+                    0 0 50px rgba(245, 158, 11, 0.8);
+            }
+        }
 
-/* ===== Form Section ===== */
-.form-group {
-    margin-bottom: 1.5rem;
-}
+        .star-label:hover {
+            transform: scale(1.3) translateY(-5px);
+            z-index: 10;
+            color: #f59e0b;
+        }
 
-.form-label {
-    display: block;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.8rem;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+        .star-label:hover::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 1s ease-out;
+        }
 
-.form-label::before {
-    content: '📝';
-    font-size: 1.1rem;
-}
+        @keyframes pulse {
+            0% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
 
-/* ===== Review Textarea - Modern Design ===== */
-.review-textarea {
-    width: 100%;
-    padding: 1.2rem 1.5rem;
-    border: 3px solid #e5e7eb;
-    border-radius: 16px;
-    font-family: inherit;
-    font-size: 1rem;
-    color: #374151;
-    resize: vertical;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(135deg, #f9fafb, #ffffff);
-    min-height: 120px;
-    max-height: 300px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    position: relative;
-}
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+        }
 
-.review-textarea::placeholder {
-    color: #9ca3af;
-    opacity: 1;
-}
+        /* ===== Rating Text Display ===== */
+        .rating-text {
+            text-align: center;
+            color: #6b7280;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
-.review-textarea:focus {
-    outline: none;
-    border-color: #f59e0b;
-    background: white;
-    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15),
+        /* ===== Form Section ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label::before {
+            content: '📝';
+            font-size: 1.1rem;
+        }
+
+        /* ===== Review Textarea - Modern Design ===== */
+        .review-textarea {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            border: 3px solid #e5e7eb;
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #374151;
+            resize: vertical;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #f9fafb, #ffffff);
+            min-height: 120px;
+            max-height: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .review-textarea::placeholder {
+            color: #9ca3af;
+            opacity: 1;
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15),
                 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
+            transform: translateY(-2px);
+        }
 
-/* ===== Character Counter ===== */
-.char-count {
-    text-align: right;
-    font-size: 0.85rem;
-    color: #6b7280;
-    margin-top: 0.8rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
+        /* ===== Character Counter ===== */
+        .char-count {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
 
-.char-count.warning {
-    color: #d97706;
-    animation: shake 0.3s ease;
-}
+        .char-count.warning {
+            color: #d97706;
+            animation: shake 0.3s ease;
+        }
 
-.char-count.success {
-    color: #10b981;
-}
+        .char-count.success {
+            color: #10b981;
+        }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
-}
+        @keyframes shake {
 
-/* ===== Modal Actions ===== */
-.rate-modal-actions {
-    display: flex;
-    gap: 1.2rem;
-    margin-top: 2.5rem;
-    padding-top: 2.5rem;
-    border-top: 2px solid #f3f4f6;
-    position: sticky;
-    bottom: 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), white);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding-bottom: 1.5rem;
-}
+            0%,
+            100% {
+                transform: translateX(0);
+            }
 
-/* ===== Buttons - Advanced Design ===== */
-.btn-cancel,
-.btn-submit {
-    flex: 1;
-    padding: 1.1rem 1.5rem;
-    border: none;
-    border-radius: 16px;
-    font-weight: 700;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
+            25% {
+                transform: translateX(-3px);
+            }
 
-.btn-cancel {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-    color: #4b5563;
-    border: 2px solid #d1d5db;
-}
+            75% {
+                transform: translateX(3px);
+            }
+        }
 
-.btn-cancel::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.6s ease;
-}
+        /* ===== Modal Actions ===== */
+        .rate-modal-actions {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 2.5rem;
+            padding-top: 2.5rem;
+            border-top: 2px solid #f3f4f6;
+            position: sticky;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), white);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding-bottom: 1.5rem;
+        }
 
-.btn-cancel:hover::before {
-    left: 100%;
-}
+        /* ===== Buttons - Advanced Design ===== */
+        .btn-cancel,
+        .btn-submit {
+            flex: 1;
+            padding: 1.1rem 1.5rem;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
 
-.btn-cancel:hover {
-    background: linear-gradient(135deg, #e5e7eb, #d1d5db);
-    color: #374151;
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: #9ca3af;
-}
+        .btn-cancel {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            color: #4b5563;
+            border: 2px solid #d1d5db;
+        }
 
-.btn-cancel:active {
-    transform: translateY(0) scale(0.98);
-}
+        .btn-cancel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
 
-.btn-submit {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24, #d97706);
-    color: #111827;
-    box-shadow: 0 6px 25px rgba(245, 158, 11, 0.4),
+        .btn-cancel:hover::before {
+            left: 100%;
+        }
+
+        .btn-cancel:hover {
+            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+            color: #374151;
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #9ca3af;
+        }
+
+        .btn-cancel:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24, #d97706);
+            color: #111827;
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.4),
                 0 0 20px rgba(245, 158, 11, 0.2);
-    position: relative;
-    overflow: hidden;
-}
+            position: relative;
+            overflow: hidden;
+        }
 
-.btn-submit::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent);
-    transform: rotate(45deg);
-    transition: all 0.6s ease;
-}
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+        }
 
-.btn-submit:hover::before {
-    left: 100%;
-}
+        .btn-submit:hover::before {
+            left: 100%;
+        }
 
-.btn-submit::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg,
-        rgba(255, 255, 255, 0.2),
-        transparent,
-        rgba(255, 255, 255, 0.1));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg,
+                    rgba(255, 255, 255, 0.2),
+                    transparent,
+                    rgba(255, 255, 255, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-.btn-submit:hover::after {
-    opacity: 1;
-}
+        .btn-submit:hover::after {
+            opacity: 1;
+        }
 
-.btn-submit:hover {
-    transform: translateY(-6px) scale(1.05);
-    box-shadow: 0 12px 40px rgba(245, 158, 11, 0.6),
+        .btn-submit:hover {
+            transform: translateY(-6px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(245, 158, 11, 0.6),
                 0 0 30px rgba(245, 158, 11, 0.4);
-    background: linear-gradient(135deg, #fbbf24, #f59e0b, #f59e0b);
-}
+            background: linear-gradient(135deg, #fbbf24, #f59e0b, #f59e0b);
+        }
 
-.btn-submit:active {
-    transform: translateY(2px) scale(0.98);
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-}
+        .btn-submit:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
 
-.btn-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
-}
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+        }
 
-/* ===== Loading State ===== */
-.btn-submit.loading {
-    position: relative;
-    color: transparent;
-}
+        /* ===== Loading State ===== */
+        .btn-submit.loading {
+            position: relative;
+            color: transparent;
+        }
 
-.btn-submit.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #111827;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
+        .btn-submit.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #111827;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-@keyframes spin {
-    to {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
-}
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
 
-/* ===== Responsive Design ===== */
-@media (max-width: 768px) {
-    .rate-modal-content {
-        max-width: 95%;
-        border-radius: 24px;
-    }
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .rate-modal-content {
+                max-width: 95%;
+                border-radius: 24px;
+            }
 
-    .rate-modal-header h2 {
-        font-size: 1.5rem;
-    }
+            .rate-modal-header h2 {
+                font-size: 1.5rem;
+            }
 
-    .star-label {
-        font-size: 2.8rem;
-    }
+            .star-label {
+                font-size: 2.8rem;
+            }
 
-    .rate-modal-actions {
-        flex-direction: column;
-    }
+            .rate-modal-actions {
+                flex-direction: column;
+            }
 
-    .btn-cancel,
-    .btn-submit {
-        width: 100%;
-    }
-}
+            .btn-cancel,
+            .btn-submit {
+                width: 100%;
+            }
+        }
 
-@media (max-width: 480px) {
-    .rate-modal {
-        padding: 1rem;
-    }
+        @media (max-width: 480px) {
+            .rate-modal {
+                padding: 1rem;
+            }
 
-    .rate-modal-content {
-        border-radius: 20px;
-    }
+            .rate-modal-content {
+                border-radius: 20px;
+            }
 
-    .rate-modal-header,
-    .rate-modal-body {
-        padding: 1.5rem;
-    }
+            .rate-modal-header,
+            .rate-modal-body {
+                padding: 1.5rem;
+            }
 
-    .star-label {
-        font-size: 2.5rem;
-    }
+            .star-label {
+                font-size: 2.5rem;
+            }
 
-    .rating-text {
-        font-size: 0.9rem;
-    }
-}
+            .rating-text {
+                font-size: 0.9rem;
+            }
+        }
 
-/* ===== Micro Interactions ===== */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        /* ===== Micro Interactions ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
 
-.rating-section,
-.form-group {
-    animation: fadeInUp 0.6s ease-out forwards;
-}
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-.rating-section {
-    animation-delay: 0.2s;
-}
+        .rating-section,
+        .form-group {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
 
-.form-group {
-    animation-delay: 0.4s;
-}
+        .rating-section {
+            animation-delay: 0.2s;
+        }
 
-.rate-modal-actions {
-    animation: fadeInUp 0.6s ease-out 0.6s forwards;
-}
+        .form-group {
+            animation-delay: 0.4s;
+        }
 
-/* ===== Success Animation ===== */
-@keyframes successBounce {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
+        .rate-modal-actions {
+            animation: fadeInUp 0.6s ease-out 0.6s forwards;
+        }
 
-.success-animation {
-    animation: successBounce 0.5s ease-out;
-}
+        /* ===== Success Animation ===== */
+        @keyframes successBounce {
 
-/* ===== Custom Scrollbar ===== */
-.rate-modal-content::-webkit-scrollbar {
-    width: 8px;
-}
+            0%,
+            100% {
+                transform: scale(1);
+            }
 
-.rate-modal-content::-webkit-scrollbar-track {
-    background: #f9fafb;
-    border-radius: 10px;
-}
+            50% {
+                transform: scale(1.1);
+            }
+        }
 
-.rate-modal-content::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #6366f1, #f59e0b);
-    border-radius: 10px;
-    border: 2px solid #f9fafb;
-}
+        .success-animation {
+            animation: successBounce 0.5s ease-out;
+        }
 
-.rate-modal-content::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #4f46e5, #d97706);
-}
+        /* ===== Custom Scrollbar ===== */
+        .rate-modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .rate-modal-content::-webkit-scrollbar-track {
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        .rate-modal-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6366f1, #f59e0b);
+            border-radius: 10px;
+            border: 2px solid #f9fafb;
+        }
+
+        .rate-modal-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #4f46e5, #d97706);
+        }
 
         /* ===== التصميم المتجاوب ===== */
         @media (max-width: 640px) {
@@ -1577,12 +1613,29 @@
         }
 
         /* ===== تأثيرات التحميل المتتالية ===== */
-        .provider-card:nth-child(1) { animation-delay: 0.1s; }
-        .provider-card:nth-child(2) { animation-delay: 0.2s; }
-        .provider-card:nth-child(3) { animation-delay: 0.3s; }
-        .provider-card:nth-child(4) { animation-delay: 0.4s; }
-        .provider-card:nth-child(5) { animation-delay: 0.5s; }
-        .provider-card:nth-child(6) { animation-delay: 0.6s; }
+        .provider-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .provider-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .provider-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .provider-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .provider-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .provider-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
 
         /* ===== تحسينات إضافية ===== */
         .fade-in {
@@ -1594,9 +1647,17 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+            }
         }
 
         .glass-effect {
@@ -1632,11 +1693,8 @@
                 <div class="filters-grid">
                     <div class="search-wrapper">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text"
-                               class="search-input"
-                               id="searchInput"
-                               placeholder="{{ __('service_provider.search_providers') }}"
-                               value="{{ request('search') }}">
+                        <input type="text" class="search-input" id="searchInput"
+                            placeholder="{{ __('service_provider.search_providers') }}" value="{{ request('search') }}">
                     </div>
 
                     <div class="select-wrapper">
@@ -1699,11 +1757,10 @@
                             <div class="avatar-container">
                                 @if($provider->profile_image)
                                     <img src="{{ asset('storage/' . $provider->profile_image) }}"
-                                         alt="{{ $provider->company_name ?? $provider->user->name }}"
-                                         class="provider-avatar">
+                                        alt="{{ $provider->company_name ?? $provider->user->name }}" class="provider-avatar">
                                 @else
                                     <div class="provider-avatar d-flex align-items-center justify-content-center"
-                                         style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                                        style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
                                         <i class="fas fa-user fa-2x text-white"></i>
                                     </div>
                                 @endif
@@ -1727,7 +1784,8 @@
                                             $reviewCount = $provider->reviews_count ?? 0;
                                         @endphp
                                         @for ($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star {{ $i <= round($displayRating) ? 'text-warning' : 'text-muted' }}"></i>
+                                            <i
+                                                class="fas fa-star {{ $i <= round($displayRating) ? 'text-warning' : 'text-muted' }}"></i>
                                         @endfor
                                     </div>
                                     <span class="rating-score">{{ number_format($displayRating, 1) }}</span>
@@ -1742,6 +1800,9 @@
                         <div class="location-info" data-provider-id="{{ $provider->id }}">
                             <i class="fas fa-map-marker-alt location-icon"></i>
                             <div class="address-text">
+                                @if($provider->location)
+                                    <div class="mb-1 fw-bold text-primary">{{ $provider->location->city }}</div>
+                                @endif
                                 <span class="address-content hidden-address" style="display: block;">
                                     @if($provider->address)
                                         {{ preg_replace('/\d/', '*', $provider->address) }}
@@ -1765,7 +1826,8 @@
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-thumbs-up stat-icon"></i>
-                            <div class="stat-value" data-endorsements-count="{{ $provider->id }}">{{ $provider->endorsements_count ?? 0 }}</div>
+                            <div class="stat-value" data-endorsements-count="{{ $provider->id }}">
+                                {{ $provider->endorsements_count ?? 0 }}</div>
                             <div class="stat-label">{{ __('service_provider.stat_recommends') }}</div>
                         </div>
                         <div class="stat-item">
@@ -1782,9 +1844,11 @@
                                 @php
                                     $isEndorsed = $provider->isEndorsedBy(auth()->id());
                                 @endphp
-                                <form action="{{ route('endorsements.toggle', $provider->id) }}" method="POST" style="display: inline;">
+                                <form action="{{ route('endorsements.toggle', $provider->id) }}" method="POST"
+                                    style="display: inline;">
                                     @csrf
-                                    <button type="submit" class="btn-action btn-recommend {{ $isEndorsed ? 'recommended' : '' }}">
+                                    <button type="submit"
+                                        class="btn-action btn-recommend {{ $isEndorsed ? 'recommended' : '' }}">
                                         <i class="{{ $isEndorsed ? 'fas' : 'far' }} fa-thumbs-up"></i>
                                         <span>{{ $isEndorsed ? __('service_provider.recommended') : __('service_provider.recommend') }}</span>
                                     </button>
@@ -1798,13 +1862,13 @@
 
                             @if(auth()->check())
                                 <button class="btn-action btn-rate"
-                                        onclick="openRateModal({{ $provider->id }}, '{{ addslashes($provider->company_name ?? $provider->user->name) }}')">
+                                    onclick="openRateModal({{ $provider->id }}, '{{ addslashes($provider->company_name ?? $provider->user->name) }}')">
                                     <i class="fas fa-star"></i>
                                     <span>{{ __('service_provider.rate_provider') }}</span>
                                 </button>
                             @else
                                 <a href="{{ route('register') }}?redirect={{ urlencode(route('reviews.create', $provider->id)) }}"
-                                   class="btn-action btn-rate">
+                                    class="btn-action btn-rate">
                                     <i class="fas fa-star"></i>
                                     <span>{{ __('service_provider.rate_provider') }}</span>
                                 </a>
@@ -1816,12 +1880,12 @@
                             {{ __('service_provider.view_full_profile') }}
                         </a>
 
-                        @if($provider->experience_years)
+                        <!-- @if($provider->experience_years)
                             <div class="experience-badge">
                                 <i class="fas fa-briefcase"></i>
                                 <span>{{ $provider->experience_years }} {{ __('service_provider.years') }} Experience</span>
                             </div>
-                        @endif
+                        @endif -->
                     </div>
                 </div>
             @empty
@@ -1902,7 +1966,8 @@
 
                     <!-- نظام التقييم بالنجوم -->
                     <div class="rating-section">
-                        <label class="rating-label">{{ __('reviews.rating') }} <span class="text-danger">*</span></label>
+                        <label class="rating-label">{{ __('reviews.rating') }} <span
+                                class="text-danger">*</span></label>
                         <div class="star-rating" id="starRating">
                             @for ($i = 1; $i <= 5; $i++)
                                 <input type="radio" id="rating-{{ $i }}" name="rating" value="{{ $i }}" required>
@@ -1916,17 +1981,11 @@
 
                     <!-- حقل التقييم -->
                     <div class="form-group mb-4">
-                        <label for="review_text" class="form-label">{{ __('reviews.review_text') }} <span class="text-danger">*</span></label>
-                        <textarea
-                            id="review_text"
-                            name="review_text"
-                            class="form-control review-textarea"
-                            rows="5"
-                            placeholder="{{ __('reviews.review_placeholder') }}"
-                            required
-                            minlength="10"
-                            maxlength="1000"
-                        ></textarea>
+                        <label for="review_text" class="form-label">{{ __('reviews.review_text') }} <span
+                                class="text-danger">*</span></label>
+                        <textarea id="review_text" name="review_text" class="form-control review-textarea" rows="5"
+                            placeholder="{{ __('reviews.review_placeholder') }}" required minlength="10"
+                            maxlength="1000"></textarea>
                         <div class="char-count">
                             <span id="charCount">0</span> / 1000
                         </div>
@@ -1949,7 +2008,7 @@
     <!-- سكريبتات JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // عناصر الفلاتر
             const searchInput = document.getElementById('searchInput');
             const locationFilter = document.getElementById('locationFilter');
@@ -1985,7 +2044,7 @@
             }
 
             // البحث مع تأخير
-            searchInput.addEventListener('input', function() {
+            searchInput.addEventListener('input', function () {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(applyFilters, 600);
             });
@@ -1996,17 +2055,17 @@
 
             // تأثير الفلاتر عند التركيز
             [searchInput, locationFilter, categoryFilter].forEach(element => {
-                element.addEventListener('focus', function() {
+                element.addEventListener('focus', function () {
                     this.style.transform = 'scale(1.02)';
                 });
 
-                element.addEventListener('blur', function() {
+                element.addEventListener('blur', function () {
                     this.style.transform = 'scale(1)';
                 });
             });
 
             // إعادة تعيين الفلاتر
-            window.resetFilters = function() {
+            window.resetFilters = function () {
                 searchInput.value = '';
                 locationFilter.value = '';
                 categoryFilter.value = '';
@@ -2032,260 +2091,260 @@
             // تفعيل تأثير Hover على البطاقات
             const providerCards = document.querySelectorAll('.provider-card');
             providerCards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
+                card.addEventListener('mouseenter', function () {
                     this.style.zIndex = '10';
                 });
 
-                card.addEventListener('mouseleave', function() {
+                card.addEventListener('mouseleave', function () {
                     this.style.zIndex = '1';
                 });
             });
         });
 
         // دوال Modal للتقييم
-document.addEventListener('DOMContentLoaded', function() {
-    // ======================
-    // دوال التحكم في الـ Modal
-    // ======================
-    window.openRateModal = function(providerId, providerName) {
-        console.log('Opening modal for provider:', providerId, providerName);
+        document.addEventListener('DOMContentLoaded', function () {
+            // ======================
+            // دوال التحكم في الـ Modal
+            // ======================
+            window.openRateModal = function (providerId, providerName) {
+                console.log('Opening modal for provider:', providerId, providerName);
 
-        const modal = document.getElementById('rateModal');
-        if (!modal) {
-            console.error('Modal element not found');
-            return;
-        }
-
-        // تحديث محتوى الـ Modal
-        const updates = {
-            'providerNameInModal': el => el.textContent = providerName,
-            'providerIdInput': el => el.value = providerId,
-            'charCount': el => el.textContent = '0',
-            'ratingText': el => el.textContent = 'Select your rating'
-        };
-
-        Object.entries(updates).forEach(([id, fn]) => {
-            const el = document.getElementById(id);
-            if (el) fn(el);
-        });
-
-        // إعادة تعيين النموذج
-        const rateForm = document.getElementById('rateForm');
-        if (rateForm) rateForm.reset();
-
-        // تفعيل الـ Modal
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        console.log('Modal opened successfully');
-    };
-
-    window.closeRateModal = function() {
-        const modal = document.getElementById('rateModal');
-        if (modal) modal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-    };
-
-    // ======================
-    // أحداث إغلاق الـ Modal
-    // ======================
-    const modal = document.getElementById('rateModal');
-    if (modal) {
-        // إغلاق عند الضغط خارج الـ Modal
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) window.closeRateModal();
-        });
-
-        // إغلاق بـ ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('active')) {
-                window.closeRateModal();
-            }
-        });
-    }
-
-    // ======================
-    // عداد الأحرف
-    // ======================
-    const reviewText = document.getElementById('review_text');
-    const charCount = document.getElementById('charCount');
-    if (reviewText && charCount) {
-        reviewText.addEventListener('input', () => {
-            charCount.textContent = reviewText.value.length;
-        });
-    }
-
-    // ======================
-    // نظام التقييم بالنجوم
-    // ======================
-    const starContainers = document.querySelectorAll('.star-rating');
-    const ratingTexts = {
-        '1': @json(__('reviews.poor')),
-        '2': @json(__('reviews.fair')),
-        '3': @json(__('reviews.good')),
-        '4': @json(__('reviews.very_good')),
-        '5': @json(__('reviews.excellent'))
-    };
-
-    starContainers.forEach(container => {
-        const labels = container.querySelectorAll('.star-label');
-        const inputs = container.querySelectorAll('input');
-        const ratingDisplay = document.getElementById('ratingText');
-
-        // تحديث العرض عند التغيير
-        inputs.forEach(input => {
-            input.addEventListener('change', () => {
-                const value = input.value;
-                // تحديث النجوم النشطة
-                labels.forEach((label, i) => {
-                    label.classList.toggle('active', i < value);
-                });
-                // تحديث نص التقييم
-                if (ratingDisplay && ratingTexts[value]) {
-                    ratingDisplay.textContent = ratingTexts[value];
+                const modal = document.getElementById('rateModal');
+                if (!modal) {
+                    console.error('Modal element not found');
+                    return;
                 }
-            });
 
-            // تأثير التمرير
-            input.addEventListener('mouseenter', () => {
-                const hoverValue = parseInt(input.value);
-                labels.forEach((label, i) => {
-                    label.style.color = i < hoverValue ? 'var(--warning)' : 'var(--gray-300)';
-                    label.style.transform = i < hoverValue ? 'scale(1.15)' : 'scale(1)';
-                });
-            });
-        });
+                // تحديث محتوى الـ Modal
+                const updates = {
+                    'providerNameInModal': el => el.textContent = providerName,
+                    'providerIdInput': el => el.value = providerId,
+                    'charCount': el => el.textContent = '0',
+                    'ratingText': el => el.textContent = 'Select your rating'
+                };
 
-        // إعادة التعيين بعد مغادرة المنطقة
-        container.addEventListener('mouseleave', () => {
-            const checked = container.querySelector('input:checked');
-            const currentValue = checked ? parseInt(checked.value) : 0;
-
-            labels.forEach((label, i) => {
-                label.style.color = i < currentValue ? 'var(--warning)' : 'var(--gray-300)';
-                label.style.transform = 'scale(1)';
-                label.classList.toggle('active', i < currentValue);
-            });
-        });
-    });
-
-    // ======================
-    // معالجة إرسال التقييم
-    // ======================
-    const rateForm = document.getElementById('rateForm');
-    if (rateForm) {
-        rateForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = rateForm.querySelector('.btn-submit');
-            if (!submitBtn) return;
-
-            const originalHTML = submitBtn.innerHTML;
-            const rating = rateForm.querySelector('input[name="rating"]:checked')?.value;
-            const reviewText = rateForm.querySelector('textarea[name="review_text"]')?.value.trim();
-
-            // التحقق من الصحة
-            if (!rating) {
-                alert('Please select a rating');
-                return;
-            }
-            if (!reviewText || reviewText.length < 10) {
-                alert('Please write a review (minimum 10 characters)');
-                return;
-            }
-
-            // إعداد الزر للإرسال
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Submitting...';
-
-            try {
-                // جلب CSRF Token بأمان
-                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                if (!csrfMeta) throw new Error('CSRF token not found');
-
-                const response = await fetch(rateForm.action || '{{ route("reviews.store") }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfMeta.content,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(new FormData(rateForm))
+                Object.entries(updates).forEach(([id, fn]) => {
+                    const el = document.getElementById(id);
+                    if (el) fn(el);
                 });
 
-                const data = await response.json();
+                // إعادة تعيين النموذج
+                const rateForm = document.getElementById('rateForm');
+                if (rateForm) rateForm.reset();
 
-                if (!response.ok) throw data;
-                if (!data.success) throw { message: data.message || 'Submission failed' };
+                // تفعيل الـ Modal
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                console.log('Modal opened successfully');
+            };
 
-                // نجاح الإرسال: إغلاق الـ Modal وتحديث الواجهة
-                window.closeRateModal();
-                updateProviderCard(data.review, document.getElementById('providerIdInput')?.value);
-                showSuccessMessage('Your review has been submitted successfully!');
+            window.closeRateModal = function () {
+                const modal = document.getElementById('rateModal');
+                if (modal) modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            };
 
-            } catch (error) {
-                console.error('Submission error:', error);
-                const errorMsg = extractErrorMessage(error);
-                alert(`Submission failed: ${errorMsg}`);
-            } finally {
-                // استعادة حالة الزر
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalHTML;
-            }
-        });
-    }
+            // ======================
+            // أحداث إغلاق الـ Modal
+            // ======================
+            const modal = document.getElementById('rateModal');
+            if (modal) {
+                // إغلاق عند الضغط خارج الـ Modal
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) window.closeRateModal();
+                });
 
-    // ======================
-    // دوال مساعدة
-    // ======================
-    function updateProviderCard(review, providerId) {
-        if (!review || !providerId) return;
-
-        document.querySelectorAll(`.provider-card[data-provider-id="${providerId}"]`).forEach(card => {
-            const starsContainer = card.querySelector('.stars');
-            const ratingScore = card.querySelector('.rating-score');
-            const reviewsCount = card.querySelector('.reviews-count');
-
-            if (starsContainer) {
-                const rating = Math.round(review.rating || 0);
-                starsContainer.innerHTML = Array.from({length: 5}, (_, i) =>
-                    `<i class="fas fa-star ${i < rating ? 'text-warning' : 'text-muted'}"></i>`
-                ).join('');
+                // إغلاق بـ ESC
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.classList.contains('active')) {
+                        window.closeRateModal();
+                    }
+                });
             }
 
-            if (ratingScore) ratingScore.textContent = (review.rating || 0).toFixed(1);
-            if (reviewsCount) reviewsCount.textContent = `(${review.reviews_count || 0})`;
-        });
-    }
+            // ======================
+            // عداد الأحرف
+            // ======================
+            const reviewText = document.getElementById('review_text');
+            const charCount = document.getElementById('charCount');
+            if (reviewText && charCount) {
+                reviewText.addEventListener('input', () => {
+                    charCount.textContent = reviewText.value.length;
+                });
+            }
 
-    function showSuccessMessage(message) {
-        const container = document.querySelector('.page-shell') || document.body;
-        const alert = document.createElement('div');
-        alert.className = 'alert alert-success alert-dismissible fade show';
-        alert.style.cssText = 'margin:1rem; position:fixed; top:1rem; right:1rem; z-index:9999;';
-        alert.innerHTML = `
+            // ======================
+            // نظام التقييم بالنجوم
+            // ======================
+            const starContainers = document.querySelectorAll('.star-rating');
+            const ratingTexts = {
+                '1': @json(__('reviews.poor')),
+                '2': @json(__('reviews.fair')),
+                '3': @json(__('reviews.good')),
+                '4': @json(__('reviews.very_good')),
+                '5': @json(__('reviews.excellent'))
+            };
+
+            starContainers.forEach(container => {
+                const labels = container.querySelectorAll('.star-label');
+                const inputs = container.querySelectorAll('input');
+                const ratingDisplay = document.getElementById('ratingText');
+
+                // تحديث العرض عند التغيير
+                inputs.forEach(input => {
+                    input.addEventListener('change', () => {
+                        const value = input.value;
+                        // تحديث النجوم النشطة
+                        labels.forEach((label, i) => {
+                            label.classList.toggle('active', i < value);
+                        });
+                        // تحديث نص التقييم
+                        if (ratingDisplay && ratingTexts[value]) {
+                            ratingDisplay.textContent = ratingTexts[value];
+                        }
+                    });
+
+                    // تأثير التمرير
+                    input.addEventListener('mouseenter', () => {
+                        const hoverValue = parseInt(input.value);
+                        labels.forEach((label, i) => {
+                            label.style.color = i < hoverValue ? 'var(--warning)' : 'var(--gray-300)';
+                            label.style.transform = i < hoverValue ? 'scale(1.15)' : 'scale(1)';
+                        });
+                    });
+                });
+
+                // إعادة التعيين بعد مغادرة المنطقة
+                container.addEventListener('mouseleave', () => {
+                    const checked = container.querySelector('input:checked');
+                    const currentValue = checked ? parseInt(checked.value) : 0;
+
+                    labels.forEach((label, i) => {
+                        label.style.color = i < currentValue ? 'var(--warning)' : 'var(--gray-300)';
+                        label.style.transform = 'scale(1)';
+                        label.classList.toggle('active', i < currentValue);
+                    });
+                });
+            });
+
+            // ======================
+            // معالجة إرسال التقييم
+            // ======================
+            const rateForm = document.getElementById('rateForm');
+            if (rateForm) {
+                rateForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const submitBtn = rateForm.querySelector('.btn-submit');
+                    if (!submitBtn) return;
+
+                    const originalHTML = submitBtn.innerHTML;
+                    const rating = rateForm.querySelector('input[name="rating"]:checked')?.value;
+                    const reviewText = rateForm.querySelector('textarea[name="review_text"]')?.value.trim();
+
+                    // التحقق من الصحة
+                    if (!rating) {
+                        alert('Please select a rating');
+                        return;
+                    }
+                    if (!reviewText || reviewText.length < 10) {
+                        alert('Please write a review (minimum 10 characters)');
+                        return;
+                    }
+
+                    // إعداد الزر للإرسال
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Submitting...';
+
+                    try {
+                        // جلب CSRF Token بأمان
+                        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                        if (!csrfMeta) throw new Error('CSRF token not found');
+
+                        const response = await fetch(rateForm.action || '{{ route("reviews.store") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfMeta.content,
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams(new FormData(rateForm))
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) throw data;
+                        if (!data.success) throw { message: data.message || 'Submission failed' };
+
+                        // نجاح الإرسال: إغلاق الـ Modal وتحديث الواجهة
+                        window.closeRateModal();
+                        updateProviderCard(data.review, document.getElementById('providerIdInput')?.value);
+                        showSuccessMessage('Your review has been submitted successfully!');
+
+                    } catch (error) {
+                        console.error('Submission error:', error);
+                        const errorMsg = extractErrorMessage(error);
+                        alert(`Submission failed: ${errorMsg}`);
+                    } finally {
+                        // استعادة حالة الزر
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHTML;
+                    }
+                });
+            }
+
+            // ======================
+            // دوال مساعدة
+            // ======================
+            function updateProviderCard(review, providerId) {
+                if (!review || !providerId) return;
+
+                document.querySelectorAll(`.provider-card[data-provider-id="${providerId}"]`).forEach(card => {
+                    const starsContainer = card.querySelector('.stars');
+                    const ratingScore = card.querySelector('.rating-score');
+                    const reviewsCount = card.querySelector('.reviews-count');
+
+                    if (starsContainer) {
+                        const rating = Math.round(review.rating || 0);
+                        starsContainer.innerHTML = Array.from({ length: 5 }, (_, i) =>
+                            `<i class="fas fa-star ${i < rating ? 'text-warning' : 'text-muted'}"></i>`
+                        ).join('');
+                    }
+
+                    if (ratingScore) ratingScore.textContent = (review.rating || 0).toFixed(1);
+                    if (reviewsCount) reviewsCount.textContent = `(${review.reviews_count || 0})`;
+                });
+            }
+
+            function showSuccessMessage(message) {
+                const container = document.querySelector('.page-shell') || document.body;
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success alert-dismissible fade show';
+                alert.style.cssText = 'margin:1rem; position:fixed; top:1rem; right:1rem; z-index:9999;';
+                alert.innerHTML = `
             <strong>Success!</strong> ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        container.appendChild(alert);
+                container.appendChild(alert);
 
-        // إزالة تلقائية بعد 5 ثوانٍ
-        setTimeout(() => {
-            alert.classList.remove('show');
-            alert.classList.add('fade');
-            setTimeout(() => alert.remove(), 300);
-        }, 5000);
-    }
+                // إزالة تلقائية بعد 5 ثوانٍ
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    alert.classList.add('fade');
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            }
 
-    function extractErrorMessage(error) {
-        if (typeof error === 'string') return error;
-        if (error?.errors) return Object.values(error.errors).flat().join(', ');
-        if (error?.message) return error.message;
-        if (error?.statusText) return error.statusText;
-        return 'An unexpected error occurred';
-    }
-});
+            function extractErrorMessage(error) {
+                if (typeof error === 'string') return error;
+                if (error?.errors) return Object.values(error.errors).flat().join(', ');
+                if (error?.message) return error.message;
+                if (error?.statusText) return error.statusText;
+                return 'An unexpected error occurred';
+            }
+        });
 
         // تأثير تحميل الصفحة
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             document.body.style.opacity = '0';
             document.body.style.transition = 'opacity 0.5s ease';
 

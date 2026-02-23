@@ -266,7 +266,7 @@ class ServiceProvider extends Model
     protected function displayRating(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->calculated_rating ?? $this->rating ?? 0
+            get: fn() => $this->calculated_rating ?? $this->rating ?? 0
         );
     }
 

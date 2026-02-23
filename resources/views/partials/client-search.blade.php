@@ -30,7 +30,7 @@
 
         <!-- CTA Button -->
         <div class="text-center mb-5">
-            <a href="{{ route('register') }}" class="client-search-cta">
+            <a href="{{ route('register', ['type' => 'service-provider']) }}" class="client-search-cta">
                 <span class="position-relative z-2">
                     <i class="fas fa-user-plus me-2"></i> Create Your Free Profile Now
                 </span>

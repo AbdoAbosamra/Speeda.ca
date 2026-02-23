@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}"
-    dir="{{ in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']) ? 'rtl' : 'ltr' }}">
+<html lang="<?php echo e(app()->getLocale()); ?>"
+    dir="<?php echo e(in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']) ? 'rtl' : 'ltr'); ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('auth.authentication') }} | {{ config('app.name', 'Speeda') }}</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo e(__('auth.authentication')); ?> | <?php echo e(config('app.name', 'Speeda')); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1521,49 +1521,49 @@
 <body>
     <!-- Update HTML lang attribute dynamically -->
     <script>
-        document.documentElement.lang = '{{ app()->getLocale() }}';
-        document.documentElement.dir = '{{ app()->getLocale() === "ar" ? "rtl" : "ltr" }}';
+        document.documentElement.lang = '<?php echo e(app()->getLocale()); ?>';
+        document.documentElement.dir = '<?php echo e(app()->getLocale() === "ar" ? "rtl" : "ltr"); ?>';
     </script>
 
     <!-- Standalone Language Button for Register Page -->
-    @php($authLocaleRedirect = request()->fullUrl())
+    <?php ($authLocaleRedirect = request()->fullUrl()); ?>
     <div class="register-language-switcher">
         <div class="language-switcher-standalone" id="languageSwitcherStandalone">
             <button type="button" class="language-btn-standalone" onclick="toggleLanguageMenuStandalone()"
                 aria-haspopup="true" aria-expanded="false">
                 <span class="current-language-standalone">
-                    @if(app()->getLocale() === 'en') 🇺🇸 EN
-                    @elseif(app()->getLocale() === 'ar') 🇸🇦 AR
-                    @elseif(app()->getLocale() === 'fr') 🇫🇷 FR
-                    @endif
+                    <?php if(app()->getLocale() === 'en'): ?> 🇺🇸 EN
+                    <?php elseif(app()->getLocale() === 'ar'): ?> 🇸🇦 AR
+                    <?php elseif(app()->getLocale() === 'fr'): ?> 🇫🇷 FR
+                    <?php endif; ?>
                 </span>
                 <i class="fas fa-chevron-down"></i>
             </button>
 
             <div class="language-dropdown-standalone" id="languageDropdownStandalone">
-                @if(app()->getLocale() !== 'en')
+                <?php if(app()->getLocale() !== 'en'): ?>
                     <a href="#" onclick="event.preventDefault(); switchLanguageAuth('en');"
                         class="language-option-standalone">
                         <span class="language-flag-standalone">🇺🇸</span>
-                        <span class="language-name-standalone">{{ __('language.english') }}</span>
+                        <span class="language-name-standalone"><?php echo e(__('language.english')); ?></span>
                     </a>
-                @endif
+                <?php endif; ?>
 
-                @if(app()->getLocale() !== 'ar')
+                <?php if(app()->getLocale() !== 'ar'): ?>
                     <a href="#" onclick="event.preventDefault(); switchLanguageAuth('ar');"
                         class="language-option-standalone">
                         <span class="language-flag-standalone">🇸🇦</span>
-                        <span class="language-name-standalone">{{ __('language.arabic') }}</span>
+                        <span class="language-name-standalone"><?php echo e(__('language.arabic')); ?></span>
                     </a>
-                @endif
+                <?php endif; ?>
 
-                @if(app()->getLocale() !== 'fr')
+                <?php if(app()->getLocale() !== 'fr'): ?>
                     <a href="#" onclick="event.preventDefault(); switchLanguageAuth('fr');"
                         class="language-option-standalone">
                         <span class="language-flag-standalone">🇫🇷</span>
-                        <span class="language-name-standalone">{{ __('language.french') }}</span>
+                        <span class="language-name-standalone"><?php echo e(__('language.french')); ?></span>
                     </a>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -1572,59 +1572,80 @@
 
     <div class="auth-card" id="main-content">
         <div class="auth-header">
-            <h1 id="auth-title">{{ __('auth.welcome_back') }}</h1>
-            <p id="auth-subtitle">{{ __('auth.sign_in_subtitle') }}</p>
+            <h1 id="auth-title"><?php echo e(__('auth.welcome_back')); ?></h1>
+            <p id="auth-subtitle"><?php echo e(__('auth.sign_in_subtitle')); ?></p>
         </div>
 
-        {{-- Unified Error Handler --}}
-        <x-error-handler />
+        
+        <?php if (isset($component)) { $__componentOriginalb73145fe1614d50b3151d575d31121ae = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb73145fe1614d50b3151d575d31121ae = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.error-handler','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('error-handler'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb73145fe1614d50b3151d575d31121ae)): ?>
+<?php $attributes = $__attributesOriginalb73145fe1614d50b3151d575d31121ae; ?>
+<?php unset($__attributesOriginalb73145fe1614d50b3151d575d31121ae); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb73145fe1614d50b3151d575d31121ae)): ?>
+<?php $component = $__componentOriginalb73145fe1614d50b3151d575d31121ae; ?>
+<?php unset($__componentOriginalb73145fe1614d50b3151d575d31121ae); ?>
+<?php endif; ?>
 
         <div class="tab-container" role="tablist">
             <div class="tab active" id="login-tab" role="tab" aria-selected="true" aria-controls="login-panel"
-                tabindex="0">{{ __('auth.login_tab') }}</div>
+                tabindex="0"><?php echo e(__('auth.login_tab')); ?></div>
             <div class="tab" id="register-tab" role="tab" aria-selected="false" aria-controls="register-panel"
-                tabindex="0">{{ __('auth.register_tab') }}</div>
+                tabindex="0"><?php echo e(__('auth.register_tab')); ?></div>
         </div>
 
         <div class="form-container">
             <div class="session-status mb-4" id="session-status" style="display: none;" role="alert">
             </div>
 
-            <form method="POST" action="{{ route('login') }}" id="login-form" role="tabpanel" id="login-panel"
+            <form method="POST" action="<?php echo e(route('login')); ?>" id="login-form" role="tabpanel" id="login-panel"
                 aria-labelledby="login-tab">
-                @csrf
+                <?php echo csrf_field(); ?>
 
                 <div class="form-group">
                     <label for="login-field" class="form-label">
                         <i class="fas fa-user-circle"></i>
-                        {{ __('auth.email_or_mobile') }}
+                        <?php echo e(__('auth.email_or_mobile')); ?>
+
                     </label>
                     <div class="input-wrapper">
-                        <input id="login-field" class="form-input" type="text" name="login" value="{{ old('login') }}"
+                        <input id="login-field" class="form-input" type="text" name="login" value="<?php echo e(old('login')); ?>"
                             required autofocus autocomplete="username" aria-describedby="login-field-error login-hint">
                         <i class="fas fa-envelope input-icon" id="login-field-icon"></i>
                     </div>
                     <div class="phone-hint" id="login-hint">
-                        <span id="client-login-hint">{{ __('auth.email_address') }}</span>
-                        <span id="provider-login-hint" style="display: none;">{{ __('auth.email_or_mobile') }}</span>
+                        <span id="client-login-hint"><?php echo e(__('auth.email_address')); ?></span>
+                        <span id="provider-login-hint" style="display: none;"><?php echo e(__('auth.email_or_mobile')); ?></span>
                     </div>
-                    @if ($errors->has('login'))
+                    <?php if($errors->has('login')): ?>
                         <div class="input-error" id="login-field-error" style="display: flex;">
                             <i class="fas fa-exclamation-circle"></i>
-                            <span>{{ $errors->first('login') }}</span>
+                            <span><?php echo e($errors->first('login')); ?></span>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">{{ __('auth.profession') }}</label>
+                    <label class="form-label"><?php echo e(__('auth.profession')); ?></label>
                     <div class="role-selection" role="radiogroup" aria-labelledby="role-label">
                         <div class="role-option selected" id="login-client-option" role="radio" aria-checked="true"
                             tabindex="0">
                             <input type="radio" id="login_role_client" name="role" value="client" checked>
                             <label for="login_role_client" class="role-label">
                                 <i class="fas fa-user role-icon"></i>
-                                {{ __('auth.client') }}
+                                <?php echo e(__('auth.client')); ?>
+
                             </label>
                         </div>
                         <div class="role-option" id="login-provider-option" role="radio" aria-checked="false"
@@ -1632,7 +1653,8 @@
                             <input type="radio" id="login_role_provider" name="role" value="service_provider">
                             <label for="login_role_provider" class="role-label">
                                 <i class="fas fa-tools role-icon"></i>
-                                {{ __('auth.service_provider') }}
+                                <?php echo e(__('auth.service_provider')); ?>
+
                             </label>
                         </div>
                     </div>
@@ -1641,7 +1663,8 @@
                 <div class="form-group">
                     <label for="login-password" class="form-label">
                         <i class="fas fa-lock"></i>
-                        {{ __('auth.password') }}
+                        <?php echo e(__('auth.password')); ?>
+
                     </label>
                     <div class="input-wrapper">
                         <input id="login-password" class="form-input" type="password" name="password" required
@@ -1650,37 +1673,39 @@
                             <i class="fas fa-eye"></i>
                         </div>
                     </div>
-                    @if ($errors->has('password'))
+                    <?php if($errors->has('password')): ?>
                         <div class="input-error" id="login-password-error" style="display: flex;">
                             <i class="fas fa-exclamation-circle"></i>
-                            <span>{{ $errors->first('password') }}</span>
+                            <span><?php echo e($errors->first('password')); ?></span>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
 
                 <div class="checkbox-container">
                     <input id="remember_me" type="checkbox" class="checkbox-input" name="remember">
-                    <label for="remember_me" class="checkbox-label">{{ __('auth.remember_me') }}</label>
+                    <label for="remember_me" class="checkbox-label"><?php echo e(__('auth.remember_me')); ?></label>
                 </div>
 
                 <div class="flex items-center justify-between mt-4">
-                    @if (Route::has('password.request'))
+                    <?php if(Route::has('password.request')): ?>
                         <div class="auth-link">
-                            <a href="{{ route('password.request') }}">
-                                {{ __('auth.forgot_password') }}
+                            <a href="<?php echo e(route('password.request')); ?>">
+                                <?php echo e(__('auth.forgot_password')); ?>
+
                             </a>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <button type="submit" class="auth-button" id="login-button">
-                        {{ __('auth.login_tab') }}
+                        <?php echo e(__('auth.login_tab')); ?>
+
                     </button>
                 </div>
             </form>
 
-            <form method="POST" action="{{ route('register') }}" id="register-form" style="display: none;"
+            <form method="POST" action="<?php echo e(route('register')); ?>" id="register-form" style="display: none;"
                 role="tabpanel" id="register-panel" aria-labelledby="register-tab">
-                @csrf
+                <?php echo csrf_field(); ?>
 
                 <div class="social-login">
                     <button type="button" class="social-button" id="google-signup">
@@ -1694,55 +1719,60 @@
                 </div>
 
                 <div class="divider">
-                    <span>{{ __('auth.or') }}</span>
+                    <span><?php echo e(__('auth.or')); ?></span>
                 </div>
 
                 <div class="form-group">
                     <label for="name" class="form-label">
                         <i class="fas fa-user"></i>
-                        {{ __('auth.full_name') }}
+                        <?php echo e(__('auth.full_name')); ?>
+
                     </label>
                     <div class="input-wrapper">
-                        <input id="name" class="form-input" type="text" name="name" value="{{ old('name') }}" required
+                        <input id="name" class="form-input" type="text" name="name" value="<?php echo e(old('name')); ?>" required
                             autofocus autocomplete="name" aria-describedby="name-error">
                         <i class="fas fa-user input-icon" id="name-icon"></i>
                     </div>
                     <div class="input-error" id="name-error">
-                        @if ($errors->has('name'))
+                        <?php if($errors->has('name')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('name') }}
-                        @endif
+                            <?php echo e($errors->first('name')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="register-email" class="form-label">
                         <i class="fas fa-envelope"></i>
-                        {{ __('auth.email_address') }}
+                        <?php echo e(__('auth.email_address')); ?>
+
                     </label>
                     <div class="input-wrapper">
                         <input id="register-email" class="form-input" type="email" name="email"
-                            value="{{ old('email') }}" required autocomplete="username"
+                            value="<?php echo e(old('email')); ?>" required autocomplete="username"
                             aria-describedby="register-email-error">
                         <i class="fas fa-envelope input-icon" id="email-icon"></i>
                     </div>
                     <div class="input-error" id="register-email-error">
-                        @if ($errors->has('email'))
+                        <?php if($errors->has('email')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('email') }}
-                        @endif
+                            <?php echo e($errors->first('email')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="mobile" class="form-label">
                         <i class="fas fa-mobile-alt"></i>
-                        {{ __('auth.mobile_number') }}
+                        <?php echo e(__('auth.mobile_number')); ?>
+
                         <span class="phone-required-indicator" id="phone-required" style="display: none;">
                             <span class="text-red-500">*</span>
                         </span>
                         <span class="phone-optional-indicator" id="phone-optional">
-                            <span class="text-gray-500">({{ __('general.optional') }})</span>
+                            <span class="text-gray-500">(<?php echo e(__('general.optional')); ?>)</span>
                         </span>
                     </label>
                     <div class="whatsapp-input-container">
@@ -1757,33 +1787,35 @@
                         <div class="whatsapp-input-field">
                             <div class="input-wrapper whatsapp-mobile-input">
                                 <input id="mobile" class="form-input" type="tel" name="mobile"
-                                    value="{{ old('mobile') }}" autocomplete="tel" placeholder="613-520-4877"
+                                    value="<?php echo e(old('mobile')); ?>" autocomplete="tel" placeholder="613-520-4877"
                                     pattern="[0-9\-\s]{10,20}" minlength="10" maxlength="15"
                                     aria-describedby="mobile-error phone-format">
                                 <i class="fas fa-phone-alt input-icon" id="phone-icon"></i>
                             </div>
                             <div class="phone-hint whatsapp-hint" id="phone-hint">
                                 <i class="fas fa-lightbulb"></i>
-                                <span>{{ __('auth.phone_auto_format') ?? 'Type your phone number - we\'ll format it automatically' }}</span>
+                                <span><?php echo e(__('auth.phone_auto_format') ?? 'Type your phone number - we\'ll format it automatically'); ?></span>
                             </div>
                             <div class="phone-format whatsapp-success" id="phone-format" style="display: none;">
                                 <i class="fas fa-check-circle"></i>
-                                <span>{{ __('validation.valid_canadian_format') ?? 'Perfect! Valid format' }}</span>
+                                <span><?php echo e(__('validation.valid_canadian_format') ?? 'Perfect! Valid format'); ?></span>
                             </div>
                         </div>
                     </div>
                     <div class="input-error" id="mobile-error">
-                        @if ($errors->has('mobile'))
+                        <?php if($errors->has('mobile')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('mobile') }}
-                        @endif
+                            <?php echo e($errors->first('mobile')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="whatsapp_number" class="form-label">
                         <i class="fab fa-whatsapp"></i>
-                        {{ __('service_provider.whatsapp_number') }}
+                        <?php echo e(__('service_provider.whatsapp_number')); ?>
+
                         <span class="text-red-500">*</span>
                     </label>
                     <div class="whatsapp-input-container">
@@ -1795,19 +1827,20 @@
                                 <span class="country-name">CA</span>
                             </div>
                             <input type="hidden" id="whatsapp_country_code" name="whatsapp_country_code" value="+1">
-                            @if ($errors->has('whatsapp_country_code'))
+                            <?php if($errors->has('whatsapp_country_code')): ?>
                                 <div class="input-error">
                                     <i class="fas fa-exclamation-circle"></i>
-                                    {{ $errors->first('whatsapp_country_code') }}
+                                    <?php echo e($errors->first('whatsapp_country_code')); ?>
+
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
                         <!-- WhatsApp Number Input -->
                         <div class="whatsapp-input-field">
                             <div class="input-wrapper whatsapp-mobile-input">
                                 <input id="whatsapp_number" class="form-input" type="tel" name="whatsapp_number"
-                                    value="{{ old('whatsapp_number') }}" required autocomplete="tel"
+                                    value="<?php echo e(old('whatsapp_number')); ?>" required autocomplete="tel"
                                     placeholder="514-123-4567" aria-describedby="whatsapp-error whatsapp-hint">
                                 <i class="fab fa-whatsapp input-icon whatsapp-icon" id="whatsapp-icon"></i>
                             </div>
@@ -1815,32 +1848,35 @@
                                 <i class="fas fa-lightbulb"></i>
                                 <span>Enter your WhatsApp number without country code</span>
                             </div>
-                            @if ($errors->has('whatsapp_number'))
+                            <?php if($errors->has('whatsapp_number')): ?>
                                 <div class="input-error" id="whatsapp-error">
                                     <i class="fas fa-exclamation-circle"></i>
-                                    {{ $errors->first('whatsapp_number') }}
+                                    <?php echo e($errors->first('whatsapp_number')); ?>
+
                                 </div>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">{{ __('auth.profession') }}</label>
+                    <label class="form-label"><?php echo e(__('auth.profession')); ?></label>
                     <div class="role-selection" role="radiogroup" aria-labelledby="role-label">
                         <div class="role-option selected" id="client-option" role="radio" aria-checked="true"
                             tabindex="0">
                             <input type="radio" id="client" name="role" value="client" checked>
                             <label for="client" class="role-label">
                                 <i class="fas fa-user role-icon"></i>
-                                {{ __('auth.client') }}
+                                <?php echo e(__('auth.client')); ?>
+
                             </label>
                         </div>
                         <div class="role-option" id="provider-option" role="radio" aria-checked="false" tabindex="0">
                             <input type="radio" id="provider" name="role" value="service_provider">
                             <label for="provider" class="role-label">
                                 <i class="fas fa-tools role-icon"></i>
-                                {{ __('auth.service_provider') }}
+                                <?php echo e(__('auth.service_provider')); ?>
+
                             </label>
                         </div>
                     </div>
@@ -1849,70 +1885,77 @@
                 <div class="form-group profession-field" id="profession-field">
                     <label for="profession" class="form-label">
                         <i class="fas fa-briefcase"></i>
-                        {{ __('auth.profession') }} <span class="text-red-500">*</span>
+                        <?php echo e(__('auth.profession')); ?> <span class="text-red-500">*</span>
                     </label>
                     <div class="custom-select" id="profession-select">
                         <div class="select-trigger" id="profession-trigger">
                             <span class="select-value placeholder"
-                                id="profession-value">{{ __('auth.select_profession') }}</span>
+                                id="profession-value"><?php echo e(__('auth.select_profession')); ?></span>
                             <div class="select-arrow"></div>
                         </div>
                         <div class="select-options" id="profession-options">
-                            <div class="select-option" data-value="">{{ __('auth.select_profession') }}</div>
-                            @if(isset($professions) && $professions)
-                                @foreach($professions as $p)
-                                    <div class="select-option" data-value="{{ $p->id }}">{{ $p->name }}</div>
-                                @endforeach
-                            @endif
-                            <div class="select-option" data-value="other">{{ __('general.other') }}</div>
+                            <div class="select-option" data-value=""><?php echo e(__('auth.select_profession')); ?></div>
+                            <?php if(isset($professions) && $professions): ?>
+                                <?php $__currentLoopData = $professions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="select-option" data-value="<?php echo e($p->id); ?>"><?php echo e($p->name); ?></div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endif; ?>
+                            <div class="select-option" data-value="other"><?php echo e(__('general.other')); ?></div>
                         </div>
-                        <input type="hidden" name="profession" id="profession-input" value="{{ old('profession') }}">
+                        <input type="hidden" name="profession" id="profession-input" value="<?php echo e(old('profession')); ?>">
                     </div>
                     <div class="input-error" id="profession-error">
-                        @if ($errors->has('profession'))
+                        <?php if($errors->has('profession')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('profession') }}
-                        @endif
+                            <?php echo e($errors->first('profession')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-group city-field" id="city-field">
                     <label for="city" class="form-label">
                         <i class="fas fa-map-marker-alt"></i>
-                        {{ __('auth.city') }} <span class="text-red-500">*</span>
+                        <?php echo e(__('auth.city')); ?> <span class="text-red-500">*</span>
                     </label>
                     <div class="custom-select" id="city-select">
                         <div class="select-trigger" id="city-trigger">
-                            <span class="select-value placeholder" id="city-value">{{ __('auth.select_city') }}</span>
+                            <span class="select-value placeholder" id="city-value"><?php echo e(__('auth.select_city')); ?></span>
                             <div class="select-arrow"></div>
                         </div>
                         <div class="select-options" id="city-options">
-                            <div class="select-option" data-value="">{{ __('auth.select_city') }}</div>
-                            <div class="select-option" data-value="{{ __('cities.laval') }}">{{ __('cities.laval') }}
+                            <div class="select-option" data-value=""><?php echo e(__('auth.select_city')); ?></div>
+                            <div class="select-option" data-value="<?php echo e(__('cities.laval')); ?>"><?php echo e(__('cities.laval')); ?>
+
                             </div>
-                            <div class="select-option" data-value="{{ __('cities.montreal') }}">
-                                {{ __('cities.montreal') }}
+                            <div class="select-option" data-value="<?php echo e(__('cities.montreal')); ?>">
+                                <?php echo e(__('cities.montreal')); ?>
+
                             </div>
-                            <div class="select-option" data-value="{{ __('cities.ottawa') }}">{{ __('cities.ottawa') }}
+                            <div class="select-option" data-value="<?php echo e(__('cities.ottawa')); ?>"><?php echo e(__('cities.ottawa')); ?>
+
                             </div>
-                            <div class="select-option" data-value="{{ __('cities.gatineau') }}">
-                                {{ __('cities.gatineau') }}
+                            <div class="select-option" data-value="<?php echo e(__('cities.gatineau')); ?>">
+                                <?php echo e(__('cities.gatineau')); ?>
+
                             </div>
                         </div>
-                        <input type="hidden" name="city" id="city-input" value="{{ old('city') }}">
+                        <input type="hidden" name="city" id="city-input" value="<?php echo e(old('city')); ?>">
                     </div>
                     <div class="input-error" id="city-error">
-                        @if ($errors->has('city'))
+                        <?php if($errors->has('city')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('city') }}
-                        @endif
+                            <?php echo e($errors->first('city')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="register-password" class="form-label">
                         <i class="fas fa-lock"></i>
-                        {{ __('auth.password') }}
+                        <?php echo e(__('auth.password')); ?>
+
                     </label>
                     <div class="input-wrapper">
                         <input id="register-password" class="form-input" type="password" name="password" required
@@ -1926,21 +1969,23 @@
                         <div class="password-strength-meter" id="password-strength-meter"></div>
                     </div>
                     <div class="password-strength-text" id="password-strength-text">
-                        <span>{{ __('auth.weak') }}</span>
-                        <span>{{ __('auth.strong') }}</span>
+                        <span><?php echo e(__('auth.weak')); ?></span>
+                        <span><?php echo e(__('auth.strong')); ?></span>
                     </div>
                     <div class="input-error" id="register-password-error">
-                        @if ($errors->has('password'))
+                        <?php if($errors->has('password')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('password') }}
-                        @endif
+                            <?php echo e($errors->first('password')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="password_confirmation" class="form-label">
                         <i class="fas fa-lock"></i>
-                        {{ __('auth.confirm_password') }}
+                        <?php echo e(__('auth.confirm_password')); ?>
+
                     </label>
                     <div class="input-wrapper">
                         <input id="password_confirmation" class="form-input" type="password"
@@ -1951,10 +1996,11 @@
                         </div>
                     </div>
                     <div class="input-error" id="password-confirmation-error">
-                        @if ($errors->has('password_confirmation'))
+                        <?php if($errors->has('password_confirmation')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('password_confirmation') }}
-                        @endif
+                            <?php echo e($errors->first('password_confirmation')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -1962,31 +2008,36 @@
                     <div class="checkbox-container">
                         <input id="terms" type="checkbox" class="checkbox-input" name="terms" required>
                         <label for="terms" class="checkbox-label">
-                            {{ __('auth.i_agree_to') }}
-                            <a href="{{ route('terms-of-service') }}" target="_blank"
-                                style="color: #667eea; text-decoration: underline; font-weight: 600;">{{ __('auth.terms_of_service') }}</a>
-                            {{ __('auth.and') }}
-                            <a href="{{ route('privacy-policy') }}" target="_blank"
-                                style="color: #667eea; text-decoration: underline; font-weight: 600;">{{ __('auth.privacy_policy') }}</a>
+                            <?php echo e(__('auth.i_agree_to')); ?>
+
+                            <a href="<?php echo e(route('terms-of-service')); ?>" target="_blank"
+                                style="color: #667eea; text-decoration: underline; font-weight: 600;"><?php echo e(__('auth.terms_of_service')); ?></a>
+                            <?php echo e(__('auth.and')); ?>
+
+                            <a href="<?php echo e(route('privacy-policy')); ?>" target="_blank"
+                                style="color: #667eea; text-decoration: underline; font-weight: 600;"><?php echo e(__('auth.privacy_policy')); ?></a>
                         </label>
                     </div>
                     <div class="input-error" id="terms-error">
-                        @if ($errors->has('terms'))
+                        <?php if($errors->has('terms')): ?>
                             <i class="fas fa-exclamation-circle"></i>
-                            {{ $errors->first('terms') }}
-                        @endif
+                            <?php echo e($errors->first('terms')); ?>
+
+                        <?php endif; ?>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-end mt-4">
                     <div class="auth-link">
-                        <a href="{{route("register")}}" id="already-registered-link">
-                            {{ __('auth.already_registered') }}
+                        <a href="<?php echo e(route("register")); ?>" id="already-registered-link">
+                            <?php echo e(__('auth.already_registered')); ?>
+
                         </a>
                     </div>
 
                     <button type="submit" class="auth-button" id="register-button">
-                        {{ __('auth.register_button') }}
+                        <?php echo e(__('auth.register_button')); ?>
+
                     </button>
                 </div>
             </form>
@@ -2113,8 +2164,8 @@
             registerTab.classList.remove('active');
             loginTab.setAttribute('aria-selected', 'true');
             registerTab.setAttribute('aria-selected', 'false');
-            authTitle.textContent = "{{ __('auth.welcome_back') }}";
-            authSubtitle.textContent = "{{ __('auth.sign_in_subtitle') }}";
+            authTitle.textContent = "<?php echo e(__('auth.welcome_back')); ?>";
+            authSubtitle.textContent = "<?php echo e(__('auth.sign_in_subtitle')); ?>";
             // Reset scroll
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2126,8 +2177,8 @@
             loginTab.classList.remove('active');
             registerTab.setAttribute('aria-selected', 'true');
             loginTab.setAttribute('aria-selected', 'false');
-            authTitle.textContent = "{{ __('auth.create_account') }}";
-            authSubtitle.textContent = "{{ __('auth.sign_up_subtitle') }}";
+            authTitle.textContent = "<?php echo e(__('auth.create_account')); ?>";
+            authSubtitle.textContent = "<?php echo e(__('auth.sign_up_subtitle')); ?>";
             // Reset scroll
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2633,7 +2684,7 @@
             // Only do basic validation - let server handle detailed validation
             if (!selectedRole) {
                 e.preventDefault();
-                showToast("{{ __('validation.role_required') }}", 'error', "{{ __('validation.error_title') }}");
+                showToast("<?php echo e(__('validation.role_required')); ?>", 'error', "<?php echo e(__('validation.error_title')); ?>");
                 return false;
             }
 
@@ -2665,22 +2716,22 @@
             // Basic validation
             if (!loginField) {
                 e.preventDefault();
-                showToast('{{ __('auth.login_required') }}', 'error', '{{ __('validation.error_title') }}');
-                document.getElementById('login-field-error').innerHTML = '<i class="fas fa-exclamation-circle"></i> {{ __('auth.login_required') }}';
+                showToast('<?php echo e(__('auth.login_required')); ?>', 'error', '<?php echo e(__('validation.error_title')); ?>');
+                document.getElementById('login-field-error').innerHTML = '<i class="fas fa-exclamation-circle"></i> <?php echo e(__('auth.login_required')); ?>';
                 return false;
             }
 
             if (!loginPassword) {
                 e.preventDefault();
-                showToast('{{ __('auth.password_required') }}', 'error', '{{ __('validation.error_title') }}');
-                document.getElementById('login-password-error').innerHTML = '<i class="fas fa-exclamation-circle"></i> {{ __('auth.password_required') }}';
+                showToast('<?php echo e(__('auth.password_required')); ?>', 'error', '<?php echo e(__('validation.error_title')); ?>');
+                document.getElementById('login-password-error').innerHTML = '<i class="fas fa-exclamation-circle"></i> <?php echo e(__('auth.password_required')); ?>';
                 return false;
             }
 
             if (loginPassword.length < 8) {
                 e.preventDefault();
-                showToast('{{ __('auth.password_min') }}', 'error', '{{ __('validation.error_title') }}');
-                document.getElementById('login-password-error').innerHTML = '<i class="fas fa-exclamation-circle"></i> {{ __('auth.password_min') }}';
+                showToast('<?php echo e(__('auth.password_min')); ?>', 'error', '<?php echo e(__('validation.error_title')); ?>');
+                document.getElementById('login-password-error').innerHTML = '<i class="fas fa-exclamation-circle"></i> <?php echo e(__('auth.password_min')); ?>';
                 return false;
             }
 
@@ -2714,7 +2765,7 @@
                 googleSignup.addEventListener('click', function (e) {
                     e.preventDefault();
                     console.log('Google button clicked');
-                    showToast('{{ __("auth.coming_soon_google") ?? "Google Sign-Up Coming Soon! 🚀" }}', 'info', '{{ __("general.coming_soon") ?? "Coming Soon" }}');
+                    showToast('<?php echo e(__("auth.coming_soon_google") ?? "Google Sign-Up Coming Soon! 🚀"); ?>', 'info', '<?php echo e(__("general.coming_soon") ?? "Coming Soon"); ?>');
                 });
             } else {
                 console.error('Google signup button not found');
@@ -2724,7 +2775,7 @@
                 facebookSignup.addEventListener('click', function (e) {
                     e.preventDefault();
                     console.log('Facebook button clicked');
-                    showToast('{{ __("auth.coming_soon_facebook") ?? "Facebook Sign-Up Coming Soon! 🚀" }}', 'info', '{{ __("general.coming_soon") ?? "Coming Soon" }}');
+                    showToast('<?php echo e(__("auth.coming_soon_facebook") ?? "Facebook Sign-Up Coming Soon! 🚀"); ?>', 'info', '<?php echo e(__("general.coming_soon") ?? "Coming Soon"); ?>');
                 });
             } else {
                 console.error('Facebook signup button not found');
@@ -2734,7 +2785,7 @@
             // Respect old input (server-side validation) or URL params if provided
             // so clicking the provider option earlier will not be overwritten.
             const urlParams = new URLSearchParams(window.location.search);
-            const oldRole = "{{ old('role') }}";
+            const oldRole = "<?php echo e(old('role')); ?>";
             const roleParam = urlParams.get('role');
             if (oldRole) {
                 // If the form was submitted and returned with errors, restore the user's choice
@@ -2745,7 +2796,7 @@
             }
 
             // Check URL parameters to determine which form to show
-            if (urlParams.get('form') === 'register' || "{{ $errors->any() && old('name') }}") {
+            if (urlParams.get('form') === 'register' || "<?php echo e($errors->any() && old('name')); ?>") {
                 switchToRegister();
             }
 
@@ -2777,7 +2828,7 @@
             }
 
             // Check for session status
-            const statusMessage = "{{ session('status') }}";
+            const statusMessage = "<?php echo e(session('status')); ?>";
             if (statusMessage) {
                 sessionStatus.textContent = statusMessage;
                 sessionStatus.style.display = 'flex';
@@ -2790,7 +2841,7 @@
             }
 
             // Check for error messages
-            const errorMessage = "{{ session('error') }}";
+            const errorMessage = "<?php echo e(session('error')); ?>";
             if (errorMessage) {
                 sessionStatus.textContent = errorMessage;
                 sessionStatus.style.display = 'flex';
@@ -2824,7 +2875,7 @@
 
         // CSRF Token refresh and error handling
         function refreshCsrfToken() {
-            fetch('{{ route("csrf-token") }}')
+            fetch('<?php echo e(route("csrf-token")); ?>')
                 .then(response => response.json())
                 .then(data => {
                     document.querySelectorAll('input[name="_token"]').forEach(token => {
@@ -2884,14 +2935,14 @@
             // Create a form to POST the language change
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '{{ route("locale.update") }}';
+            form.action = '<?php echo e(route("locale.update")); ?>';
             form.style.display = 'none';
 
             // Add CSRF token
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = '_token';
-            csrfInput.value = '{{ csrf_token() }}';
+            csrfInput.value = '<?php echo e(csrf_token()); ?>';
             form.appendChild(csrfInput);
 
             // Add locale
@@ -2934,4 +2985,4 @@
     </script>
 </body>
 
-</html>
+</html><?php /**PATH Y:\Speeda - Versions\Speeda\resources\views/auth/register.blade.php ENDPATH**/ ?>

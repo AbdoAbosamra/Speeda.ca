@@ -7,12 +7,16 @@
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
     <title><?php echo e(__('service_provider.service_providers')); ?> - Speeda</title>
+    <meta name="description" content="<?php echo e(__('service_provider.browse_providers_description')); ?>">
     <link rel="icon" type="image/png" href="<?php echo e(asset('images/main-logo.png')); ?>">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+
+    
+    <?php echo $__env->make('partials.meta-pixel', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <style>
         /* ===== نظام التصميم الأساسي ===== */
@@ -1717,7 +1721,7 @@
                             <option value=""><?php echo e(__('service_provider.all_categories')); ?></option>
                             <?php
                                 $categories = $categories ?? collect([]);
-                                $othersNames = ['other', 'others', 'أخرى'];
+                                $othersNames = ['other', 'others', 'أخرى', 'autres'];
                                 $others = $categories->filter(function ($c) use ($othersNames) {
                                     return in_array(strtolower(trim($c->translated_name)), $othersNames);
                                 });
@@ -1837,7 +1841,9 @@
                         <div class="stat-item">
                             <i class="fas fa-thumbs-up stat-icon"></i>
                             <div class="stat-value" data-endorsements-count="<?php echo e($provider->id); ?>">
-                                <?php echo e($provider->endorsements_count ?? 0); ?></div>
+                                <?php echo e($provider->endorsements_count ?? 0); ?>
+
+                            </div>
                             <div class="stat-label"><?php echo e(__('service_provider.stat_recommends')); ?></div>
                         </div>
                         <div class="stat-item">
@@ -1892,11 +1898,11 @@
                         </a>
 
                         <!-- <?php if($provider->experience_years): ?>
-                            <div class="experience-badge">
-                                <i class="fas fa-briefcase"></i>
-                                <span><?php echo e($provider->experience_years); ?> <?php echo e(__('service_provider.years')); ?> Experience</span>
-                            </div>
-                        <?php endif; ?> -->
+                                    <div class="experience-badge">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span><?php echo e($provider->experience_years); ?> <?php echo e(__('service_provider.years')); ?> Experience</span>
+                                    </div>
+                                <?php endif; ?> -->
                     </div>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -2035,6 +2041,7 @@
             // دالة تطبيق الفلاتر
             function applyFilters() {
                 const params = new URLSearchParams(window.location.search);
+                params.delete('page'); // Reset pagination when filters change
 
                 if (searchInput.value) {
                     params.set('search', searchInput.value);
@@ -2370,6 +2377,30 @@
     </script>
 
     <?php echo $__env->make('layouts.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+    
+    <?php if(config('facebook.enabled') && !request()->routeIs('admin.*')): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof fbq === 'function') {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    var searchString = urlParams.get('search') || '';
+                    var category = urlParams.get('category') || '';
+                    var location = urlParams.get('location') || '';
+
+                    // Only fire Search event if at least one filter is active
+                    if (searchString || category || location) {
+                        fbq('track', 'Search', {
+                            search_string: searchString,
+                            content_category: category,
+                            content_type: 'service_provider',
+                            language: '<?php echo e(app()->getLocale()); ?>'
+                        });
+                    }
+                }
+            });
+        </script>
+    <?php endif; ?>
 
 </body>
 

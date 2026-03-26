@@ -27,6 +27,8 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <!-- Custom CSS -->
+    {{-- Meta (Facebook) Pixel --}}
+    @include('partials.meta-pixel')
     <style>
         :root {
             --primary-color: #4361ee;
@@ -833,6 +835,26 @@
 </head>
 
 <body>
+    {{-- Meta Pixel: ViewContent Event --}}
+    @if(config('facebook.enabled') && !request()->routeIs('admin.*'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof fbq === 'function') {
+                    var spViewEventId = 'vc_{{ $serviceProvider->id }}_' + Date.now();
+                    fbq('track', 'ViewContent', {
+                        content_name: {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},
+                        content_ids: ['{!! $serviceProvider->id !!}'],
+                        content_category: {!! json_encode($serviceProvider->category->translated_name ?? 'Uncategorized') !!},
+                        content_type: 'service_provider',
+                        language: '{{ app()->getLocale() }}'
+                    }, { eventID: spViewEventId });
+                    // Store event_id for CAPI deduplication
+                    window.__spViewEventId = spViewEventId;
+                }
+            });
+        </script>
+    @endif
+
     <!-- Animated Background -->
     <div class="animated-bg"></div>
 
@@ -1701,7 +1723,9 @@
                             <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
                         </button>
 
-                        <a href="mailto:{{ $serviceProvider->user->email }}" class="btn btn-outline-primary w-100">
+                        <a href="mailto:{{ $serviceProvider->user->email }}" class="btn btn-outline-primary w-100"
+                            id="emailContactBtn"
+                            onclick="if(typeof fbq==='function'){fbq('track','Lead',{content_name:{!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},content_ids:['{!! $serviceProvider->id !!}'],contact_type:'email',language:'{{ app()->getLocale() }}'});}">
                             <i class="fas fa-envelope me-2"></i> {{ __('service_provider.send_email') }}
                         </a>
                     </div>
@@ -1983,6 +2007,18 @@
 
         // Reveal contact information and open WhatsApp
         function revealContactInfo(phoneClean, phoneDisplay, address) {
+            // Meta Pixel: Track Lead event (WhatsApp contact)
+            if (typeof fbq === 'function') {
+                var leadEventId = 'lead_{{ $serviceProvider->id }}_' + Date.now();
+                fbq('track', 'Lead', {
+                    content_name: {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},
+                    content_ids: ['{!! $serviceProvider->id !!}'],
+                    content_category: {!! json_encode($serviceProvider->category->translated_name ?? 'Uncategorized') !!},
+                    contact_type: 'whatsapp',
+                    language: '{{ app()->getLocale() }}'
+                }, { eventID: leadEventId });
+            }
+
             // Store reveal in SESSION (server-side) instead of localStorage
             // This ensures only the user who clicked can see the info
             const providerId = {{ $serviceProvider->id }};
@@ -2342,12 +2378,12 @@
                     alertDiv.style.zIndex = '9999';
                     alertDiv.style.maxWidth = '500px';
                     alertDiv.innerHTML = `
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>{{ __("validation.please_correct_errors") }}</h6>
-                                    <ul class="mb-0 small">
-                                        ${errorList.map(error => '<li>' + error + '</li>').join('')}
-                                    </ul>
-                                `;
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>{{ __("validation.please_correct_errors") }}</h6>
+                                                <ul class="mb-0 small">
+                                                    ${errorList.map(error => '<li>' + error + '</li>').join('')}
+                                                </ul>
+                                            `;
                     document.body.appendChild(alertDiv);
 
                     // Auto dismiss after 10 seconds

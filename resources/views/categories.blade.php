@@ -641,7 +641,7 @@
                 <div class="row">
                     @foreach($section->children as $category)
                         <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
-                            <a href="{{ route('service-providers.index', ['category' => $category->id, 'city' => $selectedCity]) }}"
+                            <a href="{{ route('service-providers.index', array_filter(['category' => $category->id, 'location' => $selectedCity?->id])) }}"
                                 class="category-card">
                                 <div class="category-icon cat-bg-{{ ($loop->index % 6) + 1 }}">
                                     <i class="{{ $category->icon }}"></i>

@@ -7,12 +7,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ __('service_provider.service_providers') }} - Speeda</title>
+    <meta name="description" content="{{ __('service_provider.browse_providers_description') }}">
     <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+
+    {{-- Meta (Facebook) Pixel --}}
+    @include('partials.meta-pixel')
 
     <style>
         /* ===== نظام التصميم الأساسي ===== */
@@ -1714,7 +1718,7 @@
                             <option value="">{{ __('service_provider.all_categories') }}</option>
                             @php
                                 $categories = $categories ?? collect([]);
-                                $othersNames = ['other', 'others', 'أخرى'];
+                                $othersNames = ['other', 'others', 'أخرى', 'autres'];
                                 $others = $categories->filter(function ($c) use ($othersNames) {
                                     return in_array(strtolower(trim($c->translated_name)), $othersNames);
                                 });
@@ -1827,7 +1831,8 @@
                         <div class="stat-item">
                             <i class="fas fa-thumbs-up stat-icon"></i>
                             <div class="stat-value" data-endorsements-count="{{ $provider->id }}">
-                                {{ $provider->endorsements_count ?? 0 }}</div>
+                                {{ $provider->endorsements_count ?? 0 }}
+                            </div>
                             <div class="stat-label">{{ __('service_provider.stat_recommends') }}</div>
                         </div>
                         <div class="stat-item">
@@ -1881,11 +1886,11 @@
                         </a>
 
                         <!-- @if($provider->experience_years)
-                            <div class="experience-badge">
-                                <i class="fas fa-briefcase"></i>
-                                <span>{{ $provider->experience_years }} {{ __('service_provider.years') }} Experience</span>
-                            </div>
-                        @endif -->
+                                    <div class="experience-badge">
+                                        <i class="fas fa-briefcase"></i>
+                                        <span>{{ $provider->experience_years }} {{ __('service_provider.years') }} Experience</span>
+                                    </div>
+                                @endif -->
                     </div>
                 </div>
             @empty
@@ -2020,6 +2025,7 @@
             // دالة تطبيق الفلاتر
             function applyFilters() {
                 const params = new URLSearchParams(window.location.search);
+                params.delete('page'); // Reset pagination when filters change
 
                 if (searchInput.value) {
                     params.set('search', searchInput.value);
@@ -2355,6 +2361,30 @@
     </script>
 
     @include('layouts.footer')
+
+    {{-- Meta Pixel: Search Event --}}
+    @if(config('facebook.enabled') && !request()->routeIs('admin.*'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof fbq === 'function') {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    var searchString = urlParams.get('search') || '';
+                    var category = urlParams.get('category') || '';
+                    var location = urlParams.get('location') || '';
+
+                    // Only fire Search event if at least one filter is active
+                    if (searchString || category || location) {
+                        fbq('track', 'Search', {
+                            search_string: searchString,
+                            content_category: category,
+                            content_type: 'service_provider',
+                            language: '{{ app()->getLocale() }}'
+                        });
+                    }
+                }
+            });
+        </script>
+    @endif
 
 </body>
 

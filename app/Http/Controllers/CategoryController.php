@@ -7,7 +7,6 @@ use App\Models\Location;
 use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 
 class CategoryController extends Controller
 {
@@ -17,7 +16,7 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         // Use caching for better performance
-        $cacheKey = 'categories_frontend_' . md5($request->fullUrl());
+        $cacheKey = 'categories_frontend_' . app()->getLocale() . '_' . md5($request->fullUrl());
         
         $data = Cache::remember($cacheKey, 300, function () use ($request) {
             // Get search query if provided
@@ -34,10 +33,7 @@ class CategoryController extends Controller
 
             // Get ONLY ACTIVE categories for frontend visibility
             $categoriesQuery = Category::with(['parent', 'serviceProviders' => function ($query) {
-                    // Safe filtering: Only apply if is_active column exists
-                    if (Schema::hasColumn('service_providers', 'is_active')) {
-                        $query->where('is_active', true); // Only active service providers
-                    }
+                    $query->where('is_active', true);
                 }])
                 ->where('is_active', true) // Frontend: Only show active categories
                 ->orderBy('sort_order')
@@ -45,17 +41,19 @@ class CategoryController extends Controller
 
             // Apply search filter
             if ($search) {
-                $categoriesQuery->where('name', 'LIKE', '%' . $search . '%');
+                $categoriesQuery->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', '%' . $search . '%')
+                      ->orWhere('name_ar', 'LIKE', '%' . $search . '%')
+                      ->orWhere('name_en', 'LIKE', '%' . $search . '%')
+                      ->orWhere('name_fr', 'LIKE', '%' . $search . '%');
+                });
             }
 
             // Apply city filter with safe filtering
             if ($selectedCity) {
                 $categoriesQuery->whereHas('serviceProviders', function ($query) use ($selectedCity) {
-                    $query->where('location_id', $selectedCity->id);
-                    // Safe filtering: Only apply if is_active column exists
-                    if (Schema::hasColumn('service_providers', 'is_active')) {
-                        $query->where('is_active', true);
-                    }
+                    $query->where('location_id', $selectedCity->id)
+                          ->where('is_active', true);
                 });
             }
 
@@ -117,11 +115,8 @@ class CategoryController extends Controller
                     $query->where('is_active', true)->orderBy('sort_order')->orderBy('name');
                 },
                 'serviceProviders' => function ($query) {
-                    $query->with('location');
-                    // Safe filtering: Only apply if is_active column exists
-                    if (Schema::hasColumn('service_providers', 'is_active')) {
-                        $query->where('is_active', true); // Only active service providers
-                    }
+                    $query->with('location')
+                          ->where('is_active', true);
                 }
             ]);
 

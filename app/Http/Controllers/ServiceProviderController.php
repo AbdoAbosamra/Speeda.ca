@@ -11,8 +11,8 @@ use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use App\Services\FacebookConversionService;
 
 class ServiceProviderController extends Controller
 {
@@ -33,13 +33,9 @@ class ServiceProviderController extends Controller
                 ) as live_rating'
             );
 
-        // Safe filtering: Only show providers whose users are active
-        // Using whereHas to filter by user status with safe check
+        // Only show providers whose users are active
         $query->whereHas('user', function ($userQuery) {
-            // Safe check: Only filter if is_active column exists
-            if (Schema::hasColumn('users', 'is_active')) {
-                $userQuery->where('is_active', true);
-            }
+            $userQuery->where('is_active', true);
         });
 
         // Search filter
@@ -59,7 +55,7 @@ class ServiceProviderController extends Controller
         if ($request->filled('category')) {
             $category = $request->input('category');
             if ($category === 'others') {
-                $othersNames = ['other', 'others', 'أخرى'];
+                $othersNames = ['other', 'others', 'أخرى', 'autres'];
                 $otherIds = Category::all()->filter(function ($c) use ($othersNames) {
                     return in_array(strtolower(trim($c->translated_name)), $othersNames);
                 })->pluck('id')->toArray();
@@ -85,8 +81,13 @@ class ServiceProviderController extends Controller
             ->orderBy('views', 'desc')
             ->paginate(12);
 
-        $categories = Category::orderBy('name')->get();
-        $locations = Location::orderBy('city')->get();
+        $categories = Category::whereNotNull('parent_id')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->sortBy('translated_name')
+            ->values();
+        $locations = Location::where('is_active', true)->orderBy('city')->get();
 
         // Get list of revealed contacts from session
         $revealedContacts = session('revealed_contacts', []);
@@ -164,13 +165,11 @@ class ServiceProviderController extends Controller
     public function show(ServiceProvider $serviceProvider)
     {
         try {
-            // Check if the service provider's user is active (safe check)
-            if (Schema::hasColumn('users', 'is_active')) {
-                $user = $serviceProvider->user;
-                if ($user && !$user->is_active) {
-                    // User is deactivated - show 404
-                    abort(404, __('service_provider.account_disabled'));
-                }
+            // Check if the service provider's user is active
+            $user = $serviceProvider->user;
+            if ($user && !$user->is_active) {
+                // User is deactivated - show 404
+                abort(404, __('service_provider.account_disabled'));
             }
 
             // Increment views only if not the owner
@@ -284,6 +283,19 @@ class ServiceProviderController extends Controller
                     ->first();
             }
 
+            // === CAPI: Send ViewContent event (server-side, non-blocking) ===
+            try {
+                $capiEventId = 'vc_' . $serviceProvider->id . '_' . time();
+                app(FacebookConversionService::class)->trackViewContent($capiEventId, [
+                    'content_name' => $serviceProvider->company_name ?? $serviceProvider->user->name,
+                    'content_ids' => [(string) $serviceProvider->id],
+                    'content_category' => $serviceProvider->category->translated_name ?? 'Uncategorized',
+                    'content_type' => 'service_provider',
+                ]);
+            } catch (\Throwable $e) {
+                // Silently ignore CAPI errors
+            }
+
             return view('service-providers.show', compact(
                 'serviceProvider',
                 'reviews',
@@ -320,6 +332,23 @@ class ServiceProviderController extends Controller
 
         // ARCHITECTURE COMPLIANCE: Only return JSON for AJAX requests
         if ($request->expectsJson()) {
+            // CAPI: Send Lead event (server-side, non-blocking)
+            try {
+                $leadEventId = 'lead_' . $serviceProvider->id . '_' . time();
+                $userData = [];
+                if (auth()->check()) {
+                    $userData['email'] = auth()->user()->email;
+                    $userData['external_id'] = auth()->id();
+                }
+                app(FacebookConversionService::class)->trackLead($leadEventId, [
+                    'content_name' => $serviceProvider->company_name ?? $serviceProvider->user->name ?? '',
+                    'content_ids' => [(string) $serviceProvider->id],
+                    'contact_type' => 'whatsapp',
+                ], $userData);
+            } catch (\Throwable $e) {
+                // Silently ignore CAPI errors
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Contact revealed'
@@ -515,7 +544,7 @@ class ServiceProviderController extends Controller
             if ($serviceProvider->category) {
                 $othersNames = ['other', 'others', 'أخرى'];
                 $isOthersCategory = in_array(strtolower(trim($serviceProvider->category->name)), $othersNames) ||
-                                    in_array(strtolower(trim($serviceProvider->category->translated_name)), $othersNames);
+                    in_array(strtolower(trim($serviceProvider->category->translated_name)), $othersNames);
 
                 // If current category is NOT "Others", reject any category_id in the request
                 if (!$isOthersCategory && isset($validated['category_id']) && $validated['category_id'] !== $serviceProvider->category_id) {

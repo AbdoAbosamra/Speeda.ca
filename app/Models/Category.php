@@ -47,8 +47,6 @@ class Category extends Model
     protected $appends = [
         'localized_name',
         'localized_description',
-        'translated_name',
-        'translated_description',
     ];
 
     // Relationships

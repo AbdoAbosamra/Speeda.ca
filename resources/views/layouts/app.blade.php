@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-      dir="{{ in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']) ? 'rtl' : 'ltr' }}">
+    dir="{{ in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']) ? 'rtl' : 'ltr' }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +11,9 @@
     <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
 
     <!-- Google Font: Inter (clean, modern) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
 
     <!-- Bootstrap + Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -45,19 +48,26 @@
         }
 
         /* ----- Typography ----- */
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-weight: 600;
             letter-spacing: -0.01em;
         }
 
         /* ----- Cards & Containers ----- */
-        .card, .card-panel {
+        .card,
+        .card-panel {
             background-color: var(--card-bg);
             border: 1px solid var(--border-light);
             border-radius: var(--radius-card);
             box-shadow: var(--shadow-sm);
             transition: var(--transition);
         }
+
         .card:hover {
             box-shadow: var(--shadow-hover);
             border-color: #e2e8f0;
@@ -69,6 +79,7 @@
             text-decoration: none;
             transition: var(--transition);
         }
+
         a:not(.btn):not(.dropdown-item):not(.nav-link):hover {
             color: #4338ca;
             text-decoration: underline;
@@ -83,23 +94,27 @@
             transition: var(--transition);
             border-width: 1px;
         }
+
         .btn-primary {
             background-color: var(--accent-indigo);
             border-color: var(--accent-indigo);
             color: white;
             box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
         }
+
         .btn-primary:hover {
             background-color: #4338ca;
             border-color: #4338ca;
             box-shadow: 0 4px 8px rgba(79, 70, 229, 0.15);
             transform: translateY(-1px);
         }
+
         .btn-outline-secondary {
             border-color: var(--border-light);
             color: var(--text-secondary);
             background: white;
         }
+
         .btn-outline-secondary:hover {
             background-color: #f8fafc;
             border-color: #cbd5e1;
@@ -123,10 +138,12 @@
             gap: 0.75rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
+
         [dir="rtl"] .admin-top-bar {
             left: 0;
             right: 280px;
         }
+
         .admin-top-bar .btn {
             padding: 0.4rem 1rem;
             font-size: 0.85rem;
@@ -153,10 +170,12 @@
             transition: var(--transition);
             backdrop-filter: blur(8px);
         }
+
         [dir="rtl"] .admin-quick-link {
             right: auto;
             left: 1.5rem;
         }
+
         .admin-quick-link:hover {
             background: #f8fafc;
             border-color: var(--accent-indigo);
@@ -164,13 +183,21 @@
             box-shadow: 0 8px 20px rgba(79, 70, 229, 0.1);
             transform: translateY(-2px);
         }
+
         .admin-quick-link i {
             color: var(--accent-indigo);
         }
 
         /* ----- RTL Spacing Helpers (Bootstrap 5 native) ----- */
-        [dir="rtl"] .ms-auto { margin-right: auto !important; margin-left: 0 !important; }
-        [dir="rtl"] .me-auto { margin-left: auto !important; margin-right: 0 !important; }
+        [dir="rtl"] .ms-auto {
+            margin-right: auto !important;
+            margin-left: 0 !important;
+        }
+
+        [dir="rtl"] .me-auto {
+            margin-left: auto !important;
+            margin-right: 0 !important;
+        }
 
         /* ----- Page Header / Navigation Placeholder ----- */
         .navbar {
@@ -180,24 +207,35 @@
         }
 
         /* ----- Content Spacing ----- */
-        .admin-top-bar + * {
+        .admin-top-bar+* {
             margin-top: 72px !important;
         }
+
         main.py-4 {
             padding-top: 2rem !important;
             padding-bottom: 3rem !important;
         }
 
         /* ----- Utility: subtle border radius ----- */
-        .rounded-2xl { border-radius: 1rem; }
-        .rounded-3xl { border-radius: 1.5rem; }
+        .rounded-2xl {
+            border-radius: 1rem;
+        }
+
+        .rounded-3xl {
+            border-radius: 1.5rem;
+        }
 
         /* ----- Icons color balance ----- */
-        i[class^="fa-"], i[class*=" fa-"] {
+        i[class^="fa-"],
+        i[class*=" fa-"] {
             color: currentColor;
         }
     </style>
+
+    {{-- Meta (Facebook) Pixel --}}
+    @include('partials.meta-pixel')
 </head>
+
 <body class="antialiased bg-light">
 
     <div class="min-vh-100 d-flex flex-column">
@@ -216,22 +254,23 @@
         @endauth
 
         @if(request()->routeIs('admin.*'))
-    <style>
-        /* إخفاء النافبار العام */
-        .sp-nav,
-        nav:not(.admin-sidebar):not(.admin-top-bar),
-        header[class*="nav"] {
-            display: none !important;
-        }
-        /* ضبط الـ main padding ليتوافق مع الـ admin bar الجديد */
-        .admin-top-bar + * {
-            margin-top: 64px !important;
-        }
-    </style>
+            <style>
+                /* إخفاء النافبار العام */
+                .sp-nav,
+                nav:not(.admin-sidebar):not(.admin-top-bar),
+                header[class*="nav"] {
+                    display: none !important;
+                }
 
-    {{-- Admin Top Bar – مكون منفصل احترافي --}}
-    <x-admin-top-bar :unreadNotifications="0" />
-@endif
+                /* ضبط الـ main padding ليتوافق مع الـ admin bar الجديد */
+                .admin-top-bar+* {
+                    margin-top: 64px !important;
+                }
+            </style>
+
+            {{-- Admin Top Bar – مكون منفصل احترافي --}}
+            <x-admin-top-bar :unreadNotifications="0" />
+        @endif
 
         {{-- Page Header (optional) --}}
         @isset($header)
@@ -262,4 +301,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
+
 </html>

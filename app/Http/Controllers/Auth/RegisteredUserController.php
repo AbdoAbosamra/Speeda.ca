@@ -11,6 +11,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Services\FacebookConversionService;
 
 class RegisteredUserController extends Controller
 {
@@ -44,6 +45,23 @@ class RegisteredUserController extends Controller
 
         // Get role-based redirect path
         $redirectPath = $authService->getRedirectPath($user);
+
+        // Flash Meta Pixel CompleteRegistration event data for client-side tracking
+        $registrationEventId = 'reg_' . $user->id . '_' . time();
+        session()->flash('meta_pixel_complete_registration', true);
+        session()->flash('meta_pixel_registration_event_id', $registrationEventId);
+
+        // CAPI: Send CompleteRegistration event (server-side, non-blocking)
+        try {
+            app(FacebookConversionService::class)->trackCompleteRegistration($registrationEventId, [
+                'status' => true,
+            ], [
+                'email' => $user->email,
+                'external_id' => $user->id,
+            ]);
+        } catch (\Throwable $e) {
+            // Silently ignore CAPI errors
+        }
 
         return redirect($redirectPath)->with('success', __('auth.registration_success'));
     }

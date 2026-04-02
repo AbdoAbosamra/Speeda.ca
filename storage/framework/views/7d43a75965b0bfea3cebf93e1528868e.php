@@ -1765,9 +1765,30 @@
 
                         <div class="provider-header">
                             <div class="avatar-container">
-                                <?php if($provider->profile_image): ?>
-                                    <img src="<?php echo e(asset('storage/' . $provider->profile_image)); ?>"
-                                        alt="<?php echo e($provider->company_name ?? $provider->user->name); ?>" class="provider-avatar">
+                                <?php
+                                    $galleryMedia = null;
+                                    if (isset($provider->media) && $provider->relationLoaded('media')) {
+                                        $galleryMedia = $provider->media->where('collection_name', 'provider_gallery')->first();
+                                    } else {
+                                        $galleryMedia = $provider->getMedia('provider_gallery')->first();
+                                    }
+
+                                    $avatarUrl = null;
+                                    if ($galleryMedia) {
+                                        $avatarUrl = $galleryMedia->hasGeneratedConversion('gallery_thumb')
+                                            ? $galleryMedia->getUrl('gallery_thumb')
+                                            : $galleryMedia->getUrl();
+                                    }
+                                ?>
+
+                                <?php if($avatarUrl): ?>
+                                    <img src="<?php echo e($avatarUrl); ?>"
+                                        alt="<?php echo e($provider->company_name ?? $provider->user->name); ?>" class="provider-avatar"
+                                        loading="lazy" decoding="async">
+                                <?php elseif($provider->profile_image): ?>
+                                    <img src="<?php echo e(Storage::url($provider->profile_image)); ?>"
+                                        alt="<?php echo e($provider->company_name ?? $provider->user->name); ?>" class="provider-avatar"
+                                        loading="lazy" decoding="async">
                                 <?php else: ?>
                                     <div class="provider-avatar d-flex align-items-center justify-content-center"
                                         style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
@@ -2404,4 +2425,5 @@
 
 </body>
 
-</html><?php /**PATH Y:\Speeda - Versions\Speeda\resources\views/service-providers/index.blade.php ENDPATH**/ ?>
+</html>
+<?php /**PATH Y:\Speeda - Versions\Speeda\resources\views/service-providers/index.blade.php ENDPATH**/ ?>

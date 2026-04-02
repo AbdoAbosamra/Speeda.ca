@@ -1759,9 +1759,30 @@
 
                         <div class="provider-header">
                             <div class="avatar-container">
-                                @if($provider->profile_image)
-                                    <img src="{{ asset('storage/' . $provider->profile_image) }}"
-                                        alt="{{ $provider->company_name ?? $provider->user->name }}" class="provider-avatar">
+                                @php
+                                    $galleryMedia = null;
+                                    if (isset($provider->media) && $provider->relationLoaded('media')) {
+                                        $galleryMedia = $provider->media->where('collection_name', 'provider_gallery')->first();
+                                    } else {
+                                        $galleryMedia = $provider->getMedia('provider_gallery')->first();
+                                    }
+
+                                    $avatarUrl = null;
+                                    if ($galleryMedia) {
+                                        $avatarUrl = $galleryMedia->hasGeneratedConversion('gallery_thumb')
+                                            ? $galleryMedia->getUrl('gallery_thumb')
+                                            : $galleryMedia->getUrl();
+                                    }
+                                @endphp
+
+                                @if($avatarUrl)
+                                    <img src="{{ $avatarUrl }}"
+                                        alt="{{ $provider->company_name ?? $provider->user->name }}" class="provider-avatar"
+                                        loading="lazy" decoding="async">
+                                @elseif($provider->profile_image)
+                                    <img src="{{ Storage::url($provider->profile_image) }}"
+                                        alt="{{ $provider->company_name ?? $provider->user->name }}" class="provider-avatar"
+                                        loading="lazy" decoding="async">
                                 @else
                                     <div class="provider-avatar d-flex align-items-center justify-content-center"
                                         style="background: linear-gradient(135deg, var(--primary), var(--secondary));">

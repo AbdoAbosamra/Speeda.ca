@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use App\Models\ServiceProvider as ServiceProviderModel;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\ServiceProviderObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,6 +44,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::share('supportedLocales', config('app.supported_locales'));
+
+        // Profile completion engine (observer-driven, not page-load calculated)
+        ServiceProviderModel::observe(ServiceProviderObserver::class);
 
         // Auto-create admin user if configured via environment (only when explicitly enabled)
         try {

@@ -8,10 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\MediaCollections\File;
 
-class ServiceProvider extends Model
+class ServiceProvider extends Model implements HasMedia
 {
     use HasFactory;
+    use InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -34,6 +39,8 @@ class ServiceProvider extends Model
         'services_offered',
         'availability_schedule',
         'profile_image',
+        'profile_completion_percent',
+        'profile_completion_popup_shown_at',
         'business_license',
         'business_type',
         'is_verified',
@@ -60,6 +67,8 @@ class ServiceProvider extends Model
         'hourly_rate' => 'decimal:2',
         'response_time_hours' => 'integer',
         'views' => 'integer',
+        'profile_completion_percent' => 'integer',
+        'profile_completion_popup_shown_at' => 'datetime',
         'languages' => 'array',
         'specializations' => 'array',
         'services_offered' => 'array',
@@ -67,6 +76,54 @@ class ServiceProvider extends Model
         'portfolio_images' => 'array',
         'portfolio_videos' => 'array',
     ];
+
+    /**
+     * Gallery media collection for provider images.
+     * - Max 4 images
+     * - Only JPEG/PNG/WebP
+     * - Stored in the `public` disk
+     */
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection('provider_gallery')
+            ->useDisk('public')
+            ->onlyKeepLatest(4)
+            ->acceptsMimeTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
+            ->acceptsFile(function (File $file) {
+                // Backend defense in depth: max 10MB
+                return $file->size <= 10 * 1024 * 1024;
+            });
+    }
+
+    /**
+     * Queued conversions:
+     * - Resize + optimize
+     * - Convert to WebP
+     * - Generate a thumbnail for the responsive gallery grid
+     */
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('gallery_thumb')
+            ->performOnCollections('provider_gallery')
+            ->nonQueued()
+            ->width(600)
+            ->height(600)
+            ->fit('crop', 600, 600)
+            ->quality(80)
+            ->format('webp');
+
+        $this
+            ->addMediaConversion('gallery_large')
+            ->performOnCollections('provider_gallery')
+            ->nonQueued()
+            ->width(1200)
+            ->height(1200)
+            ->fit('crop', 1200, 1200)
+            ->quality(85)
+            ->format('webp');
+    }
 
     /**
      * Provide a virtual "business_name" attribute that maps to company_name.

@@ -141,7 +141,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'string',
                 'min:5',
                 'max:500',
-                'regex:/^[^<>]*$/u' // Prevent HTML tags
+                'regex:/^[a-zA-Z0-9\s\-_.,#&\'\/@]+$/', // English characters only — Arabic blocked
             ],
 
             'location_id' => [
@@ -169,6 +169,20 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'file',
                 'mimes:jpg,jpeg,png,webp,pdf',
                 'max:2048', // 2MB max (matching PHP upload_max_filesize)
+            ],
+
+            // Provider gallery (Spatie Media Library)
+            'gallery_images' => [
+                'nullable',
+                'array',
+                'max:4',
+            ],
+            'gallery_images.*' => [
+                'nullable',
+                'file',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:10240', // 10MB
             ],
         ];
 
@@ -215,7 +229,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
             // Address
             'address.min' => __('sp_validation.sp_address_min'),
             'address.max' => __('sp_validation.sp_address_max'),
-            'address.regex' => __('sp_validation.sp_address_no_html'),
+            'address.regex' => __('sp_validation.sp_address_english_only'),
 
             // Location
             'location_id.exists' => __('sp_validation.sp_location_invalid'),

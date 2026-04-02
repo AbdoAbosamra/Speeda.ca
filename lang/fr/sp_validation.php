@@ -49,7 +49,7 @@ return [
     // Address
     'sp_address_min' => "L'adresse doit contenir au moins 5 caractères",
     'sp_address_max' => "L'adresse ne peut pas dépasser 500 caractères",
-    'sp_address_no_html' => "L'adresse ne peut pas contenir de code HTML",
+    'sp_address_english_only' => "L'adresse doit contenir uniquement des caractères anglais, chiffres et ponctuation",
 
     // Location
     'sp_location_invalid' => "L'emplacement sélectionné est invalide",

@@ -907,15 +907,26 @@
                     <div class="profile-header"></div>
 
                     <!-- Profile Image -->
-                    <div class="profile-image-container">
+                    <div class="profile-image-container" @if(auth()->check() && auth()->id() === $serviceProvider->user_id) id="profileImageClickable" style="cursor: pointer;" title="{{ __('service_provider.click_to_change_image') }}" @endif>
                         @if($serviceProvider->profile_image)
                             <img src="{{ Storage::url($serviceProvider->profile_image) }}"
                                 alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
-                                class="profile-image" loading="lazy">
+                                class="profile-image" loading="lazy" id="profileImagePreview">
                         @else
-                            <div class="profile-image d-flex align-items-center justify-content-center"
+                            <div class="profile-image d-flex align-items-center justify-content-center" id="profileImagePreview"
                                 style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">
                                 <i class="fas fa-user fa-4x text-white"></i>
+                            </div>
+                        @endif
+                        {{-- Camera overlay for owner --}}
+                        @if(auth()->check() && auth()->id() === $serviceProvider->user_id)
+                            <div id="imageOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer;">
+                                <i class="fas fa-camera fa-2x text-white"></i>
+                            </div>
+                            <input type="file" id="profileImageInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
+                            {{-- Loading spinner --}}
+                            <div id="imageUploadSpinner" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;">
+                                <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
                             </div>
                         @endif
                     </div>
@@ -951,6 +962,24 @@
 
                         @if(auth()->id() === $serviceProvider->user_id)
                             <!-- Owner-only Edit Section -->
+
+                            {{-- Engagement Popup / Banner --}}
+                            <x-profile-completion-popup :serviceProvider="$serviceProvider" />
+
+                            {{-- Profile Completion Progress Bar --}}
+                            @php $pct = $serviceProvider->profile_completion_percent ?? 0; @endphp
+                            <div class="mb-4 p-3 rounded-4 shadow-sm" style="background: white;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-semibold"><i class="fas fa-tasks text-primary me-2"></i>{{ __('service_provider.profile_completion_title') }}</span>
+                                    <span class="badge rounded-pill @if($pct >= 80) bg-success @elseif($pct >= 50) bg-warning text-dark @else bg-danger @endif px-3">{{ $pct }}%</span>
+                                </div>
+                                <div class="progress" style="height: 10px; border-radius: 5px;" id="completionProgressBar">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ $pct }}%; background: linear-gradient(90deg, @if($pct >= 80) #10b981,#059669 @elseif($pct >= 50) #f59e0b,#d97706 @else #ef4444,#dc2626 @endif); border-radius: 5px; transition: width 0.6s ease;" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+
+
+
                             <div class="mb-4">
                                 <h4 class="fw-bold text-secondary mb-3"><i
                                         class="fas fa-edit me-2"></i>{{ __('service_provider.edit_profile') }}</h4>
@@ -1016,7 +1045,7 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-calendar-check text-muted"></i>
                                                     </span>
-                                                    <input type="number" name="experience_years"
+                                                    <input type="number" name="experience_years" id="experienceYearsInput"
                                                         class="form-control form-control-lg border-start-0"
                                                         value="{{ old('experience_years', $serviceProvider->experience_years) }}"
                                                         min="0" max="50" placeholder="{{ __('general.example') }}: 5">
@@ -1186,14 +1215,14 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-location-dot text-danger"></i>
                                                     </span>
-                                                    <input type="text" name="address"
+                                                    <input type="text" name="address" id="addressInput"
                                                         class="form-control form-control-lg border-start-0"
                                                         value="{{ old('address', $serviceProvider->address) }}"
                                                         placeholder="{{ __('general.example') }}: {{ __('general.address_placeholder') }}">
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-info-circle text-info me-1"></i>
-                                                    {{ __('service_provider.detailed_work_address') }}
+                                                    {{ __('service_provider.address_english_only_hint') }}
                                                 </small>
                                                 @error('address')
                                                     <small class="text-danger d-block mt-1"><i
@@ -1254,6 +1283,49 @@
                                                     </div>
                                                 @endif
                                                 @error('profile_image')
+                                                    <small class="text-danger d-block">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+                                            @php
+                                                $currentGallery = $serviceProvider->getMedia('provider_gallery')->take(4);
+                                            @endphp
+
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="fas fa-images text-primary me-1"></i>
+                                                    {{ __('service_provider.gallery_upload_title') }}
+                                                </label>
+
+                                                <input type="file"
+                                                    name="gallery_images[]"
+                                                    id="galleryImagesInput"
+                                                    class="form-control"
+                                                    accept="image/jpeg,image/png,image/webp"
+                                                    multiple
+                                                    onchange="validateMultipleFilesSize(this, 10, 4)">
+
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    {{ __('service_provider.gallery_upload_hint') }}
+                                                </small>
+
+                                                @if($currentGallery->count() > 0)
+                                                    <div class="mt-2">
+                                                        <div class="row g-2">
+                                                            @foreach($currentGallery as $media)
+                                                                <div class="col-6 col-md-3">
+                                                                    <img src="{{ $media->hasGeneratedConversion('gallery_thumb') ? $media->getUrl('gallery_thumb') : $media->getUrl() }}"
+                                                                        alt="{{ __('service_provider.gallery_image_alt') }}"
+                                                                        style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
+                                                                        loading="lazy">
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
+
+                                                @error('gallery_images')
                                                     <small class="text-danger d-block">{{ $message }}</small>
                                                 @enderror
                                             </div>
@@ -1354,29 +1426,35 @@
                         </div>
 
                         <!-- Gallery Section -->
-                        @if($serviceProvider->images && $serviceProvider->images->count() > 0)
+                        @php
+                            $providerGallery = $serviceProvider->getMedia('provider_gallery');
+                        @endphp
+                        @if($providerGallery->count() > 0)
                             <div class="gallery-container">
-                                <h4 class="fw-bold text-primary mb-3">{{ __('service_provider.gallery_title') }}
-                                    <div class="row g-3">
-                                        @foreach($serviceProvider->images->take(6) as $image)
-                                            <div class="col-md-4">
-                                                <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                                    data-image="{{ asset('storage/' . $image->image_path) }}">
-                                                    <img src="{{ asset('storage/' . $image->image_path) }}"
-                                                        alt="{{ __('service_provider.gallery_image_alt') }}" loading="lazy">
-                                                    <div class="gallery-overlay">
-                                                        <i class="fas fa-search-plus text-white fa-2x"></i>
-                                                    </div>
+                                <h4 class="fw-bold text-primary mb-3">
+                                    <i class="fas fa-images me-2"></i>{{ __('service_provider.gallery_title') }}
+                                </h4>
+
+                                <div class="row g-3">
+                                    @foreach($providerGallery->take(4) as $media)
+                                        <div class="col-6 col-md-3">
+                                            <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
+                                                data-image="{{ $media->hasGeneratedConversion('gallery_large') ? $media->getUrl('gallery_large') : $media->getUrl() }}">
+                                                <img src="{{ $media->hasGeneratedConversion('gallery_thumb') ? $media->getUrl('gallery_thumb') : $media->getUrl() }}"
+                                                    alt="{{ __('service_provider.gallery_image_alt') }}"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    width="600"
+                                                    height="600"
+                                                    style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
+                                                    onerror="this.onerror=null;this.src='/images/placeholder-image.png';">
+                                                <div class="gallery-overlay">
+                                                    <i class="fas fa-search-plus text-white fa-2x"></i>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                    @if($serviceProvider->images->count() > 6)
-                                        <div class="text-center mt-3">
-                                            <button
-                                                class="btn btn-outline-primary">{{ __('service_provider.view_all_images') }}</button>
                                         </div>
-                                    @endif
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
 
@@ -1514,41 +1592,6 @@
                             <i class="fas fa-address-card me-2"></i>{{ __('service_provider.contact_information') }}
                         </h4>
 
-                        <!-- Phone (Hidden until button click) -->
-                        @if($serviceProvider->phone)
-                            @php
-                                $phoneDisplay = $serviceProvider->phone;
-                                if ($isContactRevealed) {
-                                    // Show full number if already revealed
-                                    $displayPhone = $phoneDisplay;
-                                    $phoneClass = 'text-success fw-bold';
-                                } else {
-                                    // Hide last 3 digits if not revealed
-                                    if (strlen($phoneDisplay) > 3) {
-                                        $displayPhone = substr($phoneDisplay, 0, -3) . '***';
-                                    } else {
-                                        $displayPhone = '***';
-                                    }
-                                    $phoneClass = 'text-muted';
-                                }
-                            @endphp
-                            <div class="contact-item">
-                                <div class="d-flex align-items-center">
-                                    <div class="contact-icon phone-icon">
-                                        <i class="fas fa-phone"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1 fw-bold">{{ __('general.phone_number') }}</h6>
-                                        <span id="phoneNumber" class="{{ $phoneClass }}">{{ $displayPhone }}</span>
-                                        @if(!$isContactRevealed)
-                                            <small class="d-block text-muted" style="font-size: 0.75rem;"><i
-                                                    class="fas fa-lock me-1"></i>{{ __('service_provider.phone_reveal_hint') }}</small>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
                         <!-- WhatsApp Number (Hidden until button click) -->
                         @php
                             $whatsappDisplay = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
@@ -1673,20 +1716,22 @@
                             </div>
                         @endif
 
-                        <!-- Business Views -->
-                        <div class="contact-item">
-                            <div class="d-flex align-items-center">
-                                <div class="contact-icon hours-icon">
-                                    <i class="fas fa-eye"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1 fw-bold">{{ __('service_provider.profile_views') }}</h6>
-                                    <p class="mb-0">{{ number_format($serviceProvider->views) }}
-                                        {{ __('service_provider.views_label') }}
-                                    </p>
+                        {{-- Business Views: keep public, hide from the provider owner --}}
+                        @if(!auth()->check() || auth()->id() !== $serviceProvider->user_id)
+                            <div class="contact-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="contact-icon hours-icon">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold">{{ __('service_provider.profile_views') }}</h6>
+                                        <p class="mb-0">{{ number_format($serviceProvider->views) }}
+                                            {{ __('service_provider.views_label') }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
 
                     <!-- Quick Action Buttons -->
@@ -1715,13 +1760,15 @@
                             $whatsappNumberClean = str_replace('+', '', $whatsappNumber);
                         @endphp
 
-                        {{-- WhatsApp Button with reveal functionality --}}
-                        <button
-                            onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
-                            class="btn w-100 mb-3"
-                            style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
-                            <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
-                        </button>
+                        @if(!empty($whatsappNumberClean))
+                            {{-- WhatsApp Button (tracks analytics then opens WhatsApp) --}}
+                            <button
+                                onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
+                                class="btn w-100 mb-3"
+                                style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
+                                <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
+                            </button>
+                        @endif
 
                         <a href="mailto:{{ $serviceProvider->user->email }}" class="btn btn-outline-primary w-100"
                             id="emailContactBtn"
@@ -1774,8 +1821,23 @@
                             <div class="col-md-3 mb-4">
                                 <div class="similar-provider-card">
                                     <div class="similar-provider-image">
-                                        <img src="{{ $similar->profile_image_url }}"
-                                            alt="{{ $similar->company_name ?? $similar->user->name }}" loading="lazy">
+                                        @php
+                                            $similarGalleryMedia = null;
+                                            if (isset($similar->media) && $similar->relationLoaded('media')) {
+                                                $similarGalleryMedia = $similar->media->where('collection_name', 'provider_gallery')->first();
+                                            } else {
+                                                $similarGalleryMedia = $similar->getMedia('provider_gallery')->first();
+                                            }
+
+                                            $similarAvatarUrl = null;
+                                            if ($similarGalleryMedia) {
+                                                $similarAvatarUrl = $similarGalleryMedia->hasGeneratedConversion('gallery_thumb')
+                                                    ? $similarGalleryMedia->getUrl('gallery_thumb')
+                                                    : $similarGalleryMedia->getUrl();
+                                            }
+                                        @endphp
+                                        <img src="{{ $similarAvatarUrl ?? $similar->profile_image_url }}"
+                                            alt="{{ $similar->company_name ?? $similar->user->name }}" loading="lazy" decoding="async">
                                     </div>
                                     <div class="similar-provider-content">
                                         <h6 class="fw-bold mb-2">{{ $similar->company_name ?? $similar->user->name }}</h6>
@@ -1966,6 +2028,37 @@
             }
         }
 
+        function validateMultipleFilesSize(input, maxSizeMB, maxFilesCount = 4) {
+            if (!input.files || input.files.length === 0) {
+                return true;
+            }
+
+            if (input.files.length > maxFilesCount) {
+                alert(`{{ __('service_provider.gallery_upload_max_images') }} (${maxFilesCount})`);
+                input.value = '';
+                return false;
+            }
+
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+            for (const file of input.files) {
+                const fileSize = file.size / 1024 / 1024; // Convert to MB
+                if (fileSize > maxSizeMB) {
+                    alert(`{{ __('service_provider.file_too_large_gallery') }} (${file.name}) (${fileSize.toFixed(2)}MB). {{ __('service_provider.max_allowed') }}: ${maxSizeMB}MB`);
+                    input.value = '';
+                    return false;
+                }
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert(`{{ __('service_provider.gallery_upload_invalid_type') }}`);
+                    input.value = '';
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             // Image Modal
             const imageModal = document.getElementById('imageModal');
@@ -2003,10 +2096,132 @@
                     toastContainer.setAttribute('x-show', 'false');
                 }, 3000);
             }
+
+            // English-only Address Validation
+            const addressInput = document.getElementById('addressInput');
+            if (addressInput) {
+                addressInput.addEventListener('input', function() {
+                    const originalValue = this.value;
+                    const newValue = originalValue.replace(/[^a-zA-Z0-9\s\-_.,#&'\/\@]/g, '');
+
+                    if (originalValue !== newValue) {
+                        this.value = newValue;
+                        if(typeof window.showToast === 'function'){
+                            window.showToast('{{ __("service_provider.address_english_only_hint") }}', 'error');
+                        }
+                    }
+                });
+            }
+
+            // Click-to-change Profile Image
+            const imageContainer = document.getElementById('profileImageClickable');
+            const imageInput = document.getElementById('profileImageInput');
+            const imageOverlay = document.getElementById('imageOverlay');
+            const imageSpinner = document.getElementById('imageUploadSpinner');
+            let imagePreview = document.getElementById('profileImagePreview');
+
+            @if(auth()->check() && auth()->id() === $serviceProvider->user_id)
+            if (imageContainer && imageInput) {
+                imageContainer.addEventListener('mouseenter', function() {
+                    if(imageOverlay) imageOverlay.style.opacity = '1';
+                });
+                imageContainer.addEventListener('mouseleave', function() {
+                    if(imageOverlay) imageOverlay.style.opacity = '0';
+                });
+                imageContainer.addEventListener('click', function(e) {
+                    if(e.target === imageInput) return; // Prevent loop
+                    imageInput.click();
+                });
+
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // Validate client-side
+                    if (typeof validateFileSize === 'function' && !validateFileSize(this, 2)) return;
+
+                    // Show spinner
+                    if(imageSpinner) imageSpinner.style.display = 'flex';
+
+                    // Prepare form data
+                    const formData = new FormData();
+                    formData.append('profile_image', file);
+                    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+                    // AJAX Request
+                    fetch('{{ route("service-providers.profile.image-upload", $serviceProvider->id) }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update preview
+                            imagePreview = document.getElementById('profileImagePreview'); // Re-fetch in case it was replaced
+                            if (imagePreview) {
+                                if (imagePreview.tagName === 'IMG') {
+                                    imagePreview.src = data.image_url;
+                                } else {
+                                    // Replace placeholder div with img
+                                    const img = document.createElement('img');
+                                    img.src = data.image_url;
+                                    img.alt = '{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}';
+                                    img.className = 'profile-image';
+                                    img.id = 'profileImagePreview';
+                                    img.loading = 'lazy';
+                                    imagePreview.replaceWith(img);
+                                }
+                            }
+                            if(typeof window.showToast === 'function') window.showToast(data.message, 'success');
+
+                            // Update progress bar
+                            if (data.completion_percent !== undefined) {
+                                const progressBar = document.querySelector('#completionProgressBar .progress-bar');
+                                const percentBadge = document.querySelector('#completionProgressBar').closest('.mb-4').querySelector('.badge');
+                                if (progressBar && percentBadge) {
+                                    progressBar.style.width = data.completion_percent + '%';
+                                    progressBar.setAttribute('aria-valuenow', data.completion_percent);
+                                    percentBadge.textContent = data.completion_percent + '%';
+
+                                    // Update colors
+                                    let newBg = '';
+                                    let newBadgeClass = 'badge rounded-pill px-3 ';
+                                    if(data.completion_percent >= 80) {
+                                        newBg = 'linear-gradient(90deg, #10b981,#059669)';
+                                        newBadgeClass += 'bg-success';
+                                    } else if(data.completion_percent >= 50) {
+                                        newBg = 'linear-gradient(90deg, #f59e0b,#d97706)';
+                                        newBadgeClass += 'bg-warning text-dark';
+                                    } else {
+                                        newBg = 'linear-gradient(90deg, #ef4444,#dc2626)';
+                                        newBadgeClass += 'bg-danger';
+                                    }
+                                    progressBar.style.background = newBg;
+                                    percentBadge.className = newBadgeClass;
+                                }
+                            }
+                        } else {
+                            if(typeof window.showToast === 'function') window.showToast(data.message || 'Error occurred', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if(typeof window.showToast === 'function') window.showToast('Upload failed', 'error');
+                    })
+                    .finally(() => {
+                        if(imageSpinner) imageSpinner.style.display = 'none';
+                        imageInput.value = ''; // Reset
+                    });
+                });
+            }
+            @endif
         });
 
-        // Reveal contact information and open WhatsApp
-        function revealContactInfo(phoneClean, phoneDisplay, address) {
+        // Track WhatsApp click (internal analytics) + reveal contact (privacy) + open WhatsApp
+        async function revealContactInfo(whatsappClean, whatsappDisplay, address) {
             // Meta Pixel: Track Lead event (WhatsApp contact)
             if (typeof fbq === 'function') {
                 var leadEventId = 'lead_{{ $serviceProvider->id }}_' + Date.now();
@@ -2024,6 +2239,20 @@
             const providerId = {{ $serviceProvider->id }};
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
+            // Internal analytics: click_whatsapp (dedupe is intentionally not applied to clicks)
+            let analyticsPromise = Promise.resolve();
+            if (csrfToken) {
+                analyticsPromise = fetch(`/service-providers/${providerId}/analytics/click`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ action_type: 'click_whatsapp' }),
+                    keepalive: true,
+                }).catch(() => {});
+            }
+
             // Store reveal in session via AJAX request
             if (csrfToken) {
                 fetch(`/service-providers/${providerId}/reveal-contact`, {
@@ -2036,18 +2265,10 @@
                 }).catch(err => console.error('Failed to store reveal:', err));
             }
 
-            // Reveal Phone number
-            const phoneElement = document.getElementById('phoneNumber');
-            if (phoneElement) {
-                phoneElement.textContent = phoneDisplay;
-                phoneElement.classList.remove('text-muted');
-                phoneElement.classList.add('text-success', 'fw-bold');
-            }
-
             // Reveal WhatsApp number
             const whatsappElement = document.getElementById('whatsappNumber');
             if (whatsappElement) {
-                whatsappElement.textContent = phoneDisplay;
+                whatsappElement.textContent = whatsappDisplay;
                 whatsappElement.classList.remove('text-muted');
                 whatsappElement.classList.add('text-success', 'fw-bold');
             }
@@ -2081,12 +2302,22 @@
 
             // Create WhatsApp URL with message
             // Use api.whatsapp.com for better compatibility with WhatsApp Desktop and Web
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodedMessage}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappClean}&text=${encodedMessage}`;
 
             // Debug: Log the URL (you can remove this later)
             console.log('WhatsApp URL:', whatsappUrl);
-            console.log('Phone:', phoneClean);
+            console.log('WhatsApp phone:', whatsappClean);
             console.log('Message:', message);
+
+            // Attempt analytics write before redirecting (timeout keeps UX snappy)
+            try {
+                await Promise.race([
+                    analyticsPromise,
+                    new Promise((resolve) => setTimeout(resolve, 150)),
+                ]);
+            } catch (e) {
+                // Ignore analytics errors: user action must still proceed.
+            }
 
             // Open WhatsApp after a short delay
             setTimeout(function () {
@@ -2097,7 +2328,7 @@
                 if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
                     window.location.href = whatsappUrl;
                 }
-            }, 500);
+            }, 0);
         }
 
         // ========== PROFILE EDIT FORM VALIDATION & UX ENHANCEMENTS ==========

@@ -64,7 +64,7 @@ class ReviewController extends Controller
             abort(404, 'Review not found');
         }
 
-        $review->load(['client', 'serviceProviderProfile.user', 'approvedBy']);
+        $review->load(['client', 'serviceProvider.user', 'approvedBy']);
 
         return view('reviews.show', compact('review'));
     }
@@ -246,7 +246,7 @@ class ReviewController extends Controller
                     'success'
                 );
 
-                return redirect()->route('service-providers.show', $review->serviceProviderProfile)
+                return redirect()->route('service-providers.show', $review->serviceProvider)
                     ->with('success', __('reviews.review_updated_pending_reapproval'));
             });
         } catch (\Exception $e) {
@@ -275,7 +275,7 @@ class ReviewController extends Controller
             }
 
             $reviewId = $review->id;
-            $provider = $review->serviceProviderProfile;
+            $provider = $review->serviceProvider;
             $review->delete();
 
             Log::info('Review deleted', [

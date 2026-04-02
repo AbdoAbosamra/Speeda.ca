@@ -1,0 +1,17 @@
+./composer.json has been updated
+Running composer update barryvdh/laravel-dompdf --with-all-dependencies
+Loading composer repositories with package information
+Updating dependencies
+Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - spatie/laravel-medialibrary is locked to version 11.21.0 and an update of this package was not requested.
+    - spatie/laravel-medialibrary 11.21.0 requires ext-exif * -> it is missing from your system. Install or enable PHP's exif extension.
+
+To enable extensions, verify that they are enabled in your .ini files:
+    - C:\php\php.ini
+You can also run `php --ini` in a terminal to see which files are used by PHP in CLI mode.
+Alternatively, you can run Composer with `--ignore-platform-req=ext-exif` to temporarily ignore these required extensions.
+You can also try re-running composer require with an explicit version constraint, e.g. "composer require barryvdh/laravel-dompdf:*" to figure out if any version is installable, or "composer require barryvdh/laravel-dompdf:^2.1" if you know which you need.
+
+Installation failed, reverting ./composer.json and ./composer.lock to their original content.

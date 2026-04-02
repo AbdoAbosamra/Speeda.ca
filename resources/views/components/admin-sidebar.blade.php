@@ -278,30 +278,81 @@
             </ul>
         </div>
 
+        <div class="admin-sidebar-divider"></div>
+
+        <div style="padding:0.75rem 0.75rem 0.25rem 0.75rem;">
+            <h6 style="color:rgba(255,255,255,0.85); font-size:0.9rem; margin:0 0 0.6rem 0;">{{ __('admin.nav_core') ?? 'System Management' }}</h6>
+        </div>
+
         <a href="{{ route('admin.dashboard') }}"
            class="admin-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="fas fa-tachometer-alt"></i>
-            <span>{{ __('admin.dashboard') }}</span>
+            <span>{{ __('admin.dashboard') ?? 'Dashboard' }}</span>
         </a>
         <a href="{{ route('admin.locations') }}"
            class="admin-nav-item {{ request()->routeIs('admin.locations*') ? 'active' : '' }}">
             <i class="fas fa-map-marker-alt"></i>
-            <span>{{ __('admin.manage_locations') }}</span>
+            <span>{{ __('admin.manage_locations') ?? 'Locations' }}</span>
         </a>
         <a href="{{ route('admin.categories') }}"
            class="admin-nav-item {{ request()->routeIs('admin.categories*') ? 'active' : '' }}">
             <i class="fas fa-folder"></i>
-            <span>{{ __('admin.manage_categories') }}</span>
+            <span>{{ __('admin.manage_categories') ?? 'Categories' }}</span>
         </a>
+        <a href="{{ route('admin.users') }}"
+           class="admin-nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+            <i class="fas fa-user-shield"></i>
+            <span>{{ __('admin.manage_users') ?? 'Users' }}</span>
+        </a>
+
+        <div class="admin-sidebar-divider"></div>
+
+        <div style="padding:0.75rem 0.75rem 0.25rem 0.75rem;">
+            <h6 style="color:rgba(255,255,255,0.85); font-size:0.9rem; margin:0 0 0.6rem 0;">{{ __('admin.nav_analytics') ?? 'Analytics & Moderation' }}</h6>
+        </div>
+
+        @if(Route::has('admin.reviews'))
+            <a href="{{ route('admin.reviews') }}"
+               class="admin-nav-item {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
+                <i class="fas fa-star"></i>
+                <span>{{ __('admin.manage_reviews') ?? 'Reviews' }}</span>
+            </a>
+        @endif
+
+        @if(Route::has('admin.comments'))
+            <a href="{{ route('admin.comments') }}"
+               class="admin-nav-item {{ request()->routeIs('admin.comments*') ? 'active' : '' }}">
+                <i class="fas fa-comments"></i>
+                <span>{{ __('admin.manage_comments') ?? 'Comments' }}</span>
+            </a>
+        @endif
+
         <a href="{{ route('admin.visitors') }}"
            class="admin-nav-item {{ request()->routeIs('admin.visitors*') ? 'active' : '' }}">
             <i class="fas fa-chart-line"></i>
-            <span>Visitor Analytics</span>
+            <span>{{ __('admin.visitor_analytics') ?? 'Visitor Analytics' }}</span>
         </a>
+
+        @if(Route::has('admin.provider_activity_monitor'))
+            <a href="{{ route('admin.provider_activity_monitor') }}"
+               class="admin-nav-item {{ request()->routeIs('admin.provider_activity_monitor*') ? 'active' : '' }}">
+                <i class="fas fa-history"></i>
+                <span>{{ __('admin.provider_monitor') ?? 'Provider Activity' }}</span>
+            </a>
+        @endif
+
+        @if(Route::has('admin.activity_logs'))
+            <a href="{{ route('admin.activity_logs') }}"
+               class="admin-nav-item {{ request()->routeIs('admin.activity_logs*') ? 'active' : '' }}">
+                <i class="fas fa-clipboard-list"></i>
+                <span>{{ __('admin.activity_logs') ?? 'Activity Logs' }}</span>
+            </a>
+        @endif
+
         <div class="admin-sidebar-divider">
             <a href="{{ route('service-providers.index') }}" class="admin-nav-item">
                 <i class="fas fa-external-link-alt"></i>
-                <span>{{ __('admin.view_site') }}</span>
+                <span>{{ __('admin.view_site') ?? 'View Public Site' }}</span>
             </a>
         </div>
     </nav>

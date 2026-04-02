@@ -27,6 +27,8 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <!-- Custom CSS -->
+    
+    <?php echo $__env->make('partials.meta-pixel', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -833,6 +835,26 @@
 </head>
 
 <body>
+    
+    <?php if(config('facebook.enabled') && !request()->routeIs('admin.*')): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (typeof fbq === 'function') {
+                    var spViewEventId = 'vc_<?php echo e($serviceProvider->id); ?>_' + Date.now();
+                    fbq('track', 'ViewContent', {
+                        content_name: <?php echo json_encode($serviceProvider->company_name ?? $serviceProvider->user->name); ?>,
+                        content_ids: ['<?php echo $serviceProvider->id; ?>'],
+                        content_category: <?php echo json_encode($serviceProvider->category->translated_name ?? 'Uncategorized'); ?>,
+                        content_type: 'service_provider',
+                        language: '<?php echo e(app()->getLocale()); ?>'
+                    }, { eventID: spViewEventId });
+                    // Store event_id for CAPI deduplication
+                    window.__spViewEventId = spViewEventId;
+                }
+            });
+        </script>
+    <?php endif; ?>
+
     <!-- Animated Background -->
     <div class="animated-bg"></div>
 
@@ -906,15 +928,26 @@
                     <div class="profile-header"></div>
 
                     <!-- Profile Image -->
-                    <div class="profile-image-container">
+                    <div class="profile-image-container" <?php if(auth()->check() && auth()->id() === $serviceProvider->user_id): ?> id="profileImageClickable" style="cursor: pointer;" title="<?php echo e(__('service_provider.click_to_change_image')); ?>" <?php endif; ?>>
                         <?php if($serviceProvider->profile_image): ?>
                             <img src="<?php echo e(Storage::url($serviceProvider->profile_image)); ?>"
                                 alt="<?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?>"
-                                class="profile-image" loading="lazy">
+                                class="profile-image" loading="lazy" id="profileImagePreview">
                         <?php else: ?>
-                            <div class="profile-image d-flex align-items-center justify-content-center"
+                            <div class="profile-image d-flex align-items-center justify-content-center" id="profileImagePreview"
                                 style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">
                                 <i class="fas fa-user fa-4x text-white"></i>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if(auth()->check() && auth()->id() === $serviceProvider->user_id): ?>
+                            <div id="imageOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer;">
+                                <i class="fas fa-camera fa-2x text-white"></i>
+                            </div>
+                            <input type="file" id="profileImageInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
+                            
+                            <div id="imageUploadSpinner" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:rgba(255,255,255,0.8);align-items:center;justify-content:center;">
+                                <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -971,6 +1004,43 @@
 
                         <?php if(auth()->id() === $serviceProvider->user_id): ?>
                             <!-- Owner-only Edit Section -->
+
+                            
+                            <?php if (isset($component)) { $__componentOriginal037f8e4db3e2dbc9091d29eab3779257 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal037f8e4db3e2dbc9091d29eab3779257 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.profile-completion-popup','data' => ['serviceProvider' => $serviceProvider]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('profile-completion-popup'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['serviceProvider' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($serviceProvider)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal037f8e4db3e2dbc9091d29eab3779257)): ?>
+<?php $attributes = $__attributesOriginal037f8e4db3e2dbc9091d29eab3779257; ?>
+<?php unset($__attributesOriginal037f8e4db3e2dbc9091d29eab3779257); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal037f8e4db3e2dbc9091d29eab3779257)): ?>
+<?php $component = $__componentOriginal037f8e4db3e2dbc9091d29eab3779257; ?>
+<?php unset($__componentOriginal037f8e4db3e2dbc9091d29eab3779257); ?>
+<?php endif; ?>
+
+                            
+                            <?php $pct = $serviceProvider->profile_completion_percent ?? 0; ?>
+                            <div class="mb-4 p-3 rounded-4 shadow-sm" style="background: white;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-semibold"><i class="fas fa-tasks text-primary me-2"></i><?php echo e(__('service_provider.profile_completion_title')); ?></span>
+                                    <span class="badge rounded-pill <?php if($pct >= 80): ?> bg-success <?php elseif($pct >= 50): ?> bg-warning text-dark <?php else: ?> bg-danger <?php endif; ?> px-3"><?php echo e($pct); ?>%</span>
+                                </div>
+                                <div class="progress" style="height: 10px; border-radius: 5px;" id="completionProgressBar">
+                                    <div class="progress-bar" role="progressbar" style="width: <?php echo e($pct); ?>%; background: linear-gradient(90deg, <?php if($pct >= 80): ?> #10b981,#059669 <?php elseif($pct >= 50): ?> #f59e0b,#d97706 <?php else: ?> #ef4444,#dc2626 <?php endif; ?>); border-radius: 5px; transition: width 0.6s ease;" aria-valuenow="<?php echo e($pct); ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+
+
+
                             <div class="mb-4">
                                 <h4 class="fw-bold text-secondary mb-3"><i
                                         class="fas fa-edit me-2"></i><?php echo e(__('service_provider.edit_profile')); ?></h4>
@@ -1054,7 +1124,7 @@ unset($__errorArgs, $__bag); ?>
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-calendar-check text-muted"></i>
                                                     </span>
-                                                    <input type="number" name="experience_years"
+                                                    <input type="number" name="experience_years" id="experienceYearsInput"
                                                         class="form-control form-control-lg border-start-0"
                                                         value="<?php echo e(old('experience_years', $serviceProvider->experience_years)); ?>"
                                                         min="0" max="50" placeholder="<?php echo e(__('general.example')); ?>: 5">
@@ -1264,14 +1334,14 @@ unset($__errorArgs, $__bag); ?>
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-location-dot text-danger"></i>
                                                     </span>
-                                                    <input type="text" name="address"
+                                                    <input type="text" name="address" id="addressInput"
                                                         class="form-control form-control-lg border-start-0"
                                                         value="<?php echo e(old('address', $serviceProvider->address)); ?>"
                                                         placeholder="<?php echo e(__('general.example')); ?>: <?php echo e(__('general.address_placeholder')); ?>">
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-info-circle text-info me-1"></i>
-                                                    <?php echo e(__('service_provider.detailed_work_address')); ?>
+                                                    <?php echo e(__('service_provider.address_english_only_hint')); ?>
 
                                                 </small>
                                                 <?php $__errorArgs = ['address'];
@@ -1351,6 +1421,58 @@ unset($__errorArgs, $__bag); ?>
                                                     </div>
                                                 <?php endif; ?>
                                                 <?php $__errorArgs = ['profile_image'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger d-block"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                            </div>
+
+                                            <?php
+                                                $currentGallery = $serviceProvider->getMedia('provider_gallery')->take(4);
+                                            ?>
+
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="fas fa-images text-primary me-1"></i>
+                                                    <?php echo e(__('service_provider.gallery_upload_title')); ?>
+
+                                                </label>
+
+                                                <input type="file"
+                                                    name="gallery_images[]"
+                                                    id="galleryImagesInput"
+                                                    class="form-control"
+                                                    accept="image/jpeg,image/png,image/webp"
+                                                    multiple
+                                                    onchange="validateMultipleFilesSize(this, 10, 4)">
+
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    <?php echo e(__('service_provider.gallery_upload_hint')); ?>
+
+                                                </small>
+
+                                                <?php if($currentGallery->count() > 0): ?>
+                                                    <div class="mt-2">
+                                                        <div class="row g-2">
+                                                            <?php $__currentLoopData = $currentGallery; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $media): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <div class="col-6 col-md-3">
+                                                                    <img src="<?php echo e($media->hasGeneratedConversion('gallery_thumb') ? $media->getUrl('gallery_thumb') : $media->getUrl()); ?>"
+                                                                        alt="<?php echo e(__('service_provider.gallery_image_alt')); ?>"
+                                                                        style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
+                                                                        loading="lazy">
+                                                                </div>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+
+                                                <?php $__errorArgs = ['gallery_images'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -1473,30 +1595,36 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <!-- Gallery Section -->
-                        <?php if($serviceProvider->images && $serviceProvider->images->count() > 0): ?>
+                        <?php
+                            $providerGallery = $serviceProvider->getMedia('provider_gallery');
+                        ?>
+                        <?php if($providerGallery->count() > 0): ?>
                             <div class="gallery-container">
-                                <h4 class="fw-bold text-primary mb-3"><?php echo e(__('service_provider.gallery_title')); ?>
+                                <h4 class="fw-bold text-primary mb-3">
+                                    <i class="fas fa-images me-2"></i><?php echo e(__('service_provider.gallery_title')); ?>
 
-                                    <div class="row g-3">
-                                        <?php $__currentLoopData = $serviceProvider->images->take(6); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <div class="col-md-4">
-                                                <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                                    data-image="<?php echo e(asset('storage/' . $image->image_path)); ?>">
-                                                    <img src="<?php echo e(asset('storage/' . $image->image_path)); ?>"
-                                                        alt="<?php echo e(__('service_provider.gallery_image_alt')); ?>" loading="lazy">
-                                                    <div class="gallery-overlay">
-                                                        <i class="fas fa-search-plus text-white fa-2x"></i>
-                                                    </div>
+                                </h4>
+
+                                <div class="row g-3">
+                                    <?php $__currentLoopData = $providerGallery->take(4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $media): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <div class="col-6 col-md-3">
+                                            <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
+                                                data-image="<?php echo e($media->hasGeneratedConversion('gallery_large') ? $media->getUrl('gallery_large') : $media->getUrl()); ?>">
+                                                <img src="<?php echo e($media->hasGeneratedConversion('gallery_thumb') ? $media->getUrl('gallery_thumb') : $media->getUrl()); ?>"
+                                                    alt="<?php echo e(__('service_provider.gallery_image_alt')); ?>"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    width="600"
+                                                    height="600"
+                                                    style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
+                                                    onerror="this.onerror=null;this.src='/images/placeholder-image.png';">
+                                                <div class="gallery-overlay">
+                                                    <i class="fas fa-search-plus text-white fa-2x"></i>
                                                 </div>
                                             </div>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </div>
-                                    <?php if($serviceProvider->images->count() > 6): ?>
-                                        <div class="text-center mt-3">
-                                            <button
-                                                class="btn btn-outline-primary"><?php echo e(__('service_provider.view_all_images')); ?></button>
                                         </div>
-                                    <?php endif; ?>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </div>
                             </div>
                         <?php endif; ?>
 
@@ -1645,41 +1773,6 @@ unset($__errorArgs, $__bag); ?>
 
                         </h4>
 
-                        <!-- Phone (Hidden until button click) -->
-                        <?php if($serviceProvider->phone): ?>
-                            <?php
-                                $phoneDisplay = $serviceProvider->phone;
-                                if ($isContactRevealed) {
-                                    // Show full number if already revealed
-                                    $displayPhone = $phoneDisplay;
-                                    $phoneClass = 'text-success fw-bold';
-                                } else {
-                                    // Hide last 3 digits if not revealed
-                                    if (strlen($phoneDisplay) > 3) {
-                                        $displayPhone = substr($phoneDisplay, 0, -3) . '***';
-                                    } else {
-                                        $displayPhone = '***';
-                                    }
-                                    $phoneClass = 'text-muted';
-                                }
-                            ?>
-                            <div class="contact-item">
-                                <div class="d-flex align-items-center">
-                                    <div class="contact-icon phone-icon">
-                                        <i class="fas fa-phone"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1 fw-bold"><?php echo e(__('general.phone_number')); ?></h6>
-                                        <span id="phoneNumber" class="<?php echo e($phoneClass); ?>"><?php echo e($displayPhone); ?></span>
-                                        <?php if(!$isContactRevealed): ?>
-                                            <small class="d-block text-muted" style="font-size: 0.75rem;"><i
-                                                    class="fas fa-lock me-1"></i><?php echo e(__('service_provider.phone_reveal_hint')); ?></small>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
                         <!-- WhatsApp Number (Hidden until button click) -->
                         <?php
                             $whatsappDisplay = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
@@ -1809,22 +1902,24 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                         <?php endif; ?>
 
-                        <!-- Business Views -->
-                        <div class="contact-item">
-                            <div class="d-flex align-items-center">
-                                <div class="contact-icon hours-icon">
-                                    <i class="fas fa-eye"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1 fw-bold"><?php echo e(__('service_provider.profile_views')); ?></h6>
-                                    <p class="mb-0"><?php echo e(number_format($serviceProvider->views)); ?>
+                        
+                        <?php if(!auth()->check() || auth()->id() !== $serviceProvider->user_id): ?>
+                            <div class="contact-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="contact-icon hours-icon">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold"><?php echo e(__('service_provider.profile_views')); ?></h6>
+                                        <p class="mb-0"><?php echo e(number_format($serviceProvider->views)); ?>
 
-                                        <?php echo e(__('service_provider.views_label')); ?>
+                                            <?php echo e(__('service_provider.views_label')); ?>
 
-                                    </p>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Quick Action Buttons -->
@@ -1853,16 +1948,20 @@ unset($__errorArgs, $__bag); ?>
                             $whatsappNumberClean = str_replace('+', '', $whatsappNumber);
                         ?>
 
-                        
-                        <button
-                            onclick="revealContactInfo('<?php echo e($whatsappNumberClean); ?>', '<?php echo e($serviceProvider->whatsapp_number ?? $serviceProvider->phone); ?>', '<?php echo e($serviceProvider->address ?? ''); ?>')"
-                            class="btn w-100 mb-3"
-                            style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
-                            <i class="fab fa-whatsapp me-2"></i> <?php echo e(__('service_provider.contact_whatsapp')); ?>
+                        <?php if(!empty($whatsappNumberClean)): ?>
+                            
+                            <button
+                                onclick="revealContactInfo('<?php echo e($whatsappNumberClean); ?>', '<?php echo e($serviceProvider->whatsapp_number ?? $serviceProvider->phone); ?>', '<?php echo e($serviceProvider->address ?? ''); ?>')"
+                                class="btn w-100 mb-3"
+                                style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
+                                <i class="fab fa-whatsapp me-2"></i> <?php echo e(__('service_provider.contact_whatsapp')); ?>
 
-                        </button>
+                            </button>
+                        <?php endif; ?>
 
-                        <a href="mailto:<?php echo e($serviceProvider->user->email); ?>" class="btn btn-outline-primary w-100">
+                        <a href="mailto:<?php echo e($serviceProvider->user->email); ?>" class="btn btn-outline-primary w-100"
+                            id="emailContactBtn"
+                            onclick="if(typeof fbq==='function'){fbq('track','Lead',{content_name:<?php echo json_encode($serviceProvider->company_name ?? $serviceProvider->user->name); ?>,content_ids:['<?php echo $serviceProvider->id; ?>'],contact_type:'email',language:'<?php echo e(app()->getLocale()); ?>'});}">
                             <i class="fas fa-envelope me-2"></i> <?php echo e(__('service_provider.send_email')); ?>
 
                         </a>
@@ -1917,8 +2016,23 @@ unset($__errorArgs, $__bag); ?>
                             <div class="col-md-3 mb-4">
                                 <div class="similar-provider-card">
                                     <div class="similar-provider-image">
-                                        <img src="<?php echo e($similar->profile_image_url); ?>"
-                                            alt="<?php echo e($similar->company_name ?? $similar->user->name); ?>" loading="lazy">
+                                        <?php
+                                            $similarGalleryMedia = null;
+                                            if (isset($similar->media) && $similar->relationLoaded('media')) {
+                                                $similarGalleryMedia = $similar->media->where('collection_name', 'provider_gallery')->first();
+                                            } else {
+                                                $similarGalleryMedia = $similar->getMedia('provider_gallery')->first();
+                                            }
+
+                                            $similarAvatarUrl = null;
+                                            if ($similarGalleryMedia) {
+                                                $similarAvatarUrl = $similarGalleryMedia->hasGeneratedConversion('gallery_thumb')
+                                                    ? $similarGalleryMedia->getUrl('gallery_thumb')
+                                                    : $similarGalleryMedia->getUrl();
+                                            }
+                                        ?>
+                                        <img src="<?php echo e($similarAvatarUrl ?? $similar->profile_image_url); ?>"
+                                            alt="<?php echo e($similar->company_name ?? $similar->user->name); ?>" loading="lazy" decoding="async">
                                     </div>
                                     <div class="similar-provider-content">
                                         <h6 class="fw-bold mb-2"><?php echo e($similar->company_name ?? $similar->user->name); ?></h6>
@@ -2116,6 +2230,37 @@ unset($__errorArgs, $__bag); ?>
             }
         }
 
+        function validateMultipleFilesSize(input, maxSizeMB, maxFilesCount = 4) {
+            if (!input.files || input.files.length === 0) {
+                return true;
+            }
+
+            if (input.files.length > maxFilesCount) {
+                alert(`<?php echo e(__('service_provider.gallery_upload_max_images')); ?> (${maxFilesCount})`);
+                input.value = '';
+                return false;
+            }
+
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+            for (const file of input.files) {
+                const fileSize = file.size / 1024 / 1024; // Convert to MB
+                if (fileSize > maxSizeMB) {
+                    alert(`<?php echo e(__('service_provider.file_too_large_gallery')); ?> (${file.name}) (${fileSize.toFixed(2)}MB). <?php echo e(__('service_provider.max_allowed')); ?>: ${maxSizeMB}MB`);
+                    input.value = '';
+                    return false;
+                }
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert(`<?php echo e(__('service_provider.gallery_upload_invalid_type')); ?>`);
+                    input.value = '';
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             // Image Modal
             const imageModal = document.getElementById('imageModal');
@@ -2153,14 +2298,162 @@ unset($__errorArgs, $__bag); ?>
                     toastContainer.setAttribute('x-show', 'false');
                 }, 3000);
             }
+
+            // English-only Address Validation
+            const addressInput = document.getElementById('addressInput');
+            if (addressInput) {
+                addressInput.addEventListener('input', function() {
+                    const originalValue = this.value;
+                    const newValue = originalValue.replace(/[^a-zA-Z0-9\s\-_.,#&'\/\@]/g, '');
+
+                    if (originalValue !== newValue) {
+                        this.value = newValue;
+                        if(typeof window.showToast === 'function'){
+                            window.showToast('<?php echo e(__("service_provider.address_english_only_hint")); ?>', 'error');
+                        }
+                    }
+                });
+            }
+
+            // Click-to-change Profile Image
+            const imageContainer = document.getElementById('profileImageClickable');
+            const imageInput = document.getElementById('profileImageInput');
+            const imageOverlay = document.getElementById('imageOverlay');
+            const imageSpinner = document.getElementById('imageUploadSpinner');
+            let imagePreview = document.getElementById('profileImagePreview');
+
+            <?php if(auth()->check() && auth()->id() === $serviceProvider->user_id): ?>
+            if (imageContainer && imageInput) {
+                imageContainer.addEventListener('mouseenter', function() {
+                    if(imageOverlay) imageOverlay.style.opacity = '1';
+                });
+                imageContainer.addEventListener('mouseleave', function() {
+                    if(imageOverlay) imageOverlay.style.opacity = '0';
+                });
+                imageContainer.addEventListener('click', function(e) {
+                    if(e.target === imageInput) return; // Prevent loop
+                    imageInput.click();
+                });
+
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // Validate client-side
+                    if (typeof validateFileSize === 'function' && !validateFileSize(this, 2)) return;
+
+                    // Show spinner
+                    if(imageSpinner) imageSpinner.style.display = 'flex';
+
+                    // Prepare form data
+                    const formData = new FormData();
+                    formData.append('profile_image', file);
+                    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+                    // AJAX Request
+                    fetch('<?php echo e(route("service-providers.profile.image-upload", $serviceProvider->id)); ?>', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update preview
+                            imagePreview = document.getElementById('profileImagePreview'); // Re-fetch in case it was replaced
+                            if (imagePreview) {
+                                if (imagePreview.tagName === 'IMG') {
+                                    imagePreview.src = data.image_url;
+                                } else {
+                                    // Replace placeholder div with img
+                                    const img = document.createElement('img');
+                                    img.src = data.image_url;
+                                    img.alt = '<?php echo e($serviceProvider->company_name ?? $serviceProvider->user->name); ?>';
+                                    img.className = 'profile-image';
+                                    img.id = 'profileImagePreview';
+                                    img.loading = 'lazy';
+                                    imagePreview.replaceWith(img);
+                                }
+                            }
+                            if(typeof window.showToast === 'function') window.showToast(data.message, 'success');
+
+                            // Update progress bar
+                            if (data.completion_percent !== undefined) {
+                                const progressBar = document.querySelector('#completionProgressBar .progress-bar');
+                                const percentBadge = document.querySelector('#completionProgressBar').closest('.mb-4').querySelector('.badge');
+                                if (progressBar && percentBadge) {
+                                    progressBar.style.width = data.completion_percent + '%';
+                                    progressBar.setAttribute('aria-valuenow', data.completion_percent);
+                                    percentBadge.textContent = data.completion_percent + '%';
+
+                                    // Update colors
+                                    let newBg = '';
+                                    let newBadgeClass = 'badge rounded-pill px-3 ';
+                                    if(data.completion_percent >= 80) {
+                                        newBg = 'linear-gradient(90deg, #10b981,#059669)';
+                                        newBadgeClass += 'bg-success';
+                                    } else if(data.completion_percent >= 50) {
+                                        newBg = 'linear-gradient(90deg, #f59e0b,#d97706)';
+                                        newBadgeClass += 'bg-warning text-dark';
+                                    } else {
+                                        newBg = 'linear-gradient(90deg, #ef4444,#dc2626)';
+                                        newBadgeClass += 'bg-danger';
+                                    }
+                                    progressBar.style.background = newBg;
+                                    percentBadge.className = newBadgeClass;
+                                }
+                            }
+                        } else {
+                            if(typeof window.showToast === 'function') window.showToast(data.message || 'Error occurred', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if(typeof window.showToast === 'function') window.showToast('Upload failed', 'error');
+                    })
+                    .finally(() => {
+                        if(imageSpinner) imageSpinner.style.display = 'none';
+                        imageInput.value = ''; // Reset
+                    });
+                });
+            }
+            <?php endif; ?>
         });
 
-        // Reveal contact information and open WhatsApp
-        function revealContactInfo(phoneClean, phoneDisplay, address) {
+        // Track WhatsApp click (internal analytics) + reveal contact (privacy) + open WhatsApp
+        async function revealContactInfo(whatsappClean, whatsappDisplay, address) {
+            // Meta Pixel: Track Lead event (WhatsApp contact)
+            if (typeof fbq === 'function') {
+                var leadEventId = 'lead_<?php echo e($serviceProvider->id); ?>_' + Date.now();
+                fbq('track', 'Lead', {
+                    content_name: <?php echo json_encode($serviceProvider->company_name ?? $serviceProvider->user->name); ?>,
+                    content_ids: ['<?php echo $serviceProvider->id; ?>'],
+                    content_category: <?php echo json_encode($serviceProvider->category->translated_name ?? 'Uncategorized'); ?>,
+                    contact_type: 'whatsapp',
+                    language: '<?php echo e(app()->getLocale()); ?>'
+                }, { eventID: leadEventId });
+            }
+
             // Store reveal in SESSION (server-side) instead of localStorage
             // This ensures only the user who clicked can see the info
             const providerId = <?php echo e($serviceProvider->id); ?>;
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            // Internal analytics: click_whatsapp (dedupe is intentionally not applied to clicks)
+            let analyticsPromise = Promise.resolve();
+            if (csrfToken) {
+                analyticsPromise = fetch(`/service-providers/${providerId}/analytics/click`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ action_type: 'click_whatsapp' }),
+                    keepalive: true,
+                }).catch(() => {});
+            }
 
             // Store reveal in session via AJAX request
             if (csrfToken) {
@@ -2174,18 +2467,10 @@ unset($__errorArgs, $__bag); ?>
                 }).catch(err => console.error('Failed to store reveal:', err));
             }
 
-            // Reveal Phone number
-            const phoneElement = document.getElementById('phoneNumber');
-            if (phoneElement) {
-                phoneElement.textContent = phoneDisplay;
-                phoneElement.classList.remove('text-muted');
-                phoneElement.classList.add('text-success', 'fw-bold');
-            }
-
             // Reveal WhatsApp number
             const whatsappElement = document.getElementById('whatsappNumber');
             if (whatsappElement) {
-                whatsappElement.textContent = phoneDisplay;
+                whatsappElement.textContent = whatsappDisplay;
                 whatsappElement.classList.remove('text-muted');
                 whatsappElement.classList.add('text-success', 'fw-bold');
             }
@@ -2219,12 +2504,22 @@ unset($__errorArgs, $__bag); ?>
 
             // Create WhatsApp URL with message
             // Use api.whatsapp.com for better compatibility with WhatsApp Desktop and Web
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodedMessage}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappClean}&text=${encodedMessage}`;
 
             // Debug: Log the URL (you can remove this later)
             console.log('WhatsApp URL:', whatsappUrl);
-            console.log('Phone:', phoneClean);
+            console.log('WhatsApp phone:', whatsappClean);
             console.log('Message:', message);
+
+            // Attempt analytics write before redirecting (timeout keeps UX snappy)
+            try {
+                await Promise.race([
+                    analyticsPromise,
+                    new Promise((resolve) => setTimeout(resolve, 150)),
+                ]);
+            } catch (e) {
+                // Ignore analytics errors: user action must still proceed.
+            }
 
             // Open WhatsApp after a short delay
             setTimeout(function () {
@@ -2235,7 +2530,7 @@ unset($__errorArgs, $__bag); ?>
                 if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
                     window.location.href = whatsappUrl;
                 }
-            }, 500);
+            }, 0);
         }
 
         // ========== PROFILE EDIT FORM VALIDATION & UX ENHANCEMENTS ==========
@@ -2516,12 +2811,12 @@ unset($__errorArgs, $__bag); ?>
                     alertDiv.style.zIndex = '9999';
                     alertDiv.style.maxWidth = '500px';
                     alertDiv.innerHTML = `
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i><?php echo e(__("validation.please_correct_errors")); ?></h6>
-                                    <ul class="mb-0 small">
-                                        ${errorList.map(error => '<li>' + error + '</li>').join('')}
-                                    </ul>
-                                `;
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i><?php echo e(__("validation.please_correct_errors")); ?></h6>
+                                                <ul class="mb-0 small">
+                                                    ${errorList.map(error => '<li>' + error + '</li>').join('')}
+                                                </ul>
+                                            `;
                     document.body.appendChild(alertDiv);
 
                     // Auto dismiss after 10 seconds
@@ -2583,4 +2878,5 @@ unset($__errorArgs, $__bag); ?>
     </style>
 </body>
 
-</html><?php /**PATH Y:\Speeda - Versions\Speeda\resources\views/service-providers/show.blade.php ENDPATH**/ ?>
+</html>
+<?php /**PATH Y:\Speeda - Versions\Speeda\resources\views/service-providers/show.blade.php ENDPATH**/ ?>

@@ -182,6 +182,15 @@ class ServiceProviderProfileController extends Controller
 
             $serviceProvider->update($validated);
 
+            // معالجة صور المعرض (gallery_images) باستخدام مكتبة spatie
+            if ($request->hasFile('gallery_images')) {
+                foreach ($request->file('gallery_images') as $image) {
+                    $serviceProvider
+                        ->addMedia($image)
+                        ->toMediaCollection('provider_gallery');
+                }
+            }
+
             return redirect()->route('service-providers.manage')
                 ->with('success', 'Service provider profile updated successfully!');
 

@@ -12,7 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Actions\CalculateProfileCompletionAction;
+use App\Actions\TrackProviderViewAction;
 use App\Services\FacebookConversionService;
+use App\Services\LocationClusterService;
 
 class ServiceProviderController extends Controller
 {
@@ -21,7 +24,8 @@ class ServiceProviderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ServiceProvider::with(['user', 'category', 'location'])
+        // Eager-load Spatie media to avoid N+1 queries in provider cards.
+        $query = ServiceProvider::with(['user', 'category', 'location', 'media'])
             ->withCount(['activeReviews as reviews_count', 'endorsements as endorsements_count'])
             // Calculate live average rating from active reviews (SINGLE QUERY PER PROVIDER)
             ->selectRaw(
@@ -71,9 +75,12 @@ class ServiceProviderController extends Controller
             }
         }
 
-        // Location filter
+        // Location filter — with cluster mapping
         if ($request->filled('location')) {
-            $query->where('location_id', $request->input('location'));
+            $clusterIds = app(LocationClusterService::class)->getClusterIds(
+                (int) $request->input('location')
+            );
+            $query->whereIn('location_id', $clusterIds);
         }
 
         // Order by LIVE rating (from subquery) instead of stored rating
@@ -162,7 +169,7 @@ class ServiceProviderController extends Controller
      * Display the specified service provider's profile (public view)
      * Anyone can view but only owner can edit
      */
-    public function show(ServiceProvider $serviceProvider)
+    public function show(Request $request, ServiceProvider $serviceProvider)
     {
         try {
             // Check if the service provider's user is active
@@ -178,6 +185,12 @@ class ServiceProviderController extends Controller
                     ->where('id', $serviceProvider->id)
                     ->increment('views');
                 $serviceProvider->refresh(); // Reload to get updated views count
+
+                // Internal analytics (spam-protected by session fingerprint within 24h)
+                // PRIVACY: No IP address stored
+                app(TrackProviderViewAction::class)->execute(
+                    $serviceProvider->id
+                );
             }
 
             // === STEP 1: Calculate review statistics FIRST (before eager loading) ===
@@ -249,7 +262,8 @@ class ServiceProviderController extends Controller
             $locations = Location::orderBy('city')->get();
 
             // Get similar providers in same category (excluding self)
-            $similarProviders = ServiceProvider::with(['category', 'location', 'user'])
+            // Eager-load Spatie media to render gallery thumbnails in similar-provider cards.
+            $similarProviders = ServiceProvider::with(['category', 'location', 'user', 'media'])
                 ->where('category_id', $serviceProvider->category_id)
                 ->where('id', '!=', $serviceProvider->id)
                 ->orderBy('rating', 'desc')
@@ -602,6 +616,36 @@ class ServiceProviderController extends Controller
             // Commit the transaction
             DB::commit();
 
+            // Provider gallery upload:
+            // - Stored by Spatie media library
+            // - Conversions (resize/compress/webp/thumb) are queued (not synchronous)
+            // - Max 4 images enforced via `onlyKeepLatest(4)` on the collection
+            try {
+                if ($request->hasFile('gallery_images')) {
+                    $files = $request->file('gallery_images', []);
+
+                    if (is_array($files)) {
+                        foreach ($files as $file) {
+                            // Collection enforces max-4 via onlyKeepLatest(4).
+                            $serviceProvider->addMedia($file)->toMediaCollection('provider_gallery');
+                        }
+                    }
+
+                    // Ensure completion percent is updated after gallery changes.
+                    app(CalculateProfileCompletionAction::class)->execute($serviceProvider);
+                }
+            } catch (\Throwable $galleryError) {
+                Log::error('Gallery upload failed', [
+                    'user_id' => auth()->id(),
+                    'sp_id' => $serviceProvider->id,
+                    'error' => $galleryError->getMessage(),
+                ]);
+                ErrorHelper::flashNotification(
+                    __('service_provider.gallery_upload_failed'),
+                    'error'
+                );
+            }
+
             ErrorHelper::flashNotification(
                 __('service_provider.profile_updated_successfully'),
                 'success'
@@ -671,10 +715,14 @@ class ServiceProviderController extends Controller
                 // Update service provider record
                 $serviceProvider->update(['profile_image' => $path]);
 
+                // Recalculate profile completion after image upload
+                $completionPercent = app(CalculateProfileCompletionAction::class)->execute($serviceProvider);
+
                 return response()->json([
                     'success' => true,
                     'message' => __('service_provider.profile_image_updated'),
-                    'image_url' => Storage::url($path)
+                    'image_url' => Storage::url($path),
+                    'completion_percent' => $completionPercent,
                 ]);
             }
 

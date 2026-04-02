@@ -4,12 +4,23 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-2xl">
-    <h1 class="text-3xl font-bold mb-6">{{ __('reviews.add_review') }}</h1>
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <h1 class="text-3xl font-bold mb-1">{{ __('reviews.add_review') }}</h1>
+            <p class="text-muted mb-0">
+                {{ $provider->company_name ?? $provider->user->name }}
+            </p>
+        </div>
+        <a href="{{ route('service-providers.show', $provider->id) }}" class="btn btn-outline-secondary rounded-pill">
+            <i class="fas fa-arrow-left me-2"></i>{{ __('general.back') ?? 'Back' }}
+        </a>
+    </div>
 
     <form method="POST" action="{{ route('reviews.store') }}" class="bg-white rounded-lg shadow p-6">
         @csrf
 
         <div class="form-group mb-4">
+            <input type="hidden" name="service_provider_id" value="{{ $provider->id }}">
             <label for="rating" class="block font-semibold mb-2">{{ __('reviews.rating') }} *</label>
             <div class="flex gap-2" id="rating-container">
                 @for ($i = 1; $i <= 5; $i++)
@@ -45,7 +56,9 @@
 
         <div class="flex gap-4">
             <button type="submit" class="btn btn-primary px-6 py-2">{{ __('reviews.submit_review') }}</button>
-            <a href="{{ url()->previous() }}" class="btn btn-secondary px-6 py-2">{{ __('general.cancel') }}</a>
+            <a href="{{ route('service-providers.show', $provider->id) }}" class="btn btn-secondary px-6 py-2">
+                {{ __('general.cancel') ?? 'Cancel' }}
+            </a>
         </div>
     </form>
 </div>

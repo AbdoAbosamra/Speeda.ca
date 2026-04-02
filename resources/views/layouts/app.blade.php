@@ -286,6 +286,14 @@
             <div class="container">
                 <x-error-handler />
             </div>
+
+            {{-- Provider gamification (popup once, then compact reminder) - never show on admin routes --}}
+            @auth
+                @if(!request()->routeIs('admin.*') && auth()->user()->serviceProvider)
+                    <x-profile-completion-notification-center :provider="auth()->user()->serviceProvider" />
+                @endif
+            @endauth
+
             @yield('content')
         </main>
 

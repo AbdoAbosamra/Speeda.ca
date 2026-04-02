@@ -1,0 +1,164 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ServiceProviderController;
+use App\Http\Controllers\ServiceProviderAnalyticsController;
+use App\Http\Controllers\ProviderDashboardController;
+use App\Http\Controllers\Admin\AdminCommentController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\EndorsementController;
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application's
+| web frontend. These routes are loaded by the RouteServiceProvider
+| and all of them will be assigned to the web middleware group.
+|
+*/
+
+// ============================= PUBLIC ROUTES =============================
+
+// Home page
+Route::get('/', function () {
+    return view('home');
+})->name('home');
+
+// ==================== SERVICE PROVIDERS - PUBLIC ====================
+Route::get('/service-providers', [ServiceProviderController::class, 'index'])
+    ->name('service-providers.index');
+
+// Public profile view
+Route::get('/service-providers/{serviceProvider}', [ServiceProviderController::class, 'show'])
+    ->name('service-providers.show');
+
+
+    $gallery = $serviceProvider->getMedia('provider_gallery');
+    $totalMedia = DB::table('media')
+        ->where('model_type', 'App\\Models\\ServiceProvider')
+        ->where('model_id', $serviceProvider->id)
+        ->count();
+
+// Track contact reveal (no auth required, uses session)
+Route::post('/service-providers/{serviceProvider}/reveal-contact', [ServiceProviderController::class, 'revealContact'])
+    ->middleware('throttle:5,1')
+    ->name('service-providers.reveal-contact');
+
+// Internal analytics tracking for provider contact buttons
+Route::post('/service-providers/{serviceProvider}/analytics/click', [ServiceProviderAnalyticsController::class, 'trackClick'])
+    ->name('service-providers.analytics.click');
+
+// ==================== DIAGNOSTIC PAGES ====================
+Route::get('/diagnostic', function () {
+    $totalSP = \App\Models\ServiceProvider::count();
+    $spWithImages = \App\Models\ServiceProvider::whereNotNull('profile_image')
+        ->where('profile_image', '!=', '')
+        ->count();
+    $storagePath = storage_path('app/public');
+    $storageCount = count(array_diff(scandir($storagePath), ['.', '..']));
+    $serviceProviders = \App\Models\ServiceProvider::limit(3)->get();
+    $storageFiles = [];
+    if (is_dir($storagePath)) {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($storagePath));
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $storageFiles[] = $file->getFilename();
+            }
+        }
+    }
+    return view('diagnostic', compact('totalSP', 'spWithImages', 'storageCount', 'serviceProviders', 'storageFiles'));
+})->name('diagnostic');
+
+// ==================== REVIEWS - PUBLIC ====================
+Route::get('/service-providers/{serviceProvider}/reviews', [ReviewController::class, 'index'])
+    ->name('reviews.index');
+
+// ==================== AUTHENTICATED ROUTES ====================
+Route::middleware('auth')->group(function () {
+    // Dashboard redirect logic
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        if ($user->serviceProvider) {
+            return redirect()->route('service-providers.profile');
+        }
+        return redirect()->route('service-providers.index');
+    })->name('dashboard');
+
+    // Provider profile management (edit included)
+    Route::middleware(['auth'])->prefix('service-providers')->group(function () {
+        // View own profile - redirect to show page (with edit section for owner)
+        Route::get('/profile', [ServiceProviderController::class, 'profile'])
+            ->name('service-providers.profile');
+
+        Route::get('/{serviceProvider}/edit', function ($serviceProvider) {
+            return redirect()->route('service-providers.show', $serviceProvider);
+        })->name('service-providers.edit');
+
+        // Update profile - Rate limited to prevent spam (max 10 requests per minute)
+        Route::put('/profile/{serviceProvider}', [ServiceProviderController::class, 'updateProfile'])
+            ->middleware('throttle:10,1')
+            ->name('service-providers.profile.update');
+
+        // Handle profile image upload
+        Route::post('/profile/image-upload', [ServiceProviderController::class, 'uploadProfileImage'])
+            ->name('service-providers.profile.image-upload');
+
+        Route::get('/dashboard', [ProviderDashboardController::class, 'index'])
+            ->name('service-providers.dashboard');
+
+        Route::get('/analytics/export-pdf', [ProviderAnalyticsExportController::class, 'exportPdf'])
+            ->name('service-providers.analytics.export-pdf');
+
+        // Dismiss profile completion popup
+        Route::post('/profile-completion-dismissed', function() {
+            session(['profile_completion_dismissed' => true]);
+            return response()->json(['success' => true]);
+        })->name('service-providers.popup-dismissed');
+    });
+
+    // Public routes - see active reviews
+    Route::get('/service-providers/{serviceProvider}/reviews', [ReviewController::class, 'index'])
+        ->name('reviews.index');
+
+    Route::post('/service-providers/{serviceProvider}/rate', [RatingController::class, 'store'])
+        ->name('ratings.store');
+
+    Route::get('/service-providers/{serviceProvider}/my-rating', [RatingController::class, 'getUserRating'])
+        ->name('ratings.user');
+
+    Route::post('/service-providers/{serviceProvider}/endorse', [EndorsementController::class, 'toggle'])
+        ->name('endorsements.toggle');
+});
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+
+    Route::resource('comments', AdminCommentController::class);
+});
+
+// Static pages
+Route::get('/privacy-policy', function () {
+    return view('Static.PrivacyPolicy');
+})->name('privacy.policy');
+
+Route::get('/terms-of-service', function () {
+    return view('Static.terms-of-service');
+})->name('terms.service');
+
+Route::get('/test-whatsapp', function () {
+    return view('test-whatsapp');
+});
+
+Route::get('/test-main-nav', function () {
+    return view('test-main-nav');
+});
+
+require __DIR__.'/auth.php';
+

@@ -49,7 +49,7 @@ return [
     // Address
     'sp_address_min' => 'العنوان يجب أن يكون على الأقل 5 أحرف',
     'sp_address_max' => 'العنوان لا يمكن أن يتجاوز 500 حرف',
-    'sp_address_no_html' => 'العنوان لا يمكن أن يحتوي على أكواد HTML',
+    'sp_address_english_only' => 'يجب كتابة العنوان باللغة الإنجليزية والأرقام فقط.',
 
     // Location
     'sp_location_invalid' => 'الموقع المختار غير صالح',

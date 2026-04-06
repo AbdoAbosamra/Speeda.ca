@@ -4,6 +4,8 @@ namespace App\Actions;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class TrackProviderViewAction
 {
@@ -32,16 +34,22 @@ class TrackProviderViewAction
         }
 
         $now = now();
+        $payload = $this->buildAnalyticsPayload($providerId, 'view', $sessionHash, $now);
+        if (empty($payload)) {
+            return false;
+        }
 
-        DB::table('analytics')->insert([
-            'provider_id' => $providerId,
-            'action_type' => 'view',
-            'session_hash' => $sessionHash,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        try {
+            DB::table('analytics')->insert($payload);
+            return true;
+        } catch (\Throwable $e) {
+            Log::warning('Provider view analytics insert failed', [
+                'provider_id' => $providerId,
+                'error' => $e->getMessage(),
+            ]);
 
-        return true;
+            return false;
+        }
     }
 
     /**
@@ -58,5 +66,48 @@ class TrackProviderViewAction
         }
 
         return hash('sha256', $sessionId . '|' . $userAgent);
+    }
+
+    /**
+     * Build an insert payload that is compatible with both legacy and current
+     * analytics schemas without storing raw visitor IP addresses.
+     */
+    private function buildAnalyticsPayload(int $providerId, string $actionType, string $sessionHash, $timestamp): array
+    {
+        $columns = $this->getAnalyticsColumns();
+        $payload = [];
+
+        if (in_array('provider_id', $columns, true)) {
+            $payload['provider_id'] = $providerId;
+        }
+
+        if (in_array('action_type', $columns, true)) {
+            $payload['action_type'] = $actionType;
+        }
+
+        if (in_array('session_hash', $columns, true)) {
+            $payload['session_hash'] = $sessionHash;
+        } elseif (in_array('ip_address', $columns, true)) {
+            $payload['ip_address'] = 'hash:' . substr($sessionHash, 0, 40);
+        }
+
+        if (in_array('created_at', $columns, true)) {
+            $payload['created_at'] = $timestamp;
+        }
+
+        if (in_array('updated_at', $columns, true)) {
+            $payload['updated_at'] = $timestamp;
+        }
+
+        return isset($payload['provider_id'], $payload['action_type']) ? $payload : [];
+    }
+
+    private function getAnalyticsColumns(): array
+    {
+        return Cache::rememberForever('analytics_table_columns', function () {
+            return Schema::hasTable('analytics')
+                ? Schema::getColumnListing('analytics')
+                : [];
+        });
     }
 }

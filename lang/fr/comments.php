@@ -1,0 +1,80 @@
+<?php
+
+return [
+    'title' => 'Commentaires',
+    'add_comment' => 'Ajouter un commentaire',
+    'edit_comment' => 'Modifier votre commentaire',
+    'delete_comment' => 'Supprimer le commentaire',
+    'view_comments' => 'Voir les commentaires',
+    'no_comments' => 'Aucun commentaire pour le moment',
+    'my_comments' => 'Mes commentaires',
+
+    'comment' => 'Commentaire',
+    'your_comment' => 'Votre commentaire',
+    'comment_placeholder' => 'Partagez votre avis (minimum 5 caractères)',
+
+    'comment_submitted_pending_approval' => 'Merci ! Votre commentaire a été envoyé et sera publié après validation par notre équipe.',
+    'comment_updated_pending_reapproval' => 'Votre commentaire a été mis à jour et sera réexaminé par notre équipe.',
+    'comment_deleted_successfully' => 'Votre commentaire a été supprimé avec succès.',
+    'comment_cannot_edit_approved' => 'Vous ne pouvez pas modifier un commentaire déjà approuvé. Veuillez contacter le support si des changements sont nécessaires.',
+    'cannot_edit_others_comments' => 'Vous ne pouvez modifier que vos propres commentaires.',
+    'cannot_edit_approved_comments' => 'Vous ne pouvez pas modifier un commentaire déjà approuvé.',
+    'not_authorized_to_delete' => 'Vous n’êtes pas autorisé à supprimer ce commentaire.',
+    'comment_already_flagged' => 'Ce commentaire a déjà été signalé.',
+    'comment_flagged_successfully' => 'Commentaire signalé avec succès.',
+    'must_login_to_comment' => 'Vous devez être connecté pour commenter.',
+    'only_clients_can_comment' => 'Seuls les clients peuvent laisser des commentaires.',
+    'missing_parameters' => 'Paramètres requis manquants.',
+
+    'pending_approval' => 'En attente d’approbation',
+    'approved' => 'Approuvé',
+    'rejected' => 'Rejeté',
+    'flagged' => 'Signalé',
+
+    'report_comment' => 'Signaler le commentaire',
+    'inappropriate_content' => 'Contenu inapproprié',
+    'spam' => 'Spam',
+    'offensive' => 'Offensant',
+    'irrelevant' => 'Non pertinent',
+
+    'admin_panel' => [
+        'title' => 'Gestion des commentaires',
+        'all_comments' => 'Tous les commentaires',
+        'pending_comments' => 'Commentaires en attente',
+        'approved_comments' => 'Commentaires approuvés',
+        'rejected_comments' => 'Commentaires rejetés',
+        'flagged_comments' => 'Commentaires signalés',
+
+        'comment_id' => 'ID du commentaire',
+        'author' => 'Auteur',
+        'on_item' => 'Sur l’élément',
+        'content' => 'Contenu',
+        'created_at' => 'Créé le',
+        'status' => 'Statut',
+        'actions' => 'Actions',
+
+        'approve' => 'Approuver',
+        'reject' => 'Rejeter',
+        'flag' => 'Signaler',
+        'unflag' => 'Retirer le signalement',
+        'delete' => 'Supprimer',
+        'restore' => 'Restaurer',
+        'view' => 'Voir',
+
+        'rejection_reason' => 'Motif du rejet',
+        'reason_offensive' => 'Contenu offensant',
+        'reason_spam' => 'Spam',
+        'reason_irrelevant' => 'Non pertinent',
+        'reason_other' => 'Autre',
+
+        'no_pending_comments' => 'Aucun commentaire en attente',
+        'no_flagged_comments' => 'Aucun commentaire signalé',
+
+        'comment_approved_successfully' => 'Commentaire approuvé avec succès',
+        'comment_rejected_successfully' => 'Commentaire rejeté avec succès',
+        'comment_flagged_successfully' => 'Commentaire signalé avec succès',
+        'comment_unflagged_successfully' => 'Signalement retiré avec succès',
+        'comment_deleted_successfully' => 'Commentaire supprimé avec succès',
+        'comment_restored_successfully' => 'Commentaire restauré avec succès',
+    ],
+];

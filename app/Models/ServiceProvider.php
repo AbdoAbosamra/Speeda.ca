@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -239,16 +240,86 @@ class ServiceProvider extends Model implements HasMedia
      */
     public function getProfileImageUrlAttribute(): string
     {
-        if ($this->profile_image) {
-            return Storage::url($this->profile_image);
+        if ($this->profile_image && Storage::disk('public')->exists($this->profile_image)) {
+            return $this->normalizePublicUrl(Storage::url($this->profile_image));
         }
 
-        $placeholderSeed = $this->business_name
-            ?? $this->company_name
-            ?? $this->user?->name
-            ?? 'SP';
+        return $this->default_image_url;
+    }
 
-        return 'https://via.placeholder.com/300x300/E5E7EB/6B7280?text=' . urlencode(strtoupper(substr($placeholderSeed, 0, 2)));
+    /**
+     * Get a safe URL for the first gallery image when present.
+     */
+    public function getGalleryImageUrlAttribute(): ?string
+    {
+        $media = $this->getMedia('provider_gallery')->first();
+
+        if (!$media) {
+            return null;
+        }
+
+        return $this->getMediaPublicUrl(
+            $media,
+            $media->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null
+        );
+    }
+
+    /**
+     * Get the best image to display for cards/profile thumbnails.
+     */
+    public function getDisplayImageUrlAttribute(): string
+    {
+        return $this->gallery_image_url
+            ?? $this->profile_image_url
+            ?? $this->default_image_url;
+    }
+
+    /**
+     * Get a safe local fallback image path.
+     */
+    public function getDefaultImageUrlAttribute(): string
+    {
+        return '/images/default-provider.jpg';
+    }
+
+    /**
+     * Normalize app-generated URLs to same-origin relative paths for local disks.
+     */
+    private function normalizePublicUrl(string $url): string
+    {
+        if (!Str::startsWith($url, ['http://', 'https://'])) {
+            return $url;
+        }
+
+        $parts = parse_url($url);
+        if (!$parts || empty($parts['path'])) {
+            return $url;
+        }
+
+        $normalized = $parts['path'];
+
+        if (!empty($parts['query'])) {
+            $normalized .= '?' . $parts['query'];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Resolve a media-library file to a safe same-origin public URL when it exists.
+     */
+    public function getMediaPublicUrl(?Media $media, ?string $conversionName = null): ?string
+    {
+        if (!$media) {
+            return null;
+        }
+
+        $relativePath = $media->getPathRelativeToRoot($conversionName ?? '');
+        if (!Storage::disk($media->disk)->exists($relativePath)) {
+            return null;
+        }
+
+        return $this->normalizePublicUrl($media->getUrl($conversionName ?? ''));
     }
 
     /**

@@ -55,9 +55,7 @@ class SEOService
             'description' => $description,
             'keywords' => $this->generateProviderKeywords($provider),
             'og_type' => 'profile',
-            'og_image' => $provider->profile_photo_path
-                ? asset('storage/' . $provider->profile_photo_path)
-                : asset('images/default-provider.png'),
+            'og_image' => url($provider->display_image_url),
             'canonical' => route('service-providers.show', $provider),
         ];
     }
@@ -76,7 +74,7 @@ class SEOService
             'description' => $category->description ?? __('seo.category_description', ['name' => $category->name]),
             'keywords' => $category->name . ', ' . __('seo.category_keywords'),
             'og_type' => 'website',
-            'canonical' => route('categories'),
+            'canonical' => route('categories.show', $category),
         ];
     }
 
@@ -174,13 +172,11 @@ class SEOService
                 'ratingValue' => $provider->rating,
                 'bestRating' => 5,
                 'worstRating' => 1,
-                'ratingCount' => $provider->ratings()->count(),
+                'ratingCount' => $provider->activeReviews()->count(),
             ];
         }
 
-        if ($provider->profile_photo_path) {
-            $jsonLd['image'] = asset('storage/' . $provider->profile_photo_path);
-        }
+        $jsonLd['image'] = url($provider->display_image_url);
 
         return $jsonLd;
     }

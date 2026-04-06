@@ -15,7 +15,7 @@ class ProfileController extends Controller
     {
         // If user is a service provider, redirect to their service provider profile
         if ($request->user()->role === 'service_provider' && $request->user()->serviceProvider) {
-            return redirect()->route('provider-profile.show', $request->user()->serviceProvider->id);
+            return redirect()->route('service-providers.show', $request->user()->serviceProvider->id);
         }
 
         return view('profile.edit', [

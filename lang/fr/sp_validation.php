@@ -34,7 +34,7 @@ return [
 
     // WhatsApp (Obligatoire)
     'sp_whatsapp_country_code_required' => 'Le code pays est requis',
-    'sp_whatsapp_country_code_in' => 'Veuillez sélectionner un code pays valide',
+    'sp_whatsapp_country_code_in' => 'Veuillez saisir un indicatif pays valide commençant par +',
     'sp_whatsapp_required' => 'Le numéro WhatsApp est requis',
     'sp_whatsapp_min' => 'Le numéro WhatsApp doit comporter au moins 10 chiffres',
     'sp_whatsapp_max' => 'Le numéro WhatsApp ne peut pas dépasser 15 chiffres',
@@ -49,7 +49,7 @@ return [
     // Address
     'sp_address_min' => "L'adresse doit contenir au moins 5 caractères",
     'sp_address_max' => "L'adresse ne peut pas dépasser 500 caractères",
-    'sp_address_english_only' => "L'adresse doit contenir uniquement des caractères anglais, chiffres et ponctuation",
+    'sp_address_english_only' => "L'adresse contient des caractères non pris en charge.",
 
     // Location
     'sp_location_invalid' => "L'emplacement sélectionné est invalide",

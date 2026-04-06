@@ -34,7 +34,7 @@
                             @foreach($gallery as $media)
                                 <div class="col-6">
                                     <div class="border p-2 rounded">
-                                        <img src="{{ $media->getUrl('gallery_thumb') }}" class="img-fluid" style="height:100px;object-fit:cover;">
+                                        <img src="{{ $serviceProvider->getMediaPublicUrl($media, 'gallery_thumb') ?? $serviceProvider->default_image_url }}" class="img-fluid" style="height:100px;object-fit:cover;">
                                         <small><code>{{ $media->file_name }}</code></small>
                                     </div>
                                 </div>

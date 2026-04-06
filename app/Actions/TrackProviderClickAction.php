@@ -2,8 +2,10 @@
 
 namespace App\Actions;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class TrackProviderClickAction
 {
@@ -17,15 +19,14 @@ class TrackProviderClickAction
     {
         $sessionHash = $this->generateSessionHash();
         $now = now();
+        $payload = $this->buildAnalyticsPayload($providerId, $actionType, $sessionHash, $now);
+
+        if (empty($payload)) {
+            return false;
+        }
 
         try {
-            DB::table('analytics')->insert([
-                'provider_id' => $providerId,
-                'action_type' => $actionType,
-                'session_hash' => $sessionHash,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
+            DB::table('analytics')->insert($payload);
 
             return true;
         } catch (\Throwable $e) {
@@ -52,5 +53,47 @@ class TrackProviderClickAction
         }
 
         return hash('sha256', $sessionId . '|' . $userAgent);
+    }
+
+    /**
+     * Build an insert payload for whichever analytics schema is currently deployed.
+     */
+    private function buildAnalyticsPayload(int $providerId, string $actionType, string $sessionHash, $timestamp): array
+    {
+        $columns = $this->getAnalyticsColumns();
+        $payload = [];
+
+        if (in_array('provider_id', $columns, true)) {
+            $payload['provider_id'] = $providerId;
+        }
+
+        if (in_array('action_type', $columns, true)) {
+            $payload['action_type'] = $actionType;
+        }
+
+        if (in_array('session_hash', $columns, true)) {
+            $payload['session_hash'] = $sessionHash;
+        } elseif (in_array('ip_address', $columns, true)) {
+            $payload['ip_address'] = 'hash:' . substr($sessionHash, 0, 40);
+        }
+
+        if (in_array('created_at', $columns, true)) {
+            $payload['created_at'] = $timestamp;
+        }
+
+        if (in_array('updated_at', $columns, true)) {
+            $payload['updated_at'] = $timestamp;
+        }
+
+        return isset($payload['provider_id'], $payload['action_type']) ? $payload : [];
+    }
+
+    private function getAnalyticsColumns(): array
+    {
+        return Cache::rememberForever('analytics_table_columns', function () {
+            return Schema::hasTable('analytics')
+                ? Schema::getColumnListing('analytics')
+                : [];
+        });
     }
 }

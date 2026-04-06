@@ -123,7 +123,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
             'whatsapp_country_code' => [
                 'required',
                 'string',
-                'in:+1'
+                'regex:/^\+[0-9]{1,4}$/'
             ],
 
             'whatsapp_number' => [
@@ -141,7 +141,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'string',
                 'min:5',
                 'max:500',
-                'regex:/^[a-zA-Z0-9\s\-_.,#&\'\/@]+$/', // English characters only — Arabic blocked
+                'regex:/^[\pL\pN\s\-_.,#&\'\/@،()]+$/u',
             ],
 
             'location_id' => [
@@ -220,7 +220,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
 
             // WhatsApp (Required)
             'whatsapp_country_code.required' => __('sp_validation.sp_whatsapp_country_code_required'),
-            'whatsapp_country_code.in' => __('sp_validation.sp_whatsapp_country_code_in'),
+            'whatsapp_country_code.regex' => __('sp_validation.sp_whatsapp_country_code_in'),
             'whatsapp_number.required' => __('sp_validation.sp_whatsapp_required'),
             'whatsapp_number.min' => __('sp_validation.sp_whatsapp_min'),
             'whatsapp_number.max' => __('sp_validation.sp_whatsapp_max'),

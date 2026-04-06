@@ -181,7 +181,7 @@ class AdminReviewController extends Controller
 
             Log::info('Review featured by admin', [
                 'review_id' => $review->id,
-                'provider_id' => $review->service_provider_profile_id,
+                'provider_id' => $review->service_provider_id,
             ]);
 
             ErrorHelper::flashNotification(
@@ -207,7 +207,7 @@ class AdminReviewController extends Controller
 
             Log::info('Review unfeatured by admin', [
                 'review_id' => $review->id,
-                'provider_id' => $review->service_provider_profile_id,
+                'provider_id' => $review->service_provider_id,
             ]);
 
             ErrorHelper::flashNotification(

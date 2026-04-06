@@ -34,7 +34,7 @@ return [
 
     // WhatsApp (إجباري)
     'sp_whatsapp_country_code_required' => 'كود الدولة مطلوب',
-    'sp_whatsapp_country_code_in' => 'يرجى اختيار كود دولة صحيح',
+    'sp_whatsapp_country_code_in' => 'يرجى إدخال كود دولة صالح يبدأ بعلامة +',
     'sp_whatsapp_required' => 'رقم الواتساب مطلوب',
     'sp_whatsapp_min' => 'رقم الواتساب يجب أن يكون 10 أرقام على الأقل',
     'sp_whatsapp_max' => 'رقم الواتساب لا يمكن أن يتجاوز 15 رقم',
@@ -49,7 +49,7 @@ return [
     // Address
     'sp_address_min' => 'العنوان يجب أن يكون على الأقل 5 أحرف',
     'sp_address_max' => 'العنوان لا يمكن أن يتجاوز 500 حرف',
-    'sp_address_english_only' => 'يجب كتابة العنوان باللغة الإنجليزية والأرقام فقط.',
+    'sp_address_english_only' => 'يحتوي العنوان على أحرف غير مدعومة.',
 
     // Location
     'sp_location_invalid' => 'الموقع المختار غير صالح',

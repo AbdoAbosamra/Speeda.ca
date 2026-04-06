@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" dir="<?php echo e(app()->getLocale() === 'ar' ? 'rtl' : 'ltr'); ?>">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 
-    <title>{{ __('service_provider.service_providers') }} - Speeda</title>
-    <meta name="description" content="{{ __('service_provider.browse_providers_description') }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <title><?php echo e(__('service_provider.service_providers')); ?> - Speeda</title>
+    <meta name="description" content="<?php echo e(__('service_provider.browse_providers_description')); ?>">
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/main-logo.png')); ?>">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    {{-- Meta (Facebook) Pixel --}}
-    @include('partials.meta-pixel')
+    
+    <?php echo $__env->make('partials.meta-pixel', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <style>
         /* ===== نظام التصميم الأساسي ===== */
@@ -1673,7 +1673,7 @@
 </head>
 
 <body>
-    @include('components.main-nav')
+    <?php echo $__env->make('components.main-nav', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <div class="container page-shell">
         <!-- قسم الهيرو المحسّن -->
@@ -1682,14 +1682,16 @@
                 <div class="hero-header">
                     <div class="hero-text">
                         <p class="text-uppercase text-primary fw-semibold mb-2">
-                            <i class="fas fa-compass me-2"></i>{{ __('service_provider.discover_providers') }}
+                            <i class="fas fa-compass me-2"></i><?php echo e(__('service_provider.discover_providers')); ?>
+
                         </p>
-                        <h1 class="mb-2">{{ __('service_provider.service_providers') }}</h1>
-                        <p class="hero-subtitle">{{ __('service_provider.browse_providers_description') }}</p>
+                        <h1 class="mb-2"><?php echo e(__('service_provider.service_providers')); ?></h1>
+                        <p class="hero-subtitle"><?php echo e(__('service_provider.browse_providers_description')); ?></p>
                     </div>
-                    <a href="{{ route('home') }}" class="btn-back">
+                    <a href="<?php echo e(route('home')); ?>" class="btn-back">
                         <i class="fas fa-arrow-left"></i>
-                        {{ __('general.back_to_home') }}
+                        <?php echo e(__('general.back_to_home')); ?>
+
                     </a>
                 </div>
 
@@ -1698,25 +1700,26 @@
                     <div class="search-wrapper">
                         <i class="fas fa-search search-icon"></i>
                         <input type="text" class="search-input" id="searchInput"
-                            placeholder="{{ __('service_provider.search_providers') }}" value="{{ request('search') }}">
+                            placeholder="<?php echo e(__('service_provider.search_providers')); ?>" value="<?php echo e(request('search')); ?>">
                     </div>
 
                     <div class="select-wrapper">
                         <select class="filter-select" id="locationFilter">
-                            <option value="">{{ __('service_provider.all_locations') }}</option>
-                            @foreach($locations as $location)
-                                <option value="{{ $location->id }}" {{ request('location') == $location->id ? 'selected' : '' }}>
-                                    <i class="fas fa-map-marker-alt me-2"></i>{{ $location->city }}
+                            <option value=""><?php echo e(__('service_provider.all_locations')); ?></option>
+                            <?php $__currentLoopData = $locations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $location): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($location->id); ?>" <?php echo e(request('location') == $location->id ? 'selected' : ''); ?>>
+                                    <i class="fas fa-map-marker-alt me-2"></i><?php echo e($location->city); ?>
+
                                 </option>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
                     </div>
 
                     <div class="select-wrapper">
                         <select class="filter-select" id="categoryFilter">
-                            <option value="">{{ __('service_provider.all_categories') }}</option>
-                            @php
+                            <option value=""><?php echo e(__('service_provider.all_categories')); ?></option>
+                            <?php
                                 $categories = $categories ?? collect([]);
                                 $othersNames = ['other', 'others', 'أخرى', 'autres'];
                                 $others = $categories->filter(function ($c) use ($othersNames) {
@@ -1726,19 +1729,21 @@
                                 $categoriesFiltered = $categories->reject(function ($c) use ($othersNames) {
                                     return in_array(strtolower(trim($c->translated_name)), $othersNames);
                                 });
-                            @endphp
+                            ?>
 
-                            @foreach($categoriesFiltered as $category)
-                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->translated_name }}
-                                </option>
-                            @endforeach
+                            <?php $__currentLoopData = $categoriesFiltered; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($category->id); ?>" <?php echo e(request('category') == $category->id ? 'selected' : ''); ?>>
+                                    <?php echo e($category->translated_name); ?>
 
-                            @if($others->isNotEmpty())
-                                <option value="others" {{ request('category') == 'others' ? 'selected' : '' }}>
-                                    {{ __('categories.others') }}
                                 </option>
-                            @endif
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                            <?php if($others->isNotEmpty()): ?>
+                                <option value="others" <?php echo e(request('category') == 'others' ? 'selected' : ''); ?>>
+                                    <?php echo e(__('categories.others')); ?>
+
+                                </option>
+                            <?php endif; ?>
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
                     </div>
@@ -1748,47 +1753,49 @@
 
         <!-- شبكة البطاقات المحسّنة -->
         <div class="providers-grid">
-            @forelse($serviceProviders as $provider)
+            <?php $__empty_1 = true; $__currentLoopData = $serviceProviders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $provider): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div class="provider-card fade-in">
                     <div class="card-header">
-                        @if($provider->featured)
+                        <?php if($provider->featured): ?>
                             <div class="provider-badge">
-                                <i class="fas fa-crown me-1"></i> {{ __('service_provider.featured') }}
+                                <i class="fas fa-crown me-1"></i> <?php echo e(__('service_provider.featured')); ?>
+
                             </div>
-                        @endif
+                        <?php endif; ?>
 
                         <div class="provider-header">
                             <div class="avatar-container">
-                                <img src="{{ $provider->display_image_url }}"
-                                    alt="{{ $provider->company_name ?? $provider->user->name }}" class="provider-avatar"
+                                <img src="<?php echo e($provider->display_image_url); ?>"
+                                    alt="<?php echo e($provider->company_name ?? $provider->user->name); ?>" class="provider-avatar"
                                     loading="lazy" decoding="async"
-                                    onerror="this.onerror=null;this.src='{{ $provider->default_image_url }}';">
+                                    onerror="this.onerror=null;this.src='<?php echo e($provider->default_image_url); ?>';">
 
-                                @if($provider->certification)
+                                <?php if($provider->certification): ?>
                                     <div class="verified-check">
                                         <i class="fas fa-check"></i>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
                             <div class="provider-info">
-                                <h3>{{ $provider->company_name ?? $provider->user->name }}</h3>
+                                <h3><?php echo e($provider->company_name ?? $provider->user->name); ?></h3>
                                 <p class="provider-category">
-                                    {{ $provider->category->translated_name ?? __('service_provider.uncategorized') }}
+                                    <?php echo e($provider->category->translated_name ?? __('service_provider.uncategorized')); ?>
+
                                 </p>
-                                <div class="rating-display" data-provider-id="{{ $provider->id }}">
+                                <div class="rating-display" data-provider-id="<?php echo e($provider->id); ?>">
                                     <div class="stars">
-                                        @php
+                                        <?php
                                             $displayRating = $provider->live_rating ?? $provider->rating ?? 0;
                                             $reviewCount = $provider->reviews_count ?? 0;
-                                        @endphp
-                                        @for ($i = 1; $i <= 5; $i++)
+                                        ?>
+                                        <?php for($i = 1; $i <= 5; $i++): ?>
                                             <i
-                                                class="fas fa-star {{ $i <= round($displayRating) ? 'text-warning' : 'text-muted' }}"></i>
-                                        @endfor
+                                                class="fas fa-star <?php echo e($i <= round($displayRating) ? 'text-warning' : 'text-muted'); ?>"></i>
+                                        <?php endfor; ?>
                                     </div>
-                                    <span class="rating-score">{{ number_format($displayRating, 1) }}</span>
-                                    <span class="reviews-count">({{ $reviewCount }})</span>
+                                    <span class="rating-score"><?php echo e(number_format($displayRating, 1)); ?></span>
+                                    <span class="reviews-count">(<?php echo e($reviewCount); ?>)</span>
                                 </div>
                             </div>
                         </div>
@@ -1796,21 +1803,24 @@
 
                     <!-- معلومات الموقع -->
                     <div class="location-section">
-                        <div class="location-info" data-provider-id="{{ $provider->id }}">
+                        <div class="location-info" data-provider-id="<?php echo e($provider->id); ?>">
                             <i class="fas fa-map-marker-alt location-icon"></i>
                             <div class="address-text">
-                                @if($provider->location)
-                                    <div class="mb-1 fw-bold text-primary">{{ $provider->location->city }}</div>
-                                @endif
+                                <?php if($provider->location): ?>
+                                    <div class="mb-1 fw-bold text-primary"><?php echo e($provider->location->city); ?></div>
+                                <?php endif; ?>
                                 <span class="address-content hidden-address" style="display: block;">
-                                    @if($provider->address)
-                                        {{ preg_replace('/\d/', '*', $provider->address) }}
-                                    @else
-                                        {{ __('service_provider.address_not_provided') }}
-                                    @endif
+                                    <?php if($provider->address): ?>
+                                        <?php echo e(preg_replace('/\d/', '*', $provider->address)); ?>
+
+                                    <?php else: ?>
+                                        <?php echo e(__('service_provider.address_not_provided')); ?>
+
+                                    <?php endif; ?>
                                 </span>
                                 <span class="address-content full-address" style="display: none;">
-                                    {{ $provider->address ?? __('service_provider.address_not_provided') }}
+                                    <?php echo e($provider->address ?? __('service_provider.address_not_provided')); ?>
+
                                 </span>
                             </div>
                         </div>
@@ -1820,132 +1830,136 @@
                     <div class="stats-grid">
                         <div class="stat-item">
                             <i class="fas fa-eye stat-icon"></i>
-                            <div class="stat-value">{{ number_format($provider->views) }}</div>
-                            <div class="stat-label">{{ __('service_provider.stat_views') }}</div>
+                            <div class="stat-value"><?php echo e(number_format($provider->views)); ?></div>
+                            <div class="stat-label"><?php echo e(__('service_provider.stat_views')); ?></div>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-thumbs-up stat-icon"></i>
-                            <div class="stat-value" data-endorsements-count="{{ $provider->id }}">
-                                {{ $provider->endorsements_count ?? 0 }}
+                            <div class="stat-value" data-endorsements-count="<?php echo e($provider->id); ?>">
+                                <?php echo e($provider->endorsements_count ?? 0); ?>
+
                             </div>
-                            <div class="stat-label">{{ __('service_provider.stat_recommends') }}</div>
+                            <div class="stat-label"><?php echo e(__('service_provider.stat_recommends')); ?></div>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-briefcase stat-icon"></i>
-                            <div class="stat-value">{{ $provider->experience_years ?? '0' }}</div>
-                            <div class="stat-label">{{ __('service_provider.stat_years') }}</div>
+                            <div class="stat-value"><?php echo e($provider->experience_years ?? '0'); ?></div>
+                            <div class="stat-label"><?php echo e(__('service_provider.stat_years')); ?></div>
                         </div>
                     </div>
 
                     <!-- أزرار التفاعل -->
                     <div class="card-footer">
                         <div class="action-buttons">
-                            @if(auth()->check() && auth()->user()->isClient())
-                                @php
+                            <?php if(auth()->check() && auth()->user()->isClient()): ?>
+                                <?php
                                     $isEndorsed = $provider->isEndorsedBy(auth()->id());
-                                @endphp
-                                <form action="{{ route('endorsements.toggle', $provider->id) }}" method="POST"
+                                ?>
+                                <form action="<?php echo e(route('endorsements.toggle', $provider->id)); ?>" method="POST"
                                     style="display: inline;">
-                                    @csrf
+                                    <?php echo csrf_field(); ?>
                                     <button type="submit"
-                                        class="btn-action btn-recommend {{ $isEndorsed ? 'recommended' : '' }}">
-                                        <i class="{{ $isEndorsed ? 'fas' : 'far' }} fa-thumbs-up"></i>
-                                        <span>{{ $isEndorsed ? __('service_provider.recommended') : __('service_provider.recommend') }}</span>
+                                        class="btn-action btn-recommend <?php echo e($isEndorsed ? 'recommended' : ''); ?>">
+                                        <i class="<?php echo e($isEndorsed ? 'fas' : 'far'); ?> fa-thumbs-up"></i>
+                                        <span><?php echo e($isEndorsed ? __('service_provider.recommended') : __('service_provider.recommend')); ?></span>
                                     </button>
                                 </form>
-                            @else
+                            <?php else: ?>
                                 <button class="btn-action btn-recommend" disabled>
                                     <i class="far fa-thumbs-up"></i>
-                                    <span>{{ __('service_provider.recommend') }}</span>
+                                    <span><?php echo e(__('service_provider.recommend')); ?></span>
                                 </button>
-                            @endif
+                            <?php endif; ?>
 
-                            @if(auth()->check())
+                            <?php if(auth()->check()): ?>
                                 <button class="btn-action btn-rate"
-                                    onclick="openRateModal({{ $provider->id }}, '{{ addslashes($provider->company_name ?? $provider->user->name) }}')">
+                                    onclick="openRateModal(<?php echo e($provider->id); ?>, '<?php echo e(addslashes($provider->company_name ?? $provider->user->name)); ?>')">
                                     <i class="fas fa-star"></i>
-                                    <span>{{ __('service_provider.rate_provider') }}</span>
+                                    <span><?php echo e(__('service_provider.rate_provider')); ?></span>
                                 </button>
-                            @else
-                                <a href="{{ route('register') }}?redirect={{ urlencode(route('reviews.create', $provider->id)) }}"
+                            <?php else: ?>
+                                <a href="<?php echo e(route('register')); ?>?redirect=<?php echo e(urlencode(route('reviews.create', $provider->id))); ?>"
                                     class="btn-action btn-rate">
                                     <i class="fas fa-star"></i>
-                                    <span>{{ __('service_provider.rate_provider') }}</span>
+                                    <span><?php echo e(__('service_provider.rate_provider')); ?></span>
                                 </a>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
-                        <a href="{{ route('service-providers.show', $provider) }}" class="btn-profile">
+                        <a href="<?php echo e(route('service-providers.show', $provider)); ?>" class="btn-profile">
                             <i class="fas fa-user-circle"></i>
-                            {{ __('service_provider.view_full_profile') }}
+                            <?php echo e(__('service_provider.view_full_profile')); ?>
+
                         </a>
 
-                        <!-- @if($provider->experience_years)
+                        <!-- <?php if($provider->experience_years): ?>
                                     <div class="experience-badge">
                                         <i class="fas fa-briefcase"></i>
-                                        <span>{{ $provider->experience_years }} {{ __('service_provider.years') }} Experience</span>
+                                        <span><?php echo e($provider->experience_years); ?> <?php echo e(__('service_provider.years')); ?> Experience</span>
                                     </div>
-                                @endif -->
+                                <?php endif; ?> -->
                     </div>
                 </div>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <!-- حالة عدم وجود نتائج محسّنة -->
                 <div class="empty-state">
                     <div class="empty-illustration">
                         <i class="fas fa-users"></i>
                     </div>
 
-                    <h2 class="empty-title">{{ __('service_provider.no_providers_found') }}</h2>
-                    <p class="empty-description">{{ __('service_provider.no_providers_description') }}</p>
+                    <h2 class="empty-title"><?php echo e(__('service_provider.no_providers_found')); ?></h2>
+                    <p class="empty-description"><?php echo e(__('service_provider.no_providers_description')); ?></p>
 
                     <div class="empty-actions">
                         <button class="btn-primary" onclick="resetFilters()">
                             <i class="fas fa-redo me-2"></i>
-                            {{ __('service_provider.reset_filters') }}
+                            <?php echo e(__('service_provider.reset_filters')); ?>
+
                         </button>
-                        <a href="{{ route('home') }}" class="btn-back">
+                        <a href="<?php echo e(route('home')); ?>" class="btn-back">
                             <i class="fas fa-home me-2"></i>
                             Return Home
                         </a>
                     </div>
 
                     <div class="suggestions-section">
-                        <h3 class="suggestions-title">{{ __('service_provider.or_try_browsing') }}</h3>
+                        <h3 class="suggestions-title"><?php echo e(__('service_provider.or_try_browsing')); ?></h3>
                         <div class="suggestions-grid">
-                            <a href="{{ route('categories') }}" class="suggestion-card">
+                            <a href="<?php echo e(route('categories')); ?>" class="suggestion-card">
                                 <div class="suggestion-icon">
                                     <i class="fas fa-th-large"></i>
                                 </div>
-                                <div class="suggestion-text">{{ __('categories.popular_categories') }}</div>
+                                <div class="suggestion-text"><?php echo e(__('categories.popular_categories')); ?></div>
                             </a>
-                            <a href="{{ route('location') }}" class="suggestion-card">
+                            <a href="<?php echo e(route('location')); ?>" class="suggestion-card">
                                 <div class="suggestion-icon">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
-                                <div class="suggestion-text">{{ __('location.nearby_locations') }}</div>
+                                <div class="suggestion-text"><?php echo e(__('location.nearby_locations')); ?></div>
                             </a>
-                            <a href="{{ route('home') }}" class="suggestion-card">
+                            <a href="<?php echo e(route('home')); ?>" class="suggestion-card">
                                 <div class="suggestion-icon">
                                     <i class="fas fa-star"></i>
                                 </div>
-                                <div class="suggestion-text">{{ __('service_provider.top_rated') }}</div>
+                                <div class="suggestion-text"><?php echo e(__('service_provider.top_rated')); ?></div>
                             </a>
                         </div>
                     </div>
                 </div>
-            @endforelse
+            <?php endif; ?>
         </div>
 
         <!-- الترقيم الصفحي -->
-        @if($serviceProviders->hasPages())
+        <?php if($serviceProviders->hasPages()): ?>
             <div class="d-flex justify-content-center mt-5">
                 <nav aria-label="Page navigation">
                     <ul class="pagination">
-                        {{ $serviceProviders->links() }}
+                        <?php echo e($serviceProviders->links()); ?>
+
                     </ul>
                 </nav>
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 
     <!-- Modal للتقييم -->
@@ -1959,32 +1973,32 @@
             </div>
 
             <div class="rate-modal-body">
-                <form id="rateForm" method="POST" action="{{ route('reviews.store') }}">
-                    @csrf
+                <form id="rateForm" method="POST" action="<?php echo e(route('reviews.store')); ?>">
+                    <?php echo csrf_field(); ?>
 
                     <input type="hidden" id="providerIdInput" name="service_provider_id">
 
                     <!-- نظام التقييم بالنجوم -->
                     <div class="rating-section">
-                        <label class="rating-label">{{ __('reviews.rating') }} <span
+                        <label class="rating-label"><?php echo e(__('reviews.rating')); ?> <span
                                 class="text-danger">*</span></label>
                         <div class="star-rating" id="starRating">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <input type="radio" id="rating-{{ $i }}" name="rating" value="{{ $i }}" required>
-                                <label for="rating-{{ $i }}" class="star-label">
+                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                <input type="radio" id="rating-<?php echo e($i); ?>" name="rating" value="<?php echo e($i); ?>" required>
+                                <label for="rating-<?php echo e($i); ?>" class="star-label">
                                     <i class="fas fa-star"></i>
                                 </label>
-                            @endfor
+                            <?php endfor; ?>
                         </div>
-                        <p class="rating-text" id="ratingText">{{ __('reviews.select_your_rating') }}</p>
+                        <p class="rating-text" id="ratingText"><?php echo e(__('reviews.select_your_rating')); ?></p>
                     </div>
 
                     <!-- حقل التقييم -->
                     <div class="form-group mb-4">
-                        <label for="review_text" class="form-label">{{ __('reviews.review_text') }} <span
+                        <label for="review_text" class="form-label"><?php echo e(__('reviews.review_text')); ?> <span
                                 class="text-danger">*</span></label>
                         <textarea id="review_text" name="review_text" class="form-control review-textarea" rows="5"
-                            placeholder="{{ __('reviews.review_placeholder') }}" required minlength="10"
+                            placeholder="<?php echo e(__('reviews.review_placeholder')); ?>" required minlength="10"
                             maxlength="1000"></textarea>
                         <div class="char-count">
                             <span id="charCount">0</span> / 1000
@@ -1994,10 +2008,12 @@
                     <!-- أزرار التصرف -->
                     <div class="rate-modal-actions">
                         <button type="button" class="btn-cancel" onclick="closeRateModal()">
-                            <i class="fas fa-times me-2"></i> {{ __('general.cancel') }}
+                            <i class="fas fa-times me-2"></i> <?php echo e(__('general.cancel')); ?>
+
                         </button>
                         <button type="submit" class="btn-submit">
-                            <i class="fas fa-check me-2"></i> {{ __('reviews.submit_review') }}
+                            <i class="fas fa-check me-2"></i> <?php echo e(__('reviews.submit_review')); ?>
+
                         </button>
                     </div>
                 </form>
@@ -2074,7 +2090,7 @@
             };
 
             // كشف عناوين مقدمي الخدمات
-            const revealedContacts = @json($revealedContacts ?? []);
+            const revealedContacts = <?php echo json_encode($revealedContacts ?? [], 15, 512) ?>;
             revealedContacts.forEach(providerId => {
                 const addressContainer = document.querySelector(`.location-info[data-provider-id="${providerId}"]`);
                 if (addressContainer) {
@@ -2179,11 +2195,11 @@
             // ======================
             const starContainers = document.querySelectorAll('.star-rating');
             const ratingTexts = {
-                '1': @json(__('reviews.poor')),
-                '2': @json(__('reviews.fair')),
-                '3': @json(__('reviews.good')),
-                '4': @json(__('reviews.very_good')),
-                '5': @json(__('reviews.excellent'))
+                '1': <?php echo json_encode(__('reviews.poor'), 15, 512) ?>,
+                '2': <?php echo json_encode(__('reviews.fair'), 15, 512) ?>,
+                '3': <?php echo json_encode(__('reviews.good'), 15, 512) ?>,
+                '4': <?php echo json_encode(__('reviews.very_good'), 15, 512) ?>,
+                '5': <?php echo json_encode(__('reviews.excellent'), 15, 512) ?>
             };
 
             starContainers.forEach(container => {
@@ -2261,7 +2277,7 @@
                         const csrfMeta = document.querySelector('meta[name="csrf-token"]');
                         if (!csrfMeta) throw new Error('CSRF token not found');
 
-                        const response = await fetch(rateForm.action || '{{ route("reviews.store") }}', {
+                        const response = await fetch(rateForm.action || '<?php echo e(route("reviews.store")); ?>', {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': csrfMeta.content,
@@ -2355,10 +2371,10 @@
         });
     </script>
 
-    @include('layouts.footer')
+    <?php echo $__env->make('layouts.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    {{-- Meta Pixel: Search Event --}}
-    @if(config('facebook.enabled') && !request()->routeIs('admin.*'))
+    
+    <?php if(config('facebook.enabled') && !request()->routeIs('admin.*')): ?>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 if (typeof fbq === 'function') {
@@ -2373,14 +2389,15 @@
                             search_string: searchString,
                             content_category: category,
                             content_type: 'service_provider',
-                            language: '{{ app()->getLocale() }}'
+                            language: '<?php echo e(app()->getLocale()); ?>'
                         });
                     }
                 }
             });
         </script>
-    @endif
+    <?php endif; ?>
 
 </body>
 
 </html>
+<?php /**PATH Y:\Speeda - Versions\Speeda\resources\views/service-providers/index.blade.php ENDPATH**/ ?>

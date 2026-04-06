@@ -19,13 +19,15 @@ class ReviewController extends Controller
     /**
      * Display reviews for a service provider (public - only active reviews).
      */
-    public function index(ServiceProvider $provider)
+    public function index(ServiceProvider $serviceProvider)
     {
         // Only show active (approved) reviews to public
-        $reviews = $provider->activeReviews()
+        $reviews = $serviceProvider->activeReviews()
             ->with(['client', 'approvedBy'])
             ->orderByDesc('created_at')
             ->paginate(10);
+
+        $provider = $serviceProvider;
 
         return view('reviews.index', compact('provider', 'reviews'));
     }
@@ -33,7 +35,7 @@ class ReviewController extends Controller
     /**
      * Show review submission form for a service provider.
      */
-    public function create(ServiceProvider $provider)
+    public function create(ServiceProvider $serviceProvider)
     {
         /** @var User $user */
         $user = Auth::user();
@@ -43,13 +45,15 @@ class ReviewController extends Controller
         }
 
         // Check if user already reviewed this provider
-        $existing = Review::where('service_provider_id', $provider->id)
+        $existing = Review::where('service_provider_id', $serviceProvider->id)
             ->where('client_id', $user->id)
             ->first();
 
         if ($existing) {
             return redirect()->back()->with('error', __('reviews.review_already_exists'));
         }
+
+        $provider = $serviceProvider;
 
         return view('reviews.create', compact('provider'));
     }

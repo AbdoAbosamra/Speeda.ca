@@ -908,16 +908,10 @@
 
                     <!-- Profile Image -->
                     <div class="profile-image-container" @if(auth()->check() && auth()->id() === $serviceProvider->user_id) id="profileImageClickable" style="cursor: pointer;" title="{{ __('service_provider.click_to_change_image') }}" @endif>
-                        @if($serviceProvider->profile_image)
-                            <img src="{{ Storage::url($serviceProvider->profile_image) }}"
-                                alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
-                                class="profile-image" loading="lazy" id="profileImagePreview">
-                        @else
-                            <div class="profile-image d-flex align-items-center justify-content-center" id="profileImagePreview"
-                                style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color));">
-                                <i class="fas fa-user fa-4x text-white"></i>
-                            </div>
-                        @endif
+                        <img src="{{ $serviceProvider->display_image_url }}"
+                            alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
+                            class="profile-image" loading="lazy" id="profileImagePreview"
+                            onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
                         {{-- Camera overlay for owner --}}
                         @if(auth()->check() && auth()->id() === $serviceProvider->user_id)
                             <div id="imageOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer;">
@@ -1277,7 +1271,8 @@
                                                 @if($serviceProvider->profile_image)
                                                     <div class="mt-2">
                                                         <img src="{{ $serviceProvider->profile_image_url }}" class="rounded"
-                                                            style="width: 80px; height: 80px; object-fit: cover;">
+                                                            style="width: 80px; height: 80px; object-fit: cover;"
+                                                            onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
                                                         <small
                                                             class="text-muted d-block">{{ __('service_provider.current_image') }}</small>
                                                     </div>
@@ -1315,10 +1310,11 @@
                                                         <div class="row g-2">
                                                             @foreach($currentGallery as $media)
                                                                 <div class="col-6 col-md-3">
-                                                                    <img src="{{ $media->hasGeneratedConversion('gallery_thumb') ? $media->getUrl('gallery_thumb') : $media->getUrl() }}"
+                                                                    <img src="{{ $serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null) ?? $serviceProvider->default_image_url }}"
                                                                         alt="{{ __('service_provider.gallery_image_alt') }}"
                                                                         style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
-                                                                        loading="lazy">
+                                                                        loading="lazy"
+                                                                        onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
                                                                 </div>
                                                             @endforeach
                                                         </div>
@@ -1346,7 +1342,7 @@
                                                     <div class="mt-2">
                                                         <span class="badge bg-success"><i class="fas fa-check-circle"></i>
                                                             {{ __('service_provider.certificate_uploaded') }}</span>
-                                                        <a href="{{ asset('storage/' . $serviceProvider->certification) }}"
+                                                        <a href="{{ Storage::url($serviceProvider->certification) }}"
                                                             target="_blank" class="badge bg-primary"><i class="fas fa-eye"></i>
                                                             {{ __('service_provider.view') }}</a>
                                                     </div>
@@ -1439,15 +1435,15 @@
                                     @foreach($providerGallery->take(4) as $media)
                                         <div class="col-6 col-md-3">
                                             <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                                data-image="{{ $media->hasGeneratedConversion('gallery_large') ? $media->getUrl('gallery_large') : $media->getUrl() }}">
-                                                <img src="{{ $media->hasGeneratedConversion('gallery_thumb') ? $media->getUrl('gallery_thumb') : $media->getUrl() }}"
+                                                data-image="{{ $serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_large') ? 'gallery_large' : null) ?? $serviceProvider->default_image_url }}">
+                                                <img src="{{ $serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null) ?? $serviceProvider->default_image_url }}"
                                                     alt="{{ __('service_provider.gallery_image_alt') }}"
                                                     loading="lazy"
                                                     decoding="async"
                                                     width="600"
                                                     height="600"
                                                     style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
-                                                    onerror="this.onerror=null;this.src='/images/placeholder-image.png';">
+                                                    onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
                                                 <div class="gallery-overlay">
                                                     <i class="fas fa-search-plus text-white fa-2x"></i>
                                                 </div>
@@ -1699,13 +1695,13 @@
                                     <div>
                                         <h6 class="mb-1 fw-bold">{{ __('service_provider.certification') }}</h6>
                                         @if(Str::endsWith($serviceProvider->certification, '.pdf'))
-                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank"
+                                            <a href="{{ Storage::url($serviceProvider->certification) }}" target="_blank"
                                                 class="text-decoration-none">
                                                 <i class="fas fa-file-pdf text-danger"></i>
                                                 {{ __('service_provider.view_certificate_pdf') }}
                                             </a>
                                         @else
-                                            <a href="{{ asset('storage/' . $serviceProvider->certification) }}" target="_blank"
+                                            <a href="{{ Storage::url($serviceProvider->certification) }}" target="_blank"
                                                 class="text-decoration-none">
                                                 <i class="fas fa-image text-primary"></i>
                                                 {{ __('service_provider.view_certificate') }}
@@ -1821,23 +1817,9 @@
                             <div class="col-md-3 mb-4">
                                 <div class="similar-provider-card">
                                     <div class="similar-provider-image">
-                                        @php
-                                            $similarGalleryMedia = null;
-                                            if (isset($similar->media) && $similar->relationLoaded('media')) {
-                                                $similarGalleryMedia = $similar->media->where('collection_name', 'provider_gallery')->first();
-                                            } else {
-                                                $similarGalleryMedia = $similar->getMedia('provider_gallery')->first();
-                                            }
-
-                                            $similarAvatarUrl = null;
-                                            if ($similarGalleryMedia) {
-                                                $similarAvatarUrl = $similarGalleryMedia->hasGeneratedConversion('gallery_thumb')
-                                                    ? $similarGalleryMedia->getUrl('gallery_thumb')
-                                                    : $similarGalleryMedia->getUrl();
-                                            }
-                                        @endphp
-                                        <img src="{{ $similarAvatarUrl ?? $similar->profile_image_url }}"
-                                            alt="{{ $similar->company_name ?? $similar->user->name }}" loading="lazy" decoding="async">
+                                        <img src="{{ $similar->display_image_url }}"
+                                            alt="{{ $similar->company_name ?? $similar->user->name }}" loading="lazy" decoding="async"
+                                            onerror="this.onerror=null;this.src='{{ $similar->default_image_url }}';">
                                     </div>
                                     <div class="similar-provider-content">
                                         <h6 class="fw-bold mb-2">{{ $similar->company_name ?? $similar->user->name }}</h6>
@@ -1894,7 +1876,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="{{ __('service_provider.gallery_image_alt') }}" class="img-fluid">
+                    <img id="modalImage" src="{{ $serviceProvider->default_image_url }}" alt="{{ __('service_provider.gallery_image_alt') }}" class="img-fluid">
                 </div>
             </div>
         </div>
@@ -2369,7 +2351,7 @@
                         // Show preview with loading
                         previewContainer.innerHTML = `
                             <div class="position-relative">
-                                <img src="" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                <img src="{{ $serviceProvider->default_image_url }}" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover;">
                                 <div class="spinner-border spinner-border-sm position-absolute top-50 start-50 translate-middle text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>

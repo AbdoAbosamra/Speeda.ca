@@ -34,7 +34,7 @@ return [
 
     // WhatsApp (Required)
     'sp_whatsapp_country_code_required' => 'Country code is required',
-    'sp_whatsapp_country_code_in' => 'Please select a valid country code',
+    'sp_whatsapp_country_code_in' => 'Please enter a valid country code starting with +',
     'sp_whatsapp_required' => 'WhatsApp number is required',
     'sp_whatsapp_min' => 'WhatsApp number must be at least 10 digits',
     'sp_whatsapp_max' => 'WhatsApp number cannot exceed 15 digits',
@@ -49,7 +49,7 @@ return [
     // Address
     'sp_address_min' => 'Address must be at least 5 characters',
     'sp_address_max' => 'Address cannot exceed 500 characters',
-    'sp_address_english_only' => 'Address must contain only English characters, numbers, and common punctuation.',
+    'sp_address_english_only' => 'Address contains unsupported characters.',
 
     // Location
     'sp_location_invalid' => 'Selected location is invalid',

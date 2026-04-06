@@ -6,8 +6,11 @@ use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProviderAnalyticsExportController;
+use App\Http\Controllers\ProviderDashboardController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ServiceProviderAnalyticsController;
 use App\Http\Controllers\ServiceProviderController;
 use App\Http\Controllers\Admin\AdminCommentController;
 use App\Http\Controllers\Admin\AdminController;
@@ -28,8 +31,8 @@ Route::get('/current-locale', [LocaleController::class, 'getCurrentLocale'])->na
 // ==================== PUBLIC ROUTES ====================
 Route::view('/', 'home')->name('home');
 
-// Test translation route
-Route::get('/test-translations', function () {
+// Test translation route (internal diagnostics only)
+Route::middleware(['auth', 'admin'])->get('/test-translations', function () {
     return response()->json([
         'roadside_en' => __('categories.roadside_assistance_24_7'),
         'accounting_en' => __('categories.accounting_bookkeeping_tax_preparation'),
@@ -38,8 +41,8 @@ Route::get('/test-translations', function () {
     ]);
 });
 
-// === DIAGNOSTIC ROUTE (Temporary for debugging) ===
-Route::get('/diagnostic', function () {
+// === DIAGNOSTIC ROUTE (Internal debugging only) ===
+Route::middleware(['auth', 'admin'])->get('/diagnostic', function () {
     $totalSP = \App\Models\ServiceProvider::count();
     $spWithImages = \App\Models\ServiceProvider::whereNotNull('profile_image')
         ->where('profile_image', '!=', '')
@@ -87,6 +90,11 @@ Route::post('/service-providers/{serviceProvider}/reveal-contact', [ServiceProvi
     ->middleware('throttle:5,1')
     ->name('service-providers.reveal-contact');
 
+// Track provider analytics click events (same-origin relative endpoint used by profile page)
+Route::post('/service-providers/{serviceProvider}/analytics/click', [ServiceProviderAnalyticsController::class, 'trackClick'])
+    ->middleware('throttle:20,1')
+    ->name('service-providers.analytics.click');
+
 // ==================== AUTHENTICATED ROUTES ====================
 Route::middleware(['auth'])->get('/dashboard', function () {
     // Redirect admin to admin dashboard
@@ -109,6 +117,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth'])->prefix('service-providers')->group(function () {
+    // Provider analytics dashboard
+    Route::get('/dashboard', [ProviderDashboardController::class, 'index'])
+        ->name('service-providers.dashboard');
+
+    Route::get('/analytics/export-pdf', [ProviderAnalyticsExportController::class, 'exportPdf'])
+        ->name('service-providers.analytics.export-pdf');
+
     // View own profile - redirect to show page (with edit section for owner)
     Route::get('/profile', function () {
         $provider = Auth::user()->serviceProvider;

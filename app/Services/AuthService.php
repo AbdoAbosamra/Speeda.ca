@@ -52,7 +52,7 @@ class AuthService
         if (isset($data['profession'])) {
             if (!empty($data['profession']) && $data['profession'] !== 'other') {
                 $category = Category::find($data['profession']);
-                if ($category && $category->parent_id !== null) {
+                if ($category && $category->isLeaf()) {
                     $profession = $category->name;
                 }
             } elseif ($data['profession'] === 'other') {

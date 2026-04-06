@@ -24,8 +24,15 @@ class ServiceProviderController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->input('category') === 'construction-services') {
+            $redirectParams = $request->query();
+            $redirectParams['category'] = 'renovation-construction';
+
+            return redirect()->route('service-providers.index', $redirectParams)->setStatusCode(301);
+        }
+
         // Eager-load Spatie media to avoid N+1 queries in provider cards.
-        $query = ServiceProvider::with(['user', 'category', 'location', 'media'])
+        $query = ServiceProvider::with(['user', 'category.parent.parent', 'location', 'media'])
             ->withCount(['activeReviews as reviews_count', 'endorsements as endorsements_count'])
             // Calculate live average rating from active reviews (SINGLE QUERY PER PROVIDER)
             ->selectRaw(
@@ -57,21 +64,12 @@ class ServiceProviderController extends Controller
 
         // Category filter
         if ($request->filled('category')) {
-            $category = $request->input('category');
-            if ($category === 'others') {
-                $othersNames = ['other', 'others', 'أخرى', 'autres'];
-                $otherIds = Category::all()->filter(function ($c) use ($othersNames) {
-                    return in_array(strtolower(trim($c->translated_name)), $othersNames);
-                })->pluck('id')->toArray();
+            $selectedCategory = Category::resolveFilterValue($request->input('category'));
 
-                if (!empty($otherIds)) {
-                    $query->whereIn('category_id', $otherIds);
-                } else {
-                    // If there are no 'others' categories, return no results
-                    $query->whereNull('id');
-                }
+            if ($selectedCategory) {
+                $query->whereIn('category_id', $selectedCategory->providerCategoryIds());
             } else {
-                $query->where('category_id', $category);
+                $query->whereNull('id');
             }
         }
 
@@ -88,9 +86,8 @@ class ServiceProviderController extends Controller
             ->orderBy('views', 'desc')
             ->paginate(12);
 
-        $categories = Category::whereNotNull('parent_id')
-            ->where('is_active', true)
-            ->orderBy('name')
+        $categories = Category::with('children')
+            ->filterGroups()
             ->get()
             ->sortBy('translated_name')
             ->values();
@@ -117,14 +114,14 @@ class ServiceProviderController extends Controller
             }
 
             // Eager load relationships
-            $serviceProvider->loadMissing(['user', 'category', 'location']);
+            $serviceProvider->loadMissing(['user', 'category.parent.parent', 'location']);
 
             // Get all locations for dropdown
             $locations = Location::orderBy('city')->get();
 
             // Get all child categories (all 55 professions)
-            $categories = Category::whereNotNull('parent_id')
-                ->where('is_active', 1)
+            $categories = Category::with('parent.parent')
+                ->terminal()
                 ->orderBy('name')
                 ->get();
 
@@ -245,7 +242,7 @@ class ServiceProviderController extends Controller
             // === STEP 2: Eager load relationships for display ===
             $serviceProvider->loadMissing([
                 'user',
-                'category',
+                'category.parent.parent',
                 'location',
                 'activeReviews.client',
                 'activeReviews.approvedBy',
@@ -279,8 +276,8 @@ class ServiceProviderController extends Controller
 
             // Get all child categories (all professions) for category dropdown in edit form
             // Must match the categories loaded in profile() method to ensure consistency
-            $categories = Category::whereNotNull('parent_id')
-                ->where('is_active', 1)
+            $categories = Category::with('parent.parent')
+                ->terminal()
                 ->orderBy('name')
                 ->get();
 

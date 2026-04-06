@@ -40,7 +40,7 @@ class RegisterRequest extends FormRequest
                 if ($value === 'other') {
                     return; // Allow "other" value
                 }
-                if (!is_numeric($value) || !\App\Models\Category::where('id', $value)->exists()) {
+                if (!is_numeric($value) || !\App\Models\Category::terminal()->where('id', $value)->exists()) {
                     $fail(__('validation.profession_invalid'));
                 }
             }];

@@ -1716,29 +1716,11 @@
                     <div class="select-wrapper">
                         <select class="filter-select" id="categoryFilter">
                             <option value="">{{ __('service_provider.all_categories') }}</option>
-                            @php
-                                $categories = $categories ?? collect([]);
-                                $othersNames = ['other', 'others', 'أخرى', 'autres'];
-                                $others = $categories->filter(function ($c) use ($othersNames) {
-                                    return in_array(strtolower(trim($c->translated_name)), $othersNames);
-                                });
-                                $othersFirst = $others->first();
-                                $categoriesFiltered = $categories->reject(function ($c) use ($othersNames) {
-                                    return in_array(strtolower(trim($c->translated_name)), $othersNames);
-                                });
-                            @endphp
-
-                            @foreach($categoriesFiltered as $category)
-                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                            @foreach(($categories ?? collect([])) as $category)
+                                <option value="{{ $category->slug }}" {{ request('category') == $category->slug || request('category') == $category->id ? 'selected' : '' }}>
                                     {{ $category->translated_name }}
                                 </option>
                             @endforeach
-
-                            @if($others->isNotEmpty())
-                                <option value="others" {{ request('category') == 'others' ? 'selected' : '' }}>
-                                    {{ __('categories.others') }}
-                                </option>
-                            @endif
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
                     </div>

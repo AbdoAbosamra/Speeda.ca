@@ -25,7 +25,7 @@ class ServiceProviderProfileController extends Controller
                 ->with('info', 'You already have a service provider profile.');
         }
 
-        $categories = Category::with('parent')->active()->get();
+        $categories = Category::with('parent.parent')->terminal()->get();
         $locations = Location::active()->get();
 
         // The dedicated create view is not present in the repository. Redirect to

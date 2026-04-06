@@ -1863,7 +1863,9 @@
                             <div class="select-option" data-value="">{{ __('auth.select_profession') }}</div>
                             @if(isset($professions) && $professions)
                                 @foreach($professions as $p)
-                                    <div class="select-option" data-value="{{ $p->id }}">{{ $p->name }}</div>
+                                    <div class="select-option" data-value="{{ $p->id }}">
+                                        {{ collect($p->hierarchy_labels)->implode(' / ') }}
+                                    </div>
                                 @endforeach
                             @endif
                             <div class="select-option" data-value="other">{{ __('general.other') }}</div>

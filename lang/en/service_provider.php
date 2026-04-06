@@ -33,6 +33,8 @@ return [
     'category_info_title' => 'Category Information',
     'category_label' => 'Category:',
     'main_category_label' => 'Main Category:',
+    'section_label' => 'Section:',
+    'subcategory_label' => 'Subcategory:',
     'gallery_image_title' => 'Gallery Image',
     'location_not_specified' => 'Location not specified',
     'profile_title' => 'Profile',

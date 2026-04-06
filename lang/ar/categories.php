@@ -53,7 +53,7 @@ return [
     'gardening' => 'تنسيق الحدائق',
     'painting' => 'الدهانات',
     'moving' => 'نقل الأثاث',
-    'search_categories_placeholder' => 'ابحث في الفئات بالاسم أو الوصف...',
+    'search_categories_placeholder' => 'ابحث في الفئات بالاسم...',
     'search_button' => 'بحث',
     'clear_search' => 'مسح',
     'search_results_for' => 'عرض النتائج لـ ":query"',

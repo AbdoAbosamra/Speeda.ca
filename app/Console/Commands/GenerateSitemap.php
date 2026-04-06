@@ -61,7 +61,7 @@ class GenerateSitemap extends Command
 
         // Categories
         $this->info('Adding categories...');
-        Category::where('is_active', true)
+        Category::filterGroups()
             ->each(function ($category) use ($urls) {
                 $urls->push([
                     'url' => route('service-providers.index', ['category' => $category->slug]),

@@ -53,7 +53,7 @@ return [
     'gardening' => 'Jardinage',
     'painting' => 'Peinture',
     'moving' => 'Services de déménagement',
-    'search_categories_placeholder' => 'Rechercher des catégories par nom ou description...',
+    'search_categories_placeholder' => 'Rechercher des catégories par nom...',
     'search_button' => 'Rechercher',
     'clear_search' => 'Effacer',
     'search_results_for' => 'Affichage des résultats pour ":query"',

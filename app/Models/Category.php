@@ -78,6 +78,18 @@ class Category extends Model
         return $this->hasMany(ServiceProvider::class)->where('is_verified', true);
     }
 
+    public function grandchildren()
+    {
+        return $this->hasManyThrough(
+            Category::class,
+            Category::class,
+            'parent_id',
+            'parent_id',
+            'id',
+            'id'
+        )->where('categories.is_active', true)->orderBy('categories.sort_order');
+    }
+
     // Scopes
     public function scopeSections($query)
     {
@@ -93,6 +105,27 @@ class Category extends Model
             ->whereNotNull('parent_id')
             ->where('is_active', true)
             ->orderBy('sort_order');
+    }
+
+    public function scopeFilterGroups($query)
+    {
+        return $query->where('is_active', true)
+            ->where('is_section', false)
+            ->whereHas('parent', function ($parentQuery) {
+                $parentQuery->whereNull('parent_id')
+                    ->where('is_section', true)
+                    ->where('is_active', true)
+                    ->where('slug', '!=', 'others-1');
+            })
+            ->orderBy('sort_order')
+            ->orderBy('name');
+    }
+
+    public function scopeTerminal($query)
+    {
+        return $query->where('is_active', true)
+            ->where('is_section', false)
+            ->whereDoesntHave('allChildren');
     }
 
     public function scopeActive($query)
@@ -119,7 +152,9 @@ class Category extends Model
     {
         return $query->where(function ($q) use ($searchTerm) {
             $q->where('name', 'like', "%{$searchTerm}%")
-                ->orWhere('description', 'like', "%{$searchTerm}%");
+                ->orWhere('name_ar', 'like', "%{$searchTerm}%")
+                ->orWhere('name_en', 'like', "%{$searchTerm}%")
+                ->orWhere('name_fr', 'like', "%{$searchTerm}%");
         });
     }
 
@@ -162,47 +197,7 @@ class Category extends Model
      */
     public function getLocalizedDescriptionAttribute(): string
     {
-        $locale = app()->getLocale();
-        $localizedName = $this->localized_name;
-        $cities = $this->getCitiesForLocale($locale);
-        $template = __('categories.description_template', [], $locale);
-
-        // For non-English locales, ALWAYS generate from template
-        // This prevents any English text from appearing in Arabic/French mode
-        if ($locale !== 'en') {
-            return str_replace(
-                [':category', ':cities'],
-                [$localizedName, $cities],
-                $template
-            );
-        }
-
-        // For English: try database first, then template
-        if (! empty($this->description_en)) {
-            return $this->description_en;
-        }
-
-        return str_replace(
-            [':category', ':cities'],
-            [$localizedName, $cities],
-            $template
-        );
-    }
-
-    /**
-     * Get cities string in the specified locale
-     *
-     * Returns properly localized city names for use in description templates
-     */
-    private function getCitiesForLocale(string $locale): string
-    {
-        $cities = [
-            'en' => 'Laval, Montreal, Ottawa, Gatineau',
-            'ar' => 'لافال، مونتريال، أوتاوا، غاتينو',
-            'fr' => 'Laval, Montréal, Ottawa, Gatineau',
-        ];
-
-        return $cities[$locale] ?? $cities['en'];
+        return '';
     }
 
     /**
@@ -229,6 +224,92 @@ class Category extends Model
     public function isSubcategory(): bool
     {
         return ! $this->is_section && ! is_null($this->parent_id);
+    }
+
+    public function isLeaf(): bool
+    {
+        return ! $this->is_section && ! $this->allChildren()->exists();
+    }
+
+    public function isFilterGroup(): bool
+    {
+        return ! $this->is_section
+            && $this->parent_id !== null
+            && $this->parent?->isSection();
+    }
+
+    public function getAnchorIdAttribute(): string
+    {
+        return Str::slug($this->name_en ?: $this->name ?: (string) $this->id);
+    }
+
+    public function getHierarchyLabelsAttribute(): array
+    {
+        $labels = [];
+        $current = $this;
+
+        while ($current) {
+            array_unshift($labels, $current->translated_name);
+            $current = $current->parent;
+        }
+
+        return $labels;
+    }
+
+    public function descendantAndSelfIds(): array
+    {
+        $allIds = [$this->id];
+        $frontier = [$this->id];
+
+        while (! empty($frontier)) {
+            $children = static::query()
+                ->where('is_active', true)
+                ->whereIn('parent_id', $frontier)
+                ->pluck('id')
+                ->all();
+
+            if (empty($children)) {
+                break;
+            }
+
+            $allIds = array_merge($allIds, $children);
+            $frontier = $children;
+        }
+
+        return array_values(array_unique($allIds));
+    }
+
+    public function providerCategoryIds(): array
+    {
+        $allIds = $this->descendantAndSelfIds();
+
+        $nonLeafParentIds = static::query()
+            ->where('is_active', true)
+            ->whereIn('parent_id', $allIds)
+            ->pluck('parent_id')
+            ->filter()
+            ->unique()
+            ->all();
+
+        $leafIds = array_values(array_diff($allIds, $nonLeafParentIds));
+
+        return ! empty($leafIds) ? $leafIds : [$this->id];
+    }
+
+    public static function resolveFilterValue(string|int|null $value): ?self
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return static::query()
+            ->where('is_active', true)
+            ->when(is_numeric($value), function ($query) use ($value) {
+                $query->where('id', (int) $value);
+            }, function ($query) use ($value) {
+                $query->where('slug', (string) $value);
+            })
+            ->first();
     }
 
     public function getServiceProvidersCount(): int

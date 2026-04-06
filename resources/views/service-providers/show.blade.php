@@ -1083,7 +1083,7 @@
                                                         </option>
                                                         @foreach($categories as $cat)
                                                             <option value="{{ $cat->id }}" {{ old('category_id', $serviceProvider->category_id) == $cat->id ? 'selected' : '' }}>
-                                                                {{ $cat->translated_name ?? $cat->name }}
+                                                                {{ collect($cat->hierarchy_labels)->implode(' / ') }}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -1781,23 +1781,22 @@
                             <h6 class="fw-bold text-primary mb-3">
                                 <i class="fas fa-info-circle me-2"></i>{{ __('service_provider.category_info_title') }}
                             </h6>
-                            <div class="mb-2">
-                                <strong>{{ __('service_provider.category_label') }}</strong>
-                                {{ $serviceProvider->category->translated_name }}
-                            </div>
+                            @if($serviceProvider->category->parent?->parent)
+                                <div class="mb-2">
+                                    <strong>{{ __('service_provider.section_label') }}</strong>
+                                    {{ $serviceProvider->category->parent->parent->translated_name }}
+                                </div>
+                            @endif
                             @if($serviceProvider->category->parent)
                                 <div class="mb-2">
                                     <strong>{{ __('service_provider.main_category_label') }}</strong>
                                     {{ $serviceProvider->category->parent->translated_name }}
                                 </div>
                             @endif
-                            @if($serviceProvider->category->description)
-                                <div>
-                                    <strong>{{ __('general.description') }}:</strong>
-                                    <p class="mt-1 small text-muted">{{ $serviceProvider->category->translated_description }}
-                                    </p>
-                                </div>
-                            @endif
+                            <div class="mb-0">
+                                <strong>{{ __('service_provider.subcategory_label') }}</strong>
+                                {{ $serviceProvider->category->translated_name }}
+                            </div>
                         </div>
                     </div>
                 @endif

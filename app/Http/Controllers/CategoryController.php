@@ -16,7 +16,7 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         // Use caching for better performance
-        $cacheKey = 'categories_frontend_' . app()->getLocale() . '_' . md5($request->fullUrl());
+        $cacheKey = 'categories_frontend_v2_' . app()->getLocale() . '_' . md5($request->fullUrl());
         
         $data = Cache::remember($cacheKey, 300, function () use ($request) {
             // Get search query if provided
@@ -32,12 +32,8 @@ class CategoryController extends Controller
             }
 
             // Get ONLY ACTIVE categories for frontend visibility
-            $categoriesQuery = Category::with(['parent', 'serviceProviders' => function ($query) {
-                    $query->where('is_active', true);
-                }])
-                ->where('is_active', true) // Frontend: Only show active categories
-                ->orderBy('sort_order')
-                ->orderBy('name');
+            $categoriesQuery = Category::query()
+                ->filterGroups();
 
             // Apply search filter
             if ($search) {
@@ -51,9 +47,14 @@ class CategoryController extends Controller
 
             // Apply city filter with safe filtering
             if ($selectedCity) {
-                $categoriesQuery->whereHas('serviceProviders', function ($query) use ($selectedCity) {
-                    $query->where('location_id', $selectedCity->id)
-                          ->where('is_active', true);
+                $categoriesQuery->where(function ($query) use ($selectedCity) {
+                    $query->whereHas('serviceProviders', function ($providerQuery) use ($selectedCity) {
+                        $providerQuery->where('location_id', $selectedCity->id)
+                            ->where('is_active', true);
+                    })->orWhereHas('children.serviceProviders', function ($providerQuery) use ($selectedCity) {
+                        $providerQuery->where('location_id', $selectedCity->id)
+                            ->where('is_active', true);
+                    });
                 });
             }
 
@@ -67,20 +68,20 @@ class CategoryController extends Controller
             // Prepare sections data for the existing view
             $sections = Category::where('is_section', true)
                 ->where('is_active', true)
+                ->where('slug', '!=', 'others-1')
                 ->with(['children' => function ($query) {
-                    $query->where('is_active', true)->orderBy('sort_order')->orderBy('name');
+                    $query->where('is_active', true)
+                        ->orderBy('sort_order')
+                        ->orderBy('name')
+                        ->with(['children' => function ($childQuery) {
+                            $childQuery->where('is_active', true)
+                                ->orderBy('sort_order')
+                                ->orderBy('name');
+                        }]);
                 }])
                 ->orderBy('sort_order')
                 ->orderBy('name')
                 ->get();
-
-            // Calculate stats
-            $stats = [
-                'totalSections' => $sections->count(),
-                'totalCategories' => $categories->total(),
-                'activeCategories' => $categories->count(),
-                'totalProviders' => ServiceProvider::where('is_active', true)->count(),
-            ];
 
             return [
                 'sections' => $sections,
@@ -88,7 +89,6 @@ class CategoryController extends Controller
                 'locations' => $locations,
                 'selectedCity' => $selectedCity,
                 'search' => $search,
-                'stats' => $stats
             ];
         });
 
@@ -100,31 +100,14 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        // Only show active categories on frontend
-        if (!$category->is_active) {
+        if (! $category->is_active) {
+            if ($category->slug === 'construction-services') {
+                return redirect()->route('service-providers.index', ['category' => 'renovation-construction'])->setStatusCode(301);
+            }
+
             abort(404);
         }
 
-        // Use caching for category details
-        $cacheKey = 'category_show_' . $category->id;
-        
-        $data = Cache::remember($cacheKey, 300, function () use ($category) {
-            $category->load([
-                'parent',
-                'children' => function ($query) {
-                    $query->where('is_active', true)->orderBy('sort_order')->orderBy('name');
-                },
-                'serviceProviders' => function ($query) {
-                    $query->with('location')
-                          ->where('is_active', true);
-                }
-            ]);
-
-            return [
-                'category' => $category
-            ];
-        });
-
-        return view('categories.show', $data);
+        return redirect()->route('service-providers.index', ['category' => $category->slug])->setStatusCode(301);
     }
 }

@@ -71,10 +71,14 @@ class SEOService
 
         return [
             'title' => $category->getTranslatedNameAttribute() . ' | ' . config('app.name'),
-            'description' => $category->description ?? __('seo.category_description', ['name' => $category->name]),
-            'keywords' => $category->name . ', ' . __('seo.category_keywords'),
+            'description' => __('seo.category_description', ['name' => $category->translated_name]),
+            'keywords' => implode(', ', array_filter([
+                $category->translated_name,
+                $category->parent?->translated_name,
+                __('seo.category_keywords'),
+            ])),
             'og_type' => 'website',
-            'canonical' => route('categories.show', $category),
+            'canonical' => route('service-providers.index', ['category' => $category->slug]),
         ];
     }
 

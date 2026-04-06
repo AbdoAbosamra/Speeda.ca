@@ -53,7 +53,7 @@ return [
     'gardening' => 'Gardening',
     'painting' => 'Painting',
     'moving' => 'Moving Services',
-    'search_categories_placeholder' => 'Search categories by name or description...',
+    'search_categories_placeholder' => 'Search categories by name...',
     'search_button' => 'Search',
     'clear_search' => 'Clear',
     'search_results_for' => 'Showing results for ":query"',

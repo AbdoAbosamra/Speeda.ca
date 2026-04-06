@@ -20,8 +20,11 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        // Pass all child categories (all 55 professions) to the registration view
-        $professions = Category::whereNotNull('parent_id')->where('is_active', 1)->orderBy('name')->get();
+        // Providers should continue selecting terminal professions only.
+        $professions = Category::with('parent.parent')
+            ->terminal()
+            ->orderBy('name')
+            ->get();
 
         return view('auth.register', compact('professions'));
     }

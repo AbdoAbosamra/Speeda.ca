@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -25,7 +26,13 @@ class ServiceProviderFilter
 
         // Category filter
         if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
+            $category = Category::resolveFilterValue($request->category_id);
+
+            if ($category) {
+                $query->whereIn('category_id', $category->providerCategoryIds());
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
         // Availability filters

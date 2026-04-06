@@ -33,6 +33,8 @@ return [
     'category_info_title' => 'معلومات الفئة',
     'category_label' => 'الفئة:',
     'main_category_label' => 'الفئة الرئيسية:',
+    'section_label' => 'القسم:',
+    'subcategory_label' => 'الفئة الفرعية:',
     'gallery_image_title' => 'صورة المعرض',
     'location_not_specified' => 'الموقع غير محدد',
     'profile_title' => 'الملف الشخصي',

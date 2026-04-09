@@ -16,6 +16,7 @@ use App\Actions\CalculateProfileCompletionAction;
 use App\Actions\TrackProviderViewAction;
 use App\Services\FacebookConversionService;
 use App\Services\LocationClusterService;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ServiceProviderController extends Controller
 {
@@ -615,15 +616,14 @@ class ServiceProviderController extends Controller
 
             // Provider gallery upload:
             // - Stored by Spatie media library
-            // - Conversions (resize/compress/webp/thumb) are queued (not synchronous)
-            // - Max 4 images enforced via `onlyKeepLatest(4)` on the collection
+            // - Conversions are generated on save
+            // - Images are additive; each one can also be replaced/deleted individually
             try {
                 if ($request->hasFile('gallery_images')) {
                     $files = $request->file('gallery_images', []);
 
                     if (is_array($files)) {
                         foreach ($files as $file) {
-                            // Collection enforces max-4 via onlyKeepLatest(4).
                             $serviceProvider->addMedia($file)->toMediaCollection('provider_gallery');
                         }
                     }
@@ -735,5 +735,90 @@ class ServiceProviderController extends Controller
                 'message' => $error['message']
             ], 500);
         }
+    }
+
+    public function deleteGalleryImage(ServiceProvider $serviceProvider, int $mediaId)
+    {
+        try {
+            if (!auth()->check() || auth()->id() !== $serviceProvider->user_id) {
+                ErrorHelper::flashNotification(__('service_provider.unauthorized_access'), 'error');
+                return redirect()->route('service-providers.show', $serviceProvider->id);
+            }
+
+            $media = $this->resolveGalleryMedia($serviceProvider, $mediaId);
+            $media->delete();
+
+            app(CalculateProfileCompletionAction::class)->execute($serviceProvider->fresh());
+
+            ErrorHelper::flashNotification(__('service_provider.gallery_image_deleted'), 'success');
+
+            return redirect()
+                ->route('service-providers.show', $serviceProvider->id)
+                ->with('success', __('service_provider.gallery_image_deleted'));
+        } catch (\Exception $e) {
+            Log::error('Gallery image delete failed', [
+                'user_id' => auth()->id(),
+                'sp_id' => $serviceProvider->id,
+                'media_id' => $mediaId,
+                'error' => $e->getMessage(),
+            ]);
+
+            $error = ErrorHelper::handle($e, __('service_provider.gallery_upload_failed'));
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+
+            return redirect()->route('service-providers.show', $serviceProvider->id);
+        }
+    }
+
+    public function replaceGalleryImage(Request $request, ServiceProvider $serviceProvider, int $mediaId)
+    {
+        try {
+            if (!auth()->check() || auth()->id() !== $serviceProvider->user_id) {
+                ErrorHelper::flashNotification(__('service_provider.unauthorized_access'), 'error');
+                return redirect()->route('service-providers.show', $serviceProvider->id);
+            }
+
+            $request->validate([
+                'gallery_image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            ]);
+
+            $media = $this->resolveGalleryMedia($serviceProvider, $mediaId);
+
+            $serviceProvider
+                ->addMedia($request->file('gallery_image'))
+                ->toMediaCollection('provider_gallery');
+
+            $media->delete();
+
+            app(CalculateProfileCompletionAction::class)->execute($serviceProvider->fresh());
+
+            ErrorHelper::flashNotification(__('service_provider.gallery_image_replaced'), 'success');
+
+            return redirect()
+                ->route('service-providers.show', $serviceProvider->id)
+                ->with('success', __('service_provider.gallery_image_replaced'));
+        } catch (\Exception $e) {
+            Log::error('Gallery image replace failed', [
+                'user_id' => auth()->id(),
+                'sp_id' => $serviceProvider->id,
+                'media_id' => $mediaId,
+                'error' => $e->getMessage(),
+            ]);
+
+            $error = ErrorHelper::handle($e, __('service_provider.gallery_upload_failed'));
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+
+            return redirect()->route('service-providers.show', $serviceProvider->id);
+        }
+    }
+
+    private function resolveGalleryMedia(ServiceProvider $serviceProvider, int $mediaId): Media
+    {
+        return Media::query()
+            ->whereKey($mediaId)
+            ->where('model_type', ServiceProvider::class)
+            ->where('model_id', $serviceProvider->id)
+            ->where('collection_name', 'provider_gallery')
+            ->firstOrFail();
     }
 }

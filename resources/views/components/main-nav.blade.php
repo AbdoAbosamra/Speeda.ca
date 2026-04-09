@@ -1190,10 +1190,6 @@
                     <i class="fas fa-home"></i>
                     {{ __('general.home') }}
                 </a>
-                <a class="sp-link {{ request()->routeIs('location') ? 'is-active' : '' }}" href="{{ route('location') }}">
-                    <i class="fas fa-map-marker-alt"></i>
-                    {{ __('general.locations') }}
-                </a>
                 <a class="sp-link {{ request()->routeIs('categories') ? 'is-active' : '' }}" href="{{ route('categories') }}">
                     <i class="fas fa-th-large"></i>
                     {{ __('general.categories') }}

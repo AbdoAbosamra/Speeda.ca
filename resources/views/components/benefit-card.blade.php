@@ -19,7 +19,7 @@
             'closing' => __('home.client_closing'),
             'button' => [
                 'text' => __('home.start_project'),
-                'route' => route('location'),
+                'route' => route('service-providers.index'),
                 'class' => 'btn-warning',
                 'icon' => 'fas fa-rocket'
             ],

@@ -80,16 +80,15 @@ class ServiceProvider extends Model implements HasMedia
 
     /**
      * Gallery media collection for provider images.
-     * - Max 4 images
+     * - Dynamic image count
      * - Only JPEG/PNG/WebP
      * - Stored in the `public` disk
      */
     public function registerMediaCollections(): void
     {
         $this
-            ->addMediaCollection('provider_gallery')
+            ->addMediaCollection('gallery')
             ->useDisk('public')
-            ->onlyKeepLatest(4)
             ->acceptsMimeTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
             ->acceptsFile(function (File $file) {
                 // Backend defense in depth: max 10MB
@@ -107,7 +106,7 @@ class ServiceProvider extends Model implements HasMedia
     {
         $this
             ->addMediaConversion('gallery_thumb')
-            ->performOnCollections('provider_gallery')
+            ->performOnCollections('gallery')
             ->nonQueued()
             ->width(600)
             ->height(600)
@@ -117,7 +116,7 @@ class ServiceProvider extends Model implements HasMedia
 
         $this
             ->addMediaConversion('gallery_large')
-            ->performOnCollections('provider_gallery')
+            ->performOnCollections('gallery')
             ->nonQueued()
             ->width(1200)
             ->height(1200)
@@ -252,7 +251,7 @@ class ServiceProvider extends Model implements HasMedia
      */
     public function getGalleryImageUrlAttribute(): ?string
     {
-        $media = $this->getMedia('provider_gallery')->first();
+        $media = $this->getMedia('gallery')->first();
 
         if (!$media) {
             return null;

@@ -96,7 +96,7 @@ class SEOService
             'description' => $location->meta_description ?? __('seo.location_description', ['city' => $location->city]),
             'keywords' => $location->city . ', ' . __('seo.location_keywords'),
             'og_type' => 'website',
-            'canonical' => route('location'),
+            'canonical' => route('service-providers.index', ['location' => $location->id]),
         ];
     }
 

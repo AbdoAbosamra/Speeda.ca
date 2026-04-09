@@ -114,8 +114,7 @@ class Category extends Model
             ->whereHas('parent', function ($parentQuery) {
                 $parentQuery->whereNull('parent_id')
                     ->where('is_section', true)
-                    ->where('is_active', true)
-                    ->where('slug', '!=', 'others-1');
+                    ->where('is_active', true);
             })
             ->orderBy('sort_order')
             ->orderBy('name');

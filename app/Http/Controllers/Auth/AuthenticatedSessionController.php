@@ -42,8 +42,8 @@ class AuthenticatedSessionController extends Controller
                     ->with('success', __('auth.login_success'));
             }
 
-            // Client users go to locations
-            return redirect()->intended(route('location'))
+            // Client users go to the provider discovery page
+            return redirect()->intended(route('service-providers.index'))
                 ->with('success', __('auth.login_success'));
 
         } catch (\Illuminate\Validation\ValidationException $e) {

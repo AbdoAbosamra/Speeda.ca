@@ -12,12 +12,13 @@ class LocationClusterService
      *
      * Rules from requirements:
      * - Laval      → Laval + Montreal
+     * - Montreal   → Montreal + Laval
      * - Gatineau   → Gatineau + Ottawa
      * - Ottawa     → Ottawa + Gatineau
-     * - Montreal   → Montreal only (no clustering)
      */
     private const CLUSTERS = [
         'laval'    => ['laval', 'montreal'],
+        'montreal' => ['montreal', 'laval'],
         'gatineau' => ['gatineau', 'ottawa'],
         'ottawa'   => ['ottawa', 'gatineau'],
     ];

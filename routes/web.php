@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EndorsementController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
@@ -142,6 +143,27 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
     Route::put('/profile/{serviceProvider}', [ServiceProviderController::class, 'updateProfile'])
         ->middleware('throttle:10,1')
         ->name('service-providers.profile.update');
+
+    Route::delete('/profile/{serviceProvider}/gallery/{media}', [ServiceProviderController::class, 'deleteGalleryImage'])
+        ->middleware('throttle:20,1')
+        ->name('service-providers.profile.gallery.delete');
+
+    Route::patch('/profile/{serviceProvider}/gallery/{media}', [ServiceProviderController::class, 'replaceGalleryImage'])
+        ->middleware('throttle:20,1')
+        ->name('service-providers.profile.gallery.replace');
+
+    // ── AJAX Gallery routes (GalleryController — JSON responses) ──
+    Route::post('/profile/{serviceProvider}/gallery', [GalleryController::class, 'store'])
+        ->middleware('throttle:30,1')
+        ->name('provider.gallery.store');
+
+    Route::post('/profile/{serviceProvider}/gallery/{media}/replace', [GalleryController::class, 'update'])
+        ->middleware('throttle:20,1')
+        ->name('provider.gallery.update');
+
+    Route::delete('/profile/{serviceProvider}/gallery/{media}/ajax', [GalleryController::class, 'destroy'])
+        ->middleware('throttle:20,1')
+        ->name('provider.gallery.destroy');
 
     // Handle profile image upload
     Route::post('/profile/image-upload', [ServiceProviderController::class, 'uploadProfileImage'])

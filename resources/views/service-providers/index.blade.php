@@ -1900,11 +1900,11 @@
                                 </div>
                                 <div class="suggestion-text">{{ __('categories.popular_categories') }}</div>
                             </a>
-                            <a href="{{ route('location') }}" class="suggestion-card">
+                            <a href="{{ route('service-providers.index') }}" class="suggestion-card">
                                 <div class="suggestion-icon">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
-                                <div class="suggestion-text">{{ __('location.nearby_locations') }}</div>
+                                <div class="suggestion-text">{{ __('service_provider.discover_providers') }}</div>
                             </a>
                             <a href="{{ route('home') }}" class="suggestion-card">
                                 <div class="suggestion-icon">

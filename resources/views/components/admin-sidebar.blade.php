@@ -206,7 +206,7 @@
 
                 @if(Route::has('location'))
                 <li>
-                    <a href="{{ route('location') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
+                    <a href="{{ route('service-providers.index') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
                         <i class="fas fa-map-marker-alt" style="color:#fff; background: linear-gradient(90deg,#ef4444,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
                         <span>{{ __('general.locations') ?? 'Locations' }}</span>
                     </a>

@@ -617,6 +617,14 @@
             opacity: 1;
         }
 
+        .modal {
+            z-index: 2000 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1990 !important;
+        }
+
         /* Reviews Section */
         .review-card {
             background: white;
@@ -1258,73 +1266,294 @@
                                                 @enderror
                                             </div>
 
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">{{ __('general.profile_image') }}</label>
-                                                <input type="file" name="profile_image" id="profileImageInput"
-                                                    class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp"
-                                                    onchange="validateFileSize(this, 2)">
-                                                <small class="text-muted d-block">
-                                                    <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.profile_logo_image') }} -
-                                                    {{ __('service_provider.max_size_2mb') }}
-                                                </small>
-                                                @if($serviceProvider->profile_image)
-                                                    <div class="mt-2">
-                                                        <img src="{{ $serviceProvider->profile_image_url }}" class="rounded"
-                                                            style="width: 80px; height: 80px; object-fit: cover;"
-                                                            onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
-                                                        <small
-                                                            class="text-muted d-block">{{ __('service_provider.current_image') }}</small>
-                                                    </div>
-                                                @endif
-                                                @error('profile_image')
-                                                    <small class="text-danger d-block">{{ $message }}</small>
-                                                @enderror
-                                            </div>
 
+                                            {{-- Gallery: AJAX per-image management (Inline Alpine Widget) --}}
                                             @php
-                                                $currentGallery = $serviceProvider->getMedia('provider_gallery')->take(4);
+                                                $galleryMedia = $serviceProvider->getMedia('gallery');
+                                                $isOwner = auth()->check() && auth()->id() === $serviceProvider->user_id;
+                                                $maxImages = 4;
                                             @endphp
 
-                                            <div class="mb-3">
-                                                <label class="form-label fw-bold">
-                                                    <i class="fas fa-images text-primary me-1"></i>
-                                                    {{ __('service_provider.gallery_upload_title') }}
-                                                </label>
+                                            @if($isOwner || $galleryMedia->count() > 0)
+                                            <div class="mb-4"
+                                                 x-data="galleryManager({
+                                                     providerId: {{ $serviceProvider->id }},
+                                                     images: {{ Js::from($galleryMedia->map(fn ($m) => [
+                                                         'id' => $m->id,
+                                                         'thumb_url' => $serviceProvider->getMediaPublicUrl($m, $m->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null) ?? $m->getUrl(),
+                                                     ])->values()) }},
+                                                     max: {{ $maxImages }},
+                                                     isOwner: {{ $isOwner ? 'true' : 'false' }},
+                                                     storeUrl: '{{ route('provider.gallery.store', $serviceProvider->id) }}',
+                                                     csrfToken: '{{ csrf_token() }}'
+                                                 })">
+                                                
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <label class="form-label fw-bold mb-0">
+                                                        <i class="fas fa-images text-primary me-1"></i>
+                                                        {{ __('service_provider.gallery_upload_title') ?? 'Gallery' }}
+                                                    </label>
+                                                    <span class="badge bg-primary text-white" x-text="images.length + ' / ' + max + ' photos'"></span>
+                                                </div>
 
-                                                <input type="file"
-                                                    name="gallery_images[]"
-                                                    id="galleryImagesInput"
-                                                    class="form-control"
-                                                    accept="image/jpeg,image/png,image/webp"
-                                                    multiple
-                                                    onchange="validateMultipleFilesSize(this, 10, 4)">
+                                                <div x-show="images.length >= max" class="text-secondary small mb-3">
+                                                    <i class="fas fa-info-circle me-1"></i> Maximum 4 photos reached.
+                                                </div>
 
-                                                <small class="text-muted d-block">
-                                                    <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.gallery_upload_hint') }}
-                                                </small>
-
-                                                @if($currentGallery->count() > 0)
-                                                    <div class="mt-2">
-                                                        <div class="row g-2">
-                                                            @foreach($currentGallery as $media)
-                                                                <div class="col-6 col-md-3">
-                                                                    <img src="{{ $serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null) ?? $serviceProvider->default_image_url }}"
-                                                                        alt="{{ __('service_provider.gallery_image_alt') }}"
-                                                                        style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
-                                                                        loading="lazy"
-                                                                        onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
+                                                {{-- Inline Flash Errors --}}
+                                                <div x-show="errorMessage" x-transition style="display: none;">
+                                                    <div class="alert alert-danger p-2 small mb-3 rounded d-flex align-items-center">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        <span x-text="errorMessage"></span>
+                                                        <button type="button" class="btn-close ms-auto" @click="errorMessage = ''" style="padding: 0.5rem;"></button>
                                                     </div>
-                                                @endif
+                                                </div>
 
-                                                @error('gallery_images')
-                                                    <small class="text-danger d-block">{{ $message }}</small>
-                                                @enderror
+                                                <div class="row row-cols-2 row-cols-md-4 g-3">
+                                                    {{-- Existing Images --}}
+                                                    <template x-for="(img, index) in images" :key="img.id">
+                                                        <div class="col">
+                                                            <div class="gallery-cell position-relative overflow-hidden" 
+                                                                 style="aspect-ratio: 1/1; border-radius: 12px; border: 1px solid #e1e5eb; background: #f8f9fa;"
+                                                                 @mouseenter="if(isOwner && confirmId !== img.id) hoverId = img.id"
+                                                                 @mouseleave="hoverId = null">
+                                                                
+                                                                {{-- Delete Confirmation State --}}
+                                                                <div x-show="confirmId === img.id" 
+                                                                     class="position-absolute top-0 start-0 w-100 h-100"
+                                                                     style="background: rgba(220,53,69,0.15); z-index: 5; display: none;">
+                                                                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+                                                                        <span class="text-danger fw-bold mb-2 small text-center px-1">Delete this photo?</span>
+                                                                        <div class="d-flex gap-2">
+                                                                            <button type="button" class="btn btn-sm btn-danger rounded-circle" @click="executeDelete(img)" title="Confirm" style="width: 32px; height: 32px; padding: 0;"><i class="fas fa-check"></i></button>
+                                                                            <button type="button" class="btn btn-sm btn-secondary rounded-circle" @click="confirmId = null; hoverId = null" title="Cancel" style="width: 32px; height: 32px; padding: 0;"><i class="fas fa-times"></i></button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- Normal State: Image --}}
+                                                                <img :src="img.thumb_url" alt="Gallery Photo" class="w-100 h-100 object-fit-cover" x-show="confirmId !== img.id" loading="lazy">
+
+                                                                {{-- Loading Spinner --}}
+                                                                <div x-show="uploadingId === img.id" class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(255,255,255,0.7); z-index: 10; display: none;">
+                                                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                                                        <div class="spinner-border text-primary" role="status"></div>
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- Hover Actions (Owner Only) --}}
+                                                                <div x-show="isOwner && hoverId === img.id && confirmId !== img.id && uploadingId !== img.id" 
+                                                                     x-transition.opacity.duration.200ms
+                                                                     class="position-absolute top-0 start-0 w-100 h-100"
+                                                                     style="background: rgba(0,0,0,0.55); z-index: 2; display: none;">
+                                                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center gap-2">
+                                                                        <button type="button" class="btn btn-outline-light rounded-circle border-0" @click="startReplace(img)" title="Replace" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent;">
+                                                                            <i class="fas fa-pencil-alt"></i>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-outline-light rounded-circle border-0" @click="confirmId = img.id" title="Delete" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent;">
+                                                                            <i class="fas fa-trash-alt"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    {{-- Upload Previews during add --}}
+                                                    <template x-for="(preview, index) in addPreviews" :key="'preview-'+index">
+                                                        <div class="col">
+                                                            <div class="gallery-cell position-relative overflow-hidden" style="aspect-ratio: 1/1; border-radius: 12px; border: 1px solid #e1e5eb;">
+                                                                <img :src="preview" class="w-100 h-100 object-fit-cover" style="opacity: 0.6;">
+                                                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                                                    <div class="spinner-border text-primary" role="status"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    {{-- Add Placeholders (to fill up to 4 cells) --}}
+                                                    <template x-if="isOwner && (images.length + addPreviews.length) < max">
+                                                        <template x-for="i in (max - images.length - addPreviews.length)" :key="'placeholder-'+i">
+                                                            <div class="col">
+                                                                <div @click="$refs.galleryAddInput.click()" 
+                                                                     class="gallery-cell position-relative d-flex bg-light align-items-center justify-content-center" 
+                                                                     style="aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed #cbd5e1; cursor: pointer; transition: all 0.2s;">
+                                                                    <i class="fas fa-plus text-secondary fa-2x opacity-50"></i>
+                                                                </div>
+                                                            </div>
+                                                        </template>
+                                                    </template>
+                                                </div>
+
+                                                {{-- Hidden Inputs --}}
+                                                <input type="file" x-ref="galleryAddInput" class="d-none" accept="image/jpeg,image/png,image/webp" @change="handleAddFile">
+                                                <input type="file" x-ref="galleryReplaceInput" class="d-none" accept="image/jpeg,image/png,image/webp" @change="handleReplaceFile">
                                             </div>
+
+                                            <script>
+                                                document.addEventListener('alpine:init', () => {
+                                                    Alpine.data('galleryManager', (config) => ({
+                                                        providerId: config.providerId,
+                                                        images: config.images,
+                                                        max: config.max,
+                                                        isOwner: config.isOwner,
+                                                        storeUrl: config.storeUrl,
+                                                        csrfToken: config.csrfToken,
+
+                                                        hoverId: null,
+                                                        confirmId: null,
+                                                        uploadingId: null,
+                                                        pendingReplaceImg: null,
+                                                        addPreviews: [],
+                                                        errorMessage: '',
+
+                                                        startReplace(img) {
+                                                            this.pendingReplaceImg = img;
+                                                            this.$refs.galleryReplaceInput.value = '';
+                                                            this.$refs.galleryReplaceInput.click();
+                                                        },
+
+                                                        validateFile(file) {
+                                                            const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+                                                            if (!allowed.includes(file.type)) {
+                                                                this.errorMessage = 'Please select a JPG, PNG, or WebP image.';
+                                                                return false;
+                                                            }
+                                                            if (file.size > 5 * 1024 * 1024) {
+                                                                this.errorMessage = 'File is too large. Maximum size is 5MB.';
+                                                                return false;
+                                                            }
+                                                            return true;
+                                                        },
+
+                                                        async handleAddFile(e) {
+                                                            const file = e.target.files[0];
+                                                            if (!file) return;
+                                                            if (!this.validateFile(file)) return;
+                                                            this.errorMessage = '';
+
+                                                            // Generate Preview
+                                                            const reader = new FileReader();
+                                                            reader.onload = (e) => {
+                                                                this.addPreviews.push(e.target.result);
+                                                                // Call upload immediately after preview loads
+                                                                this.uploadNewImage(file, e.target.result);
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        },
+
+                                                        async uploadNewImage(file, previewData) {
+                                                            const formData = new FormData();
+                                                            formData.append('gallery_image', file);
+
+                                                            try {
+                                                                const res = await fetch(this.storeUrl, {
+                                                                    method: 'POST',
+                                                                    body: formData,
+                                                                    headers: {
+                                                                        'X-CSRF-TOKEN': this.csrfToken,
+                                                                        'Accept': 'application/json'
+                                                                    }
+                                                                });
+                                                                const data = await res.json();
+                                                                if (data.success) {
+                                                                    this.images.push(data.media);
+                                                                } else {
+                                                                    this.errorMessage = data.message || 'Upload failed.';
+                                                                }
+                                                            } catch (err) {
+                                                                this.errorMessage = 'Network error during upload.';
+                                                            } finally {
+                                                                // Remove this specific preview slot
+                                                                this.addPreviews = this.addPreviews.filter(p => p !== previewData);
+                                                                this.$refs.galleryAddInput.value = '';
+                                                            }
+                                                        },
+
+                                                        async handleReplaceFile(e) {
+                                                            const file = e.target.files[0];
+                                                            if (!file || !this.pendingReplaceImg) return;
+                                                            if (!this.validateFile(file)) return;
+                                                            this.errorMessage = '';
+                                                            
+                                                            this.uploadingId = this.pendingReplaceImg.id;
+
+                                                            // Preview immediately
+                                                            const reader = new FileReader();
+                                                            reader.onload = (ev) => {
+                                                                const idx = this.images.findIndex(i => i.id === this.pendingReplaceImg.id);
+                                                                if(idx !== -1) this.images[idx].thumb_url = ev.target.result;
+                                                            };
+                                                            reader.readAsDataURL(file);
+
+                                                            const formData = new FormData();
+                                                            formData.append('gallery_image', file);
+                                                            const updateUrl = `/service-providers/profile/${this.providerId}/gallery/${this.pendingReplaceImg.id}/replace`;
+
+                                                            try {
+                                                                const res = await fetch(updateUrl, {
+                                                                    method: 'POST',
+                                                                    body: formData,
+                                                                    headers: {
+                                                                        'X-CSRF-TOKEN': this.csrfToken,
+                                                                        'Accept': 'application/json'
+                                                                    }
+                                                                });
+                                                                const data = await res.json();
+                                                                if (data.success) {
+                                                                    // Update image details from server
+                                                                    const idx = this.images.findIndex(i => i.id === this.pendingReplaceImg.id);
+                                                                    if(idx !== -1) {
+                                                                        this.images[idx].id = data.media.id;
+                                                                        this.images[idx].thumb_url = data.media.thumb_url;
+                                                                    }
+                                                                } else {
+                                                                    this.errorMessage = data.message || 'Replace failed.';
+                                                                }
+                                                            } catch (err) {
+                                                                this.errorMessage = 'Network error during replace.';
+                                                            } finally {
+                                                                this.uploadingId = null;
+                                                                this.pendingReplaceImg = null;
+                                                                this.$refs.galleryReplaceInput.value = '';
+                                                                this.hoverId = null;
+                                                            }
+                                                        },
+
+                                                        async executeDelete(img) {
+                                                            this.uploadingId = img.id;
+                                                            this.confirmId = null;
+                                                            const deleteUrl = `/service-providers/profile/${this.providerId}/gallery/${img.id}/ajax`;
+
+                                                            try {
+                                                                const res = await fetch(deleteUrl, {
+                                                                    method: 'DELETE',
+                                                                    headers: {
+                                                                        'X-CSRF-TOKEN': this.csrfToken,
+                                                                        'Accept': 'application/json'
+                                                                    }
+                                                                });
+                                                                const data = await res.json();
+                                                                if (data.success) {
+                                                                    this.images = this.images.filter(i => i.id !== img.id);
+                                                                } else {
+                                                                    this.errorMessage = data.message || 'Delete failed.';
+                                                                }
+                                                            } catch (err) {
+                                                                this.errorMessage = 'Network error during delete.';
+                                                            } finally {
+                                                                this.uploadingId = null;
+                                                                this.hoverId = null;
+                                                            }
+                                                        }
+                                                    }));
+                                                });
+                                            </script>
+                                            <style>
+                                                .gallery-cell:hover { border-color: #6c757d !important; }
+                                            </style>
+                                            @endif
+                                            {{-- End Gallery Inline Widget --}}
 
                                             <div class="mb-3">
                                                 <label
@@ -1384,6 +1613,8 @@
                                         </div>
                                     </div>
                                 </form>
+
+                                {{-- Old per-image management replaced by AJAX gallery grid above --}}
                             </div>
                         @endif
 
@@ -1421,38 +1652,6 @@
                             @endif
                         </div>
 
-                        <!-- Gallery Section -->
-                        @php
-                            $providerGallery = $serviceProvider->getMedia('provider_gallery');
-                        @endphp
-                        @if($providerGallery->count() > 0)
-                            <div class="gallery-container">
-                                <h4 class="fw-bold text-primary mb-3">
-                                    <i class="fas fa-images me-2"></i>{{ __('service_provider.gallery_title') }}
-                                </h4>
-
-                                <div class="row g-3">
-                                    @foreach($providerGallery->take(4) as $media)
-                                        <div class="col-6 col-md-3">
-                                            <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal"
-                                                data-image="{{ $serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_large') ? 'gallery_large' : null) ?? $serviceProvider->default_image_url }}">
-                                                <img src="{{ $serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null) ?? $serviceProvider->default_image_url }}"
-                                                    alt="{{ __('service_provider.gallery_image_alt') }}"
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    width="600"
-                                                    height="600"
-                                                    style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px;"
-                                                    onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
-                                                <div class="gallery-overlay">
-                                                    <i class="fas fa-search-plus text-white fa-2x"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
 
                         <!-- Reviews Section -->
                         <div class="mt-5">
@@ -1774,32 +1973,6 @@
                     </div>
                 </div>
 
-                <!-- Category Info Card -->
-                @if($serviceProvider->category)
-                    <div class="card shadow-sm border-0 rounded-4 mt-4">
-                        <div class="card-body p-4">
-                            <h6 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-info-circle me-2"></i>{{ __('service_provider.category_info_title') }}
-                            </h6>
-                            @if($serviceProvider->category->parent?->parent)
-                                <div class="mb-2">
-                                    <strong>{{ __('service_provider.section_label') }}</strong>
-                                    {{ $serviceProvider->category->parent->parent->translated_name }}
-                                </div>
-                            @endif
-                            @if($serviceProvider->category->parent)
-                                <div class="mb-2">
-                                    <strong>{{ __('service_provider.main_category_label') }}</strong>
-                                    {{ $serviceProvider->category->parent->translated_name }}
-                                </div>
-                            @endif
-                            <div class="mb-0">
-                                <strong>{{ __('service_provider.subcategory_label') }}</strong>
-                                {{ $serviceProvider->category->translated_name }}
-                            </div>
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
 
@@ -2009,15 +2182,9 @@
             }
         }
 
-        function validateMultipleFilesSize(input, maxSizeMB, maxFilesCount = 4) {
+        function validateMultipleFilesSize(input, maxSizeMB) {
             if (!input.files || input.files.length === 0) {
                 return true;
-            }
-
-            if (input.files.length > maxFilesCount) {
-                alert(`{{ __('service_provider.gallery_upload_max_images') }} (${maxFilesCount})`);
-                input.value = '';
-                return false;
             }
 
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];

@@ -168,6 +168,6 @@ class AuthService
             return route('dashboard');
         }
 
-        return route('location');
+        return route('service-providers.index');
     }
 }

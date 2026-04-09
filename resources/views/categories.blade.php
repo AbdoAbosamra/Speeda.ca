@@ -537,7 +537,6 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb justify-content-center">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="fas fa-home me-1"></i>{{ __('general.home') }}</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('location') }}"><i class="fas fa-map-marker-alt me-1"></i>{{ __('general.locations') }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-tags me-1"></i>{{ __('general.categories') }}</li>
             </ol>
         </nav>

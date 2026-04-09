@@ -20,13 +20,22 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        // Providers should continue selecting terminal professions only.
+        // Load terminal categories (actual professions — no children) with parent chain.
         $professions = Category::with('parent.parent')
             ->terminal()
             ->orderBy('name')
             ->get();
 
-        return view('auth.register', compact('professions'));
+        // Group professions by immediate parent's localized name for optgroup rendering
+        $professionGroups = $professions
+            ->groupBy(function ($category) {
+                return $category->parent
+                    ? $category->parent->localized_name
+                    : __('general.other');
+            })
+            ->sortKeys();
+
+        return view('auth.register', compact('professions', 'professionGroups'));
     }
 
     /**

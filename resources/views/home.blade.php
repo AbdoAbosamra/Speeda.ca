@@ -1108,7 +1108,7 @@
                     <h1 class="hero-title" style="color: #ffc107;">{{ __('home.hero_tagline') }}</h1>
                     <p class="hero-subtitle">{{ __('home.hero_subtitle') }}</p>
                     <div class="d-flex flex-wrap gap-3">
-                        <a href="{{ route('location') }}" class="btn btn-primary btn-lg">
+                        <a href="{{ route('service-providers.index') }}" class="btn btn-primary btn-lg">
                             <i class="fas fa-search me-2"></i> {{ __('home.find_provider') }}
                             <a href="{{ route('register', ['type' => 'service-provider']) }}"
                                 class="btn btn-outline-primary btn-lg">
@@ -1219,7 +1219,7 @@
                             </li>
                         </ul>
                         <p class="text-center fw-bold mb-3">{{ __('home.client_closing') }}</p>
-                        <a href="{{ route('location') }}" class="btn btn-warning text-white">
+                        <a href="{{ route('service-providers.index') }}" class="btn btn-warning text-white">
                             <i class="fas fa-rocket me-2"></i> {{ __('home.start_project') }}
                         </a>
                     </div>
@@ -1287,7 +1287,7 @@
             <h2>{{ __('home.cta_title') }}</h2>
             <p>{{ __('home.cta_description') }}</p>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="{{ route('location') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('service-providers.index') }}" class="btn btn-primary btn-lg">
                     <i class="fas fa-search me-2"></i> {{ __('home.find_service') }}
                 </a>
                 <a href="{{ route('register') }}" class="btn btn-outline-primary btn-lg">

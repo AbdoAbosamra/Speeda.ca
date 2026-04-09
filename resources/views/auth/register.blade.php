@@ -1596,7 +1596,7 @@
                 aria-labelledby="login-tab">
                 @csrf
 
-                <div class="form-group">
+                <div class="form-group" id="mobile-field">
                     <label for="login-field" class="form-label">
                         <i class="fas fa-user-circle"></i>
                         {{ __('auth.email_or_mobile') }}
@@ -1618,7 +1618,7 @@
                     @endif
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="whatsapp-field">
                     <label class="form-label">{{ __('auth.profession') }}</label>
                     <div class="role-selection" role="radiogroup" aria-labelledby="role-label">
                         <div class="role-option selected" id="login-client-option" role="radio" aria-checked="true"
@@ -1809,7 +1809,7 @@
                         <div class="whatsapp-input-field">
                             <div class="input-wrapper whatsapp-mobile-input">
                                 <input id="whatsapp_number" class="form-input" type="tel" name="whatsapp_number"
-                                    value="{{ old('whatsapp_number') }}" required autocomplete="tel"
+                                    value="{{ old('whatsapp_number') }}" autocomplete="tel"
                                     placeholder="514-123-4567" aria-describedby="whatsapp-error whatsapp-hint">
                                 <i class="fab fa-whatsapp input-icon whatsapp-icon" id="whatsapp-icon"></i>
                             </div>
@@ -1861,14 +1861,25 @@
                         </div>
                         <div class="select-options" id="profession-options">
                             <div class="select-option" data-value="">{{ __('auth.select_profession') }}</div>
-                            @if(isset($professions) && $professions)
+                            @if(isset($professionGroups) && $professionGroups->count())
+                                @foreach($professionGroups as $groupName => $groupProfessions)
+                                    <div class="select-group-header" style="padding: 0.5rem 1rem; font-weight: 700; color: #667eea; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; background: #f8faff; border-top: 1px solid #e5e7eb; cursor: default; pointer-events: none;">
+                                        {{ $groupName }}
+                                    </div>
+                                    @foreach($groupProfessions as $p)
+                                        <div class="select-option" data-value="{{ $p->id }}" style="padding-inline-start: 1.5rem;">
+                                            {{ $p->localized_name }}
+                                        </div>
+                                    @endforeach
+                                @endforeach
+                            @elseif(isset($professions) && $professions)
+                                {{-- Fallback: flat list if grouping data unavailable --}}
                                 @foreach($professions as $p)
                                     <div class="select-option" data-value="{{ $p->id }}">
-                                        {{ collect($p->hierarchy_labels)->implode(' / ') }}
+                                        {{ $p->localized_name }}
                                     </div>
                                 @endforeach
                             @endif
-                            <div class="select-option" data-value="other">{{ __('general.other') }}</div>
                         </div>
                         <input type="hidden" name="profession" id="profession-input" value="{{ old('profession') }}">
                     </div>
@@ -1892,16 +1903,10 @@
                         </div>
                         <div class="select-options" id="city-options">
                             <div class="select-option" data-value="">{{ __('auth.select_city') }}</div>
-                            <div class="select-option" data-value="{{ __('cities.laval') }}">{{ __('cities.laval') }}
-                            </div>
-                            <div class="select-option" data-value="{{ __('cities.montreal') }}">
-                                {{ __('cities.montreal') }}
-                            </div>
-                            <div class="select-option" data-value="{{ __('cities.ottawa') }}">{{ __('cities.ottawa') }}
-                            </div>
-                            <div class="select-option" data-value="{{ __('cities.gatineau') }}">
-                                {{ __('cities.gatineau') }}
-                            </div>
+                            <div class="select-option" data-value="Laval">Laval</div>
+                            <div class="select-option" data-value="Montreal">Montreal</div>
+                            <div class="select-option" data-value="Ottawa">Ottawa</div>
+                            <div class="select-option" data-value="Gatineau">Gatineau</div>
                         </div>
                         <input type="hidden" name="city" id="city-input" value="{{ old('city') }}">
                     </div>
@@ -2211,9 +2216,12 @@
 
             const professionField = document.getElementById('profession-field');
             const cityField = document.getElementById('city-field');
+            const mobileField = document.getElementById('mobile-field');
+            const whatsappField = document.getElementById('whatsapp-field');
             const phoneRequired = document.getElementById('phone-required');
             const phoneOptional = document.getElementById('phone-optional');
             const phoneHint = document.getElementById('phone-hint');
+            const whatsappHint = document.getElementById('whatsapp-hint');
 
             if (role === 'service_provider') {
                 document.getElementById('provider-option').classList.add('selected');
@@ -2221,24 +2229,47 @@
                 document.getElementById('provider-option').setAttribute('aria-checked', 'true');
                 professionField.style.display = 'block';
                 cityField.style.display = 'block';
+                mobileField.style.display = 'block';
+                whatsappField.style.display = 'block';
                 // Phone is required for service providers
                 phoneRequired.style.display = 'inline';
                 phoneOptional.style.display = 'none';
                 phoneHint.textContent = 'Please enter a valid Canadian mobile number (10 digits) - Required for service providers';
                 // Add required attribute to phone input
                 mobileInput.setAttribute('required', 'required');
+                whatsappInput?.setAttribute('required', 'required');
+                if (whatsappHint) {
+                    whatsappHint.style.display = 'flex';
+                }
             } else {
                 document.getElementById('client-option').classList.add('selected');
                 document.getElementById('client').checked = true;
                 document.getElementById('client-option').setAttribute('aria-checked', 'true');
                 professionField.style.display = 'none';
                 cityField.style.display = 'none';
+                mobileField.style.display = 'none';
+                whatsappField.style.display = 'none';
                 // Phone is optional for clients
                 phoneRequired.style.display = 'none';
                 phoneOptional.style.display = 'inline';
                 phoneHint.textContent = 'Please enter a valid Canadian mobile number (10 digits) - Optional for clients';
                 // Remove required attribute from phone input
                 mobileInput.removeAttribute('required');
+                mobileInput.value = '';
+                mobileInput.classList.remove('error');
+                mobileError.textContent = '';
+                if (whatsappInput) {
+                    whatsappInput.removeAttribute('required');
+                    whatsappInput.value = '';
+                    whatsappInput.classList.remove('error');
+                }
+                const whatsappError = document.getElementById('whatsapp-error');
+                if (whatsappError) {
+                    whatsappError.innerHTML = '';
+                }
+                if (whatsappHint) {
+                    whatsappHint.style.display = 'none';
+                }
             }
         }
 

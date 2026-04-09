@@ -34,7 +34,6 @@ class GenerateSitemap extends Command
             ['url' => route('home'), 'priority' => '1.0', 'changefreq' => 'daily'],
             ['url' => route('service-providers.index'), 'priority' => '0.9', 'changefreq' => 'daily'],
             ['url' => route('categories'), 'priority' => '0.8', 'changefreq' => 'weekly'],
-            ['url' => route('location'), 'priority' => '0.8', 'changefreq' => 'weekly'],
             ['url' => route('about-us'), 'priority' => '0.5', 'changefreq' => 'monthly'],
             ['url' => route('privacy-policy'), 'priority' => '0.3', 'changefreq' => 'monthly'],
             ['url' => route('terms-of-service'), 'priority' => '0.3', 'changefreq' => 'monthly'],

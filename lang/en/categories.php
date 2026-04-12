@@ -249,4 +249,5 @@ return [
     'electrical_services' => 'Electrical Services',
     // General
     'others_desc' => 'Other services not listed',
+    'find_trusted_in_city' => 'Find trusted professionals in :city',
 ];

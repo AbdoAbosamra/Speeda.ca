@@ -23,4 +23,6 @@ return [
     'messenger_redirect_info' => 'سيتم توجيهك إلى ماسنجر لإرسال اقتراحك.',
     'send_via_messenger' => 'إرسال عبر ماسنجر',
     'new_location_suggestion' => 'اقتراح موقع جديد',
+    'choose_location' => 'اختر الموقع',
+    'no_cities_available' => 'لا توجد مدن متاحة',
 ];

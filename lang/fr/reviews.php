@@ -97,4 +97,5 @@ return [
         'review_unfeatured_successfully' => 'Avis retiré de la vedette avec succès',
         'review_deleted_successfully' => 'Avis supprimé avec succès',
     ],
+    'anonymous_user' => 'Utilisateur anonyme',
 ];

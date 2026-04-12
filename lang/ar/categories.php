@@ -249,4 +249,5 @@ return [
     'electrical_services' => 'الخدمات الكهربائية',
     // عام
     'others_desc' => 'خدمات أخرى غير مدرجة',
+    'find_trusted_in_city' => 'ابحث عن أفضل المحترفين الموثوقين في :city',
 ];

@@ -81,4 +81,6 @@ return [
     'client_free_forever_desc' => 'Access Speeda\'s full features in this version at no cost, for life.',
     'provider_join_free' => 'Join Free — Limited Time Offer:',
     'provider_join_free_desc' => 'Become a service provider today and keep your account free before subscription plans launch.',
+    'cookie_title' => 'Cookies',
+    'accept_cookies_aria' => 'Accept Cookies',
 ];

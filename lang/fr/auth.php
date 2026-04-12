@@ -69,4 +69,5 @@ return [
     'reset_password_button' => 'Réinitialiser le mot de passe',
     'verify_email_instructions' => 'Avant de continuer, vérifiez votre email en cliquant sur le lien que nous venons de vous envoyer.',
     'verification_link_sent' => 'Un nouveau lien de vérification a été envoyé à votre adresse email.',
+    'login' => 'Connexion',
 ];

@@ -23,4 +23,6 @@ return [
     'messenger_redirect_info' => 'Vous serez redirigé vers Messenger pour envoyer votre suggestion.',
     'send_via_messenger' => 'Envoyer via Messenger',
     'new_location_suggestion' => 'Nouvelle suggestion d\'emplacement',
+    'choose_location' => 'Choisir l\'emplacement',
+    'no_cities_available' => 'Aucune ville disponible',
 ];

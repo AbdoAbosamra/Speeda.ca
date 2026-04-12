@@ -72,4 +72,5 @@ return [
 
     // Account Status
     'account_disabled' => 'Your account is disabled. Please contact admin.',
+    'login' => 'Login',
 ];

@@ -81,4 +81,6 @@ return [
     'client_free_forever_desc' => 'Accédez à toutes les fonctionnalités de Speeda dans cette version gratuitement, à jamais.',
     'provider_join_free' => 'Rejoignez gratuitement — Offre limitée dans le temps:',
     'provider_join_free_desc' => 'Devenez prestataire de services aujourd\'hui et conservez votre compte gratuit avant le lancement des plans d\'abonnement.',
+    'cookie_title' => 'Cookies',
+    'accept_cookies_aria' => 'Accepter les cookies',
 ];

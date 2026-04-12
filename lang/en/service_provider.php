@@ -255,4 +255,13 @@ return [
     'views_trend' => 'Views Trend (7 Days)',
     'clicks_distribution' => 'Clicks Distribution (7 Days)',
     'report_generated' => 'Report Generated',
+    'add_provider' => 'Add Provider',
+    'gallery' => 'Gallery',
+    'replace_image' => 'Replace Image',
+    'delete_image' => 'Delete Image',
+    'add_image' => 'Add Image',
+    'max_5mb' => 'Max 5MB',
+    'confirm_delete_title' => 'Confirm Deletion',
+    'confirm_delete_message' => 'Are you sure you want to delete this image?',
+    'my_profile' => 'My Profile',
 ];

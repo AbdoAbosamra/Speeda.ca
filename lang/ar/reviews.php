@@ -90,4 +90,12 @@ return [
         'review_unfeatured_successfully' => 'تم إلغاء تمييز التقييم بنجاح',
         'review_deleted_successfully' => 'تم حذف التقييم بنجاح',
     ],
+    'anonymous_user' => 'مستخدم مجهول',
+    'anonymous' => 'مجهول',
+    'write_review' => 'اكتب تقييماً',
+    'reviews_total' => 'إجمالي التقييمات',
+    'no_reviews_yet' => 'لا توجد تقييمات حتى الآن',
+    'be_first_review' => 'كن أول من يقيّم',
+    'your_rating' => 'تقييمك',
+    'your_review' => 'مراجعتك',
 ];

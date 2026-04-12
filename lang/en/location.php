@@ -23,4 +23,6 @@ return [
     'messenger_redirect_info' => 'You will be redirected to Messenger to send your suggestion.',
     'send_via_messenger' => 'Send via Messenger',
     'new_location_suggestion' => 'New Location Suggestion',
+    'choose_location' => 'Choose Location',
+    'no_cities_available' => 'No cities available',
 ];

@@ -97,4 +97,5 @@ return [
         'review_unfeatured_successfully' => 'Review unfeatured successfully',
         'review_deleted_successfully' => 'Review deleted successfully',
     ],
+    'anonymous_user' => 'Anonymous User',
 ];

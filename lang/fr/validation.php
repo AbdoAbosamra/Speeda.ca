@@ -78,4 +78,5 @@ return [
     'server_error' => 'Une erreur serveur s\'est produite. Veuillez réessayer plus tard.',
     'network_error' => 'Erreur réseau. Veuillez vérifier votre connexion internet.',
     'unknown_error' => 'Une erreur inconnue s\'est produite. Veuillez réessayer.',
+    'role_required' => 'Le champ rôle est requis.',
 ];

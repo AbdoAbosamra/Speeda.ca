@@ -305,150 +305,39 @@
         }
         .quick-nav-item:hover .quick-nav-icon { transform: scale(1.1) rotate(5deg); }
 
-        /* Section Cards */
-        .section-card {
+        /* Section Grid Cards */
+        .section-grid-card {
             background: var(--surface-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem; /* Reduced padding */
-            margin-bottom: 3.5rem; /* Reduced margin */
-            box-shadow: var(--shadow-md);
-            transition: all 0.4s ease;
-            border: 1px solid var(--border-color);
             position: relative;
             scroll-margin-top: 110px;
-            overflow: hidden;
         }
-        .section-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .section-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
-        .section-card:hover::before { opacity: 1; }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem; /* Reduced margin */
-            padding-bottom: 1.2rem;
-            border-bottom: 1px solid var(--border-color);
+        
+        .section-grid-card:hover {
+            transform: translateY(-8px) !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
         }
 
-        .section-icon {
-            width: 80px; /* Reduced size */
-            height: 80px;
-            border-radius: var(--radius-xl);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1.2rem;
-            font-size: 2rem; /* Reduced size */
-            color: white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 2;
-        }
-        [dir="rtl"] .section-icon {
-            margin-right: 0;
-            margin-left: 1.2rem;
+        .transition-icon {
+            transition: transform 0.3s ease;
+            transform-origin: center;
         }
 
-        .section-title h2 {
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-            color: var(--dark-text);
-            font-size: 1.5rem; /* Reduced size */
-        }
-        .section-title p { color: var(--muted-text); margin-bottom: 0; font-weight: 500; font-size: 0.9rem; }
-
-        /* Category Cards */
-        .category-card {
-            background: white;
-            border-radius: var(--radius-md);
-            padding: 1.5rem; /* Reduced padding */
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid var(--border-color);
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-            text-decoration: none;
-            color: inherit;
-            border-color: var(--primary-light);
-            background: #fcfcff;
+        /* Rotate chevron when accordion is open */
+        button[aria-expanded="true"] .transition-icon {
+            transform: rotate(180deg);
         }
 
-        .category-icon {
-            width: 50px; /* Reduced size */
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 1.3rem; /* Reduced size */
-            color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .subcategory-link {
+            transition: all 0.2s ease-in-out;
         }
 
-        .category-card h4 {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--dark-text);
-            font-size: 1.1rem; /* Reduced size */
+        .subcategory-link:hover {
+            color: var(--primary-color) !important;
+            padding-inline-start: 4px; /* for RTL support */
         }
-
-        .category-card p {
-            color: var(--muted-text);
-            font-size: 0.9rem; /* Reduced size */
-            line-height: 1.5;
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* SUBCATEGORY LIST - Updated for clarity and size */
-        .subcategory-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: auto;
-        }
-
-        .subcategory-chip {
-            display: inline-flex;
-            align-items: center;
-            /* Increased padding and font size for clarity */
-            padding: 0.5rem 0.9rem;
-            border-radius: 8px; /* Slightly less rounded for modern look */
-            background: #f1f5f9;
-            color: #334155; /* Darker text for better readability */
-            font-size: 0.9rem; /* Increased from 0.75rem */
-            font-weight: 700; /* Bold for clarity */
-            border: 1px solid #e2e8f0; /* Added border for definition */
-            transition: all 0.2s;
-        }
-
-        .category-card:hover .subcategory-chip {
-            background: #e0e7ff;
-            color: var(--primary-color);
-            border-color: var(--primary-light);
+        
+        [dir="rtl"] .rtl-flip {
+            transform: scaleX(-1);
         }
 
         /* Statistics / Location Alert */
@@ -644,56 +533,111 @@
             </div>
         @endif
 
-        <!-- Categories Sections -->
-        @forelse($sections ?? [] as $section)
-            <div class="section-card reveal" id="{{ $section->anchor_id }}">
-                <div class="section-header">
-                    <div class="section-icon" style="background: linear-gradient(135deg, {{ $section->color ?? '#2563EB' }}, {{ $section->color ?? '#2563EB' }}cc);">
-                        <i class="{{ $section->icon }}"></i>
-                    </div>
-                    <div class="section-title">
-                        <h2>{{ $section->translated_name }}</h2>
-                        <p>Explore the best services in {{ $section->translated_name }}</p>
-                    </div>
-                </div>
+        @php
+            $sectionImages = [
+                'home-property-services' => 'https://www.umega.co.uk/wp-content/uploads/Edinburgh-Property-management.jpg',
+                'automotive-services' => 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=600&q=80',
+                'professional-business-services' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80',
+                'personal-lifestyle-services' => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80',
+                'food-services' => 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80',
+                'grocery-supermarkets' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80',
+                'technical-repair-services' => 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80',
+                'event-services' => 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=600&q=80',
+                'health-wellness' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80'
+            ];
+            $fallbackImages = [
+                'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80',
+                'https://images.unsplash.com/photo-1581093458791-9f3c3900df4b?w=600&q=80',
+                'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80',
+                'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80'
+            ];
+        @endphp
 
-                <div class="row g-3">
-                    @foreach($section->children as $category)
-                        <div class="col-xl-3 col-lg-4 col-md-6">
-                            <a href="{{ route('service-providers.index', array_filter(['category' => $category->slug, 'location' => $selectedCity?->id])) }}"
-                                class="category-card">
-                                <div class="category-icon cat-bg-{{ ($loop->index % 6) + 1 }}">
-                                    <i class="{{ $category->icon }}"></i>
-                                </div>
-                                <h4>{{ $category->translated_name }}</h4>
-                                <p>{{ $category->description ?? 'Find top rated professionals for this service.' }}</p>
+        <!-- Categories Sections Grid -->
+        <div class="row g-4 mb-5">
+            @forelse($sections ?? [] as $section)
+                @php
+                    $coverImage = $sectionImages[$section->slug] ?? $fallbackImages[$loop->index % count($fallbackImages)];
+                @endphp
+                <div class="col-xl-4 col-lg-6 reveal" id="{{ $section->anchor_id }}">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden section-grid-card transition-all" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                        
+                        <!-- Expressive Cover Image -->
+                        <div class="card-img-top position-relative" style="height: 220px;">
+                            <img src="{{ $coverImage }}" class="w-100 h-100 object-fit-cover" alt="{{ $section->translated_name }}">
+                            <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%);"></div>
+                            <div class="position-absolute bottom-0 start-0 p-4 text-white">
+                                <h3 class="fw-bold mb-1 fs-4 text-white">{{ $section->translated_name }}</h3>
+                                <!-- Replaced static placeholder description with dynamic translation for generic use -->
+                                <p class="mb-0 small text-white-50">{{ $section->description ?? __('general.explore_services', ['name' => $section->translated_name]) }}</p>
+                            </div>
+                        </div>
 
-                                {{-- Updated Subcategory Logic Area --}}
-                                @if($category->children->isNotEmpty())
-                                    <div class="subcategory-list">
-                                        @foreach($category->children->take(3) as $child) {{-- Limit chips for design --}}
-                                            <span class="subcategory-chip">{{ $child->translated_name }}</span>
-                                        @endforeach
-                                        @if($category->children->count() > 3)
-                                            <span class="subcategory-chip">+{{ $category->children->count() - 3 }}</span>
+                        <!-- Card Body with Categories -->
+                        <div class="card-body d-flex flex-column p-4 bg-white">
+                            <div class="category-list flex-grow-1">
+                                @forelse($section->children as $category)
+                                    <div class="category-item mb-3">
+                                        @if($category->children->isNotEmpty())
+                                            <!-- Subcategories Accordion Button -->
+                                            <button class="btn btn-light w-100 text-start d-flex justify-content-between align-items-center rounded-3 p-3 fw-medium" 
+                                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory{{ $category->id }}" 
+                                                    aria-expanded="false" aria-controls="collapseCategory{{ $category->id }}"
+                                                    style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+                                                <span class="text-dark">{{ $category->translated_name }}</span>
+                                                <i class="fas fa-chevron-down small text-muted transition-icon"></i>
+                                            </button>
+                                            
+                                            <!-- Subcategories List -->
+                                            <div class="collapse" id="collapseCategory{{ $category->id }}">
+                                                <div class="pt-3 pb-2 ps-4 pe-4 bg-white border border-top-0 rounded-bottom-3 mt-n1 mb-2" style="border-color: #e2e8f0 !important;">
+                                                    <ul class="list-unstyled mb-0">
+                                                        @foreach($category->children as $child)
+                                                            <li class="py-2 border-bottom border-light">
+                                                                <a href="{{ route('service-providers.index', array_filter(['category' => $child->slug, 'location' => $selectedCity?->id])) }}" class="text-decoration-none text-secondary d-flex align-items-center subcategory-link transition-all hover-primary">
+                                                                    <span class="me-2 text-primary" style="font-size: 0.6rem;">●</span> {{ $child->translated_name }}
+                                                                </a>
+                                                            </li>
+                                                        @endforeach
+                                                        <li class="py-2 mt-1">
+                                                           <a href="{{ route('service-providers.index', array_filter(['category' => $category->slug, 'location' => $selectedCity?->id])) }}" class="text-primary fw-bold text-decoration-none d-flex align-items-center">
+                                                               {{ __('general.view_all') ?? 'View All' }} <i class="fas fa-arrow-right ms-2 rtl-flip small"></i>
+                                                           </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <!-- Direct Link if no subcategories -->
+                                            <a href="{{ route('service-providers.index', array_filter(['category' => $category->slug, 'location' => $selectedCity?->id])) }}" 
+                                               class="btn btn-light w-100 text-start d-flex justify-content-between align-items-center rounded-3 p-3 fw-medium text-decoration-none"
+                                               style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+                                                <span class="text-dark">{{ $category->translated_name }}</span>
+                                                <i class="fas fa-arrow-right small text-muted rtl-flip"></i>
+                                            </a>
                                         @endif
                                     </div>
-                                @endif
-                            </a>
+                                @empty
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-folder-open mb-2 ds-block fs-4 text-light"></i>
+                                        <p class="small mb-0">{{ __('categories.none_available') }}</p>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
-                    @endforeach
+                    </div>
                 </div>
-            </div>
-        @empty
-            <!-- Empty State -->
-            <div class="section-card reveal">
-                <div class="empty-state">
-                    <i class="fas fa-folder-open"></i>
-                    <h3 class="text-muted fw-bold mb-3">{{ __('categories.none_available') }}</h3>
-                    <p class="text-muted mb-0">{{ __('categories.adding_categories_message') }}</p>
+            @empty
+                <!-- Empty State -->
+                <div class="col-12 reveal">
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3 class="text-muted fw-bold mb-3">{{ __('categories.none_available') }}</h3>
+                        <p class="text-muted mb-0">{{ __('categories.adding_categories_message') }}</p>
+                    </div>
                 </div>
-            </div>
-        @endforelse
+            @endforelse
+        </div>
 
         <!-- Call to Action Section -->
         @if(isset($sections) && count($sections) > 0)

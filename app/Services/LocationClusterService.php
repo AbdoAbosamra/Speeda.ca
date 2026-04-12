@@ -23,6 +23,11 @@ class LocationClusterService
         'ottawa'   => ['ottawa', 'gatineau'],
     ];
 
+    private const NAMED_CLUSTERS = [
+        'cluster_montreal' => ['laval', 'montreal'],
+        'cluster_ottawa' => ['ottawa', 'gatineau'],
+    ];
+
     /**
      * Get all location IDs that should be included when filtering by a given location.
      *
@@ -38,6 +43,23 @@ class LocationClusterService
                 return $this->resolveCluster($locationId);
             }
         );
+    }
+
+    /**
+     * Resolve the public named cluster keys used by the listing filter.
+     *
+     * @return array<int>
+     */
+    // @change 2026-04-12 TASK-3 | Added named cluster lookup for public listing filters | Support two fixed dropdown values without changing legacy city-based filtering | risk:LOW
+    public function getClusterIdsByKey(string $clusterKey): array
+    {
+        $normalizedKey = strtolower(trim($clusterKey));
+
+        if (!isset(self::NAMED_CLUSTERS[$normalizedKey])) {
+            return [];
+        }
+
+        return $this->resolveClusterCities(self::NAMED_CLUSTERS[$normalizedKey]);
     }
 
     /**
@@ -61,13 +83,7 @@ class LocationClusterService
         $clusterCities = self::CLUSTERS[$cityLower];
 
         // Look up all location IDs matching the cluster cities
-        $clusterIds = Location::where('is_active', true)
-            ->get()
-            ->filter(function ($loc) use ($clusterCities) {
-                return in_array(strtolower(trim($loc->city)), $clusterCities);
-            })
-            ->pluck('id')
-            ->toArray();
+        $clusterIds = $this->resolveClusterCities($clusterCities);
 
         // Ensure the original location is always included
         if (!in_array($locationId, $clusterIds)) {
@@ -75,6 +91,21 @@ class LocationClusterService
         }
 
         return $clusterIds;
+    }
+
+    /**
+     * @param array<int, string> $clusterCities
+     * @return array<int>
+     */
+    private function resolveClusterCities(array $clusterCities): array
+    {
+        return Location::where('is_active', true)
+            ->get()
+            ->filter(function ($loc) use ($clusterCities) {
+                return in_array(strtolower(trim($loc->city)), $clusterCities, true);
+            })
+            ->pluck('id')
+            ->toArray();
     }
 
     /**

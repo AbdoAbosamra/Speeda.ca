@@ -18,8 +18,9 @@ class RegisterRequest extends FormRequest
 
     public function rules(): array
     {
+        // @change 2026-04-12 TASK-2 | Relaxed client registration requirements and removed client phone validation | Clients should register with email and password only while preserving provider rules | risk:LOW
         $rules = [
-            'name' => ['required', 'string', 'max:255', 'min:2', 'regex:/^[\p{L}\p{M}\s\-\']+$/u'],
+            'name' => ['nullable', 'string', 'max:255', 'min:2', 'regex:/^[\p{L}\p{M}\s\-\']+$/u'],
             'email' => [
                 'required',
                 'string',
@@ -34,6 +35,7 @@ class RegisterRequest extends FormRequest
 
         // Service provider specific rules
         if ($this->input('role') === 'service_provider') {
+            $rules['name'][0] = 'required';
             $rules['mobile'] = ['required', 'string', new CanadianPhoneNumber(), 'unique:service_providers,phone'];
             $rules['whatsapp_number'] = ['nullable', 'string', new CanadianPhoneNumber()];
             $rules['profession'] = ['required', function($attribute, $value, $fail) {
@@ -46,9 +48,6 @@ class RegisterRequest extends FormRequest
             }];
             $rules['city'] = ['required', 'string', 'max:100'];
             $rules['terms'] = ['required', 'accepted'];
-        } else {
-            // Client can optionally provide mobile
-            $rules['mobile'] = ['nullable', 'string', new CanadianPhoneNumber()];
         }
 
         return $rules;

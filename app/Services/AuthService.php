@@ -60,14 +60,27 @@ class AuthService
             }
         }
 
+        // @change 2026-04-12 TASK-2 | Derived a fallback client name when the form omits it | Allow email/password-only client registration without changing provider registration | risk:LOW
         return User::create([
-            'name' => $data['name'],
+            'name' => $this->resolveRegistrationName($data),
             'email' => $data['email'],
             'role' => $data['role'],
             'profession' => $profession,
             'password' => Hash::make($data['password']),
             'email_verified_at' => $data['role'] === 'service_provider' ? now() : null,
         ]);
+    }
+
+    private function resolveRegistrationName(array $data): string
+    {
+        if (!empty($data['name'])) {
+            return $data['name'];
+        }
+
+        $emailPrefix = Str::before((string) ($data['email'] ?? ''), '@');
+        $fallbackName = trim(str_replace(['.', '_', '-'], ' ', $emailPrefix));
+
+        return $fallbackName !== '' ? Str::title($fallbackName) : 'Client';
     }
 
     /**

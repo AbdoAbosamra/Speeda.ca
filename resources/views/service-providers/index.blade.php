@@ -1702,11 +1702,12 @@
                     </div>
 
                     <div class="select-wrapper">
+                        {{-- @change 2026-04-12 TASK-3 | Replaced raw location options with two fixed cluster choices | Restrict public filtering to approved metropolitan clusters only | risk:LOW --}}
                         <select class="filter-select" id="locationFilter">
                             <option value="">{{ __('service_provider.all_locations') }}</option>
-                            @foreach($locations as $location)
-                                <option value="{{ $location->id }}" {{ request('location') == $location->id ? 'selected' : '' }}>
-                                    <i class="fas fa-map-marker-alt me-2"></i>{{ $location->city }}
+                            @foreach($locationClusters as $clusterKey => $clusterLabel)
+                                <option value="{{ $clusterKey }}" {{ request('location') === $clusterKey ? 'selected' : '' }}>
+                                    {{ $clusterLabel }}
                                 </option>
                             @endforeach
                         </select>

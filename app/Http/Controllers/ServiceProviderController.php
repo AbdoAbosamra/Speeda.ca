@@ -75,11 +75,29 @@ class ServiceProviderController extends Controller
         }
 
         // Location filter — with cluster mapping
+        // @change 2026-04-12 TASK-3 | Switched public location filter to two named clusters with legacy ID fallback | Restrict dropdown choices without breaking existing cluster resolution | risk:LOW
+        $locationClusters = [
+            'cluster_montreal' => 'Laval – Montréal',
+            'cluster_ottawa' => 'Ottawa – Gatineau',
+        ];
+
         if ($request->filled('location')) {
-            $clusterIds = app(LocationClusterService::class)->getClusterIds(
-                (int) $request->input('location')
-            );
-            $query->whereIn('location_id', $clusterIds);
+            $selectedLocation = (string) $request->input('location');
+            $clusterService = app(LocationClusterService::class);
+
+            if (array_key_exists($selectedLocation, $locationClusters)) {
+                $clusterIds = $clusterService->getClusterIdsByKey($selectedLocation);
+            } elseif (ctype_digit($selectedLocation)) {
+                $clusterIds = $clusterService->getClusterIds((int) $selectedLocation);
+            } else {
+                $clusterIds = [];
+            }
+
+            if (empty($clusterIds)) {
+                $query->whereNull('id');
+            } else {
+                $query->whereIn('location_id', $clusterIds);
+            }
         }
 
         // Order by LIVE rating (from subquery) instead of stored rating
@@ -92,12 +110,11 @@ class ServiceProviderController extends Controller
             ->get()
             ->sortBy('translated_name')
             ->values();
-        $locations = Location::where('is_active', true)->orderBy('city')->get();
 
         // Get list of revealed contacts from session
         $revealedContacts = session('revealed_contacts', []);
 
-        return view('service-providers.index', compact('serviceProviders', 'categories', 'locations', 'revealedContacts'));
+        return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts'));
     }
 
     /**
@@ -167,6 +184,7 @@ class ServiceProviderController extends Controller
      * Display the specified service provider's profile (public view)
      * Anyone can view but only owner can edit
      */
+    // @change 2026-04-12 TASK-1 | Added public gallery eager loading and view variables | Allow non-providers to view the gallery | risk:LOW
     public function show(Request $request, ServiceProvider $serviceProvider)
     {
         try {
@@ -247,8 +265,22 @@ class ServiceProviderController extends Controller
                 'location',
                 'activeReviews.client',
                 'activeReviews.approvedBy',
-                'endorsements'
+                'endorsements',
+                'media' => function($q) { $q->where('collection_name', 'gallery'); }
             ]);
+
+            // Prepare public gallery images payload
+            $galleryImages = collect($serviceProvider->getMedia('gallery'))->map(function ($media) use ($serviceProvider) {
+                return [
+                    'id' => $media->id,
+                    'thumb_url' => method_exists($serviceProvider, 'getMediaPublicUrl') 
+                        ? ($serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null) ?? $media->getUrl())
+                        : $media->getUrl($media->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : ''),
+                    'large_url' => method_exists($serviceProvider, 'getMediaPublicUrl')
+                        ? ($serviceProvider->getMediaPublicUrl($media, $media->hasGeneratedConversion('gallery_large') ? 'gallery_large' : null) ?? $media->getUrl())
+                        : $media->getUrl($media->hasGeneratedConversion('gallery_large') ? 'gallery_large' : '')
+                ];
+            });
 
             // === STEP 3: Get paginated reviews for display ===
             $reviews = $serviceProvider->activeReviews()
@@ -318,7 +350,8 @@ class ServiceProviderController extends Controller
                 'formattedNumber',
                 'isContactRevealed',
                 'hasReviewed',
-                'userRating'
+                'userRating',
+                'galleryImages'
             ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);

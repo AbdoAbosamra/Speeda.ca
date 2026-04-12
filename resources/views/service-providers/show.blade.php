@@ -625,6 +625,157 @@
             z-index: 1990 !important;
         }
 
+        /* @change 2026-04-12 TASK-1 | Added public gallery grid and Alpine lightbox styles | Show provider gallery to visitors without edit controls | risk:LOW */
+        .public-gallery-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .public-gallery-card {
+            aspect-ratio: 1 / 1;
+            border: 0;
+            border-radius: 16px;
+            cursor: pointer;
+            overflow: hidden;
+            padding: 0;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .public-gallery-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+        }
+
+        .public-gallery-card img {
+            block-size: 100%;
+            inline-size: 100%;
+            object-fit: cover;
+        }
+
+        .public-gallery-card::after {
+            align-items: center;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.45));
+            color: #fff;
+            content: '\f00e';
+            display: flex;
+            font-family: 'Font Awesome 6 Free';
+            font-size: 1.1rem;
+            font-weight: 900;
+            inset: 0;
+            justify-content: center;
+            opacity: 0;
+            position: absolute;
+            transition: var(--transition);
+        }
+
+        .public-gallery-card:hover::after {
+            opacity: 1;
+        }
+
+        .public-gallery-lightbox {
+            align-items: center;
+            background: rgba(15, 23, 42, 0.92);
+            display: flex;
+            inset: 0;
+            justify-content: center;
+            padding: 1.5rem;
+            position: fixed;
+            z-index: 1065;
+        }
+
+        .public-gallery-lightbox img {
+            border-radius: 20px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+            max-block-size: calc(100vh - 6rem);
+            max-inline-size: min(92vw, 960px);
+            object-fit: contain;
+        }
+
+        .public-gallery-close,
+        .public-gallery-nav {
+            align-items: center;
+            background: rgba(255, 255, 255, 0.14);
+            border: 0;
+            border-radius: 999px;
+            color: #fff;
+            display: inline-flex;
+            justify-content: center;
+            position: fixed;
+            transition: var(--transition);
+        }
+
+        .public-gallery-close:hover,
+        .public-gallery-nav:hover {
+            background: rgba(255, 255, 255, 0.24);
+            transform: scale(1.05);
+        }
+
+        .public-gallery-close {
+            block-size: 3rem;
+            inline-size: 3rem;
+            inset-block-start: 1.5rem;
+            inset-inline-end: 1.5rem;
+        }
+
+        .public-gallery-nav {
+            block-size: 3.25rem;
+            inline-size: 3.25rem;
+            inset-block-start: 50%;
+            transform: translateY(-50%);
+        }
+
+        .public-gallery-nav.prev {
+            inset-inline-start: 1.5rem;
+        }
+
+        .public-gallery-nav.next {
+            inset-inline-end: 1.5rem;
+        }
+
+        .public-gallery-counter {
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            color: #fff;
+            inset-block-end: 1.5rem;
+            inset-inline-start: 50%;
+            padding: 0.5rem 1rem;
+            position: fixed;
+            transform: translateX(-50%);
+        }
+
+        @media (min-width: 992px) {
+            .public-gallery-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .public-gallery-lightbox {
+                padding: 1rem;
+            }
+
+            .public-gallery-nav {
+                inset-block-end: 1.25rem;
+                inset-block-start: auto;
+                transform: none;
+            }
+
+            .public-gallery-nav.prev {
+                inset-inline-start: 1rem;
+            }
+
+            .public-gallery-nav.next {
+                inset-inline-end: 1rem;
+            }
+
+            .public-gallery-close {
+                inset-block-start: 1rem;
+                inset-inline-end: 1rem;
+            }
+        }
+
         /* Reviews Section */
         .review-card {
             background: white;
@@ -1625,6 +1776,71 @@
                             </h4>
                             <p class="fs-6">{{ $serviceProvider->bio ?? __('service_provider.no_description') }}</p>
                         </div>
+
+                        @if($galleryImages->count() > 0)
+                            {{-- @change 2026-04-12 TASK-1 | Added read-only public gallery section with Alpine lightbox | Let visitors browse provider gallery without edit actions | risk:LOW --}}
+                            <div class="mb-4"
+                                x-data="{
+                                    items: {{ Js::from($galleryImages->values()) }},
+                                    isOpen: false,
+                                    activeIndex: 0,
+                                    openLightbox(index) {
+                                        this.activeIndex = index;
+                                        this.isOpen = true;
+                                        document.body.classList.add('overflow-hidden');
+                                    },
+                                    closeLightbox() {
+                                        this.isOpen = false;
+                                        document.body.classList.remove('overflow-hidden');
+                                    },
+                                    nextImage() {
+                                        this.activeIndex = (this.activeIndex + 1) % this.items.length;
+                                    },
+                                    previousImage() {
+                                        this.activeIndex = (this.activeIndex - 1 + this.items.length) % this.items.length;
+                                    }
+                                }"
+                                x-on:keydown.escape.window="if (isOpen) closeLightbox()"
+                                x-on:keydown.arrow-right.window="if (isOpen) nextImage()"
+                                x-on:keydown.arrow-left.window="if (isOpen) previousImage()">
+                                <h4 class="fw-bold text-primary mb-3">
+                                    <i class="fas fa-images me-2"></i>{{ __('service_provider.gallery_upload_title') ?? 'Gallery' }}
+                                </h4>
+
+                                <div class="public-gallery-grid">
+                                    @foreach($galleryImages as $galleryIndex => $galleryImage)
+                                        <button type="button" class="public-gallery-card"
+                                            @click="openLightbox({{ $galleryIndex }})">
+                                            <img src="{{ $galleryImage['thumb_url'] }}"
+                                                alt="{{ __('service_provider.gallery_image_alt') }}"
+                                                loading="lazy">
+                                        </button>
+                                    @endforeach
+                                </div>
+
+                                <template x-if="isOpen">
+                                    <div class="public-gallery-lightbox" @click.self="closeLightbox()">
+                                        <button type="button" class="public-gallery-close" @click="closeLightbox()"
+                                            aria-label="{{ __('general.close') }}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <button type="button" class="public-gallery-nav prev" @click="previousImage()"
+                                            aria-label="{{ __('general.previous') }}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <img :src="items[activeIndex].large_url"
+                                            alt="{{ __('service_provider.gallery_image_alt') }}">
+                                        <button type="button" class="public-gallery-nav next" @click="nextImage()"
+                                            aria-label="{{ __('general.next') }}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                        <div class="public-gallery-counter">
+                                            <span x-text="`${activeIndex + 1} / ${items.length}`"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        @endif
 
                         <!-- Services Offered -->
                         <div class="mb-4">

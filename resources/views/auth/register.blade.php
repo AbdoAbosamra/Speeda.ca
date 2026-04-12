@@ -1699,7 +1699,8 @@
                     <span>{{ __('auth.or') }}</span>
                 </div>
 
-                <div class="form-group">
+                {{-- @change 2026-04-12 TASK-2 | Hid client-only registration down to essential credentials while keeping provider fields available behind role selection | Client signup should no longer collect phone details during registration | risk:LOW --}}
+                <div class="form-group" id="register-name-field">
                     <label for="name" class="form-label">
                         <i class="fas fa-user"></i>
                         {{ __('auth.full_name') }}
@@ -1736,7 +1737,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="register-mobile-field">
                     <label for="mobile" class="form-label">
                         <i class="fas fa-mobile-alt"></i>
                         {{ __('auth.mobile_number') }}
@@ -1782,7 +1783,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="register-whatsapp-field">
                     <label for="whatsapp_number" class="form-label">
                         <i class="fab fa-whatsapp"></i>
                         {{ __('service_provider.whatsapp_number') }}
@@ -1967,7 +1968,7 @@
                     </div>
                 </div>
 
-                <div class="terms-container">
+                <div class="terms-container" id="register-terms-field">
                     <div class="checkbox-container">
                         <input id="terms" type="checkbox" class="checkbox-input" name="terms" required>
                         <label for="terms" class="checkbox-label">
@@ -2023,6 +2024,11 @@
         const authSubtitle = document.getElementById('auth-subtitle');
         const alreadyRegisteredLink = document.getElementById('already-registered-link');
         const mobileInput = document.getElementById('mobile');
+        const nameField = document.getElementById('register-name-field');
+        const mobileField = document.getElementById('register-mobile-field');
+        const whatsappField = document.getElementById('register-whatsapp-field');
+        const termsField = document.getElementById('register-terms-field');
+        const termsInput = document.getElementById('terms');
         const phoneFormat = document.getElementById('phone-format');
         const mobileError = document.getElementById('mobile-error');
         const registerButton = document.getElementById('register-button');
@@ -2047,6 +2053,7 @@
         const cityOptions = document.getElementById('city-options');
         const cityValue = document.getElementById('city-value');
         const cityInput = document.getElementById('city-input');
+        const whatsappInput = document.getElementById('whatsapp_number');
 
         // Auto-select service provider role if URL parameter is present
         const urlParams = new URLSearchParams(window.location.search);
@@ -2207,6 +2214,7 @@
             }
         });
 
+        // @change 2026-04-12 TASK-2 | Updated register role toggling to hide client phone/name/terms fields and target the correct register form elements | Keep client registration limited to essential credentials without breaking provider mode | risk:LOW
         function selectRegisterRole(role) {
             document.getElementById('client-option').classList.remove('selected');
             document.getElementById('provider-option').classList.remove('selected');
@@ -2216,8 +2224,6 @@
 
             const professionField = document.getElementById('profession-field');
             const cityField = document.getElementById('city-field');
-            const mobileField = document.getElementById('mobile-field');
-            const whatsappField = document.getElementById('whatsapp-field');
             const phoneRequired = document.getElementById('phone-required');
             const phoneOptional = document.getElementById('phone-optional');
             const phoneHint = document.getElementById('phone-hint');
@@ -2227,17 +2233,21 @@
                 document.getElementById('provider-option').classList.add('selected');
                 document.getElementById('provider').checked = true;
                 document.getElementById('provider-option').setAttribute('aria-checked', 'true');
+                nameField.style.display = 'block';
                 professionField.style.display = 'block';
                 cityField.style.display = 'block';
                 mobileField.style.display = 'block';
                 whatsappField.style.display = 'block';
+                termsField.style.display = 'block';
                 // Phone is required for service providers
                 phoneRequired.style.display = 'inline';
                 phoneOptional.style.display = 'none';
                 phoneHint.textContent = 'Please enter a valid Canadian mobile number (10 digits) - Required for service providers';
+                document.getElementById('name').setAttribute('required', 'required');
                 // Add required attribute to phone input
                 mobileInput.setAttribute('required', 'required');
                 whatsappInput?.setAttribute('required', 'required');
+                termsInput.setAttribute('required', 'required');
                 if (whatsappHint) {
                     whatsappHint.style.display = 'flex';
                 }
@@ -2245,16 +2255,20 @@
                 document.getElementById('client-option').classList.add('selected');
                 document.getElementById('client').checked = true;
                 document.getElementById('client-option').setAttribute('aria-checked', 'true');
+                nameField.style.display = 'none';
                 professionField.style.display = 'none';
                 cityField.style.display = 'none';
                 mobileField.style.display = 'none';
                 whatsappField.style.display = 'none';
+                termsField.style.display = 'none';
                 // Phone is optional for clients
                 phoneRequired.style.display = 'none';
                 phoneOptional.style.display = 'inline';
-                phoneHint.textContent = 'Please enter a valid Canadian mobile number (10 digits) - Optional for clients';
+                phoneHint.textContent = 'Phone number is no longer required for client registration';
+                document.getElementById('name').removeAttribute('required');
                 // Remove required attribute from phone input
                 mobileInput.removeAttribute('required');
+                termsInput.removeAttribute('required');
                 mobileInput.value = '';
                 mobileInput.classList.remove('error');
                 mobileError.textContent = '';
@@ -2544,7 +2558,6 @@
         });
 
         // Add WhatsApp number formatting
-        const whatsappInput = document.getElementById('whatsapp_number');
         if (whatsappInput) {
             whatsappInput.addEventListener('input', function (e) {
                 formatPhoneInput(e.target, 'whatsapp');
@@ -2777,10 +2790,13 @@
             } else if (roleParam) {
                 // Support links like /register?role=service_provider
                 selectRegisterRole(roleParam);
+            } else {
+                // Keep the client flow reduced by default on first load.
+                selectRegisterRole('client');
             }
 
             // Check URL parameters to determine which form to show
-            if (urlParams.get('form') === 'register' || "{{ $errors->any() && old('name') }}") {
+            if (urlParams.get('form') === 'register' || "{{ $errors->any() && (old('email') || old('role')) }}") {
                 switchToRegister();
             }
 

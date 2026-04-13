@@ -262,4 +262,8 @@ return [
     'confirm_delete_title' => 'Confirmer la suppression',
     'confirm_delete_message' => 'Voulez-vous vraiment supprimer cette image?',
     'my_profile' => 'Mon Profil',
+    'languages_spoken' => 'Langues parlées',
+    'arabic' => 'Arabe',
+    'english' => 'Anglais',
+    'french' => 'Français',
 ];

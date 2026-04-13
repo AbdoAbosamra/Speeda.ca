@@ -183,6 +183,14 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:10240', // 10MB
             ],
+            'languages' => [
+                'nullable',
+                'array'
+            ],
+            'languages.*' => [
+                'string',
+                'in:ar,en,fr'
+            ],
         ];
 
         return $rules;
@@ -270,6 +278,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
             'services_offered' => __('service_provider.services_provided'),
             'profile_image' => __('general.profile_image'),
             'certification' => __('service_provider.certification'),
+            'languages' => __('service_provider.languages_spoken'),
         ];
     }
 }

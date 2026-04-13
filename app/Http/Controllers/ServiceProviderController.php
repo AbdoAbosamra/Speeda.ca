@@ -581,6 +581,7 @@ class ServiceProviderController extends Controller
                 'whatsapp_number' => isset($validated['whatsapp_number']) ? preg_replace('/[^0-9+]/', '', $validated['whatsapp_number']) : null,
                 'address' => isset($validated['address']) ? trim($validated['address']) : $serviceProvider->address,
                 'location_id' => $validated['location_id'] ?? $serviceProvider->location_id,
+                'languages' => $validated['languages'] ?? [],
             ];
 
             // === CATEGORY LOCK ENFORCEMENT: Backend Rule (Defense in Depth) ===

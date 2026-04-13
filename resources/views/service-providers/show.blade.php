@@ -990,6 +990,49 @@
         [dir="rtl"] .text-end {
             text-align: left !important;
         }
+
+        /* Custom Checkbox Cards */
+        .custom-checkbox-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .custom-checkbox-card:hover {
+            border-color: var(--primary-color);
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-checkbox-card.checked {
+            border-color: var(--primary-color);
+            background: #eef2ff;
+        }
+
+        .custom-checkbox-card .check-icon {
+            color: #cbd5e1;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .custom-checkbox-card.checked .check-icon {
+            color: var(--primary-color);
+        }
+
+        .language-badge {
+            background: #eef2ff;
+            color: #4f46e5;
+            border: 1px solid #c7d2fe;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 
@@ -1095,6 +1138,22 @@
                                     <i class="fas fa-briefcase me-1"></i>
                                     {{ $serviceProvider->category->translated_name ?? __('service_provider.uncategorized') }}
                                 </p>
+
+                                {{-- Languages Spoken --}}
+                                @if($serviceProvider->languages && count($serviceProvider->languages) > 0)
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        @foreach($serviceProvider->languages as $langCode)
+                                            @php 
+                                                $langNames = ['ar' => 'arabic', 'en' => 'english', 'fr' => 'french'];
+                                                $label = $langNames[$langCode] ?? $langCode;
+                                            @endphp
+                                            <span class="language-badge">
+                                                <i class="fas fa-globe-americas"></i>
+                                                {{ __('service_provider.' . $label) }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 {{-- Endorsement Button - visible to all (component handles auth) --}}
@@ -1209,6 +1268,33 @@
                                                 </div>
                                                 @error('experience_years')
                                                     <small class="text-danger"><i
+                                                            class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">
+                                                    <i class="fas fa-language text-primary me-1"></i>
+                                                    {{ __('service_provider.languages_spoken') }}
+                                                </label>
+                                                <div class="row g-2 px-1">
+                                                    @foreach(['ar' => 'arabic', 'en' => 'english', 'fr' => 'french'] as $code => $label)
+                                                        @php $isChecked = in_array($code, old('languages', $serviceProvider->languages ?? [])); @endphp
+                                                        <div class="col-md-4">
+                                                            <div class="custom-checkbox-card {{ $isChecked ? 'checked' : '' }}" 
+                                                                 onclick="const cb = this.querySelector('input'); cb.checked = !cb.checked; this.classList.toggle('checked', cb.checked);">
+                                                                <input class="d-none" type="checkbox" name="languages[]" 
+                                                                    value="{{ $code }}" {{ $isChecked ? 'checked' : '' }}>
+                                                                <div class="d-flex align-items-center justify-content-between p-3" style="cursor: pointer;">
+                                                                    <span class="fw-semibold">{{ __('service_provider.' . $label) }}</span>
+                                                                    <i class="fas fa-check-circle check-icon"></i>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                @error('languages')
+                                                    <small class="text-danger d-block mt-1"><i
                                                             class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
                                                 @enderror
                                             </div>

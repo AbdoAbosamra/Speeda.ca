@@ -264,4 +264,8 @@ return [
     'confirm_delete_title' => 'Confirm Deletion',
     'confirm_delete_message' => 'Are you sure you want to delete this image?',
     'my_profile' => 'My Profile',
+    'languages_spoken' => 'Languages Spoken',
+    'arabic' => 'Arabic',
+    'english' => 'English',
+    'french' => 'French',
 ];

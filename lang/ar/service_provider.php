@@ -261,4 +261,8 @@ return [
     'confirm_delete_title' => 'تأكيد الحذف',
     'confirm_delete_message' => 'هل أنت متأكد من رغبتك في حذف هذه الصورة؟',
     'my_profile' => 'حسابي',
+    'languages_spoken' => 'اللغات التي تتحدث بها',
+    'arabic' => 'العربية',
+    'english' => 'الإنجليزية',
+    'french' => 'الفرنسية',
 ];

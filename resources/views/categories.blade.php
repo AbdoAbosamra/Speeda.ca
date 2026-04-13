@@ -311,7 +311,7 @@
             position: relative;
             scroll-margin-top: 110px;
         }
-        
+
         .section-grid-card:hover {
             transform: translateY(-8px) !important;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
@@ -335,7 +335,7 @@
             color: var(--primary-color) !important;
             padding-inline-start: 4px; /* for RTL support */
         }
-        
+
         [dir="rtl"] .rtl-flip {
             transform: scaleX(-1);
         }
@@ -535,15 +535,14 @@
 
         @php
             $sectionImages = [
-                'home-property-services' => 'https://www.umega.co.uk/wp-content/uploads/Edinburgh-Property-management.jpg',
-                'automotive-services' => 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=600&q=80',
-                'professional-business-services' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80',
-                'personal-lifestyle-services' => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80',
-                'food-services' => 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80',
-                'grocery-supermarkets' => 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80',
-                'technical-repair-services' => 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80',
-                'event-services' => 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=600&q=80',
-                'health-wellness' => 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80'
+                'home-property-services' => asset('images/sections/Home property .jpeg'),
+                'automotive-services' => asset('images/sections/automotive services.jpeg'),
+                'professional-business-services' => asset('images/sections/professional .jpeg'),
+                'personal-lifestyle-services' => asset('images/sections/personal.jpeg'),
+                'food-services' => asset('images/sections/Food Services .jpeg'),
+                'grocery-supermarkets' => asset('images/sections/supermarket.jpeg'),
+                'technical-repair-services' => asset('images/sections/Techincal.jpeg'),
+                'others' => asset('images/sections/other.jpeg')
             ];
             $fallbackImages = [
                 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80',
@@ -561,7 +560,7 @@
                 @endphp
                 <div class="col-xl-4 col-lg-6 reveal" id="{{ $section->anchor_id }}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden section-grid-card transition-all" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                        
+
                         <!-- Expressive Cover Image -->
                         <div class="card-img-top position-relative" style="height: 220px;">
                             <img src="{{ $coverImage }}" class="w-100 h-100 object-fit-cover" alt="{{ $section->translated_name }}">
@@ -580,14 +579,14 @@
                                     <div class="category-item mb-3">
                                         @if($category->children->isNotEmpty())
                                             <!-- Subcategories Accordion Button -->
-                                            <button class="btn btn-light w-100 text-start d-flex justify-content-between align-items-center rounded-3 p-3 fw-medium" 
-                                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory{{ $category->id }}" 
+                                            <button class="btn btn-light w-100 text-start d-flex justify-content-between align-items-center rounded-3 p-3 fw-medium"
+                                                    type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory{{ $category->id }}"
                                                     aria-expanded="false" aria-controls="collapseCategory{{ $category->id }}"
                                                     style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
                                                 <span class="text-dark">{{ $category->translated_name }}</span>
                                                 <i class="fas fa-chevron-down small text-muted transition-icon"></i>
                                             </button>
-                                            
+
                                             <!-- Subcategories List -->
                                             <div class="collapse" id="collapseCategory{{ $category->id }}">
                                                 <div class="pt-3 pb-2 ps-4 pe-4 bg-white border border-top-0 rounded-bottom-3 mt-n1 mb-2" style="border-color: #e2e8f0 !important;">
@@ -609,7 +608,7 @@
                                             </div>
                                         @else
                                             <!-- Direct Link if no subcategories -->
-                                            <a href="{{ route('service-providers.index', array_filter(['category' => $category->slug, 'location' => $selectedCity?->id])) }}" 
+                                            <a href="{{ route('service-providers.index', array_filter(['category' => $category->slug, 'location' => $selectedCity?->id])) }}"
                                                class="btn btn-light w-100 text-start d-flex justify-content-between align-items-center rounded-3 p-3 fw-medium text-decoration-none"
                                                style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
                                                 <span class="text-dark">{{ $category->translated_name }}</span>

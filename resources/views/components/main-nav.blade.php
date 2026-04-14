@@ -1,13 +1,43 @@
-@php($user = auth()->user())
+@php
+    $user = auth()->user();
+    $provider = $user?->serviceProvider;
+    $unreadCount = $unreadCount ?? 0;
+    $hasUnread = $unreadCount > 0;
+    $readIds = $readNotificationIds ?? [];
+    $isServiceProvider = $user?->isServiceProvider();
+@endphp
 
 @once
     <style>
         /* ===============================================
-           النظام اللوني الرباعي المتطور
-           =============================================== */
+               1. ROOT / DESIGN TOKENS
+               =============================================== */
         :root {
-            /* الألوان الأساسية - Primary Colors */
-            --primary-base: #3b82f6;
+            /* Spacing - 8pt grid */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+
+            /* Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            /* Transitions */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Primary */
             --primary-50: #eff6ff;
             --primary-100: #dbeafe;
             --primary-200: #bfdbfe;
@@ -19,1117 +49,885 @@
             --primary-800: #1e40af;
             --primary-900: #1e3a8a;
 
-            /* ألوان النجاح - Success Colors */
-            --success-base: #10b981;
+            /* Success */
             --success-50: #ecfdf5;
-            --success-100: #d1fae5;
-            --success-200: #a7f3d0;
-            --success-300: #6ee7b7;
-            --success-400: #34d399;
             --success-500: #10b981;
             --success-600: #059669;
-            --success-700: #047857;
-            --success-800: #065f46;
-            --success-900: #064e3b;
 
-            /* ألوان التحذير - Warning Colors */
-            --warning-base: #f59e0b;
-            --warning-50: #fffbeb;
-            --warning-100: #fef3c7;
-            --warning-200: #fde68a;
-            --warning-300: #fcd34d;
-            --warning-400: #fbbf24;
+            /* Warning */
             --warning-500: #f59e0b;
-            --warning-600: #d97706;
-            --warning-700: #b45309;
-            --warning-800: #92400e;
-            --warning-900: #78350f;
 
-            /* ألوان الخطأ - Danger Colors */
-            --danger-base: #ef4444;
+            /* Danger */
             --danger-50: #fef2f2;
             --danger-100: #fee2e2;
             --danger-200: #fecaca;
-            --danger-300: #fca5a5;
-            --danger-400: #f87171;
             --danger-500: #ef4444;
             --danger-600: #dc2626;
             --danger-700: #b91c1c;
-            --danger-800: #991b1b;
-            --danger-900: #7f1d1d;
 
-            /* ألوان النصوص */
+            /* Typography */
             --text-primary: #0f172a;
             --text-secondary: #475569;
-            --text-light: #94a3b8;
-            --text-white: #ffffff;
+            --text-muted: #94a3b8;
+            --text-inverse: #ffffff;
 
-            /* خلفيات متدرجة */
-            --bg-white: #ffffff;
-            --bg-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.92));
-            --bg-glass-solid: rgba(255, 255, 255, 0.95);
-            --bg-subtle: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            --bg-card: linear-gradient(135deg, #ffffff, #f9fafb);
+            /* Surfaces */
+            --surface-white: #ffffff;
+            --surface-glass: rgba(255, 255, 255, 0.95);
+            --surface-subtle: #f8fafc;
+            --surface-card: #f9fafb;
 
-            /* حدود وظلال */
-            --border-color: #e2e8f0;
-            --border-gradient: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-            --shadow-soft: 0 2px 8px rgba(15, 23, 42, 0.04);
+            /* Borders */
+            --border-default: #e2e8f0;
+            --border-subtle: rgba(226, 232, 240, 0.4);
+
+            /* Shadows */
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
             --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
             --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
             --shadow-xl: 0 24px 64px rgba(15, 23, 42, 0.16);
-            --shadow-glow: 0 0 32px rgba(99, 102, 241, 0.2);
-            --shadow-glow-hover: 0 8px 40px rgba(99, 102, 241, 0.35);
 
-            /* تدرجات مخصصة */
+            /* Gradients */
             --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-            --gradient-secondary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%);
-            --gradient-soft: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.08));
-            --gradient-hover: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.15));
+            --gradient-primary-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.08));
+            --gradient-primary-hover: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.15));
+            --gradient-success: linear-gradient(135deg, #10b981, #059669);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
+            --gradient-danger-subtle: linear-gradient(135deg, rgba(220, 38, 38, 0.08), transparent);
+
+            /* Glow Effects */
+            --glow-primary: 0 0 32px rgba(99, 102, 241, 0.2);
+            --glow-primary-hover: 0 8px 40px rgba(99, 102, 241, 0.35);
+            --glow-danger: 0 4px 12px rgba(239, 68, 68, 0.5);
+            --glow-success: 0 12px 32px rgba(16, 185, 129, 0.5);
         }
 
-        /* وضع الليل المحسّن */
+        /* ===============================================
+               2. DARK MODE
+               =============================================== */
         body.dark-mode {
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
-            --text-light: #94a3b8;
-            --bg-white: #0f172a;
-            --bg-glass: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
-            --bg-glass-solid: rgba(15, 23, 42, 0.95);
-            --bg-subtle: linear-gradient(135deg, #1e293b, #334155);
-            --bg-card: linear-gradient(135deg, #1e293b, #293548);
-            --border-color: #334155;
-            --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --text-muted: #94a3b8;
+            --surface-white: #0f172a;
+            --surface-glass: rgba(15, 23, 42, 0.95);
+            --surface-subtle: #1e293b;
+            --surface-card: #1e293b;
+            --border-default: #334155;
+            --border-subtle: rgba(51, 65, 85, 0.4);
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.15);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
             --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
             --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.4);
             --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.5);
         }
 
-        /* --- شريط التنقل الرئيسي المحسّن --- */
+        /* ===============================================
+               3. NAVIGATION BAR (Layout)
+               =============================================== */
         .sp-nav {
             position: sticky;
             top: 0;
             z-index: 1100;
-            background: var(--bg-glass-solid);
+            width: 100%;
+            background: var(--surface-glass);
             backdrop-filter: blur(32px) saturate(180%);
             -webkit-backdrop-filter: blur(32px) saturate(180%);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.4);
-            box-shadow: var(--shadow-soft);
-            width: 100%;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: navSlideDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-xs);
+            transition: background var(--transition-smooth),
+                box-shadow var(--transition-smooth),
+                border-color var(--transition-smooth);
+            animation: navEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
 
-        @keyframes navSlideDown {
-            0% {
-                transform: translateY(-120%);
-                opacity: 0;
-                filter: blur(10px);
-            }
-            60% {
-                transform: translateY(5px);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-                filter: blur(0);
-            }
+        @keyframes navEnter {
+            from { transform: translateY(-100%); opacity: 0; filter: blur(10px); }
+            to { transform: translateY(0); opacity: 1; filter: blur(0); }
         }
 
-        .sp-nav.scrolled {
+        .sp-nav.is-scrolled {
             background: rgba(255, 255, 255, 0.98);
             box-shadow: var(--shadow-md);
-            backdrop-filter: blur(20px);
-            border-bottom-color: var(--border-color);
+            border-bottom-color: var(--border-default);
         }
 
-        .sp-nav-inner {
+        body.dark-mode .sp-nav.is-scrolled { background: rgba(15, 23, 42, 0.98); }
+
+        .sp-nav__inner {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 1rem 2.5rem;
+            padding: var(--space-4) var(--space-10);
             display: flex;
             align-items: center;
-            gap: 3rem;
-            transition: padding 0.3s ease;
+            gap: var(--space-8);
         }
 
-        /* Keep inner padding stable to avoid layout shifts when toggling .scrolled */
-        .sp-nav.scrolled .sp-nav-inner {
-            /* no padding change here to prevent content jump on scroll */
-            padding: 1rem 2.5rem;
-        }
-
-        /* --- منطقة اللوجو المحسّنة --- */
+        /* ===============================================
+               4. BRAND / LOGO
+               =============================================== */
         .sp-brand {
             display: flex;
             align-items: center;
             text-decoration: none;
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex-shrink: 0;
-            margin-right: 1.5rem;
-            animation: logoAppear 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
             position: relative;
+            transition: transform var(--transition-bounce);
+            animation: brandEnter 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
         }
 
-        @keyframes logoAppear {
-            0% {
-                opacity: 0;
-                transform: scale(0.8) rotate(-5deg);
-                filter: blur(8px);
-            }
-            60% {
-                transform: scale(1.05) rotate(2deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-                filter: blur(0);
-            }
+        @keyframes brandEnter {
+            from { opacity: 0; transform: scale(0.8); filter: blur(8px); }
+            to { opacity: 1; transform: scale(1); filter: blur(0); }
         }
 
-        .sp-brand::before {
+        .sp-brand::after {
             content: '';
             position: absolute;
             inset: -8px;
-            background: var(--gradient-primary);
-            border-radius: 20px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            filter: blur(20px);
             z-index: -1;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            opacity: 0;
+            filter: blur(20px);
+            transition: opacity var(--transition-base);
+            pointer-events: none;
         }
 
-        .sp-brand:hover::before {
-            opacity: 0.3;
-        }
+        .sp-brand:hover::after { opacity: 0.3; }
+        .sp-brand:hover { transform: scale(1.05) translateY(-2px); }
 
-        .sp-brand:hover {
-            transform: scale(1.1) translateY(-3px) rotate(2deg);
-        }
-
-        .sp-brand img {
-            height: 110px;
+        .sp-brand__img {
+            height: 104px;
             width: auto;
-            filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.12));
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
             transform-origin: left center;
-            transform: none;
+            filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.12));
+            transition: transform var(--transition-bounce), filter var(--transition-base);
         }
 
-        /* Use transform (no layout change) instead of changing the image height to avoid navbar reflow */
-        .sp-nav.scrolled .sp-brand img {
-            transform: scale(0.94);
-        }
+        .sp-nav.is-scrolled .sp-brand__img { transform: scale(0.92); }
 
-        .sp-brand:hover img {
+        .sp-brand:hover .sp-brand__img {
             filter: drop-shadow(0 12px 32px rgba(99, 102, 241, 0.4)) brightness(1.05);
             transform: translateY(-4px);
         }
 
-        /* --- زر القائمة للموبايل المحسّن --- */
-        .sp-nav-toggle {
-            margin-left: auto;
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 18px;
-            padding: 14px;
+        /* ===============================================
+               5. MOBILE TOGGLE
+               =============================================== */
+        .sp-nav__toggle {
             display: none;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            padding: var(--space-3);
+            margin-inline-start: auto;
+            background: var(--surface-white);
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-md);
             cursor: pointer;
             color: var(--text-primary);
-            flex-direction: column;
-            gap: 6px;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: var(--shadow-soft);
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow-xs);
+            transition: all var(--transition-bounce);
         }
 
-        .sp-nav-toggle::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gradient-primary);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
+        .sp-nav__toggle:hover { border-color: var(--primary-500); box-shadow: var(--glow-primary); transform: scale(1.05); }
+        .sp-nav__toggle:focus-visible { outline: 3px solid var(--primary-500); outline-offset: 2px; }
 
-        .sp-nav-toggle:hover::before {
-            opacity: 0.08;
-        }
-
-        .sp-nav-toggle:hover {
-            border-color: var(--primary-color);
-            box-shadow: var(--shadow-glow);
-            transform: translateY(-3px) scale(1.05);
-        }
-
-        .sp-nav-toggle span {
+        .sp-nav__toggle-bar {
             display: block;
-            width: 28px;
-            height: 3px;
+            position: absolute;
+            width: 24px;
+            height: 2.5px;
             background: var(--gradient-primary);
-            border-radius: 4px;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            position: relative;
-            z-index: 1;
+            border-radius: var(--radius-full);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        .sp-nav.is-open .sp-nav-toggle span:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
-        }
-        .sp-nav.is-open .sp-nav-toggle span:nth-child(2) {
-            opacity: 0;
-            transform: scale(0);
-        }
-        .sp-nav.is-open .sp-nav-toggle span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
+        .sp-nav__toggle-bar:nth-child(1) { transform: translateY(-8px); }
+        .sp-nav__toggle-bar:nth-child(2) { transform: translateY(0); }
+        .sp-nav__toggle-bar:nth-child(3) { transform: translateY(8px); }
 
-        /* --- الروابط --- */
-        .sp-nav-links {
+        .sp-nav.is-open .sp-nav__toggle-bar:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .sp-nav.is-open .sp-nav__toggle-bar:nth-child(2) { opacity: 0; transform: scale(0); }
+        .sp-nav.is-open .sp-nav__toggle-bar:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+
+        /* ===============================================
+               6. NAVIGATION LINKS & MENU
+               =============================================== */
+        .sp-nav__links {
             display: flex;
             align-items: center;
-            gap: 2.5rem;
-            margin-left: auto;
+            gap: var(--space-8);
+            margin-inline-start: auto;
             flex: 1;
         }
 
-        .sp-menu-links {
+        .sp-nav__menu {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: var(--space-2);
             flex-wrap: wrap;
         }
 
         .sp-link {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.9375rem;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 0.75rem 1.25rem;
-            border-radius: 12px;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-4);
             overflow: hidden;
             white-space: nowrap;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            transition: color var(--transition-base), transform var(--transition-base), background var(--transition-base);
         }
 
-        .sp-link i {
-            font-size: 1.0625rem;
-            transition: transform 0.3s ease;
-        }
+        .sp-link i { font-size: 1rem; transition: transform var(--transition-base); }
 
         .sp-link::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: var(--gradient-soft);
+            background: var(--gradient-primary-subtle);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity var(--transition-base);
         }
 
         .sp-link::after {
             content: '';
             position: absolute;
             left: 50%;
-            bottom: 10px;
+            bottom: 8px;
             width: 0;
-            height: 3px;
+            height: 2.5px;
             background: var(--gradient-primary);
-            border-radius: 3px;
+            border-radius: var(--radius-full);
             transform: translateX(-50%);
-            transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+            transition: width var(--transition-bounce);
         }
 
-        .sp-link:hover::before {
-            opacity: 1;
-        }
+        .sp-link:hover { color: var(--primary-600); transform: translateY(-1px); }
+        .sp-link:hover::before { opacity: 1; }
+        .sp-link:hover::after { width: calc(100% - 24px); }
+        .sp-link:hover i { transform: scale(1.12); }
+        .sp-link[aria-current="page"] { color: var(--primary-600); font-weight: 700; background: rgba(59, 130, 246, 0.08); }
+        .sp-link[aria-current="page"]::after { width: calc(100% - 24px); }
+        .sp-link:focus-visible { outline: 3px solid var(--primary-500); outline-offset: 2px; }
+        .sp-link:active { transform: translateY(0); }
 
-        .sp-link:hover {
-            color: var(--primary-600);
-            transform: translateY(-2px);
-        }
-
-        .sp-link:hover i {
-            transform: scale(1.15);
-        }
-
-        .sp-link:hover::after {
-            width: calc(100% - 20px);
-        }
-
-        .sp-link.is-active {
-            color: var(--primary-600);
-            font-weight: 700;
-            background: rgba(59, 130, 246, 0.08);
-        }
-
-        .sp-link.is-active::after {
-            width: calc(100% - 20px);
-        }
-
-        .sp-link.is-active i {
-            transform: scale(1.1);
-        }
-
-        .sp-link:active {
-            transform: translateY(0);
-        }
-
-        /* --- الأزرار والإجراءات --- */
+        /* ===============================================
+               7. ACTIONS AREA & BUTTONS
+               =============================================== */
         .sp-actions {
             display: flex;
             align-items: center;
-            gap: 1.25rem;
+            gap: var(--space-4);
         }
 
-        .sp-pill, .sp-outline-pill {
-            border-radius: 12px;
-            padding: 0.75rem 1.75rem;
-            font-weight: 600;
-            font-size: 0.9375rem;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .sp-btn {
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            position: relative;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
             overflow: hidden;
             white-space: nowrap;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
         }
 
-        .sp-pill i, .sp-outline-pill i {
-            font-size: 1rem;
-            transition: transform 0.3s ease;
+        .sp-btn i { font-size: 1rem; transition: transform var(--transition-base); }
+        .sp-btn:focus-visible { outline: 3px solid var(--primary-500); outline-offset: 2px; }
+
+        .sp-btn--primary {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            color: var(--text-inverse);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
         }
 
-        .sp-pill::before {
+        .sp-btn--primary::before {
             content: '';
             position: absolute;
             inset: 0;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity var(--transition-base);
         }
 
-        .sp-pill:hover::before {
-            opacity: 1;
-        }
+        .sp-btn--primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4); color: var(--text-inverse); }
+        .sp-btn--primary:hover::before { opacity: 1; }
+        .sp-btn--primary:hover i { transform: scale(1.12); }
+        .sp-btn--primary:active { transform: translateY(0); }
 
-        .sp-pill {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
-        }
-
-        .sp-pill:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
-            color: white;
-        }
-
-        .sp-pill:hover i {
-            transform: scale(1.15);
-        }
-
-        .sp-pill:active {
-            transform: translateY(0);
-        }
-
-        .sp-outline-pill {
-            border: 2px solid var(--border-color);
-            color: var(--text-secondary);
-            background: var(--bg-card);
-        }
-
-        .sp-outline-pill::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gradient-soft);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .sp-outline-pill:hover::after {
-            opacity: 1;
-        }
-
-        .sp-outline-pill:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: var(--shadow-glow);
-        }
-
-        /* --- معلومات المستخدم المحسّنة --- */
-        .sp-user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.875rem;
-            padding: 0.5rem 1rem 0.5rem 0.5rem;
-            border-radius: 12px;
-            background: white;
-            border: 1.5px solid var(--border-strong);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sp-user-info::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gradient-soft);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .sp-user-info:hover::before {
-            opacity: 1;
-        }
-
-        .sp-user-info:hover {
-            border-color: var(--primary-500);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-        }
-
-        .sp-user-info:hover .sp-user-avatar {
-            transform: scale(1.08);
-        }
-
-        .sp-user-info-name {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.9375rem;
-            line-height: 1.4;
-        }
-        .sp-user-info-email {
-            color: var(--text-tertiary);
-            font-size: 0.8125rem;
-            margin-top: 2px;
-            line-height: 1.3;
-        }
-
-        .sp-user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid var(--primary-100);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .sp-logout-button {
-            background: white;
+        .sp-btn--danger {
+            background: var(--surface-white);
             border: 1.5px solid var(--danger-200);
             color: var(--danger-600);
-            font-weight: 600;
-            cursor: pointer;
-            padding: 0.75rem 1.75rem;
-            border-radius: 12px;
-            font-size: 0.9375rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-            white-space: nowrap;
         }
 
-        .sp-logout-button i {
-            font-size: 1rem;
-            transition: transform 0.3s ease;
-        }
-
-        .sp-logout-button::before {
+        .sp-btn--danger::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), transparent);
+            background: var(--gradient-danger-subtle);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity var(--transition-base);
         }
 
-        .sp-logout-button:hover::before {
-            opacity: 1;
-        }
+        .sp-btn--danger:hover { background: var(--danger-50); border-color: var(--danger-500); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
+        .sp-btn--danger:hover::before { opacity: 1; }
+        .sp-btn--danger:hover i { transform: scale(1.12); }
+        .sp-btn--danger:active { transform: translateY(0); }
 
-        .sp-logout-button:hover {
-            background: var(--danger-50);
-            border-color: var(--danger-500);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-        }
-
-        .sp-logout-button:hover i {
-            transform: scale(1.15);
-        }
-
-        .sp-logout-button:active {
-            transform: translateY(0);
-        }
-
-        /* --- شريط البحث المحسّن --- */
-        .sp-search-container {
-            position: relative;
-            flex-grow: 1;
-            max-width: 480px;
-        }
-
-        .sp-search-input {
-            width: 100%;
-            padding: 1rem 4rem 1rem 4rem;
-            border: 2px solid var(--border-color);
-            border-radius: 50px;
-            font-size: 0.95rem;
-            background: var(--bg-subtle);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .sp-search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            background: var(--bg-white);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12), var(--shadow-glow);
-            transform: translateY(-3px) scale(1.01);
-        }
-
-        .sp-search-icon {
-            position: absolute;
-            left: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            pointer-events: none;
-            font-size: 1.15rem;
-            transition: all 0.3s ease;
-        }
-
-        .sp-search-input:focus ~ .sp-search-icon {
-            color: var(--primary-color);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .sp-search-clear {
-            position: absolute;
-            right: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            cursor: pointer;
-            background: var(--bg-subtle);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .sp-search-input:not(:placeholder-shown) ~ .sp-search-clear {
-            display: flex;
-        }
-
-        .sp-search-clear:hover {
-            background: var(--danger-color);
-            color: white;
-            border-color: white;
-            transform: translateY(-50%) scale(1.15) rotate(90deg);
-        }
-
-        /* نتائج البحث المحسّنة */
-        .sp-search-results {
-            position: absolute;
-            top: 115%;
-            left: 0;
-            right: 0;
-            background: var(--bg-white);
-            border: 2px solid var(--border-color);
-            border-radius: 20px;
-            box-shadow: var(--shadow-xl);
-            max-height: 450px;
-            overflow-y: auto;
-            display: none;
-            z-index: 1000;
-            overflow: hidden;
-        }
-
-        .sp-search-results.active {
-            display: block;
-            animation: searchResultsAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes searchResultsAppear {
-            0% {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-                filter: blur(4px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0);
-            }
-        }
-
-        .sp-search-result-item {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        /* ===============================================
+               8. USER INFO
+               =============================================== */
+        .sp-user {
             display: flex;
             align-items: center;
-            gap: 1.25rem;
-            position: relative;
+            gap: var(--space-3);
+            padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
             overflow: hidden;
+            background: var(--surface-white);
+            border: 1.5px solid var(--border-default);
+            border-radius: var(--radius-md);
+            cursor: default;
+            position: relative;
+            transition: all var(--transition-base);
         }
 
-        .sp-search-result-item::before {
+        .sp-user::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--gradient-primary);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
+            inset: 0;
+            background: var(--gradient-primary-subtle);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+            pointer-events: none;
         }
 
-        .sp-search-result-item:hover::before {
-            transform: scaleY(1);
-        }
+        .sp-user:hover { border-color: var(--primary-400); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12); }
+        .sp-user:hover::before { opacity: 1; }
 
-        .sp-search-result-item:last-child {
-            border-bottom: none;
-        }
-
-        .sp-search-result-item:hover {
-            background: var(--gradient-soft);
-            transform: translateX(8px);
-        }
-
-        /* --- نظام الإشعارات المحسّن --- */
-        .sp-notification-bell {
+        .sp-user__avatar {
             position: relative;
-            cursor: pointer;
-            padding: 0.875rem;
-            border-radius: 50%;
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1;
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border: 2px solid var(--primary-100);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-xs);
+            transition: transform var(--transition-bounce);
+        }
+
+        .sp-user:hover .sp-user__avatar { transform: scale(1.05); }
+
+        .sp-user__details { position: relative; z-index: 1; min-width: 0; }
+
+        .sp-user__name {
+            display: block;
+            max-width: 140px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-weight: 600;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        .sp-user__email {
+            display: block;
+            max-width: 140px;
+            margin-top: 1px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-size: 0.75rem;
+            line-height: 1.3;
+            color: var(--text-muted);
+        }
+
+        /* ===============================================
+               9. NOTIFICATION SYSTEM
+               =============================================== */
+        .sp-notif { position: relative; }
+
+        .sp-notif__trigger {
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background: var(--surface-white);
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all var(--transition-bounce);
         }
 
-        .sp-notification-bell::before {
+        .sp-notif__trigger::before {
             content: '';
             position: absolute;
             inset: -4px;
             background: var(--gradient-primary);
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             opacity: 0;
-            transition: opacity 0.4s ease;
             filter: blur(12px);
+            transition: opacity var(--transition-base);
+            pointer-events: none;
         }
 
-        .sp-notification-bell:hover::before {
-            opacity: 0.3;
+        .sp-notif__trigger:hover { background: var(--gradient-primary-subtle); border-color: var(--primary-500); transform: rotate(15deg) scale(1.1); }
+        .sp-notif__trigger:hover::before { opacity: 0.3; }
+        .sp-notif__trigger:focus-visible { outline: 3px solid var(--primary-500); outline-offset: 2px; }
+
+        .sp-notif--unread .sp-notif__trigger:hover { animation: bellShake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+        @keyframes bellShake {
+            0% { transform: rotate(15deg) scale(1.1); }
+            15% { transform: rotate(-18deg) scale(1.1); }
+            30% { transform: rotate(14deg) scale(1.1); }
+            45% { transform: rotate(-10deg) scale(1.1); }
+            60% { transform: rotate(6deg) scale(1.1); }
+            75% { transform: rotate(-3deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1.1); }
         }
 
-        .sp-notification-bell:hover {
-            background: var(--gradient-soft);
-            border-color: var(--primary-color);
-            transform: rotate(20deg) scale(1.15);
-        }
-
-        .sp-notification-badge {
+        .sp-notif__badge {
             position: absolute;
             top: -6px;
             right: -6px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            min-width: 22px;
+            min-width: 20px;
+            padding: 2px 6px;
+            background: var(--gradient-danger);
+            border-radius: var(--radius-md);
+            line-height: 1.4;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
-            animation: notificationPulse 2.5s ease-in-out infinite;
-        }
-
-        @keyframes notificationPulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
-            }
-            50% {
-                transform: scale(1.15);
-                box-shadow: 0 6px 20px rgba(239, 68, 68, 0.7);
-            }
-        }
-
-        .sp-notification-dropdown {
-            position: absolute;
-            top: 125%;
-            right: 0;
-            width: 400px;
-            background: var(--bg-white);
-            border: 2px solid var(--border-color);
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            display: none;
-            z-index: 1000;
-            overflow: hidden;
-        }
-
-        .sp-notification-dropdown.active {
-            display: block;
-            animation: searchResultsAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .sp-notification-header {
-            padding: 1.5rem;
-            border-bottom: 2px solid var(--border-color);
             font-weight: 800;
+            font-size: 0.6875rem;
+            color: var(--text-inverse);
+            box-shadow: var(--glow-danger);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .sp-notif__badge[hidden] { display: none; }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .sp-notif--unread .sp-notif__badge { animation: badgePulse 2s ease-in-out infinite; }
+
+        .sp-notif--unread .sp-notif__trigger { border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08); }
+        .sp-notif--unread .sp-notif__trigger:hover { border-color: var(--primary-500); box-shadow: none; }
+
+        /* Dropdown */
+        .sp-notif__dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            width: 400px;
+            max-width: 90vw;
+            max-height: 480px;
+            background: var(--surface-white);
+            border: 2px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.96);
+            transition: opacity var(--transition-base), transform var(--transition-bounce), visibility var(--transition-base);
+        }
+
+        .sp-notif__dropdown[aria-hidden="false"] { visibility: visible; opacity: 1; transform: translateY(0) scale(1); }
+
+        .sp-notif__header {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-5);
+            background: var(--gradient-primary-subtle);
+            border-bottom: 1px solid var(--border-default);
+            font-weight: 700;
             color: var(--text-primary);
-            background: var(--gradient-soft);
-            letter-spacing: 0.5px;
+            flex-wrap: wrap;
+            gap: var(--space-2);
         }
 
-        .sp-notification-list {
-            max-height: 420px;
-            overflow-y: auto;
+        .sp-notif__header-left { display: flex; align-items: center; gap: var(--space-2); }
+
+        .sp-notif__header-count {
+            min-width: 22px;
+            padding: 2px 8px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text-inverse);
         }
 
-        .sp-notification-item {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .sp-notif__list {
             position: relative;
+            flex: 1;
+            overflow-y: auto;
+            overscroll-behavior: contain;
         }
 
-        .sp-notification-item::before {
+        .sp-notif__list::after {
+            content: '';
+            position: sticky;
+            z-index: 2;
+            bottom: 0;
+            display: block;
+            height: 50px;
+            background: linear-gradient(to bottom, transparent, var(--surface-white));
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sp-notif__list.is-at-bottom::after { opacity: 0; }
+
+        .sp-notif__footer-btn {
+            padding: var(--space-2) var(--space-3);
+            white-space: nowrap;
+            background: none;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.8125rem;
+            color: var(--primary-600);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .sp-notif__footer-btn:hover { background: rgba(59, 130, 246, 0.08); color: var(--primary-700); }
+
+        /* Item */
+        .sp-notif__item {
+            position: relative;
+            padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .sp-notif__item:last-child { border-bottom: none; }
+
+        .sp-notif__item::before {
             content: '';
             position: absolute;
-            left: 0;
+            inset-inline-start: 0;
             top: 0;
             bottom: 0;
             width: 0;
             background: var(--gradient-primary);
-            transition: width 0.3s ease;
+            transition: width var(--transition-base);
         }
 
-        .sp-notification-item:hover::before {
-            width: 4px;
+        .sp-notif__item:hover { background: var(--surface-subtle); transform: translateX(4px); }
+        .sp-notif__item:hover::before { width: 4px; }
+
+        .sp-notif__item--unread { background: rgba(99, 102, 241, 0.04); border-inline-start: 3px solid var(--primary-500); }
+        .sp-notif__item--unread::before { display: none; }
+        .sp-notif__item--unread:hover { background: rgba(99, 102, 241, 0.08); }
+
+        .sp-notif__dot {
+            display: inline-block;
+            flex-shrink: 0;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-500);
+            border-radius: var(--radius-full);
+            animation: dotPulse 2s ease-in-out infinite;
         }
 
-        .sp-notification-item:hover {
-            background: var(--bg-subtle);
-            transform: translateX(6px);
+        @keyframes dotPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.85); }
         }
 
-        .sp-notification-item.unread {
-            background: var(--gradient-soft);
-            border-left: 4px solid var(--primary-color);
-            font-weight: 600;
+        .sp-notif__title { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1); font-weight: 600; font-size: 0.875rem; color: var(--text-primary); }
+        .sp-notif__message { font-size: 0.8125rem; line-height: 1.5; color: var(--text-secondary); }
+        .sp-notif__time { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-2); font-size: 0.75rem; color: var(--text-muted); }
+
+        .sp-notif__empty { padding: var(--space-10) var(--space-6); text-align: center; color: var(--text-muted); }
+        .sp-notif__empty i { display: block; margin-bottom: var(--space-4); font-size: 2.5rem; opacity: 0.3; }
+        .sp-notif__empty-text { font-weight: 600; font-size: 0.9375rem; color: var(--text-secondary); }
+        .sp-notif__empty-sub { font-size: 0.8125rem; margin-top: var(--space-1); }
+
+        /* ===============================================
+               10. UTILITIES (Progress, Dark Toggle, Chat)
+               =============================================== */
+        .sp-scroll-progress { position: fixed; top: 0; left: 0; z-index: 9999; width: 0%; height: 3px; background: var(--gradient-primary); box-shadow: 0 0 12px rgba(99, 102, 241, 0.5); transition: width 0.1s linear; }
+
+        .sp-theme-toggle { position: relative; width: 56px; height: 32px; padding: 3px; background: var(--surface-subtle); border: 2px solid var(--border-default); border-radius: var(--radius-full); cursor: pointer; transition: all var(--transition-base); }
+        .sp-theme-toggle:hover { border-color: var(--primary-500); box-shadow: var(--glow-primary); transform: scale(1.05); }
+        .sp-theme-toggle:focus-visible { outline: 3px solid var(--primary-500); outline-offset: 2px; }
+
+        .sp-theme-toggle__thumb { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: var(--radius-full); font-size: 0.6875rem; box-shadow: 0 2px 8px rgba(251, 191, 36, 0.5); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        body.dark-mode .sp-theme-toggle__thumb { background: linear-gradient(135deg, #6366f1, #4f46e5); transform: translateX(24px); box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5); }
+
+        .sp-chat { position: fixed; bottom: var(--space-8); right: var(--space-8); z-index: 1000; }
+        .sp-chat__btn { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: var(--gradient-success); border: 3px solid rgba(255, 255, 255, 0.3); border-radius: var(--radius-full); font-size: 1.4rem; color: var(--text-inverse); cursor: pointer; box-shadow: var(--glow-success); transition: all var(--transition-bounce); animation: chatFloat 3s ease-in-out infinite; }
+        @keyframes chatFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .sp-chat__btn:hover { transform: scale(1.12) rotate(-5deg); box-shadow: 0 16px 48px rgba(16, 185, 129, 0.7); animation: none; }
+
+        /* ===============================================
+               11. PREMIUM NOTIFICATION MODAL (Cinematic)
+               =============================================== */
+
+        /* Deep Diffused Backdrop */
+        #notifDetailModal + .modal-backdrop,
+        .modal-backdrop.show {
+            backdrop-filter: blur(16px) saturate(150%);
+            -webkit-backdrop-filter: blur(16px) saturate(150%);
         }
 
-        /* --- زر الوضع الليلي المحسّن --- */
-        .sp-dark-mode-toggle {
-            position: relative;
-            width: 64px;
-            height: 36px;
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            display: flex;
-            align-items: center;
-            padding: 0 4px;
-        }
-
-        .sp-dark-mode-toggle:hover {
-            border-color: var(--primary-color);
-            box-shadow: var(--shadow-glow);
-            transform: scale(1.05);
-        }
-
-        .sp-dark-mode-slider {
-            width: 26px;
-            height: 26px;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border-radius: 50%;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.6);
-        }
-
-        body.dark-mode .sp-dark-mode-slider {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            transform: translateX(28px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.6);
-        }
-
-        /* --- شريط التقدم للتمرير المحسّن --- */
-        .sp-scroll-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 5px;
-            background: var(--gradient-primary);
-            z-index: 9999;
-            transition: width 0.1s ease;
-            box-shadow: 0 3px 12px rgba(99, 102, 241, 0.6);
-        }
-
-        /* --- Mega Menu للفئات المحسّن --- */
-        .sp-mega-menu-trigger {
-            position: relative;
-        }
-
-        .sp-mega-menu {
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 820px;
-            max-width: 90vw;
-            background: var(--bg-white);
-            border: 2px solid var(--border-color);
-            border-radius: 28px;
-            box-shadow: var(--shadow-xl);
-            padding: 2.5rem;
-            display: none;
-            z-index: 1000;
-            margin-top: 1.25rem;
-            overflow: hidden;
-        }
-
-        .sp-mega-menu::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gradient-soft);
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .sp-mega-menu.active {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.75rem;
-            animation: megaMenuAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes megaMenuAppear {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-30px) scale(0.9);
-                filter: blur(8px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1);
-                filter: blur(0);
-            }
-        }
-
-        .sp-mega-menu-item {
-            padding: 1.25rem;
-            border-radius: 16px;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            text-decoration: none;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            position: relative;
-            z-index: 1;
-            background: var(--bg-white);
-            border: 2px solid transparent;
-        }
-
-        .sp-mega-menu-item::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gradient-hover);
+        /* Cinematic Entrance Animation */
+        #notifDetailModal .modal-dialog {
+            transform: translateY(50px) scale(0.92);
             opacity: 0;
-            transition: opacity 0.4s ease;
-            border-radius: 14px;
-            z-index: -1;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
         }
 
-        .sp-mega-menu-item:hover::before {
+        #notifDetailModal.show .modal-dialog {
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
 
-        .sp-mega-menu-item:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: var(--shadow-md);
+        /* Main Container - Extreme Glassmorphism & Multi-Layer Depth */
+        #notifDetailModal .modal-content {
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-xl);
+            background: var(--surface-glass);
+            backdrop-filter: blur(24px) saturate(200%);
+            -webkit-backdrop-filter: blur(24px) saturate(200%);
+            box-shadow:
+                0 0 0 1px rgba(226, 232, 240, 0.6),
+                0 4px 6px -1px rgba(15, 23, 42, 0.05),
+                0 20px 50px -12px rgba(15, 23, 42, 0.3),
+                0 0 100px -20px rgba(99, 102, 241, 0.2);
+            overflow: hidden;
         }
 
-        .sp-mega-menu-icon {
-            font-size: 2rem;
-            width: 52px;
-            height: 52px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gradient-soft);
-            border-radius: 14px;
-            transition: all 0.4s ease;
+        body.dark-mode #notifDetailModal .modal-content {
+            border-color: rgba(51, 65, 85, 0.6);
+            box-shadow:
+                0 0 0 1px rgba(51, 65, 85, 0.8),
+                0 20px 50px -12px rgba(0, 0, 0, 0.6),
+                0 0 100px -20px rgba(99, 102, 241, 0.3);
         }
 
-        .sp-mega-menu-item:hover .sp-mega-menu-icon {
-            transform: scale(1.15) rotate(5deg);
-        }
-
-        /* --- دردشة سريعة محسّنة --- */
-        .sp-quick-chat {
-            position: fixed;
-            bottom: 35px;
-            right: 35px;
-            z-index: 1000;
-        }
-
-        .sp-chat-bubble {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.6rem;
-            cursor: pointer;
-            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            animation: chatBounce 3s ease-in-out infinite;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-        }
-
-        @keyframes chatBounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            25% { transform: translateY(-12px) scale(1.05); }
-            50% { transform: translateY(0) scale(1); }
-            75% { transform: translateY(-6px) scale(1.02); }
-        }
-
-        .sp-chat-bubble:hover {
-            transform: scale(1.15) rotate(-5deg);
-            box-shadow: 0 16px 48px rgba(16, 185, 129, 0.7);
-            animation: none;
-        }
-
-        .sp-chat-badge {
+        /* Glass Highlight (Light Reflection) */
+        #notifDetailModal .modal-content::before {
+            content: '';
             position: absolute;
-            top: -6px;
-            right: -6px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            min-width: 24px;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
-            animation: notificationPulse 2.5s ease-in-out infinite;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.7), transparent);
+            z-index: 10;
+            pointer-events: none;
         }
 
-        /* --- تجاوب الشاشات المحسّن --- */
-        @media (max-width: 1200px) {
-            .sp-search-container { display: none; }
-            .sp-nav-inner { gap: 2.5rem; }
+        body.dark-mode #notifDetailModal .modal-content::before {
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
         }
+
+        /* Header Layout */
+        #notifDetailModal .modal-header {
+            background: var(--gradient-primary);
+            color: var(--text-inverse);
+            border: none;
+            padding: var(--space-8) var(--space-8) var(--space-6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header Texture/Depth */
+        #notifDetailModal .modal-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Premium Floating Close Button */
+        #notifDetailModal .modal-header .btn-close {
+            position: absolute;
+            top: var(--space-5);
+            right: var(--space-5);
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: var(--radius-full);
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+            transition: all var(--transition-bounce);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            z-index: 2;
+        }
+
+        [dir="rtl"] #notifDetailModal .modal-header .btn-close {
+            right: auto;
+            left: var(--space-5);
+        }
+
+        #notifDetailModal .modal-header .btn-close:hover {
+            transform: scale(1.2) rotate(90deg);
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Meta Info */
+        #notifDetailModal .modal-meta {
+            position: relative;
+            z-index: 1;
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Title */
+        #notifDetailModal .modal-title {
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+            font-size: 1.625rem;
+            line-height: 1.3;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        /* Body - Optimal Readability */
+        #notifDetailModal .modal-body {
+            padding: var(--space-10) var(--space-8);
+            color: var(--text-primary);
+            font-size: 1.0625rem;
+            line-height: 1.85;
+            background: linear-gradient(180deg, var(--surface-subtle) 0%, var(--surface-white) 100%);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Footer */
+        #notifDetailModal .modal-footer {
+            border-top: 1px solid var(--border-default);
+            padding: var(--space-5) var(--space-8);
+            background: var(--surface-subtle);
+            justify-content: flex-end;
+            gap: var(--space-3);
+        }
+
+        /* ===============================================
+               12. RESPONSIVE
+               =============================================== */
+        @media (max-width: 1200px) { .sp-nav__inner { gap: var(--space-6); } }
+
+        @media (max-width: 992px) { .sp-user__name, .sp-user__email { max-width: 100px; } }
 
         @media (max-width: 768px) {
-            .sp-nav-inner {
-                flex-direction: row;
-                justify-content: space-between;
-                padding: 1.25rem 1.75rem;
-                gap: 1.25rem;
+            .sp-nav__inner { flex-wrap: wrap; padding: var(--space-4) var(--space-5); gap: var(--space-3); }
+            .sp-brand__img { height: 64px; }
+            .sp-nav__toggle { display: flex; }
+
+            .sp-nav__links {
+                position: fixed;
+                top: 0; inset-inline-start: 0; inset-inline-end: 0; bottom: 0;
+                z-index: 1050;
+                display: flex; flex-direction: column; align-items: stretch;
+                padding: 80px var(--space-6) var(--space-8);
+                gap: var(--space-6);
+                overflow-y: auto; overscroll-behavior: contain;
+                background: var(--surface-glass);
+                backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+                visibility: hidden; opacity: 0; transform: translateY(-20px);
+                transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.4s ease;
             }
-            .sp-brand img { height: 67.2px; }
-            .sp-nav-toggle { display: flex; margin-left: 0; }
-            .sp-nav-links {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: var(--bg-white);
-                border-top: 2px solid var(--border-color);
-                box-shadow: var(--shadow-xl);
-                flex-direction: column;
-                align-items: stretch;
-                padding: 2.5rem;
-                gap: 2rem;
-                display: none;
-                animation: mobileMenuSlide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+            .sp-nav.is-open .sp-nav__links { visibility: visible; opacity: 1; transform: translateY(0); }
+            .sp-nav__menu { flex-direction: column; width: 100%; gap: var(--space-1); }
+            .sp-link { padding: var(--space-4) var(--space-5); width: 100%; font-size: 1rem; border-radius: var(--radius-lg); }
+
+            .sp-actions { flex-direction: column; width: 100%; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border-default); }
+            .sp-user { width: 100%; justify-content: center; padding: var(--space-4); }
+            .sp-user__name, .sp-user__email { max-width: none; }
+            .sp-btn { width: 100%; padding: var(--space-4); }
+            .sp-notif { align-self: center; }
+
+            .sp-notif__dropdown {
+                position: fixed; top: auto; bottom: 0; right: 0; left: 0;
+                width: 100%; max-width: none; max-height: 70vh;
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
             }
-            @keyframes mobileMenuSlide {
-                from {
-                    opacity: 0;
-                    transform: translateY(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+
+            .sp-chat { bottom: var(--space-4); right: var(--space-4); }
+
+            /* Mobile Modal Adjustments */
+            #notifDetailModal .modal-title { font-size: 1.35rem; }
+            #notifDetailModal .modal-body { padding: var(--space-6) var(--space-5); }
+            #notifDetailModal .modal-header { padding: var(--space-6) var(--space-5) var(--space-4); }
+            #notifDetailModal .modal-footer { padding: var(--space-4) var(--space-5); }
+        }
+
+        /* RTL Fixes */
+        [dir="rtl"] .sp-notif__item--unread { border-inline-start: none; border-inline-end: 3px solid var(--primary-500); }
+        [dir="rtl"] .sp-notif__item::before { inset-inline-start: auto; inset-inline-end: 0; }
+        [dir="rtl"] .sp-notif__item:hover { transform: translateX(-4px); }
+
+        /* Accessibility: Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.1ms !important;
             }
-            .sp-nav.is-open .sp-nav-links { display: flex; }
-            .sp-menu-links {
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
-                gap: 0.75rem;
+
+            #notifDetailModal .modal-dialog {
+                transition: opacity 0.1s ease !important;
+                transform: none !important;
             }
-            .sp-link {
-                padding: 1.25rem;
-                border-radius: 14px;
-                width: 100%;
-                font-size: 1.05rem;
+            #notifDetailModal.show .modal-dialog {
+                transform: none !important;
             }
-            .sp-actions {
-                flex-direction: column;
-                width: 100%;
-                gap: 1.25rem;
-            }
-            .sp-user-info {
-                width: 100%;
-                justify-content: center;
-                padding: 1.25rem;
-            }
-            .sp-pill, .sp-outline-pill, .sp-logout-button {
-                width: 100%;
-                justify-content: center;
-                padding: 1.25rem;
+            #notifDetailModal .modal-header .btn-close {
+                transition: none !important;
             }
         }
     </style>
@@ -1139,123 +937,270 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.querySelector('.sp-nav');
-            const navToggle = nav.querySelector('[data-sp-nav-toggle]');
+            if (!nav) return;
 
-            // Toggle Mobile Menu
-            navToggle?.addEventListener('click', () => {
-                nav.classList.toggle('is-open');
-                document.body.style.overflow = nav.classList.contains('is-open') ? 'hidden' : '';
-            });
+            const toggle = nav.querySelector('.sp-nav__toggle');
+            const linksContainer = nav.querySelector('.sp-nav__links');
+            const notifTrigger = document.getElementById('notifTrigger');
+            const notifDropdown = document.getElementById('notifDropdown');
+            const notifBadge = document.getElementById('notifBadge');
+            const notifWrapper = notifTrigger?.closest('.sp-notif');
+            const notifList = document.getElementById('notifList');
+            const markAllBtn = document.getElementById('markAllReadBtn');
+            const scrollProgress = document.getElementById('scrollProgress');
 
-            // Sticky Header Effect on Scroll
-            let lastScroll = 0;
-            window.addEventListener('scroll', () => {
-                const currentScroll = window.pageYOffset;
-                if (currentScroll > 80) {
-                    nav.classList.add('scrolled');
-                } else {
-                    nav.classList.remove('scrolled');
+            const markAllAsRead = async (btnElement) => {
+                const originalHTML = btnElement?.innerHTML;
+                try {
+                    if (btnElement) {
+                        btnElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> جارٍ...';
+                        btnElement.disabled = true;
+                    }
+
+                    const res = await fetch('{{ route("notifications.mark-as-read") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        notifBadge?.setAttribute('hidden', '');
+                        notifWrapper?.classList.remove('sp-notif--unread');
+                        document.querySelectorAll('.sp-notif__item--unread').forEach(el => {
+                            el.classList.remove('sp-notif__item--unread');
+                            el.querySelector('.sp-notif__dot')?.remove();
+                        });
+                        document.querySelector('.sp-notif__header-count')?.setAttribute('hidden', '');
+                        if (btnElement) btnElement.style.display = 'none';
+                    }
+                } catch (err) {
+                    console.error('Error marking as read:', err);
+                    if (btnElement) {
+                        btnElement.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i> خطأ!';
+                        setTimeout(() => { btnElement.innerHTML = originalHTML || ''; btnElement.disabled = false; }, 2000);
+                    }
                 }
-                lastScroll = currentScroll;
+            };
+
+            if (notifList) {
+                notifList.addEventListener('scroll', () => {
+                    notifList.classList.toggle('is-at-bottom', notifList.scrollHeight - notifList.scrollTop <= notifList.clientHeight + 20);
+                }, { passive: true });
+            }
+
+            if (markAllBtn) markAllBtn.addEventListener('click', () => markAllAsRead(markAllBtn));
+
+            const toggleMenu = () => {
+                const isOpen = nav.classList.toggle('is-open');
+                toggle?.setAttribute('aria-expanded', String(isOpen));
+                linksContainer?.setAttribute('aria-hidden', String(!isOpen));
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            };
+
+            toggle?.addEventListener('click', toggleMenu);
+            document.addEventListener('click', (e) => { if (nav.classList.contains('is-open') && !nav.contains(e.target)) toggleMenu(); });
+
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        nav.classList.toggle('is-scrolled', window.scrollY > 60);
+                        if (scrollProgress) {
+                            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                            scrollProgress.style.width = `${docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0}%`;
+                        }
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+
+            const closeNotif = () => {
+                notifDropdown?.setAttribute('aria-hidden', 'true');
+                notifTrigger?.setAttribute('aria-expanded', 'false');
+            };
+
+            if (notifTrigger && notifDropdown) {
+                notifTrigger.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const wasOpen = notifDropdown.getAttribute('aria-hidden') === 'false';
+                    closeNotif();
+                    if (wasOpen) return;
+
+                    notifDropdown.setAttribute('aria-hidden', 'false');
+                    notifTrigger.setAttribute('aria-expanded', 'true');
+
+                    if (notifBadge && !notifBadge.hasAttribute('hidden')) await markAllAsRead(null);
+                });
+
+                document.addEventListener('click', (e) => { if (!notifTrigger.contains(e.target) && !notifDropdown.contains(e.target)) closeNotif(); });
+            }
+
+            const notifModalEl = document.getElementById('notifDetailModal');
+            const notifModal = notifModalEl ? new bootstrap.Modal(notifModalEl) : null;
+
+            document.querySelectorAll('.sp-notif__item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const title = item.getAttribute('data-notif-title');
+                    const message = item.getAttribute('data-notif-message');
+                    const time = item.getAttribute('data-notif-time');
+
+                    const modalTitle = document.getElementById('notifDetailTitle');
+                    const modalMessage = document.getElementById('notifDetailMessage');
+                    const modalDate = document.querySelector('#notifDetailDate span');
+
+                    if (modalTitle) modalTitle.textContent = title;
+                    if (modalMessage) modalMessage.textContent = message;
+                    if (modalDate) modalDate.textContent = time;
+
+                    notifModal?.show();
+                    closeNotif();
+                });
             });
 
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (nav.classList.contains('is-open') && !nav.contains(e.target) && !e.target.closest('[data-sp-nav-toggle]')) {
-                    nav.classList.remove('is-open');
-                    document.body.style.overflow = '';
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (nav.classList.contains('is-open')) { toggleMenu(); toggle?.focus(); }
+                    if (notifDropdown?.getAttribute('aria-hidden') === 'false') notifTrigger?.focus();
                 }
             });
         });
     </script>
 @endonce
 
-<nav class="sp-nav" data-sp-nav>
-    <div class="sp-nav-inner">
-        <!-- اللوجو الموسع والمكبر -->
-        <a class="sp-brand" href="{{ route('home') }}">
-            <img src="{{ asset('images/main-logo.png') }}" alt="Speeda Logo">
+<div class="sp-scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+<nav class="sp-nav" role="navigation" aria-label="{{ __('general.main_navigation') }}">
+    <div class="sp-nav__inner">
+        <a class="sp-brand" href="{{ route('home') }}" aria-label="{{ config('app.name', 'Speeda') }} - {{ __('general.home') }}">
+            <img class="sp-brand__img" src="{{ asset('images/main-logo.png') }}" alt="{{ config('app.name', 'Speeda') }}" loading="eager">
         </a>
 
-        <!-- زر القائمة للموبايل -->
-        <button class="sp-nav-toggle" type="button" data-sp-nav-toggle aria-label="{{ __('general.toggle_navigation') }}">
-            <span></span>
-            <span></span>
-            <span></span>
+        <button class="sp-nav__toggle" type="button" aria-label="{{ __('general.toggle_navigation') }}" aria-expanded="false" aria-controls="navLinks">
+            <span class="sp-nav__toggle-bar"></span>
+            <span class="sp-nav__toggle-bar"></span>
+            <span class="sp-nav__toggle-bar"></span>
         </button>
 
-        <div class="sp-nav-links">
-            <div class="sp-menu-links">
-                <a class="sp-link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}">
-                    <i class="fas fa-home"></i>
-                    {{ __('general.home') }}
+        <div class="sp-nav__links" id="navLinks" aria-hidden="false">
+            <div class="sp-nav__menu" role="menubar">
+                <a class="sp-link" href="{{ route('home') }}" role="menuitem" @if(request()->routeIs('home')) aria-current="page" @endif>
+                    <i class="fas fa-home" aria-hidden="true"></i> {{ __('general.home') }}
                 </a>
-                <a class="sp-link {{ request()->routeIs('categories') ? 'is-active' : '' }}" href="{{ route('categories') }}">
-                    <i class="fas fa-th-large"></i>
-                    {{ __('general.categories') }}
+                <a class="sp-link" href="{{ route('categories') }}" role="menuitem" @if(request()->routeIs('categories')) aria-current="page" @endif>
+                    <i class="fas fa-th-large" aria-hidden="true"></i> {{ __('general.categories') }}
                 </a>
-                <a class="sp-link {{ request()->routeIs('service-providers.*') ? 'is-active' : '' }}" href="{{ route('service-providers.index') }}">
-                    <i class="fas fa-users"></i>
-                    {{ __('service_provider.service_providers') }}
+                <a class="sp-link" href="{{ route('service-providers.index') }}" role="menuitem" @if(request()->routeIs('service-providers.*')) aria-current="page" @endif>
+                    <i class="fas fa-users" aria-hidden="true"></i> {{ __('service_provider.service_providers') }}
                 </a>
             </div>
 
-            <!-- شريط البحث الجديد -->
-            <!-- <div class="sp-search-container">
-                <i class="fas fa-search sp-search-icon"></i>
-                <input type="text" class="sp-search-input" placeholder="{{ __('general.search_for_services') }}">
-            </div> -->
-
             <div class="sp-actions">
-                <!-- Language Switcher -->
                 @include('components.language-switcher')
 
-                @auth
-                    <div class="sp-user-info">
-                        <img src="{{ $user->profile_photo_url ?? asset('images/user.png') }}" alt="{{ $user->name }}" class="sp-user-avatar">
-                        <div>
-                            <span class="sp-user-info-name">{{ $user->name }}</span>
-                            <div class="sp-user-info-email">{{ $user->email }}</div>
+                @if($isServiceProvider && isset($activeNotifications))
+                    <div class="sp-notif {{ $hasUnread ? 'sp-notif--unread' : '' }}">
+                        <button class="sp-notif__trigger" id="notifTrigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false" aria-controls="notifDropdown">
+                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            <span class="sp-notif__badge" id="notifBadge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
+                        </button>
+
+                        <div class="sp-notif__dropdown" id="notifDropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
+                            <div class="sp-notif__header">
+                                <div class="sp-notif__header-left">
+                                    <i class="fas fa-bell" aria-hidden="true"></i> {{ __('admin.notifications') }}
+                                </div>
+                                @if($hasUnread)
+                                    <span class="sp-notif__header-count" id="notifHeaderCount">{{ $unreadCount }} {{ __('general.new') }}</span>
+                                    <button class="sp-notif__footer-btn" id="markAllReadBtn" type="button">
+                                        <i class="fas fa-check-double" aria-hidden="true"></i> {{ __('general.mark_all_read') }}
+                                    </button>
+                                @endif
+                            </div>
+                            <div class="sp-notif__list" id="notifList">
+                                @forelse($activeNotifications as $notif)
+                                    <div class="sp-notif__item {{ (!in_array($notif->id, $readIds)) ? 'sp-notif__item--unread' : '' }}" data-notif-title="{{ $notif->title }}" data-notif-message="{{ $notif->message }}" data-notif-time="{{ $notif->created_at->diffForHumans() }}">
+                                        <div class="sp-notif__title">
+                                            @if(!in_array($notif->id, $readIds))<span class="sp-notif__dot" aria-hidden="true"></span>@endif
+                                            {{ $notif->title }}
+                                        </div>
+                                        <div class="sp-notif__message">{{ Str::limit($notif->message, 120) }}</div>
+                                        <div class="sp-notif__time"><i class="fas fa-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</div>
+                                    </div>
+                                @empty
+                                    <div class="sp-notif__empty">
+                                        <i class="fas fa-bell-slash" aria-hidden="true"></i>
+                                        <div class="sp-notif__empty-text">{{ __('admin.no_notifications') }}</div>
+                                        <div class="sp-notif__empty-sub">{{ __('general.all_caught_up') }}</div>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
-                    @php($provider = $user->serviceProvider)
+                @endif
+
+                @auth
+                    <div class="sp-user" aria-label="{{ $user->name }}">
+                        <img class="sp-user__avatar" src="{{ $user->profile_photo_url ?? asset('images/user.png') }}" alt="{{ $user->name }}" loading="lazy">
+                        <div class="sp-user__details">
+                            <span class="sp-user__name">{{ $user->name }}</span>
+                            <span class="sp-user__email">{{ $user->email }}</span>
+                        </div>
+                    </div>
+
                     @if($provider)
-                        {{-- Service Provider: Link to Profile Page (contains edit section) --}}
-                        <a href="{{ route('service-providers.show', $provider) }}" class="sp-pill {{ request()->url() === route('service-providers.show', $provider) ? 'is-active' : '' }}">
-                            <i class="fas fa-id-card"></i>
-                            {{ __('general.my_profile') }}
+                        <a href="{{ route('service-providers.show', $provider) }}" class="sp-btn sp-btn--primary" @if(request()->url() === route('service-providers.show', $provider)) aria-current="page" @endif>
+                            <i class="fas fa-id-card" aria-hidden="true"></i> {{ __('general.my_profile') }}
                         </a>
-                    @elseif(auth()->user()->isAdmin())
-                        {{-- Admin: Admin Dashboard --}}
-                        <a href="{{ route('admin.dashboard') }}" class="sp-pill">
-                            <i class="fas fa-tachometer-alt"></i>
-                            {{ __('admin.dashboard') }}
+                    @elseif($user->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}" class="sp-btn sp-btn--primary">
+                            <i class="fas fa-tachometer-alt" aria-hidden="true"></i> {{ __('admin.dashboard') }}
                         </a>
                     @else
-                        {{-- Regular User: Dashboard --}}
-                        <a href="{{ route('dashboard') }}" class="sp-pill">
-                            <i class="fas fa-tachometer-alt"></i>
-                            {{ __('general.dashboard') }}
+                        <a href="{{ route('dashboard') }}" class="sp-btn sp-btn--primary">
+                            <i class="fas fa-tachometer-alt" aria-hidden="true"></i> {{ __('general.dashboard') }}
                         </a>
                     @endif
-                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+
+                    <form method="POST" action="{{ route('logout') }}" style="display: contents;">
                         @csrf
-                        <button type="submit" class="sp-logout-button">
-                            <i class="fas fa-sign-out-alt"></i>
-                            {{ __('general.logout') }}
+                        <button type="submit" class="sp-btn sp-btn--danger">
+                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> {{ __('general.logout') }}
                         </button>
                     </form>
                 @else
-                    <!-- <a href="{{ route('login') }}" class="sp-outline-pill">
-                        <i class="fas fa-sign-in-alt"></i>
-                        {{ __('general.login') }}
-                    </a> -->
-                    <a href="{{ route('register') }}" class="sp-pill">
-                        <i class="fas fa-user-plus"></i>
-                        {{ __('general.register') }}
+                    <a href="{{ route('login') }}?tab=login" class="sp-btn sp-btn--primary">
+                        <i class="fas fa-sign-in-alt" aria-hidden="true"></i> {{ __('general.login') }}
                     </a>
+                    @guest
+                        <a href="{{ route('login') }}?tab=register" class="sp-btn sp-btn--primary">
+                            <i class="fas fa-user-plus" aria-hidden="true"></i> {{ __('general.register') }}
+                        </a>
+                    @endguest
                 @endauth
             </div>
         </div>
     </div>
 </nav>
+
+<!-- Notification Detail Modal -->
+<div class="modal fade" id="notifDetailModal" tabindex="-1" aria-labelledby="notifDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('general.close') }}"></button>
+                <div class="modal-meta" id="notifDetailDate">
+                    <i class="fas fa-clock" aria-hidden="true"></i>
+                    <span></span>
+                </div>
+                <h5 class="modal-title" id="notifDetailTitle"></h5>
+            </div>
+            <div class="modal-body" id="notifDetailMessage"></div>
+            <div class="modal-footer">
+                <button type="button" class="sp-btn sp-btn--primary" data-bs-dismiss="modal">
+                    {{ __('general.close') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

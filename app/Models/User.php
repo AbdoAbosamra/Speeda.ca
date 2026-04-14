@@ -67,6 +67,16 @@ class User extends Authenticatable
         return $this->hasMany(Endorsement::class);
     }
 
+    /**
+     * Admin notifications read by the user.
+     */
+    public function readAdminNotifications()
+    {
+        return $this->belongsToMany(AdminNotification::class, 'admin_notification_user')
+            ->withPivot('read_at')
+            ->withTimestamps();
+    }
+
     // Role management
     public function assignRole(string $role): void
     {

@@ -69,6 +69,35 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Exception $e) {
             Log::error('Auto-create admin failed: '.$e->getMessage());
         }
+
+        // Share active notifications for service providers in the navbar
+        View::composer('components.main-nav', function ($view) {
+            if (auth()->check() && auth()->user()->isServiceProvider()) {
+                $user = auth()->user();
+                $notifications = \App\Models\AdminNotification::active()
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                
+                $readNotificationIds = $user->readAdminNotifications()
+                    ->whereIn('admin_notification_id', $notifications->pluck('id'))
+                    ->pluck('admin_notification_id')
+                    ->toArray();
+
+                $unreadCount = $notifications->whereNotIn('id', $readNotificationIds)->count();
+
+                $view->with([
+                    'activeNotifications' => $notifications,
+                    'unreadCount' => $unreadCount,
+                    'readNotificationIds' => $readNotificationIds
+                ]);
+            } else {
+                $view->with([
+                    'activeNotifications' => collect(),
+                    'unreadCount' => 0,
+                    'readNotificationIds' => []
+                ]);
+            }
+        });
     }
 }
 

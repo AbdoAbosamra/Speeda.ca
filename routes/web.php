@@ -273,6 +273,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/comments/{comment}/unflag', [AdminCommentController::class, 'unflag'])->name('comments.unflag');
     Route::delete('/comments/{comment}', [AdminCommentController::class, 'delete'])->name('comments.delete');
     Route::post('/comments/{comment}/restore', [AdminCommentController::class, 'restore'])->name('comments.restore');
+
+    // Notifications Management
+    Route::get('/notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/create', [App\Http\Controllers\Admin\AdminNotificationController::class, 'create'])->name('notifications.create');
+    Route::post('/notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'store'])->name('notifications.store');
+    Route::delete('/notifications/{notification}', [App\Http\Controllers\Admin\AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+});
+
+// Service Provider Notification Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/notifications/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
 });
 
 

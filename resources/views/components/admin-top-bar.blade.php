@@ -1,5 +1,3 @@
-@props(['unreadNotifications' => 0])
-
 @php
     $user = auth()->user();
     $isRtl = in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']);
@@ -67,6 +65,7 @@
     }
 @endphp
 
+{{-- @change 2026-04-14 TASK-5 | Removed admin top-bar notification scaffolding | Admin notifications now live on the dedicated page without navbar duplication | risk:LOW --}}
 <nav class="admin-top-bar" x-data="adminTopBar()" x-init="init()">
     <!-- Left Section -->
     <div class="admin-top-bar-left">
@@ -109,55 +108,6 @@
 
     <!-- Right Section -->
     <div class="admin-top-bar-right">
-        <!-- Notifications -->
-        <div class="admin-notifications" x-data="notificationsDropdown({{ $unreadNotifications }})">
-            <button class="admin-icon-btn" @click="toggle" :class="{ 'active': open }" aria-label="{{ __('admin.notifications') }}">
-                <i class="fas fa-bell"></i>
-                <span x-show="unreadCount > 0" x-text="unreadCount" class="notification-badge"></span>
-            </button>
-            <div x-show="open" @click.away="close" @keydown.escape.window="close"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 scale-100"
-                 x-transition:leave-end="opacity-0 scale-95"
-                 class="admin-dropdown notifications-dropdown">
-                <div class="dropdown-header">
-                    <span class="title">{{ __('admin.notifications') ?: 'Notifications' }}</span>
-                    <button @click="markAllAsRead" class="mark-read-btn" x-show="unreadCount > 0">
-                        {{ __('admin.mark_all_read') ?: 'Mark all read' }}
-                    </button>
-                </div>
-                <div class="dropdown-list">
-                    <template x-if="notifications.length === 0">
-                        <div class="empty-state">
-                            <i class="fas fa-check-circle"></i>
-                            <p>{{ __('admin.no_notifications') ?: 'No notifications' }}</p>
-                        </div>
-                    </template>
-                    <template x-for="note in notifications" :key="note.id">
-                        <a :href="note.link" class="dropdown-item" :class="{ 'unread': !note.read_at }">
-                            <span class="item-icon" :style="{ background: note.color ? note.color + '10' : 'var(--accent-soft-indigo)' }">
-                                <i :class="note.icon || 'fas fa-info-circle'"></i>
-                            </span>
-                            <span class="item-content">
-                                <span class="item-title" x-text="note.title"></span>
-                                <span class="item-time" x-text="note.time"></span>
-                            </span>
-                        </a>
-                    </template>
-                </div>
-                @if(Route::has('admin.notifications'))
-                    <div class="dropdown-footer">
-                        <a href="{{ route('admin.notifications') }}" class="view-all-link">
-                            {{ __('admin.view_all_notifications') ?: 'View all' }}
-                        </a>
-                    </div>
-                @endif
-            </div>
-        </div>
-
         <!-- User Dropdown -->
         <div class="admin-user" x-data="userDropdown()">
             <button class="admin-user-btn" @click="toggle" :class="{ 'active': open }" aria-expanded="false">
@@ -385,62 +335,6 @@
     align-items: center;
     gap: 0.75rem; /* Tighter for compact feel */
     flex-shrink: 0;
-}
-
-/* === Icon Buttons (Notifications, etc) === */
-.admin-icon-btn {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: 1px solid var(--border-subtle);
-    border-radius: 14px;
-    color: var(--text-secondary);
-    font-size: 1.15rem;
-    transition: var(--transition-fast);
-    cursor: pointer;
-    position: relative;
-}
-
-.admin-icon-btn:hover,
-.admin-icon-btn.active {
-    background: var(--accent-soft-indigo);
-    color: var(--accent-indigo);
-    border-color: var(--accent-indigo);
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 12px rgba(79,70,229,0.12); /* Deeper shadow */
-}
-
-.notification-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 0.4rem;
-    background: #ef4444;
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    border-radius: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white;
-    animation: pulse 1.5s infinite; /* Subtle pulse animation */
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-[dir="rtl"] .notification-badge {
-    right: auto;
-    left: -6px;
 }
 
 /* === Dropdowns – Elevated Card Style === */
@@ -800,14 +694,6 @@
     .admin-user-btn {
         padding: 0.35rem;
     }
-    .notifications-dropdown {
-        width: 360px;
-        right: -30px;
-    }
-    [dir="rtl"] .notifications-dropdown {
-        right: auto;
-        left: -30px;
-    }
 }
 
 @media (max-width: 768px) {
@@ -824,10 +710,6 @@
         width: 40px;
         height: 40px;
     }
-    .admin-icon-btn {
-        width: 40px;
-        height: 40px;
-    }
     .admin-logo img {
         height: 34px;
     }
@@ -836,14 +718,6 @@
 @media (max-width: 576px) {
     .admin-top-bar {
         padding: 0 1rem;
-    }
-    .notifications-dropdown {
-        width: 320px;
-        right: -80px;
-    }
-    [dir="rtl"] .notifications-dropdown {
-        right: auto;
-        left: -80px;
     }
     .user-dropdown {
         width: 280px;
@@ -870,39 +744,6 @@ document.addEventListener('alpine:init', () => {
             document.body.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
             window.dispatchEvent(new CustomEvent('sidebar-toggled', { detail: { collapsed: this.sidebarCollapsed } }));
         }
-    }));
-
-    // Notifications Dropdown
-    Alpine.data('notificationsDropdown', (initialUnread) => ({
-        open: false,
-        unreadCount: initialUnread,
-        notifications: [
-            {
-                id: 1,
-                title: '{{ __("admin.sample_notification_new_user") ?: "New user registered" }}',
-                time: '{{ __("admin.time_just_now") ?: "Just now" }}',
-                link: '#',
-                icon: 'fas fa-user-plus',
-                color: '#4f46e5',
-                read_at: null
-            },
-            {
-                id: 2,
-                title: '{{ __("admin.sample_notification_new_provider") ?: "New service provider" }}',
-                time: '{{ __("admin.time_1_hour_ago") ?: "1 hour ago" }}',
-                link: '#',
-                icon: 'fas fa-building',
-                color: '#059669',
-                read_at: null
-            }
-        ],
-        toggle() { this.open = !this.open; },
-        close() { this.open = false; },
-        markAllAsRead() {
-            this.unreadCount = 0;
-            this.notifications.forEach(n => n.read_at = new Date());
-        },
-        updateCount(newCount) { this.unreadCount = newCount; }
     }));
 
     // User Dropdown

@@ -2059,6 +2059,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const userType = urlParams.get('type');
 
+        // Check URL parameter for initial tab selection
+        const tabParam = urlParams.get('tab');
+        if (tabParam === 'register') {
+            switchToRegister();
+        }
+
         // Toast notification system
         function showToast(message, type = 'info', title = '') {
             const toastIcon = toast.querySelector('.toast-icon');

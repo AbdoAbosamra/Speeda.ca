@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        $schedule->call(function () {
+            \App\Models\AdminNotification::where('expires_at', '<', now())->delete();
+        })->daily();
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         // Add SetLocale, TrackVisitor, and CheckUserStatus to web middleware group
         $middleware->web(append: [

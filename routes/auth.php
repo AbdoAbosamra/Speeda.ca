@@ -20,7 +20,7 @@ Route::middleware('guest')->group(function () {
 
     // Redirect login to register page (which has login tab)
     Route::get('login', function () {
-        return redirect()->route('register');
+        return redirect()->route('register', request()->query());
     })->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);

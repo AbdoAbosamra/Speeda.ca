@@ -304,6 +304,11 @@
             <i class="fas fa-user-shield"></i>
             <span>{{ __('admin.manage_users') ?? 'Users' }}</span>
         </a>
+        <a href="{{ route('admin.notifications.index') }}"
+           class="admin-nav-item {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}">
+            <i class="fas fa-bell"></i>
+            <span>{{ __('admin.manage_notifications') ?? 'Notifications' }}</span>
+        </a>
 
         <div class="admin-sidebar-divider"></div>
 

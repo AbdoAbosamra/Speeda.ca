@@ -305,6 +305,11 @@
         }
         .quick-nav-item:hover .quick-nav-icon { transform: scale(1.1) rotate(5deg); }
 
+        /* Center last row items when there are fewer than 6 items */
+        .quick-nav .row {
+            justify-content: center;
+        }
+
         /* Section Grid Cards */
         .section-grid-card {
             background: var(--surface-color);

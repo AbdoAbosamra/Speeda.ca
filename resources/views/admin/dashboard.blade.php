@@ -184,6 +184,24 @@
                         </div>
                     </a>
                 </div>
+                {{-- @change 2026-04-14 TASK-5 | Reworked the admin notifications quick action into a dedicated CTA card | The dashboard should direct admins to the notification management page instead of a navbar bell | risk:LOW --}}
+                <!-- Notifications Management -->
+                <div class="col-md-4">
+                    <div class="action-card d-block p-4 rounded-4 border bg-white shadow-sm h-100 notification-action-card">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <span class="icon-circle bg-purple-soft text-purple flex-shrink-0">
+                                <i class="fas fa-bell"></i>
+                            </span>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-2 text-dark">Notifications</h6>
+                                <p class="text-secondary mb-0">Manage and send notifications to service providers</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('admin.notifications.index') }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                            Manage Notifications
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -338,6 +356,15 @@
     .action-card:hover .fa-chevron-right {
         color: var(--accent-indigo) !important;
         transform: translateX(4px);
+    }
+    .notification-action-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .notification-action-card .btn {
+        align-self: flex-start;
     }
     .fa-chevron-right {
         transition: transform 0.15s ease;

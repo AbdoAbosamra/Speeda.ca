@@ -49,3 +49,17 @@
 **Risk:** LOW
 **Safe because:** The annotations are comments only and the markdown log is additive documentation.
 **Verified by:** Review each modified file for a nearby `@change` marker and confirm this `CHANGES.md` file lists all tasks completed in this session.
+
+## [2026-04-14] — TASK-5: Notification UX cleanup and read-state sync
+
+**Files modified:**
+- `app/Http/Controllers/NotificationController.php` — tightened provider read-state updates, ignored invalid notification ids, and returned unread-count metadata for the dropdown UI
+- `resources/views/admin/dashboard.blade.php` — converted the dashboard notification quick action into a dedicated management card with the requested CTA
+- `resources/views/admin/notifications/index.blade.php` — replaced the harsh one-line preview with a cleaner multi-line preview and reinforced the full-content modal path
+- `resources/views/components/admin-top-bar.blade.php` — removed unused admin notification dropdown scaffolding so the admin navbar no longer duplicates notification management
+- `resources/views/components/main-nav.blade.php` — improved provider unread highlighting, fixed the bell pulse animation, and synchronized badge removal when notifications are opened or clicked
+
+**Reason:** Notification management should live on the dedicated admin page while providers get a clearer and more reliable read/unread experience.
+**Risk:** LOW
+**Safe because:** The changes are additive UI/controller refinements on top of the existing notification system and do not alter or delete stored notification data.
+**Verified by:** Open `/admin/dashboard` to confirm the bell is gone and the notification card routes to `/admin/notifications`, review a long notification preview and modal on `/admin/notifications`, and open the provider dropdown to confirm unread styling and the badge clear immediately and stay cleared after reload.

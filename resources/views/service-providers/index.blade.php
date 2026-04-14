@@ -1717,11 +1717,20 @@
                     <div class="select-wrapper">
                         <select class="filter-select" id="categoryFilter">
                             <option value="">{{ __('service_provider.all_categories') }}</option>
-                            @foreach(($categories ?? collect([])) as $category)
+                            @php
+                                $regularCategories = ($categories ?? collect([]))->filter(fn($cat) => strtolower($cat->translated_name) !== 'others' && $cat->slug !== 'others');
+                                $othersCategory = ($categories ?? collect([]))->first(fn($cat) => strtolower($cat->translated_name) === 'others' || $cat->slug === 'others');
+                            @endphp
+                            @foreach($regularCategories as $category)
                                 <option value="{{ $category->slug }}" {{ request('category') == $category->slug || request('category') == $category->id ? 'selected' : '' }}>
                                     {{ $category->translated_name }}
                                 </option>
                             @endforeach
+                            @if($othersCategory)
+                                <option value="{{ $othersCategory->slug }}" {{ request('category') == $othersCategory->slug || request('category') == $othersCategory->id ? 'selected' : '' }}>
+                                    {{ $othersCategory->translated_name }}
+                                </option>
+                            @endif
                         </select>
                         <i class="fas fa-chevron-down select-arrow"></i>
                     </div>

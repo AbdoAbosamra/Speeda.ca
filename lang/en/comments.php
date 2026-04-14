@@ -23,6 +23,7 @@ return [
     'comment_already_flagged' => 'This comment has already been flagged.',
     'comment_flagged_successfully' => 'Comment flagged successfully.',
     'must_login_to_comment' => 'You must be logged in to comment.',
+    'only_clients_can_comment' => 'Only clients can leave comments.',
     'missing_parameters' => 'Missing required parameters.',
 
     'pending_approval' => 'Pending Approval',

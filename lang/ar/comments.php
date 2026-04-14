@@ -23,6 +23,7 @@ return [
     'comment_already_flagged' => 'تم وضع علم على هذا التعليق بالفعل.',
     'comment_flagged_successfully' => 'تم وضع علم على التعليق بنجاح.',
     'must_login_to_comment' => 'يجب تسجيل الدخول لإضافة تعليق.',
+    'only_clients_can_comment' => 'فقط العملاء يمكنهم ترك تعليقات.',
     'missing_parameters' => 'معاملات مفقودة.',
 
     'pending_approval' => 'قيد الانتظار',

@@ -48,7 +48,7 @@ class ServiceProviderFactory extends Factory
             'available_weekends' => fake()->boolean(),
             'available_evenings' => fake()->boolean(),
             'availability_schedule' => json_encode(['monday' => '9-17', 'tuesday' => '9-17']),
-            'languages' => json_encode([fake()->randomElement(['English', 'French', 'Arabic'])]),
+            'languages' => fake()->randomElements(['en', 'fr', 'ar'], fake()->numberBetween(1, 2)),
             'specializations' => json_encode([fake()->word(), fake()->word()]),
             'profile_image' => null,
             'portfolio_images' => json_encode([]),
@@ -192,6 +192,65 @@ class ServiceProviderFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'experience_years' => $years,
+        ]);
+    }
+
+    /**
+     * Create with Canadian address and postal code format.
+     */
+    public function canadianAddress(): static
+    {
+        $faker = \Faker\Factory::create('en_CA');
+        $canadianCities = [
+            ['city' => 'Toronto', 'province' => 'ON'],
+            ['city' => 'Vancouver', 'province' => 'BC'],
+            ['city' => 'Ottawa', 'province' => 'ON'],
+            ['city' => 'Montreal', 'province' => 'QC'],
+            ['city' => 'Calgary', 'province' => 'AB'],
+        ];
+        $cityData = $faker->randomElement($canadianCities);
+        $postalCode = $this->generateCanadianPostalCode($faker);
+
+        return $this->state(fn (array $attributes) => [
+            'address' => "{$faker->numberBetween(1, 9999)} {$faker->streetName}, {$cityData['city']}, {$cityData['province']} {$postalCode}",
+            'service_area' => $cityData['city'],
+        ]);
+    }
+
+    /**
+     * Generate valid Canadian postal code (Format: A1B 2C3)
+     */
+    private function generateCanadianPostalCode($faker): string
+    {
+        $letters = 'ABCDEFGHJKLMNPQRSTVWXYZ';
+        return sprintf('%s%d%s %d%s%d',
+            $letters[$faker->numberBetween(0, strlen($letters) - 1)],
+            $faker->numberBetween(0, 9),
+            $letters[$faker->numberBetween(0, strlen($letters) - 1)],
+            $faker->numberBetween(0, 9),
+            $letters[$faker->numberBetween(0, strlen($letters) - 1)],
+            $faker->numberBetween(0, 9)
+        );
+    }
+
+    /**
+     * Create with rating in specific range (1-5).
+     */
+    public function withRating(float $min = 1, float $max = 5): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'rating' => fake()->randomFloat(1, $min, $max),
+        ]);
+    }
+
+    /**
+     * Create test data provider linked to test user.
+     */
+    public function testData(int $index = 1): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_id' => \App\Models\User::factory()->testData('provider', $index)->canadianProvider(),
+            'rating' => fake()->randomFloat(1, 1, 5),
         ]);
     }
 }

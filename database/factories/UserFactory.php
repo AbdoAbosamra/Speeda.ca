@@ -117,4 +117,41 @@ class UserFactory extends Factory
             'email' => $email,
         ]);
     }
+
+    /**
+     * Create a test user with @test-speeda.ca email domain.
+     * This makes the user easy to identify and clean up later.
+     */
+    public function testData(string $type = 'user', ?int $index = null): static
+    {
+        $uniqueId = \Illuminate\Support\Str::random(6);
+        $index = $index ?? fake()->numberBetween(1, 9999);
+
+        return $this->state(fn (array $attributes) => [
+            'email' => "{$type}.{$index}.{$uniqueId}@test-speeda.ca",
+            'email_verified_at' => now(),
+            'is_active' => true,
+        ]);
+    }
+
+    /**
+     * Create a Canadian-localized service provider user.
+     */
+    public function canadianProvider(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'service_provider',
+            'mobile' => $this->generateCanadianPhone(),
+        ]);
+    }
+
+    /**
+     * Create a Canadian-localized client user.
+     */
+    public function canadianClient(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'client',
+        ]);
+    }
 }

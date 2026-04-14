@@ -19,5 +19,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info('🎉 Database seeded successfully!');
         $this->command->info('   ✅ Categories: 57 (7 sections + 50 categories)');
         $this->command->info('   ✅ Locations seeded');
+        $this->command->info('');
+        $this->command->info('💡 For test data (60 Canadian users): php artisan db:seed --class=TestDataSeeder');
+        $this->command->info('🧹 To clean up test data: php artisan test-data:cleanup');
     }
 }

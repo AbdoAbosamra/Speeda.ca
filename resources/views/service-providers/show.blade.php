@@ -1144,8 +1144,18 @@
                                     <div class="d-flex flex-wrap gap-2 mb-3">
                                         @foreach($serviceProvider->languages as $langCode)
                                             @php 
-                                                $langNames = ['ar' => 'arabic', 'en' => 'english', 'fr' => 'french'];
-                                                $label = $langNames[$langCode] ?? $langCode;
+                                                // Map language codes and full names to translation keys
+                                                $langMap = [
+                                                    // Language codes
+                                                    'ar' => 'arabic',
+                                                    'en' => 'english', 
+                                                    'fr' => 'french',
+                                                    // Full names (from old data)
+                                                    'English' => 'english',
+                                                    'French' => 'french',
+                                                    'Arabic' => 'arabic',
+                                                ];
+                                                $label = $langMap[$langCode] ?? strtolower($langCode);
                                             @endphp
                                             <span class="language-badge">
                                                 <i class="fas fa-globe-americas"></i>

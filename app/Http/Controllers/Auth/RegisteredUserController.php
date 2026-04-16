@@ -26,12 +26,15 @@ class RegisteredUserController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Group professions by immediate parent's localized name for optgroup rendering
+        // Group terminal professions by their top-level root section (Level 1) for hierarchical optgroup rendering
         $professionGroups = $professions
             ->groupBy(function ($category) {
-                return $category->parent
-                    ? $category->parent->localized_name
-                    : __('general.other');
+                // Find the root section (top ancestor where parent_id is null)
+                $root = $category;
+                while ($root->parent) {
+                    $root = $root->parent;
+                }
+                return $root->localized_name;
             })
             ->sortKeys();
 

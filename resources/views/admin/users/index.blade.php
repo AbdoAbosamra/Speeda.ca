@@ -214,15 +214,16 @@
                                     
                                     <!-- Delete Button -->
                                     <form action="{{ route('admin.users.delete', $user) }}" method="POST" 
-                                          onsubmit="return confirm('{{ __('admin.confirm_delete_user') }}');" 
-                                          class="d-inline">
+                                          onsubmit="return confirm('{{ __('admin.confirm_hard_delete_user') }}');" 
+                                          class="d-inline"
+                                          title="{{ __('admin.delete') }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3" 
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" 
                                                 style="transition: all 0.3s;"
-                                                onmouseover="this.style.transform='scale(1.05)'"
-                                                onmouseout="this.style.transform='scale(1)'">
-                                            <i class="fas fa-trash me-1"></i>{{ __('admin.delete') }}
+                                                onmouseover="this.style.background='#dc3545'; this.style.color='white'; this.style.transform='scale(1.05)'"
+                                                onmouseout="this.style.background='transparent'; this.style.color='#dc3545'; this.style.transform='scale(1)'">
+                                            <i class="fas fa-user-times me-1"></i>{{ __('admin.delete') }}
                                         </button>
                                     </form>
                                 @else

@@ -743,7 +743,7 @@ class AdminController extends Controller
     }
 
     /**
-     * Delete a user account
+     * Delete a user account permanently with all related data (Hard Delete)
      */
     public function deleteUser(User $user)
     {
@@ -773,21 +773,54 @@ class AdminController extends Controller
                 $userName = $user->name;
                 $userEmail = $user->email;
 
-                // Delete related service provider profile if exists
+                // 1. Cleanup Service Provider Profile and Media
                 if ($user->serviceProvider) {
-                    $user->serviceProvider->delete();
+                    $provider = $user->serviceProvider;
+                    
+                    // Cleanup Spatie Media Library collection
+                    if (method_exists($provider, 'clearMediaCollection')) {
+                        $provider->clearMediaCollection('gallery');
+                    }
+                    
+                    // Cleanup manually managed profile image
+                    if ($provider->profile_image && Storage::disk('public')->exists($provider->profile_image)) {
+                        Storage::disk('public')->delete($provider->profile_image);
+                    }
+
+                    // Cleanup business license file if exists
+                    if ($provider->business_license && Storage::disk('public')->exists($provider->business_license)) {
+                        Storage::disk('public')->delete($provider->business_license);
+                    }
+                    
+                    $provider->delete();
                 }
 
-                // Log the action before deletion
-                $this->logAction('delete', $user, ['deleted_user' => $userEmail]);
+                // 2. Cleanup User-authored content
+                // These use the relationships added to User model
+                $user->reviews()->delete();
+                $user->comments()->forceDelete(); // Comments use SoftDeletes, so we forceDelete
+                $user->endorsements()->delete();
+                $user->bookings()->delete();
+                
+                // 3. Cleanup Pivot tables
+                $user->savedProviders()->detach();
+                $user->readAdminNotifications()->detach();
 
-                // Delete the user
+                // 4. Log the action before deletion for audit purposes
+                // Note: The log will contain the email for future reference
+                $this->logAction('permanent_delete', $user, [
+                    'deleted_user_email' => $userEmail,
+                    'deleted_user_name' => $userName,
+                    'data_cleaned' => ['provider', 'reviews', 'comments', 'endorsements', 'bookings', 'bookmarks']
+                ]);
+
+                // 5. Finally, delete the user record
                 $user->delete();
 
                 // Clear caches
                 $this->clearApplicationCaches();
 
-                Log::info('User deleted by admin', [
+                Log::info('User permanently deleted by admin', [
                     'deleted_user_id' => $user->id,
                     'deleted_user_email' => $userEmail,
                     'admin_id' => Auth::id(),
@@ -800,6 +833,7 @@ class AdminController extends Controller
                 return redirect()->back();
             });
         } catch (\Exception $e) {
+            Log::error('Permanent user deletion failed: ' . $e->getMessage());
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
             return redirect()->back();

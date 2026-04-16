@@ -400,7 +400,7 @@
             transform: translateY(-10px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 50;
-            max-height: 200px;
+            max-height: 400px;
             overflow-y: auto;
         }
 

@@ -168,6 +168,10 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
     // Handle profile image upload
     Route::post('/profile/image-upload', [ServiceProviderController::class, 'uploadProfileImage'])
         ->name('service-providers.profile.image-upload');
+
+    // Dismiss engagement popup
+    Route::post('/profile/popup-dismissed', [ServiceProviderController::class, 'dismissEngagementPopup'])
+        ->name('service-providers.popup-dismissed');
 });
 
 // ==================== REVIEWS ROUTES (Client) ====================

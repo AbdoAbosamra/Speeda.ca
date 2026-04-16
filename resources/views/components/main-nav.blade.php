@@ -13,7 +13,6 @@
                1. ROOT / DESIGN TOKENS
                =============================================== */
         :root {
-            /* Spacing - 8pt grid */
             --space-1: 0.25rem;
             --space-2: 0.5rem;
             --space-3: 0.75rem;
@@ -23,21 +22,15 @@
             --space-8: 2rem;
             --space-10: 2.5rem;
             --space-12: 3rem;
-
-            /* Radius */
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 24px;
             --radius-full: 9999px;
-
-            /* Transitions */
             --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-            /* Primary */
             --primary-50: #eff6ff;
             --primary-100: #dbeafe;
             --primary-200: #bfdbfe;
@@ -48,64 +41,43 @@
             --primary-700: #1d4ed8;
             --primary-800: #1e40af;
             --primary-900: #1e3a8a;
-
-            /* Success */
             --success-50: #ecfdf5;
             --success-500: #10b981;
             --success-600: #059669;
-
-            /* Warning */
             --warning-500: #f59e0b;
-
-            /* Danger */
             --danger-50: #fef2f2;
             --danger-100: #fee2e2;
             --danger-200: #fecaca;
             --danger-500: #ef4444;
             --danger-600: #dc2626;
             --danger-700: #b91c1c;
-
-            /* Typography */
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
             --text-inverse: #ffffff;
-
-            /* Surfaces */
             --surface-white: #ffffff;
             --surface-glass: rgba(255, 255, 255, 0.95);
             --surface-subtle: #f8fafc;
             --surface-card: #f9fafb;
-
-            /* Borders */
             --border-default: #e2e8f0;
             --border-subtle: rgba(226, 232, 240, 0.4);
-
-            /* Shadows */
             --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
             --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
             --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
             --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
             --shadow-xl: 0 24px 64px rgba(15, 23, 42, 0.16);
-
-            /* Gradients */
             --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
             --gradient-primary-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.08));
             --gradient-primary-hover: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.15));
             --gradient-success: linear-gradient(135deg, #10b981, #059669);
             --gradient-danger: linear-gradient(135deg, #ef4444, #dc2626);
             --gradient-danger-subtle: linear-gradient(135deg, rgba(220, 38, 38, 0.08), transparent);
-
-            /* Glow Effects */
             --glow-primary: 0 0 32px rgba(99, 102, 241, 0.2);
             --glow-primary-hover: 0 8px 40px rgba(99, 102, 241, 0.35);
             --glow-danger: 0 4px 12px rgba(239, 68, 68, 0.5);
             --glow-success: 0 12px 32px rgba(16, 185, 129, 0.5);
         }
 
-        /* ===============================================
-               2. DARK MODE
-               =============================================== */
         body.dark-mode {
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
@@ -123,22 +95,17 @@
             --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.5);
         }
 
-        /* ===============================================
-               3. NAVIGATION BAR (Layout)
-               =============================================== */
         .sp-nav {
             position: sticky;
             top: 0;
-            z-index: 1100;
+            z-index: 1300;
             width: 100%;
             background: var(--surface-glass);
             backdrop-filter: blur(32px) saturate(180%);
             -webkit-backdrop-filter: blur(32px) saturate(180%);
             border-bottom: 1px solid var(--border-subtle);
             box-shadow: var(--shadow-xs);
-            transition: background var(--transition-smooth),
-                box-shadow var(--transition-smooth),
-                border-color var(--transition-smooth);
+            transition: background var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
             animation: navEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
 
@@ -164,9 +131,6 @@
             gap: var(--space-8);
         }
 
-        /* ===============================================
-               4. BRAND / LOGO
-               =============================================== */
         .sp-brand {
             display: flex;
             align-items: center;
@@ -213,18 +177,15 @@
             transform: translateY(-4px);
         }
 
-        /* ===============================================
-               5. MOBILE TOGGLE
-               =============================================== */
+        /* زر التبديل - مخفي على الشاشات الكبيرة */
         .sp-nav__toggle {
             display: none;
-            position: relative;
+            z-index: 1400;
             align-items: center;
             justify-content: center;
             width: 48px;
             height: 48px;
             padding: var(--space-3);
-            margin-inline-start: auto;
             background: var(--surface-white);
             border: 2px solid var(--border-default);
             border-radius: var(--radius-md);
@@ -255,15 +216,13 @@
         .sp-nav.is-open .sp-nav__toggle-bar:nth-child(2) { opacity: 0; transform: scale(0); }
         .sp-nav.is-open .sp-nav__toggle-bar:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
 
-        /* ===============================================
-               6. NAVIGATION LINKS & MENU
-               =============================================== */
         .sp-nav__links {
             display: flex;
             align-items: center;
             gap: var(--space-8);
             margin-inline-start: auto;
             flex: 1;
+            z-index: 99999;
         }
 
         .sp-nav__menu {
@@ -323,9 +282,6 @@
         .sp-link:focus-visible { outline: 3px solid var(--primary-500); outline-offset: 2px; }
         .sp-link:active { transform: translateY(0); }
 
-        /* ===============================================
-               7. ACTIONS AREA & BUTTONS
-               =============================================== */
         .sp-actions {
             display: flex;
             align-items: center;
@@ -394,9 +350,6 @@
         .sp-btn--danger:hover i { transform: scale(1.12); }
         .sp-btn--danger:active { transform: translateY(0); }
 
-        /* ===============================================
-               8. USER INFO
-               =============================================== */
         .sp-user {
             display: flex;
             align-items: center;
@@ -464,9 +417,6 @@
             color: var(--text-muted);
         }
 
-        /* ===============================================
-               9. NOTIFICATION SYSTEM
-               =============================================== */
         .sp-notif { position: relative; }
 
         .sp-notif__trigger {
@@ -541,7 +491,6 @@
         .sp-notif--unread .sp-notif__trigger { border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08); }
         .sp-notif--unread .sp-notif__trigger:hover { border-color: var(--primary-500); box-shadow: none; }
 
-        /* Dropdown */
         .sp-notif__dropdown {
             position: absolute;
             top: calc(100% + 12px);
@@ -628,7 +577,6 @@
 
         .sp-notif__footer-btn:hover { background: rgba(59, 130, 246, 0.08); color: var(--primary-700); }
 
-        /* Item */
         .sp-notif__item {
             position: relative;
             padding: var(--space-4) var(--space-5);
@@ -681,9 +629,6 @@
         .sp-notif__empty-text { font-weight: 600; font-size: 0.9375rem; color: var(--text-secondary); }
         .sp-notif__empty-sub { font-size: 0.8125rem; margin-top: var(--space-1); }
 
-        /* ===============================================
-               10. UTILITIES (Progress, Dark Toggle, Chat)
-               =============================================== */
         .sp-scroll-progress { position: fixed; top: 0; left: 0; z-index: 9999; width: 0%; height: 3px; background: var(--gradient-primary); box-shadow: 0 0 12px rgba(99, 102, 241, 0.5); transition: width 0.1s linear; }
 
         .sp-theme-toggle { position: relative; width: 56px; height: 32px; padding: 3px; background: var(--surface-subtle); border: 2px solid var(--border-default); border-radius: var(--radius-full); cursor: pointer; transition: all var(--transition-base); }
@@ -699,17 +644,14 @@
         .sp-chat__btn:hover { transform: scale(1.12) rotate(-5deg); box-shadow: 0 16px 48px rgba(16, 185, 129, 0.7); animation: none; }
 
         /* ===============================================
-               11. PREMIUM NOTIFICATION MODAL (Cinematic)
+               MODAL (Premium)
                =============================================== */
-
-        /* Deep Diffused Backdrop */
         #notifDetailModal + .modal-backdrop,
         .modal-backdrop.show {
             backdrop-filter: blur(16px) saturate(150%);
             -webkit-backdrop-filter: blur(16px) saturate(150%);
         }
 
-        /* Cinematic Entrance Animation */
         #notifDetailModal .modal-dialog {
             transform: translateY(50px) scale(0.92);
             opacity: 0;
@@ -721,7 +663,6 @@
             opacity: 1;
         }
 
-        /* Main Container - Extreme Glassmorphism & Multi-Layer Depth */
         #notifDetailModal .modal-content {
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -729,23 +670,15 @@
             background: var(--surface-glass);
             backdrop-filter: blur(24px) saturate(200%);
             -webkit-backdrop-filter: blur(24px) saturate(200%);
-            box-shadow:
-                0 0 0 1px rgba(226, 232, 240, 0.6),
-                0 4px 6px -1px rgba(15, 23, 42, 0.05),
-                0 20px 50px -12px rgba(15, 23, 42, 0.3),
-                0 0 100px -20px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.6), 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 20px 50px -12px rgba(15, 23, 42, 0.3), 0 0 100px -20px rgba(99, 102, 241, 0.2);
             overflow: hidden;
         }
 
         body.dark-mode #notifDetailModal .modal-content {
             border-color: rgba(51, 65, 85, 0.6);
-            box-shadow:
-                0 0 0 1px rgba(51, 65, 85, 0.8),
-                0 20px 50px -12px rgba(0, 0, 0, 0.6),
-                0 0 100px -20px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 0 1px rgba(51, 65, 85, 0.8), 0 20px 50px -12px rgba(0, 0, 0, 0.6), 0 0 100px -20px rgba(99, 102, 241, 0.3);
         }
 
-        /* Glass Highlight (Light Reflection) */
         #notifDetailModal .modal-content::before {
             content: '';
             position: absolute;
@@ -762,7 +695,6 @@
             background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
         }
 
-        /* Header Layout */
         #notifDetailModal .modal-header {
             background: var(--gradient-primary);
             color: var(--text-inverse);
@@ -772,7 +704,6 @@
             overflow: hidden;
         }
 
-        /* Header Texture/Depth */
         #notifDetailModal .modal-header::after {
             content: '';
             position: absolute;
@@ -781,7 +712,6 @@
             pointer-events: none;
         }
 
-        /* Premium Floating Close Button */
         #notifDetailModal .modal-header .btn-close {
             position: absolute;
             top: var(--space-5);
@@ -810,7 +740,6 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
 
-        /* Meta Info */
         #notifDetailModal .modal-meta {
             position: relative;
             z-index: 1;
@@ -824,7 +753,6 @@
             letter-spacing: 0.3px;
         }
 
-        /* Title */
         #notifDetailModal .modal-title {
             position: relative;
             z-index: 1;
@@ -835,7 +763,6 @@
             letter-spacing: -0.02em;
         }
 
-        /* Body - Optimal Readability */
         #notifDetailModal .modal-body {
             padding: var(--space-10) var(--space-8);
             color: var(--text-primary);
@@ -846,7 +773,6 @@
             word-break: break-word;
         }
 
-        /* Footer */
         #notifDetailModal .modal-footer {
             border-top: 1px solid var(--border-default);
             padding: var(--space-5) var(--space-8);
@@ -856,50 +782,125 @@
         }
 
         /* ===============================================
-               12. RESPONSIVE
+               RESPONSIVE (MOBILE PUSH MENU)
                =============================================== */
         @media (max-width: 1200px) { .sp-nav__inner { gap: var(--space-6); } }
-
         @media (max-width: 992px) { .sp-user__name, .sp-user__email { max-width: 100px; } }
 
         @media (max-width: 768px) {
-            .sp-nav__inner { flex-wrap: wrap; padding: var(--space-4) var(--space-5); gap: var(--space-3); }
-            .sp-brand__img { height: 64px; }
-            .sp-nav__toggle { display: flex; }
-
-            .sp-nav__links {
-                position: fixed;
-                top: 0; inset-inline-start: 0; inset-inline-end: 0; bottom: 0;
-                z-index: 1050;
-                display: flex; flex-direction: column; align-items: stretch;
-                padding: 80px var(--space-6) var(--space-8);
-                gap: var(--space-6);
-                overflow-y: auto; overscroll-behavior: contain;
-                background: var(--surface-glass);
-                backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-                visibility: hidden; opacity: 0; transform: translateY(-20px);
-                transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.4s ease;
+            .sp-nav__inner {
+                flex-wrap: wrap;
+                padding: var(--space-4) var(--space-5);
+                gap: var(--space-3);
             }
 
-            .sp-nav.is-open .sp-nav__links { visibility: visible; opacity: 1; transform: translateY(0); }
-            .sp-nav__menu { flex-direction: column; width: 100%; gap: var(--space-1); }
-            .sp-link { padding: var(--space-4) var(--space-5); width: 100%; font-size: 1rem; border-radius: var(--radius-lg); }
+            .sp-brand {
+                margin-inline-end: auto;  /* يدفع العناصر التالية إلى الطرف الآخر */
+            }
 
-            .sp-actions { flex-direction: column; width: 100%; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border-default); }
-            .sp-user { width: 100%; justify-content: center; padding: var(--space-4); }
-            .sp-user__name, .sp-user__email { max-width: none; }
-            .sp-btn { width: 100%; padding: var(--space-4); }
-            .sp-notif { align-self: center; }
+            .sp-brand__img { height: 64px; }
+
+            .sp-nav__toggle {
+                display: flex;
+                margin-inline-start: auto; /* يلتصق بالطرف المقابل للشعار */
+            }
+
+            /* القائمة - push menu */
+            .sp-nav__links {
+                width: 100%;
+                order: 2;
+                position: static;
+                display: block;
+                max-height: 0;
+                overflow-y: hidden;
+                padding: 0 var(--space-5);
+                background: var(--surface-glass);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+                transition: max-height 0.4s ease, padding 0.3s ease;
+                visibility: visible;
+                opacity: 1;
+                transform: none;
+                box-shadow: none;
+                margin-top: 0;
+            }
+
+            .sp-nav.is-open .sp-nav__links {
+                max-height: 80vh;
+                padding-top: var(--space-6);
+                padding-bottom: var(--space-8);
+                overflow-y: auto;
+                border-top: 1px solid var(--border-subtle);
+                margin-top: var(--space-3);
+            }
+
+            .sp-nav__menu {
+                flex-direction: column;
+                width: 100%;
+                gap: var(--space-2);
+                margin-bottom: var(--space-6);
+            }
+
+            .sp-link {
+                padding: var(--space-4) var(--space-5);
+                width: 100%;
+                font-size: 1rem;
+                border-radius: var(--radius-lg);
+                white-space: normal;
+            }
+
+            .sp-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: var(--space-3);
+                padding-top: var(--space-4);
+                border-top: 1px solid var(--border-default);
+            }
+
+            .sp-user {
+                width: 100%;
+                justify-content: center;
+                padding: var(--space-4);
+            }
+
+            .sp-user__name, .sp-user__email {
+                max-width: none;
+            }
+
+            .sp-btn {
+                width: 100%;
+                padding: var(--space-4);
+            }
+
+            .sp-notif {
+                align-self: center;
+                width: 100%;
+            }
+
+            .sp-notif__trigger {
+                width: 100%;
+                justify-content: center;
+                gap: var(--space-2);
+            }
 
             .sp-notif__dropdown {
-                position: fixed; top: auto; bottom: 0; right: 0; left: 0;
-                width: 100%; max-width: none; max-height: 70vh;
+                position: fixed;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-width: none;
+                max-height: 70vh;
                 border-radius: var(--radius-xl) var(--radius-xl) 0 0;
             }
 
-            .sp-chat { bottom: var(--space-4); right: var(--space-4); }
+            .sp-chat {
+                bottom: var(--space-4);
+                right: var(--space-4);
+            }
 
-            /* Mobile Modal Adjustments */
             #notifDetailModal .modal-title { font-size: 1.35rem; }
             #notifDetailModal .modal-body { padding: var(--space-6) var(--space-5); }
             #notifDetailModal .modal-header { padding: var(--space-6) var(--space-5) var(--space-4); }
@@ -911,24 +912,19 @@
         [dir="rtl"] .sp-notif__item::before { inset-inline-start: auto; inset-inline-end: 0; }
         [dir="rtl"] .sp-notif__item:hover { transform: translateX(-4px); }
 
-        /* Accessibility: Reduced Motion */
+        /* Reduced Motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.1ms !important;
             }
-
             #notifDetailModal .modal-dialog {
                 transition: opacity 0.1s ease !important;
                 transform: none !important;
             }
-            #notifDetailModal.show .modal-dialog {
-                transform: none !important;
-            }
-            #notifDetailModal .modal-header .btn-close {
-                transition: none !important;
-            }
+            #notifDetailModal.show .modal-dialog { transform: none !important; }
+            #notifDetailModal .modal-header .btn-close { transition: none !important; }
         }
     </style>
 @endonce
@@ -956,13 +952,11 @@
                         btnElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> جارٍ...';
                         btnElement.disabled = true;
                     }
-
                     const res = await fetch('{{ route("notifications.mark-as-read") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
                     });
                     const data = await res.json();
-
                     if (data.success) {
                         notifBadge?.setAttribute('hidden', '');
                         notifWrapper?.classList.remove('sp-notif--unread');
@@ -994,11 +988,22 @@
                 const isOpen = nav.classList.toggle('is-open');
                 toggle?.setAttribute('aria-expanded', String(isOpen));
                 linksContainer?.setAttribute('aria-hidden', String(!isOpen));
-                document.body.style.overflow = isOpen ? 'hidden' : '';
+                // لا نمنع التمرير في الصفحة
             };
 
-            toggle?.addEventListener('click', toggleMenu);
-            document.addEventListener('click', (e) => { if (nav.classList.contains('is-open') && !nav.contains(e.target)) toggleMenu(); });
+            if (toggle) {
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+            }
+
+            document.addEventListener('click', (e) => {
+                if (nav.classList.contains('is-open') && !nav.contains(e.target)) {
+                    toggleMenu();
+                }
+            });
 
             let ticking = false;
             window.addEventListener('scroll', () => {
@@ -1026,14 +1031,13 @@
                     const wasOpen = notifDropdown.getAttribute('aria-hidden') === 'false';
                     closeNotif();
                     if (wasOpen) return;
-
                     notifDropdown.setAttribute('aria-hidden', 'false');
                     notifTrigger.setAttribute('aria-expanded', 'true');
-
                     if (notifBadge && !notifBadge.hasAttribute('hidden')) await markAllAsRead(null);
                 });
-
-                document.addEventListener('click', (e) => { if (!notifTrigger.contains(e.target) && !notifDropdown.contains(e.target)) closeNotif(); });
+                document.addEventListener('click', (e) => {
+                    if (!notifTrigger.contains(e.target) && !notifDropdown.contains(e.target)) closeNotif();
+                });
             }
 
             const notifModalEl = document.getElementById('notifDetailModal');
@@ -1044,15 +1048,12 @@
                     const title = item.getAttribute('data-notif-title');
                     const message = item.getAttribute('data-notif-message');
                     const time = item.getAttribute('data-notif-time');
-
                     const modalTitle = document.getElementById('notifDetailTitle');
                     const modalMessage = document.getElementById('notifDetailMessage');
                     const modalDate = document.querySelector('#notifDetailDate span');
-
                     if (modalTitle) modalTitle.textContent = title;
                     if (modalMessage) modalMessage.textContent = message;
                     if (modalDate) modalDate.textContent = time;
-
                     notifModal?.show();
                     closeNotif();
                 });

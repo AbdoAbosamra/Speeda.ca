@@ -77,6 +77,22 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * Reviews written by this user as a client.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'client_id');
+    }
+
+    /**
+     * Comments posted by this user.
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'user_id');
+    }
+
     // Role management
     public function assignRole(string $role): void
     {

@@ -58,7 +58,7 @@ class CategoryController extends Controller
                 });
             }
 
-            $categories = $categoriesQuery->paginate(20);
+            $categories = $categoriesQuery->paginate(20)->withQueryString();
 
             // Get only active locations for frontend
             $locations = Location::where('is_active', true)

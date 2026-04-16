@@ -61,7 +61,7 @@
                         <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal" id="popupDismissBtn">
                             {{ __('service_provider.popup_dismiss') }}
                         </button>
-                        <a href="#profileUpdateForm" class="btn text-white rounded-pill px-4" data-bs-dismiss="modal"
+                        <a href="#profileUpdateForm" class="btn text-white rounded-pill px-4" id="popupCompleteBtn" data-bs-dismiss="modal"
                            style="background: linear-gradient(135deg, #4361ee, #f72585); border: none;">
                             <i class="fas fa-edit me-2"></i>{{ __('service_provider.popup_complete_profile') }}
                         </a>
@@ -73,11 +73,39 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Show the popup
-                var popup = new bootstrap.Modal(document.getElementById('profileCompletionPopup'));
+                var popupElement = document.getElementById('profileCompletionPopup');
+                var popup = new bootstrap.Modal(popupElement);
                 popup.show();
 
-                // Mark as shown when dismissed (via close button, backdrop click, or dismiss button)
-                document.getElementById('profileCompletionPopup').addEventListener('hidden.bs.modal', function () {
+                // Handle Complete Profile button click
+                document.getElementById('popupCompleteBtn').addEventListener('click', function(e) {
+                    // Mark as shown immediately so it doesn't reappear on refresh
+                    fetch('{{ route("service-providers.popup-dismissed") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        }
+                    }).catch(function() {});
+
+                    // Manually hide modal to ensure it disappears
+                    popup.hide();
+
+                    // Give modal time to start closing before scrolling
+                    setTimeout(function() {
+                        const form = document.getElementById('profileUpdateForm');
+                        if (form) {
+                            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            // Focus on first input if possible
+                            const firstInput = form.querySelector('input, textarea');
+                            if (firstInput) firstInput.focus();
+                        }
+                    }, 350);
+                });
+
+                // Mark as shown when dismissed via other means (close button, backdrop click)
+                popupElement.addEventListener('hidden.bs.modal', function () {
+                    // This covers cases where user just closes the modal without clicking Complete
                     fetch('{{ route("service-providers.popup-dismissed") }}', {
                         method: 'POST',
                         headers: {

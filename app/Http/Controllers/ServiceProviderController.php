@@ -103,7 +103,8 @@ class ServiceProviderController extends Controller
         // Order by LIVE rating (from subquery) instead of stored rating
         $serviceProviders = $query->orderByRaw('live_rating DESC')
             ->orderBy('views', 'desc')
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
         $categories = Category::with('children')
             ->filterGroups()
@@ -286,7 +287,8 @@ class ServiceProviderController extends Controller
             $reviews = $serviceProvider->activeReviews()
                 ->with(['client', 'approvedBy'])
                 ->orderByDesc('created_at')
-                ->paginate(5, ['*'], 'reviews_page');
+                ->paginate(5, ['*'], 'reviews_page')
+                ->withQueryString();
 
             // Get all locations for dropdown (not needed for public view, only for owner edit)
             $locations = Location::orderBy('city')->get();
@@ -854,5 +856,43 @@ class ServiceProviderController extends Controller
             ->where('model_id', $serviceProvider->id)
             ->where('collection_name', 'provider_gallery')
             ->firstOrFail();
+    }
+
+    /**
+     * Mark the profile engagement popup as dismissed for the authenticated provider
+     */
+    public function dismissEngagementPopup(Request $request)
+    {
+        try {
+            /** @var \App\Models\User $user */
+            $user = auth()->user();
+            $serviceProvider = $user->serviceProvider;
+
+            if ($serviceProvider && is_null($serviceProvider->profile_completion_popup_shown_at)) {
+                $serviceProvider->update([
+                    'profile_completion_popup_shown_at' => now()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Engagement popup marked as dismissed'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Popup already dismissed or provider not found'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to dismiss engagement popup', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error while dismissing popup'
+            ], 500);
+        }
     }
 }

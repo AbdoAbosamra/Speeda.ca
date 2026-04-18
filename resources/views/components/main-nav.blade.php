@@ -781,6 +781,9 @@
             gap: var(--space-3);
         }
 
+        .sp-notif--mobile { display: none; }
+        .sp-notif--desktop { display: block; }
+
         /* ===============================================
                RESPONSIVE (MOBILE PUSH MENU)
                =============================================== */
@@ -800,9 +803,17 @@
 
             .sp-brand__img { height: 64px; }
 
+            .sp-notif--mobile {
+                display: block;
+            }
+
+            .sp-notif--desktop {
+                display: none;
+            }
+
             .sp-nav__toggle {
                 display: flex;
-                margin-inline-start: auto; /* يلتصق بالطرف المقابل للشعار */
+                margin-inline-start: 0; /* يلتصق بجوار إشعار الموبايل */
             }
 
             /* القائمة - push menu */
@@ -873,27 +884,18 @@
                 padding: var(--space-4);
             }
 
-            .sp-notif {
-                align-self: center;
-                width: 100%;
-            }
-
-            .sp-notif__trigger {
-                width: 100%;
-                justify-content: center;
-                gap: var(--space-2);
-            }
+            /* Notification icon is now outside the mobile menu, so we keep its natural 44x44 size */
 
             .sp-notif__dropdown {
                 position: fixed;
-                top: auto;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
+                top: 90px; /* Below the mobile header */
+                left: var(--space-4);
+                right: var(--space-4);
+                width: calc(100% - (var(--space-4) * 2));
                 max-width: none;
-                max-height: 70vh;
-                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                max-height: calc(100vh - 120px);
+                z-index: 1500;
+                transform-origin: top;
             }
 
             .sp-chat {
@@ -937,15 +939,12 @@
 
             const toggle = nav.querySelector('.sp-nav__toggle');
             const linksContainer = nav.querySelector('.sp-nav__links');
-            const notifTrigger = document.getElementById('notifTrigger');
-            const notifDropdown = document.getElementById('notifDropdown');
-            const notifBadge = document.getElementById('notifBadge');
-            const notifWrapper = notifTrigger?.closest('.sp-notif');
-            const notifList = document.getElementById('notifList');
-            const markAllBtn = document.getElementById('markAllReadBtn');
             const scrollProgress = document.getElementById('scrollProgress');
 
-            const markAllAsRead = async (btnElement) => {
+            // --- Notifications Logic ---
+            const notifsContainers = document.querySelectorAll('.sp-notif');
+
+            const markAllAsRead = async (btnElement, wrapperElement) => {
                 const originalHTML = btnElement?.innerHTML;
                 try {
                     if (btnElement) {
@@ -958,14 +957,15 @@
                     });
                     const data = await res.json();
                     if (data.success) {
-                        notifBadge?.setAttribute('hidden', '');
-                        notifWrapper?.classList.remove('sp-notif--unread');
+                        // Sync across all instances
+                        document.querySelectorAll('.sp-notif__badge').forEach(b => b.setAttribute('hidden', ''));
+                        document.querySelectorAll('.sp-notif').forEach(w => w.classList.remove('sp-notif--unread'));
                         document.querySelectorAll('.sp-notif__item--unread').forEach(el => {
                             el.classList.remove('sp-notif__item--unread');
                             el.querySelector('.sp-notif__dot')?.remove();
                         });
-                        document.querySelector('.sp-notif__header-count')?.setAttribute('hidden', '');
-                        if (btnElement) btnElement.style.display = 'none';
+                        document.querySelectorAll('.sp-notif__header-count').forEach(c => c.setAttribute('hidden', ''));
+                        document.querySelectorAll('.sp-notif__footer-btn').forEach(btn => btn.style.display = 'none');
                     }
                 } catch (err) {
                     console.error('Error marking as read:', err);
@@ -976,19 +976,84 @@
                 }
             };
 
-            if (notifList) {
-                notifList.addEventListener('scroll', () => {
-                    notifList.classList.toggle('is-at-bottom', notifList.scrollHeight - notifList.scrollTop <= notifList.clientHeight + 20);
-                }, { passive: true });
-            }
+            const closeAllNotifs = () => {
+                notifsContainers.forEach(otherWrapper => {
+                    otherWrapper.querySelector('.sp-notif__dropdown')?.setAttribute('aria-hidden', 'true');
+                    otherWrapper.querySelector('.sp-notif__trigger')?.setAttribute('aria-expanded', 'false');
+                });
+            };
 
-            if (markAllBtn) markAllBtn.addEventListener('click', () => markAllAsRead(markAllBtn));
+            notifsContainers.forEach(wrapper => {
+                const trigger = wrapper.querySelector('.sp-notif__trigger');
+                const dropdown = wrapper.querySelector('.sp-notif__dropdown');
+                const badge = wrapper.querySelector('.sp-notif__badge');
+                const list = wrapper.querySelector('.sp-notif__list');
+                const markAllBtn = wrapper.querySelector('.sp-notif__footer-btn');
 
+                if (list) {
+                    list.addEventListener('scroll', () => {
+                        list.classList.toggle('is-at-bottom', list.scrollHeight - list.scrollTop <= list.clientHeight + 20);
+                    }, { passive: true });
+                }
+
+                if (markAllBtn) {
+                    markAllBtn.addEventListener('click', () => markAllAsRead(markAllBtn, wrapper));
+                }
+
+                if (trigger && dropdown) {
+                    trigger.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const wasOpen = dropdown.getAttribute('aria-hidden') === 'false';
+                        
+                        // Close all others
+                        closeAllNotifs();
+                        
+                        // Close mobile menu if it is open
+                        if (nav.classList.contains('is-open')) {
+                            nav.classList.remove('is-open');
+                            toggle?.setAttribute('aria-expanded', 'false');
+                            linksContainer?.setAttribute('aria-hidden', 'true');
+                        }
+
+                        if (wasOpen) return; // if it was open, it's now closed by closeAllNotifs
+
+                        dropdown.setAttribute('aria-hidden', 'false');
+                        trigger.setAttribute('aria-expanded', 'true');
+                        if (badge && !badge.hasAttribute('hidden')) await markAllAsRead(null, wrapper);
+                    });
+                }
+            });
+
+            // Close notifications on outside click
+            document.addEventListener('click', (e) => {
+                let insideNotif = false;
+                notifsContainers.forEach(wrapper => {
+                    const trigger = wrapper.querySelector('.sp-notif__trigger');
+                    const dropdown = wrapper.querySelector('.sp-notif__dropdown');
+                    if (trigger && dropdown && (trigger.contains(e.target) || dropdown.contains(e.target))) {
+                        insideNotif = true;
+                    }
+                });
+                
+                if (!insideNotif) {
+                    closeAllNotifs();
+                }
+                
+                if (nav.classList.contains('is-open') && !nav.contains(e.target)) {
+                    toggleMenu(); // Closes menu if clicking completely outside
+                }
+            });
+
+            // Toggle Mobile Menu
             const toggleMenu = () => {
                 const isOpen = nav.classList.toggle('is-open');
                 toggle?.setAttribute('aria-expanded', String(isOpen));
                 linksContainer?.setAttribute('aria-hidden', String(!isOpen));
-                // لا نمنع التمرير في الصفحة
+                
+                // If we are opening the menu, close any open notifications
+                if (isOpen) {
+                    closeAllNotifs();
+                }
             };
 
             if (toggle) {
@@ -998,12 +1063,6 @@
                     toggleMenu();
                 });
             }
-
-            document.addEventListener('click', (e) => {
-                if (nav.classList.contains('is-open') && !nav.contains(e.target)) {
-                    toggleMenu();
-                }
-            });
 
             let ticking = false;
             window.addEventListener('scroll', () => {
@@ -1019,26 +1078,6 @@
                     ticking = true;
                 }
             }, { passive: true });
-
-            const closeNotif = () => {
-                notifDropdown?.setAttribute('aria-hidden', 'true');
-                notifTrigger?.setAttribute('aria-expanded', 'false');
-            };
-
-            if (notifTrigger && notifDropdown) {
-                notifTrigger.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    const wasOpen = notifDropdown.getAttribute('aria-hidden') === 'false';
-                    closeNotif();
-                    if (wasOpen) return;
-                    notifDropdown.setAttribute('aria-hidden', 'false');
-                    notifTrigger.setAttribute('aria-expanded', 'true');
-                    if (notifBadge && !notifBadge.hasAttribute('hidden')) await markAllAsRead(null);
-                });
-                document.addEventListener('click', (e) => {
-                    if (!notifTrigger.contains(e.target) && !notifDropdown.contains(e.target)) closeNotif();
-                });
-            }
 
             const notifModalEl = document.getElementById('notifDetailModal');
             const notifModal = notifModalEl ? new bootstrap.Modal(notifModalEl) : null;
@@ -1077,6 +1116,47 @@
             <img class="sp-brand__img" src="{{ asset('images/main-logo.png') }}" alt="{{ config('app.name', 'Speeda') }}" loading="eager">
         </a>
 
+        @if($isServiceProvider && isset($activeNotifications))
+            <div class="sp-notif sp-notif--mobile {{ $hasUnread ? 'sp-notif--unread' : '' }}">
+                <button class="sp-notif__trigger js-notif-trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false">
+                    <i class="fas fa-bell" aria-hidden="true"></i>
+                    <span class="sp-notif__badge js-notif-badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
+                </button>
+
+                <div class="sp-notif__dropdown js-notif-dropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
+                    <div class="sp-notif__header">
+                        <div class="sp-notif__header-left">
+                            <i class="fas fa-bell" aria-hidden="true"></i> {{ __('admin.notifications') }}
+                        </div>
+                        @if($hasUnread)
+                            <span class="sp-notif__header-count js-notif-header-count">{{ $unreadCount }} {{ __('general.new') }}</span>
+                            <button class="sp-notif__footer-btn js-mark-read-btn" type="button">
+                                <i class="fas fa-check-double" aria-hidden="true"></i> {{ __('general.mark_all_read') }}
+                            </button>
+                        @endif
+                    </div>
+                    <div class="sp-notif__list js-notif-list">
+                        @forelse($activeNotifications as $notif)
+                            <div class="sp-notif__item {{ (!in_array($notif->id, $readIds)) ? 'sp-notif__item--unread' : '' }}" data-notif-title="{{ $notif->title }}" data-notif-message="{{ $notif->message }}" data-notif-time="{{ $notif->created_at->diffForHumans() }}">
+                                <div class="sp-notif__title">
+                                    @if(!in_array($notif->id, $readIds))<span class="sp-notif__dot" aria-hidden="true"></span>@endif
+                                    {{ $notif->title }}
+                                </div>
+                                <div class="sp-notif__message">{{ Str::limit($notif->message, 120) }}</div>
+                                <div class="sp-notif__time"><i class="fas fa-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</div>
+                            </div>
+                        @empty
+                            <div class="sp-notif__empty">
+                                <i class="fas fa-bell-slash" aria-hidden="true"></i>
+                                <div class="sp-notif__empty-text">{{ __('admin.no_notifications') }}</div>
+                                <div class="sp-notif__empty-sub">{{ __('general.all_caught_up') }}</div>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <button class="sp-nav__toggle" type="button" aria-label="{{ __('general.toggle_navigation') }}" aria-expanded="false" aria-controls="navLinks">
             <span class="sp-nav__toggle-bar"></span>
             <span class="sp-nav__toggle-bar"></span>
@@ -1100,25 +1180,25 @@
                 @include('components.language-switcher')
 
                 @if($isServiceProvider && isset($activeNotifications))
-                    <div class="sp-notif {{ $hasUnread ? 'sp-notif--unread' : '' }}">
-                        <button class="sp-notif__trigger" id="notifTrigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false" aria-controls="notifDropdown">
+                    <div class="sp-notif sp-notif--desktop {{ $hasUnread ? 'sp-notif--unread' : '' }}">
+                        <button class="sp-notif__trigger js-notif-trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false">
                             <i class="fas fa-bell" aria-hidden="true"></i>
-                            <span class="sp-notif__badge" id="notifBadge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
+                            <span class="sp-notif__badge js-notif-badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
                         </button>
 
-                        <div class="sp-notif__dropdown" id="notifDropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
+                        <div class="sp-notif__dropdown js-notif-dropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
                             <div class="sp-notif__header">
                                 <div class="sp-notif__header-left">
                                     <i class="fas fa-bell" aria-hidden="true"></i> {{ __('admin.notifications') }}
                                 </div>
                                 @if($hasUnread)
-                                    <span class="sp-notif__header-count" id="notifHeaderCount">{{ $unreadCount }} {{ __('general.new') }}</span>
-                                    <button class="sp-notif__footer-btn" id="markAllReadBtn" type="button">
+                                    <span class="sp-notif__header-count js-notif-header-count">{{ $unreadCount }} {{ __('general.new') }}</span>
+                                    <button class="sp-notif__footer-btn js-mark-read-btn" type="button">
                                         <i class="fas fa-check-double" aria-hidden="true"></i> {{ __('general.mark_all_read') }}
                                     </button>
                                 @endif
                             </div>
-                            <div class="sp-notif__list" id="notifList">
+                            <div class="sp-notif__list js-notif-list">
                                 @forelse($activeNotifications as $notif)
                                     <div class="sp-notif__item {{ (!in_array($notif->id, $readIds)) ? 'sp-notif__item--unread' : '' }}" data-notif-title="{{ $notif->title }}" data-notif-message="{{ $notif->message }}" data-notif-time="{{ $notif->created_at->diffForHumans() }}">
                                         <div class="sp-notif__title">

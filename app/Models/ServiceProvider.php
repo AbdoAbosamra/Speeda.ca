@@ -268,9 +268,7 @@ class ServiceProvider extends Model implements HasMedia
      */
     public function getDisplayImageUrlAttribute(): string
     {
-        return $this->gallery_image_url
-            ?? $this->profile_image_url
-            ?? $this->default_image_url;
+        return $this->profile_image_url;
     }
 
     /**

@@ -2799,72 +2799,7 @@
         if (profileForm) {
             let isSubmitting = false;
 
-            // Enhanced file preview for profile image with progress
-            const profileImageInput = profileForm.querySelector('input[name="profile_image"]');
-            if (profileImageInput) {
-                // Create preview container
-                const previewContainer = document.createElement('div');
-                previewContainer.className = 'image-preview-container mt-3';
-                previewContainer.style.cssText = 'display: none; position: relative;';
-                profileImageInput.parentElement.appendChild(previewContainer);
-
-                profileImageInput.addEventListener('change', function (e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        // Validate file size (5MB)
-                        if (file.size > 5 * 1024 * 1024) {
-                            alert('{{ __("sp_validation.sp_image_size") }}');
-                            e.target.value = '';
-                            return;
-                        }
-
-                        // Validate file type
-                        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-                        if (!validTypes.includes(file.type)) {
-                            alert('{{ __("sp_validation.sp_image_mimes") }}');
-                            e.target.value = '';
-                            return;
-                        }
-
-                        // Show preview with loading
-                        previewContainer.innerHTML = `
-                            <div class="position-relative">
-                                <img src="{{ $serviceProvider->default_image_url }}" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover;">
-                                <div class="spinner-border spinner-border-sm position-absolute top-50 start-50 translate-middle text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 remove-preview">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <small class="text-success d-block mt-2">
-                                <i class="fas fa-check-circle me-1"></i>${file.name} (${(file.size / 1024).toFixed(1)} KB)
-                            </small>
-                        `;
-                        previewContainer.style.display = 'block';
-
-                        const reader = new FileReader();
-                        reader.onload = function (event) {
-                            const img = previewContainer.querySelector('img');
-                            img.src = event.target.result;
-                            previewContainer.querySelector('.spinner-border').remove();
-
-                            // Also update existing preview if present
-                            const existingPreview = profileImageInput.parentElement.querySelector('.rounded');
-                            if (existingPreview && existingPreview.tagName === 'IMG') {
-                                existingPreview.src = event.target.result;
-                            }
-                        };
-                        reader.readAsDataURL(file);
-
-                        // Remove preview functionality
-                        previewContainer.querySelector('.remove-preview').addEventListener('click', function () {
-                            e.target.value = '';
-                            previewContainer.style.display = 'none';
-                        });
-                    }
-                });
-            }
+            // Legacy profile image preview removed - now handled by AJAX auto-save camera overlay
 
             // File validation for certification
             const certInput = profileForm.querySelector('input[name="certification"]');

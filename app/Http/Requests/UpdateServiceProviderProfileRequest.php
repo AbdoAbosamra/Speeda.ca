@@ -156,13 +156,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'regex:/^[a-zA-Z0-9\s\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{08A0}-\x{08FF}\x{FB50}-\x{FDFF}\x{FE70}-\x{FEFF}\-_،,]+$/u'
             ],
 
-            'profile_image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048', // 2MB max (matching PHP upload_max_filesize)
-                'dimensions:min_width=200,min_height=200,max_width=5000,max_height=5000'
-            ],
+            // profile_image validation removed (handled by AJAX)
 
             'certification' => [
                 'nullable',

@@ -432,58 +432,8 @@ class ServiceProviderController extends Controller
         DB::beginTransaction();
 
         try {
-            // CRITICAL FIX: Handle profile image upload
-            if ($request->hasFile('profile_image')) {
-                try {
-                    $image = $request->file('profile_image');
-
-                    // Validate file was uploaded successfully
-                    if (!$image->isValid()) {
-                        throw new \Exception(__('service_provider.upload_error'));
-                    }
-
-                    // Validate it's a real image
-                    $imageSize = @getimagesize($image->getRealPath());
-                    if ($imageSize === false) {
-                        throw new \Exception(__('service_provider.invalid_image_file'));
-                    }
-
-                    // Validate image dimensions
-                    if ($imageSize[0] > 5000 || $imageSize[1] > 5000) {
-                        throw new \Exception(__('service_provider.image_too_large_dimensions'));
-                    }
-
-                    // Validate minimum dimensions
-                    if ($imageSize[0] < 200 || $imageSize[1] < 200) {
-                        throw new \Exception(__('service_provider.image_too_small'));
-                    }
-
-                    // Generate secure filename
-                    $filename = 'profile_' . $serviceProvider->id . '_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $image->getClientOriginalExtension();
-                    $path = $image->storeAs('profile-images', $filename, 'public');
-
-                    if (!$path) {
-                        throw new \Exception(__('service_provider.failed_upload_image'));
-                    }
-
-                    $uploadedFiles[] = $path;
-
-                    // Delete old image only after new one uploaded successfully
-                    if ($serviceProvider->profile_image && Storage::disk('public')->exists($serviceProvider->profile_image)) {
-                        Storage::disk('public')->delete($serviceProvider->profile_image);
-                    }
-
-                    $validated['profile_image'] = $path;
-
-                } catch (\Exception $imgError) {
-                    Log::error('Profile image upload failed', [
-                        'user_id' => auth()->id(),
-                        'sp_id' => $serviceProvider->id,
-                        'error' => $imgError->getMessage()
-                    ]);
-                    throw new \Exception(__('service_provider.failed_upload_image') . ': ' . $imgError->getMessage());
-                }
-            }
+            // Profile image is now handled via AJAX auto-save (uploadProfileImage method)
+            // so we no longer process it in the main update form.
 
             // CRITICAL FIX: Handle certification upload (image or PDF) with enhanced validation
             if ($request->hasFile('certification')) {

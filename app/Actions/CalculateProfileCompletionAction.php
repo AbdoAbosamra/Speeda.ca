@@ -8,47 +8,35 @@ class CalculateProfileCompletionAction
 {
     public function execute(ServiceProvider $serviceProvider): int
     {
+        // Identify completion status for core fields
         $profilePhotoComplete = filled($serviceProvider->profile_image);
         $experienceYearsComplete = filled($serviceProvider->experience_years) && (int) $serviceProvider->experience_years > 0;
-        $addressComplete = filled($serviceProvider->address);
-
         $bioComplete = filled($serviceProvider->bio);
-        $galleryCount = $serviceProvider->getMedia('provider_gallery')->count();
-        $galleryComplete = $galleryCount >= 4;
-
         $servicesComplete = is_array($serviceProvider->services_offered)
             ? count(array_filter($serviceProvider->services_offered)) > 0
             : filled($serviceProvider->services_offered);
 
-        // Weighted scoring:
-        // - Profile photo: 30%
-        // - Years of experience: 30%
-        // - Address: 20%
-        // - Remaining fields (20%): bio 10% + gallery (>=4) 5% + services offered 5%
+        // Updated scoring (simplified to 4 core points):
+        // - Profile photo: 40%
+        // - Years of experience: 40%
+        // - Bio (Description): 10%
+        // - Services offered: 10%
         $percent = 0;
 
         if ($profilePhotoComplete) {
-            $percent += 30;
+            $percent += 40;
         }
 
         if ($experienceYearsComplete) {
-            $percent += 30;
-        }
-
-        if ($addressComplete) {
-            $percent += 20;
+            $percent += 40;
         }
 
         if ($bioComplete) {
             $percent += 10;
         }
 
-        if ($galleryComplete) {
-            $percent += 5;
-        }
-
         if ($servicesComplete) {
-            $percent += 5;
+            $percent += 10;
         }
 
         $percent = min(100, max(0, $percent));

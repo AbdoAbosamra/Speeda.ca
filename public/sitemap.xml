@@ -1,0 +1,2763 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+    <url>
+    <loc>http://localhost?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+            </url>
+    <url>
+    <loc>http://localhost?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+            </url>
+    <url>
+    <loc>http://localhost?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=automotive-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=automotive-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=automotive-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=automotive-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=automotive-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=automotive-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=automotive-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=automotive-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=automotive-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=automotive-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=automotive-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=automotive-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-property-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-property-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-property-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-property-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-property-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-property-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-property-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-property-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-property-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-property-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-property-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-property-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=professional-business-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=professional-business-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=professional-business-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=professional-business-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=professional-business-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=professional-business-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=professional-business-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=professional-business-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=professional-business-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=professional-business-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=professional-business-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=professional-business-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=personal-lifestyle-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=technical-repair-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=technical-repair-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=technical-repair-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=technical-repair-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-mechanics&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-mechanics&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-mechanics&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-mechanics&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-mechanics&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-mechanics&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-mechanics&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-mechanics&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-mechanics&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-mechanics&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-mechanics&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-mechanics&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electric-hybrid-car-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=tire-balancing-wheel-alignment&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-dealers&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-dealers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-dealers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-dealers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-dealers&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-dealers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-dealers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-dealers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-dealers&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-dealers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-dealers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-dealers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=auto-body-repair&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=auto-body-repair&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=auto-body-repair&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=auto-body-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-wash-detailing&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-wash-detailing&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=car-wash-detailing&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=car-wash-detailing&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=carpentry-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=carpentry-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=carpentry-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=carpentry-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=carpentry-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=carpentry-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=carpentry-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=carpentry-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=carpentry-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=carpentry-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=carpentry-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=carpentry-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=painting-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=painting-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=painting-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=painting-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=painting-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=painting-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=painting-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=painting-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=painting-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=painting-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=painting-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=painting-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=plumbing-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=plumbing-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=plumbing-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=plumbing-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=plumbing-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=plumbing-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=plumbing-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=plumbing-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=plumbing-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=plumbing-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=plumbing-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=plumbing-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electrical-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electrical-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electrical-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electrical-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electrical-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electrical-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electrical-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electrical-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electrical-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electrical-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electrical-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electrical-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=handyman-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=handyman-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=handyman-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=handyman-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=handyman-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=handyman-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=handyman-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=handyman-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=handyman-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=handyman-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=handyman-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=handyman-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=moving-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=moving-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=moving-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=moving-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=moving-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=moving-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=moving-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=moving-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=moving-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=moving-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=moving-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=moving-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=cleaning-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=cleaning-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=cleaning-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=cleaning-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=cleaning-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=cleaning-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=cleaning-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=cleaning-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=cleaning-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=cleaning-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=cleaning-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=cleaning-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=landscaping-gardening&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=landscaping-gardening&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=landscaping-gardening&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=landscaping-gardening&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-renovation&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-renovation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-renovation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-renovation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-renovation&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-renovation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-renovation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-renovation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-renovation&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-renovation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-renovation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-renovation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=pest-control&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=pest-control&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=pest-control&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=pest-control&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=pest-control&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=pest-control&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=pest-control&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=pest-control&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=pest-control&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=pest-control&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=pest-control&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=pest-control&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=security-system-installation&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=security-system-installation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=security-system-installation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=security-system-installation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=security-system-installation&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=security-system-installation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=security-system-installation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=security-system-installation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=security-system-installation&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=security-system-installation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=security-system-installation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=security-system-installation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hvac-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hvac-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hvac-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hvac-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hvac-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hvac-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hvac-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hvac-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hvac-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hvac-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hvac-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hvac-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=accounting-bookkeeping-tax-preparation&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=insurance-brokers&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=insurance-brokers&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=insurance-brokers&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=insurance-brokers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=lawyers-legal-advisors&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=translators-interpreters&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=translators-interpreters&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=translators-interpreters&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=translators-interpreters&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=real-estate-agents&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=real-estate-agents&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=real-estate-agents&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=real-estate-agents&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=marketing-advertising&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=marketing-advertising&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=marketing-advertising&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=marketing-advertising&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=beauty-personal-care&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=beauty-personal-care&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=beauty-personal-care&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=beauty-personal-care&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=restaurants-catering&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=restaurants-catering&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=restaurants-catering&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=restaurants-catering&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=dental-oral-care&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=dental-oral-care&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=dental-oral-care&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=dental-oral-care&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=fitness-trainers&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=fitness-trainers&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=fitness-trainers&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=fitness-trainers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=massage-therapy&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=massage-therapy&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=massage-therapy&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=massage-therapy&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=massage-therapy&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=massage-therapy&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=massage-therapy&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=massage-therapy&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=massage-therapy&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=massage-therapy&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=massage-therapy&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=massage-therapy&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hair-stylists&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hair-stylists&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hair-stylists&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hair-stylists&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hair-stylists&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hair-stylists&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hair-stylists&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hair-stylists&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hair-stylists&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hair-stylists&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hair-stylists&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hair-stylists&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=makeup-artists&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=makeup-artists&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=makeup-artists&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=makeup-artists&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=makeup-artists&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=makeup-artists&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=makeup-artists&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=makeup-artists&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=makeup-artists&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=makeup-artists&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=makeup-artists&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=makeup-artists&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=barber&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=barber&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=barber&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=barber&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=barber&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=barber&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=barber&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=barber&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=barber&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=barber&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=barber&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=barber&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=computer-repair&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=computer-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=computer-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=computer-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=computer-repair&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=computer-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=computer-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=computer-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=computer-repair&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=computer-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=computer-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=computer-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=phone-repair&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=phone-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=phone-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=phone-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=phone-repair&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=phone-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=phone-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=phone-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=phone-repair&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=phone-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=phone-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=phone-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=others-1&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=others-1&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=others-1&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=others-1&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=others-1&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=others-1&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=others-1&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=others-1&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=others-1&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=others-1&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=others-1&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=others-1&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=others-subcategory&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=others-subcategory&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=others-subcategory&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=others-subcategory&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=others-subcategory&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=others-subcategory&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=others-subcategory&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=others-subcategory&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=others-subcategory&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=others-subcategory&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=others-subcategory&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=others-subcategory&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=roadside-assistance-24-7&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=appliance-repair-home&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=appliance-repair-home&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=appliance-repair-home&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=appliance-repair-home&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=flooring-installation-repair&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=flooring-installation-repair&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=flooring-installation-repair&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=flooring-installation-repair&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=repairs-and-maintenance&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=junk-removal&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=junk-removal&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=junk-removal&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=junk-removal&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=junk-removal&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=junk-removal&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=junk-removal&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=junk-removal&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=junk-removal&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=junk-removal&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=junk-removal&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=junk-removal&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hr-recruiting&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hr-recruiting&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=hr-recruiting&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=hr-recruiting&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=web-design&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=web-design&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=web-design&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=web-design&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=web-design&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=web-design&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=web-design&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=web-design&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=web-design&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=web-design&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=web-design&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=web-design&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=graphic-design&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=graphic-design&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=graphic-design&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=graphic-design&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=graphic-design&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=graphic-design&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=graphic-design&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=graphic-design&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=graphic-design&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=graphic-design&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=graphic-design&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=graphic-design&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=notary-public&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=notary-public&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=notary-public&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=notary-public&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=notary-public&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=notary-public&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=notary-public&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=notary-public&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=notary-public&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=notary-public&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=notary-public&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=notary-public&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=childcare-babysitting&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=childcare-babysitting&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=childcare-babysitting&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=childcare-babysitting&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=electronics-repair-maintenance&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=food-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=food-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=food-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=food-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=food-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=food-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=food-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=food-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=food-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=food-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=food-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=food-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=construction-services&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=construction-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=construction-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=construction-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=construction-services&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=construction-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=construction-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=construction-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=construction-services&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=construction-services&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=construction-services&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=construction-services&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=restaurants&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=restaurants&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=restaurants&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=restaurants&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=restaurants&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=restaurants&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=restaurants&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=restaurants&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=restaurants&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=restaurants&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=restaurants&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=restaurants&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-kitchen&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-kitchen&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-kitchen&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-kitchen&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-kitchen&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-kitchen&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-kitchen&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-kitchen&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=home-kitchen&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=home-kitchen&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=home-kitchen&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=home-kitchen&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=catering-services-food&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=catering-services-food&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=catering-services-food&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=catering-services-food&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=catering-services-food&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=catering-services-food&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=catering-services-food&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=catering-services-food&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=catering-services-food&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=catering-services-food&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=catering-services-food&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=catering-services-food&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=general-construction&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=general-construction&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=general-construction&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=general-construction&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=general-construction&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=general-construction&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=general-construction&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=general-construction&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=general-construction&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=general-construction&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=general-construction&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=general-construction&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=photographers-videographers&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=photographers-videographers&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=photographers-videographers&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=photographers-videographers&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=driving-lessons-schools&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=driving-lessons-schools&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?category=driving-lessons-schools&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?category=driving-lessons-schools&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/1?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/1?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/1?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/1?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/1?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/1?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/1?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/1?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/1?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/1?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/1?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/1?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/2?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/2?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/2?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/2?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/2?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/2?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/2?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/2?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/2?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/2?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/2?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/2?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/3?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/3?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/3?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/3?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/3?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/3?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/3?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/3?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/3?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/3?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/3?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/3?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/4?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/4?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/4?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/4?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/4?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/4?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/4?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/4?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/4?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/4?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/4?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/4?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/5?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/5?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/5?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/5?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/5?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/5?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/5?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/5?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/5?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/5?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/5?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/5?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/6?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/6?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/6?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/6?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/6?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/6?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/6?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/6?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/6?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/6?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/6?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/6?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/7?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/7?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/7?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/7?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/7?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/7?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/7?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/7?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/7?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/7?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/7?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/7?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/8?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/8?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/8?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/8?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/8?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/8?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/8?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/8?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/8?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/8?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/8?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/8?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/9?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/9?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/9?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/9?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/9?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/9?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/9?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/9?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/9?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/9?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/9?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/9?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/10?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/10?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/10?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/10?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/10?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/10?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/10?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/10?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/10?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/10?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/10?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/10?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/11?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/11?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/11?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/11?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/11?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/11?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/11?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/11?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/11?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/11?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/11?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/11?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/12?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/12?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/12?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/12?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/12?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/12?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/12?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/12?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/12?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/12?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/12?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/12?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/13?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/13?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/13?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/13?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/13?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/13?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/13?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/13?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/13?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/13?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/13?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/13?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/14?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/14?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/14?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/14?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/14?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/14?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/14?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/14?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/14?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/14?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/14?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/14?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/15?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/15?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/15?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/15?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/15?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/15?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/15?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/15?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/15?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/15?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/15?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/15?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/16?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/16?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/16?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/16?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/16?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/16?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/16?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/16?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/16?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/16?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/16?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/16?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/17?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/17?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/17?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/17?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/17?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/17?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/17?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/17?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/17?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/17?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/17?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/17?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/18?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/18?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/18?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/18?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/18?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/18?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/18?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/18?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/18?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/18?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/18?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/18?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/19?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/19?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/19?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/19?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/19?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/19?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/19?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/19?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/19?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/19?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/19?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/19?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/20?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/20?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/20?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/20?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/20?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/20?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/20?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/20?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/20?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/20?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/20?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/20?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/21?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/21?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/21?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/21?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/21?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/21?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/21?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/21?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/21?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/21?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/21?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/21?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/22?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/22?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/22?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/22?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/22?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/22?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/22?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/22?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/22?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/22?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/22?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/22?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/23?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/23?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/23?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/23?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/23?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/23?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/23?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/23?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/23?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/23?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/23?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/23?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/24?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/24?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/24?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/24?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/24?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/24?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/24?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/24?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/24?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/24?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/24?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/24?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/25?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/25?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/25?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/25?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/25?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/25?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/25?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/25?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/25?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/25?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/25?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/25?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/26?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/26?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/26?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/26?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/26?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/26?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/26?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/26?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/26?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/26?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/26?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/26?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/27?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/27?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/27?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/27?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/27?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/27?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/27?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/27?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/27?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/27?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/27?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/27?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/28?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/28?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/28?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/28?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/28?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/28?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/28?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/28?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/28?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/28?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/28?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/28?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/29?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/29?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/29?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/29?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/29?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/29?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/29?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/29?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/29?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/29?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/29?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/29?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/30?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/30?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/30?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/30?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/30?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/30?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/30?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/30?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/30?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/30?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/30?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/30?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/31?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/31?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/31?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/31?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/31?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/31?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/31?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/31?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/31?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/31?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/31?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/31?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/32?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/32?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/32?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/32?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/32?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/32?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/32?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/32?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/32?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/32?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/32?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/32?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/33?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/33?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/33?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/33?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/33?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/33?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/33?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/33?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/33?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/33?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/33?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/33?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/34?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/34?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/34?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/34?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/34?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/34?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/34?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/34?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/34?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/34?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/34?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/34?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/35?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/35?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/35?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/35?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/35?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/35?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/35?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/35?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/35?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/35?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/35?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/35?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/36?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/36?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/36?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/36?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/36?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/36?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/36?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/36?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/36?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/36?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/36?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/36?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/37?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/37?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/37?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/37?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/37?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/37?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/37?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/37?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/37?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/37?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/37?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/37?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/38?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/38?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/38?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/38?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/38?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/38?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/38?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/38?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/38?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/38?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/38?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/38?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/39?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/39?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/39?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/39?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/39?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/39?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/39?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/39?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/39?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/39?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/39?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/39?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/40?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/40?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/40?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/40?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/40?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/40?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/40?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/40?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/40?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/40?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/40?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/40?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/41?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/41?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/41?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/41?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/41?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/41?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/41?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/41?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/41?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/41?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/41?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/41?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/42?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/42?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/42?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/42?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/42?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/42?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/42?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/42?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/42?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/42?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/42?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/42?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/43?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/43?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/43?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/43?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/43?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/43?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/43?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/43?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/43?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/43?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/43?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/43?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/44?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/44?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/44?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/44?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/44?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/44?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/44?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/44?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/44?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/44?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/44?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/44?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/45?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/45?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/45?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/45?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/45?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/45?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/45?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/45?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/45?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/45?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/45?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/45?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/46?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/46?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/46?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/46?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/46?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/46?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/46?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/46?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/46?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/46?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/46?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/46?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/47?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/47?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/47?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/47?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/47?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/47?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/47?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/47?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/47?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/47?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/47?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/47?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/48?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/48?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/48?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/48?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/48?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/48?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/48?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/48?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/48?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/48?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/48?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/48?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/49?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/49?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/49?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/49?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/49?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/49?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/49?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/49?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/49?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/49?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/49?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/49?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/50?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/50?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/50?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/50?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/50?lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/50?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/50?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/50?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers/50?lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers/50?lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers/50?lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers/50?lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=1&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=1&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=1&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=1&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=1&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=1&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=1&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=1&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=1&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=1&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=1&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=1&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=2&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=2&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=2&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=2&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=2&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=2&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=2&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=2&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=2&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=2&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=2&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=2&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=3&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=3&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=3&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=3&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=3&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=3&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=3&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=3&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=3&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=3&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=3&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=3&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=4&amp;lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=4&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=4&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=4&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=4&amp;lang=ar</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=4&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=4&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=4&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://localhost/service-providers?location=4&amp;lang=fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://localhost/service-providers?location=4&amp;lang=en" />
+    <xhtml:link rel="alternate" hreflang="ar" href="http://localhost/service-providers?location=4&amp;lang=ar" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://localhost/service-providers?location=4&amp;lang=fr" />
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+            </url>
+</urlset>

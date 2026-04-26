@@ -45,7 +45,8 @@ class AppServiceProvider extends ServiceProvider
     {
         View::share('supportedLocales', config('app.supported_locales'));
 
-        // Profile completion engine (observer-driven, not page-load calculated)
+        // SEO & Business Logic Observers
+        \App\Models\Category::observe(\App\Observers\CategoryObserver::class);
         ServiceProviderModel::observe(ServiceProviderObserver::class);
 
         // Auto-create admin user if configured via environment (only when explicitly enabled)

@@ -27,8 +27,6 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
     <!-- Custom CSS -->
-    {{-- Meta (Facebook) Pixel --}}
-    @include('partials.meta-pixel')
     <style>
         :root {
             --primary-color: #4361ee;
@@ -1037,26 +1035,6 @@
 </head>
 
 <body>
-    {{-- Meta Pixel: ViewContent Event --}}
-    @if(config('facebook.enabled') && !request()->routeIs('admin.*'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                if (typeof fbq === 'function') {
-                    var spViewEventId = 'vc_{{ $serviceProvider->id }}_' + Date.now();
-                    fbq('track', 'ViewContent', {
-                        content_name: {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},
-                        content_ids: ['{!! $serviceProvider->id !!}'],
-                        content_category: {!! json_encode($serviceProvider->category->translated_name ?? 'Uncategorized') !!},
-                        content_type: 'service_provider',
-                        language: '{{ app()->getLocale() }}'
-                    }, { eventID: spViewEventId });
-                    // Store event_id for CAPI deduplication
-                    window.__spViewEventId = spViewEventId;
-                }
-            });
-        </script>
-    @endif
-
     <!-- Animated Background -->
     <div class="animated-bg"></div>
 
@@ -1143,12 +1121,12 @@
                                 @if($serviceProvider->languages && count($serviceProvider->languages) > 0)
                                     <div class="d-flex flex-wrap gap-2 mb-3">
                                         @foreach($serviceProvider->languages as $langCode)
-                                            @php 
+                                            @php
                                                 // Map language codes and full names to translation keys
                                                 $langMap = [
                                                     // Language codes
                                                     'ar' => 'arabic',
-                                                    'en' => 'english', 
+                                                    'en' => 'english',
                                                     'fr' => 'french',
                                                     // Full names (from old data)
                                                     'English' => 'english',
@@ -1291,9 +1269,9 @@
                                                     @foreach(['ar' => 'arabic', 'en' => 'english', 'fr' => 'french'] as $code => $label)
                                                         @php $isChecked = in_array($code, old('languages', $serviceProvider->languages ?? [])); @endphp
                                                         <div class="col-md-4">
-                                                            <div class="custom-checkbox-card {{ $isChecked ? 'checked' : '' }}" 
+                                                            <div class="custom-checkbox-card {{ $isChecked ? 'checked' : '' }}"
                                                                  onclick="const cb = this.querySelector('input'); cb.checked = !cb.checked; this.classList.toggle('checked', cb.checked);">
-                                                                <input class="d-none" type="checkbox" name="languages[]" 
+                                                                <input class="d-none" type="checkbox" name="languages[]"
                                                                     value="{{ $code }}" {{ $isChecked ? 'checked' : '' }}>
                                                                 <div class="d-flex align-items-center justify-content-between p-3" style="cursor: pointer;">
                                                                     <span class="fw-semibold">{{ __('service_provider.' . $label) }}</span>
@@ -1534,7 +1512,7 @@
                                                      storeUrl: '{{ route('provider.gallery.store', $serviceProvider->id) }}',
                                                      csrfToken: '{{ csrf_token() }}'
                                                  })">
-                                                
+
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <label class="form-label fw-bold mb-0">
                                                         <i class="fas fa-images text-primary me-1"></i>
@@ -1560,13 +1538,13 @@
                                                     {{-- Existing Images --}}
                                                     <template x-for="(img, index) in images" :key="img.id">
                                                         <div class="col">
-                                                            <div class="gallery-cell position-relative overflow-hidden" 
+                                                            <div class="gallery-cell position-relative overflow-hidden"
                                                                  style="aspect-ratio: 1/1; border-radius: 12px; border: 1px solid #e1e5eb; background: #f8f9fa;"
                                                                  @mouseenter="if(isOwner && confirmId !== img.id) hoverId = img.id"
                                                                  @mouseleave="hoverId = null">
-                                                                
+
                                                                 {{-- Delete Confirmation State --}}
-                                                                <div x-show="confirmId === img.id" 
+                                                                <div x-show="confirmId === img.id"
                                                                      class="position-absolute top-0 start-0 w-100 h-100"
                                                                      style="background: rgba(220,53,69,0.15); z-index: 5; display: none;">
                                                                     <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
@@ -1589,7 +1567,7 @@
                                                                 </div>
 
                                                                 {{-- Hover Actions (Owner Only) --}}
-                                                                <div x-show="isOwner && hoverId === img.id && confirmId !== img.id && uploadingId !== img.id" 
+                                                                <div x-show="isOwner && hoverId === img.id && confirmId !== img.id && uploadingId !== img.id"
                                                                      x-transition.opacity.duration.200ms
                                                                      class="position-absolute top-0 start-0 w-100 h-100"
                                                                      style="background: rgba(0,0,0,0.55); z-index: 2; display: none;">
@@ -1622,8 +1600,8 @@
                                                     <template x-if="isOwner && (images.length + addPreviews.length) < max">
                                                         <template x-for="i in (max - images.length - addPreviews.length)" :key="'placeholder-'+i">
                                                             <div class="col">
-                                                                <div @click="$refs.galleryAddInput.click()" 
-                                                                     class="gallery-cell position-relative d-flex bg-light align-items-center justify-content-center" 
+                                                                <div @click="$refs.galleryAddInput.click()"
+                                                                     class="gallery-cell position-relative d-flex bg-light align-items-center justify-content-center"
                                                                      style="aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed #cbd5e1; cursor: pointer; transition: all 0.2s;">
                                                                     <i class="fas fa-plus text-secondary fa-2x opacity-50"></i>
                                                                 </div>
@@ -1722,7 +1700,7 @@
                                                             if (!file || !this.pendingReplaceImg) return;
                                                             if (!this.validateFile(file)) return;
                                                             this.errorMessage = '';
-                                                            
+
                                                             this.uploadingId = this.pendingReplaceImg.id;
 
                                                             // Preview immediately
@@ -2278,8 +2256,7 @@
                         @endif
 
                         <a href="mailto:{{ $serviceProvider->user->email }}" class="btn btn-outline-primary w-100"
-                            id="emailContactBtn"
-                            onclick="if(typeof fbq==='function'){fbq('track','Lead',{content_name:{!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},content_ids:['{!! $serviceProvider->id !!}'],contact_type:'email',language:'{{ app()->getLocale() }}'});}">
+                            id="emailContactBtn">
                             <i class="fas fa-envelope me-2"></i> {{ __('service_provider.send_email') }}
                         </a>
                     </div>
@@ -2682,17 +2659,6 @@
 
         // Track WhatsApp click (internal analytics) + reveal contact (privacy) + open WhatsApp
         async function revealContactInfo(whatsappClean, whatsappDisplay, address) {
-            // Meta Pixel: Track Lead event (WhatsApp contact)
-            if (typeof fbq === 'function') {
-                var leadEventId = 'lead_{{ $serviceProvider->id }}_' + Date.now();
-                fbq('track', 'Lead', {
-                    content_name: {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},
-                    content_ids: ['{!! $serviceProvider->id !!}'],
-                    content_category: {!! json_encode($serviceProvider->category->translated_name ?? 'Uncategorized') !!},
-                    contact_type: 'whatsapp',
-                    language: '{{ app()->getLocale() }}'
-                }, { eventID: leadEventId });
-            }
 
             // Store reveal in SESSION (server-side) instead of localStorage
             // This ensures only the user who clicked can see the info

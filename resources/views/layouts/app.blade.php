@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Speeda') }}</title>
+    @include('seo.meta')
     <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
 
     <!-- Google Font: Inter (clean, modern) -->
@@ -21,6 +21,9 @@
 
     <!-- Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    @stack('styles')
+    @livewireStyles
 
     <style>
         /* ----- DESIGN SYSTEM – Premium Light Mode ----- */
@@ -230,10 +233,116 @@
         i[class*=" fa-"] {
             color: currentColor;
         }
-    </style>
 
-    {{-- Meta (Facebook) Pixel --}}
-    @include('partials.meta-pixel')
+        /* ============================================
+           GLOBAL PREMIUM PAGINATION
+           ============================================ */
+        .premium-pagination-wrapper {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            animation: fadeIn 1s ease-out;
+            padding: 1.5rem;
+        }
+
+        .pagination-status {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .pagination-status b {
+            color: #4f46e5;
+            font-weight: 700;
+        }
+
+        .premium-pagination-nav {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            padding: 0.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px -5px rgba(79, 70, 229, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            position: relative;
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 0.75rem;
+            border-radius: 12px;
+            color: #475569;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            background: transparent;
+            border: none;
+        }
+
+        .pagination-link:hover {
+            background: rgba(79, 70, 229, 0.1);
+            color: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        .pagination-link.active {
+            background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+            color: white;
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.3);
+        }
+
+        .pagination-nav-btn {
+            width: 44px;
+            height: 44px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+
+        .pagination-nav-btn:hover:not(:disabled) {
+            background: #4f46e5;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+            border-color: #4f46e5;
+        }
+
+        .pagination-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+
+        .pagination-dots {
+            padding: 0 0.5rem;
+            color: #94a3b8;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+    </style>
 </head>
 
 <body class="antialiased bg-light">
@@ -308,6 +417,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
+    @livewireScripts
 </body>
 
 </html>

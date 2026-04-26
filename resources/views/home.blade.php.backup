@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    dir="{{ in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']) ? 'rtl' : 'ltr' }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ __('home.meta_title', ['app_name' => 'Speeda']) }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <!-- Preconnect to CDNs for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --dark-text: #212529;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark-text);
+            line-height: 1.6;
+            background-color: #ffffff;
+        }
+
+
+        /* Navigation */
+        .navbar-brand img {
+            width: 120px;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand img:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ============================================
+           HERO SECTION — FULLY REDESIGNED
+           ============================================ */
+        #hero {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        /* Multi-layer gradient background */
+        #hero .hero-bg-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 20%, rgba(0, 123, 255, 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 85% 75%, rgba(255, 193, 7, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 90% 70% at 50% 50%, rgba(25, 135, 84, 0.04) 0%, transparent 70%),
+                linear-gradient(175deg, #f0f7ff 0%, #ffffff 35%, #fefbf3 65%, #f5fff9 100%);
+        }
+
+        /* Subtle grid pattern overlay */
+        #hero .hero-bg-layer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 123, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 123, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 70% 60% at 30% 50%, black, transparent);
+        }
+
+        /* Floating decorative blobs */
+        .hero-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .hero-blob-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(0, 123, 255, 0.1);
+            top: -80px;
+            right: -60px;
+            animation: blobFloat1 8s ease-in-out infinite;
+        }
+
+        .hero-blob-2 {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 193, 7, 0.1);
+            bottom: -40px;
+            left: 10%;
+            animation: blobFloat2 10s ease-in-out infinite;
+        }
+
+        .hero-blob-3 {
+            width: 150px;
+            height: 150px;
+            background: rgba(25, 135, 84, 0.08);
+            top: 40%;
+            right: 25%;
+            animation: blobFloat3 12s ease-in-out infinite;
+        }
+
+        @keyframes blobFloat1 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(-20px, 15px) scale(1.05);
+            }
+
+            66% {
+                transform: translate(10px, -10px) scale(0.95);
+            }
+        }
+
+        @keyframes blobFloat2 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(25px, -20px) scale(1.08);
+            }
+        }
+
+        @keyframes blobFloat3 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            40% {
+                transform: translate(-15px, 20px) scale(1.03);
+            }
+
+            80% {
+                transform: translate(10px, -15px) scale(0.97);
+            }
+        }
+
+        /* Hero inner container */
+        .hero-inner {
+            position: relative;
+            z-index: 2;
+            padding: 7rem 0 4rem;
+        }
+
+        /* Trust badge pill at top */
+        .hero-trust-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 123, 255, 0.08);
+            border: 1px solid rgba(0, 123, 255, 0.15);
+            color: var(--primary-color);
+            padding: 8px 18px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero-trust-badge i {
+            font-size: 0.75rem;
+        }
+
+        .hero-trust-badge .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+        }
+
+        .hero-trust-badge .pulse-dot::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: rgba(34, 197, 94, 0.3);
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hero title — multi-line with colored emphasis */
+        .hero-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+            color: #1a1a2e;
+            animation: heroTitleIn 1s ease-out 0.1s both;
+        }
+
+        .hero-title .line-1 {
+            display: block;
+        }
+
+        .hero-title .line-2 {
+            display: block;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        .hero-title .line-2::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(90deg, rgba(0, 123, 255, 0.15), rgba(0, 123, 255, 0.05));
+            border-radius: 6px;
+            z-index: -1;
+        }
+
+        .hero-title .line-3 {
+            display: block;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #ffc107;
+            margin-top: 4px;
+        }
+
+        @keyframes heroTitleIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hero subtitle */
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
+            max-width: 520px;
+            line-height: 1.7;
+            animation: heroTitleIn 1s ease-out 0.3s both;
+        }
+
+        /* Trust pills row */
+        .hero-trust-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2rem;
+            animation: heroTitleIn 1s ease-out 0.45s both;
+        }
+
+        .hero-trust-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .hero-trust-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .hero-trust-pill.pill-gold {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            color: #92400e;
+            border: 1px solid rgba(255, 193, 7, 0.25);
+        }
+
+        .hero-trust-pill.pill-green {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            color: #166534;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .hero-trust-pill.pill-blue {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: #1e40af;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .hero-trust-pill i {
+            font-size: 0.9rem;
+        }
+
+        /* ===== SEARCH BAR — Modern Glass Card ===== */
+        .hero-search-form {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 20px;
+            padding: 8px;
+            box-shadow:
+                0 4px 6px rgba(0, 0, 0, 0.04),
+                0 12px 40px rgba(0, 0, 0, 0.06);
+            animation: heroSearchIn 1s ease-out 0.55s both;
+            transition: all 0.4s ease;
+        }
+
+        .hero-search-form:hover {
+            box-shadow:
+                0 4px 6px rgba(0, 0, 0, 0.04),
+                0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes heroSearchIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .hero-search-form .form-select {
+            border: 1.5px solid transparent;
+            background-color: #f8fafc;
+            border-radius: 14px;
+            height: 54px;
+            font-weight: 500;
+            font-size: 0.92rem;
+            color: #374151;
+            padding: 0 40px 0 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 13px;
+        }
+
+        .hero-search-form .form-select:focus {
+            border-color: var(--primary-color);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+            outline: none;
+        }
+
+        .hero-search-form .form-select:hover {
+            border-color: rgba(0, 123, 255, 0.3);
+            background-color: #f1f5f9;
+        }
+
+        /* Search button */
+        .hero-search-btn {
+            height: 54px;
+            border-radius: 14px;
+            padding: 0 28px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            white-space: nowrap;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.35);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-search-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .hero-search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.45);
+        }
+
+        .hero-search-btn:hover::before {
+            left: 100%;
+        }
+
+        .hero-search-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Popular tags under search */
+        .hero-popular-tags {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-top: 1rem;
+            animation: heroTitleIn 1s ease-out 0.7s both;
+        }
+
+        .hero-popular-tags .tag-label {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .hero-popular-tags .tag-btn {
+            font-size: 0.78rem;
+            color: #6b7280;
+            background: #f3f4f6;
+            border: 1px solid transparent;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .hero-popular-tags .tag-btn:hover {
+            color: var(--primary-color);
+            background: #eff6ff;
+            border-color: rgba(0, 123, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+
+
+        /* ===== HERO IMAGE SIDE ===== */
+        .hero-image-wrapper {
+            position: relative;
+            animation: heroImageIn 1.2s ease-out 0.4s both;
+        }
+
+        @keyframes heroImageIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .hero-image-wrapper img.hero-image {
+            border-radius: 24px;
+            width: 100%;
+            max-width: 540px;
+            margin-left: auto;
+            display: block;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.1),
+                0 8px 20px rgba(0, 0, 0, 0.06);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-image-wrapper img.hero-image:hover {
+            transform: scale(1.02) translateY(-4px);
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.15),
+                0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+
+
+        /* Decorative ring behind image */
+        .hero-image-ring {
+            position: absolute;
+            width: 85%;
+            height: 85%;
+            top: 7.5%;
+            left: 7.5%;
+            border: 2px dashed rgba(0, 123, 255, 0.12);
+            border-radius: 28px;
+            z-index: 0;
+            pointer-events: none;
+            animation: ringRotate 30s linear infinite;
+        }
+
+        @keyframes ringRotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== HERO RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .hero-inner {
+                padding: 6rem 0 3rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-title .line-3 {
+                font-size: 1.5rem;
+            }
+
+            .hero-image-wrapper {
+                margin-top: 2.5rem;
+                text-align: center;
+            }
+
+            .hero-image-wrapper img.hero-image {
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 460px;
+            }
+
+
+
+            .hero-image-ring {
+                width: 90%;
+                height: 90%;
+                top: 5%;
+                left: 5%;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .hero-inner {
+                padding: 5.5rem 0 2.5rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-title .line-3 {
+                font-size: 1.25rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-trust-pills {
+                gap: 8px;
+            }
+
+            .hero-trust-pill {
+                padding: 6px 12px;
+                font-size: 0.76rem;
+            }
+
+            .hero-search-form .form-select,
+            .hero-search-btn {
+                height: 48px;
+                font-size: 0.85rem;
+            }
+
+
+
+
+
+            .hero-image-ring {
+                display: none;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .hero-title {
+                font-size: 1.7rem;
+            }
+
+            .hero-title .line-3 {
+                font-size: 1.1rem;
+            }
+
+
+        }
+
+
+        /* Section Headings */
+        .section-heading {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #0056b3);
+            border-radius: 2px;
+        }
+
+        .text-center .section-heading::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem 2rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+            height: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 123, 255, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+        }
+
+        .feature-card h4 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* Benefits Section */
+        .benefits-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefits-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(255, 193, 7, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(25, 135, 84, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .benefit-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, currentColor, transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .benefit-card:hover::before {
+            opacity: 0.6;
+        }
+
+        .client-card {
+            background: linear-gradient(135deg, #fffbf0 0%, #fff8e1 50%, #fff3cd 100%);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-left: 6px solid #ffc107;
+            position: relative;
+        }
+
+        .client-card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            bottom: -2px;
+            left: -2px;
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .client-card:hover::after {
+            opacity: 0.1;
+        }
+
+        .client-card:hover {
+            border-color: rgba(255, 193, 7, 0.6);
+            background: linear-gradient(135deg, #fffff5 0%, #fffbf0 50%, #fff8e1 100%);
+        }
+
+        .provider-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #d1e7dd 100%);
+            border: 2px solid rgba(25, 135, 84, 0.3);
+            border-left: 6px solid #198754;
+            position: relative;
+        }
+
+        .provider-card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            bottom: -2px;
+            left: -2px;
+            background: linear-gradient(135deg, #198754, #0d6efd);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .provider-card:hover::after {
+            opacity: 0.1;
+        }
+
+        .provider-card:hover {
+            border-color: rgba(25, 135, 84, 0.6);
+            background: linear-gradient(135deg, #f7fef9 0%, #f0fdf4 50%, #dcfce7 100%);
+        }
+
+        .benefit-card .card-title {
+            font-size: 1.875rem;
+            font-weight: 800;
+            margin-bottom: 1.75rem;
+            position: relative;
+            padding-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .benefit-card .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .benefit-card:hover .card-title::after {
+            width: 100px;
+        }
+
+        .client-card .card-title {
+            color: #c77700;
+            text-shadow: 0 2px 4px rgba(199, 119, 0, 0.1);
+        }
+
+        .client-card .card-title::after {
+            background: linear-gradient(90deg, #ffc107, #ff9800);
+        }
+
+        .provider-card .card-title {
+            color: #0a4028;
+            text-shadow: 0 2px 4px rgba(10, 64, 40, 0.1);
+        }
+
+        .provider-card .card-title::after {
+            background: linear-gradient(90deg, #198754, #28a745);
+        }
+
+        .benefit-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+
+        .benefit-list li {
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .benefit-list li:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .benefit-list .icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-list li:hover .icon {
+            transform: scale(1.15) rotate(10deg);
+        }
+
+        .client-card .icon {
+            color: #ffc107;
+            background: rgba(255, 193, 7, 0.15);
+        }
+
+        .client-card .benefit-list li:hover .icon {
+            background: rgba(255, 193, 7, 0.25);
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .provider-card .icon {
+            color: #198754;
+            background: rgba(25, 135, 84, 0.15);
+        }
+
+        .provider-card .benefit-list li:hover .icon {
+            background: rgba(25, 135, 84, 0.25);
+            box-shadow: 0 0 20px rgba(25, 135, 84, 0.4);
+        }
+
+        .benefit-list li strong {
+            color: #212529;
+            font-weight: 700;
+            font-size: 1.0625rem;
+        }
+
+        /* Promotional Badge Styles */
+        .promo-badge {
+            display: block;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+            animation: promoPulse 3s ease-in-out infinite;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(5px);
+            border: 2px solid;
+            line-height: 1.6;
+        }
+
+        .promo-badge i {
+            font-size: 1.1rem;
+            vertical-align: middle;
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+
+        .client-promo {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            color: #856404;
+            border-color: #ffc107;
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.5);
+        }
+
+        .client-promo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        .provider-promo {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 50%, #00ff88 100%);
+            color: #0a4028;
+            border-color: #198754;
+            box-shadow: 0 6px 20px rgba(25, 135, 84, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.5);
+        }
+
+        .provider-promo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes promoPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        @keyframes iconBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: rotate(0deg) translate(-50%, -50%);
+            }
+
+            100% {
+                transform: rotate(360deg) translate(-50%, -50%);
+            }
+        }
+
+        /* أزرار الكروت المحسّنة */
+        .benefit-card .btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            border-radius: 12px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .benefit-card .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .benefit-card .btn:hover::before {
+            left: 100%;
+        }
+
+        .benefit-card .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .benefit-card .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .client-card .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .client-card .btn-warning:hover {
+            background: linear-gradient(135deg, #ffb300 0%, #ff6f00 100%);
+        }
+
+        .provider-card .btn-success {
+            background: linear-gradient(135deg, #198754 0%, #28a745 100%);
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .provider-card .btn-success:hover {
+            background: linear-gradient(135deg, #157347 0%, #20c997 100%);
+        }
+
+        .benefit-card .btn i {
+            transition: transform 0.3s ease;
+            font-size: 1.25rem;
+        }
+
+        .benefit-card .btn:hover i {
+            transform: translateX(5px);
+        }
+
+        /* نص الإغلاق في الكروت */
+        .benefit-card>p.fw-bold {
+            font-size: 1.125rem;
+            color: #495057;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            border-left: 4px solid currentColor;
+        }
+
+        .client-card>p.fw-bold {
+            border-left-color: #ffc107;
+        }
+
+        .provider-card>p.fw-bold {
+            border-left-color: #198754;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #cookie-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+            z-index: 9998;
+            display: none;
+        }
+
+        /* ===== Cookie Banner Styling ===== */
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2b2b2b;
+            color: #fff;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.4);
+            font-size: 14px;
+            z-index: 9999;
+            display: none;
+        }
+
+        #cookie-banner a {
+            color: #4fc3f7;
+            text-decoration: underline;
+        }
+
+        #cookie-banner button {
+            background-color: #4fc3f7;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #cookie-banner button:hover {
+            background-color: #03a9f4;
+        }
+
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature-card,
+        .benefit-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    @include('components.main-nav')
+
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <!-- Decorative background layers -->
+        <div class="hero-bg-layer"></div>
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+        <div class="hero-blob hero-blob-3"></div>
+
+        <div class="container hero-inner">
+            <div class="row align-items-center">
+                <!-- Left: Text Content -->
+                <div class="col-lg-6 hero-content">
+                    <!-- Trust Badge -->
+                    <div class="hero-trust-badge">
+                        <span class="pulse-dot"></span>
+                        <i class="fas fa-shield-halved"></i>
+                        {{ __('home.meta_title', ['app_name' => 'Speeda']) }} — Ottawa's Trusted Platform
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="hero-title">
+                        <span class="line-1">Find Trusted Local</span>
+                        <span class="line-2">Service Providers</span>
+                        <span class="line-3">in Ottawa — Fast & Easy</span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <p class="hero-subtitle">
+                        Compare providers, read reviews, and contact them directly. All in one place.
+                    </p>
+
+                    <!-- Trust Pills -->
+                    <div class="hero-trust-pills">
+                        <span class="hero-trust-pill pill-gold">
+                            <i class="fas fa-star"></i> Top Rated Providers
+                        </span>
+                        <span class="hero-trust-pill pill-green">
+                            <i class="fas fa-comment-dots"></i> Direct Contact
+                        </span>
+                        <span class="hero-trust-pill pill-blue">
+                            <i class="fas fa-shield-check"></i> Verified Reviews
+                        </span>
+                    </div>
+
+                    <!-- Search Form -->
+                    <form action="{{ route('service-providers.index') }}" method="GET" class="hero-search-form">
+                        <div class="d-flex flex-column flex-md-row gap-2">
+                            <div class="flex-grow-1">
+                                <select name="location" class="form-select w-100">
+                                    <option value="">{{ __('service_provider.all_locations') }}</option>
+                                    @foreach($locationClusters as $clusterKey => $clusterLabel)
+                                        <option value="{{ $clusterKey }}">{{ $clusterLabel }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <select name="category" class="form-select w-100">
+                                    <option value="">{{ __('service_provider.all_categories') }}</option>
+                                    @php
+                                        $regularCategories = ($categories ?? collect([]))->filter(fn($cat) => strtolower($cat->translated_name) !== 'others' && $cat->slug !== 'others');
+                                        $othersCategory = ($categories ?? collect([]))->first(fn($cat) => strtolower($cat->translated_name) === 'others' || $cat->slug === 'others');
+                                    @endphp
+                                    @foreach($regularCategories as $category)
+                                        <option value="{{ $category->slug }}">{{ $category->translated_name }}</option>
+                                    @endforeach
+                                    @if($othersCategory)
+                                        <option value="{{ $othersCategory->slug }}">{{ $othersCategory->translated_name }}
+                                        </option>
+                                    @endif
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn hero-search-btn">
+                                <i class="fas fa-search me-2"></i> Find service provider
+                            </button>
+                        </div>
+
+                        <!-- Popular Tags -->
+                        <div class="hero-popular-tags">
+                            <span class="tag-label">Popular:</span>
+                            <a href="{{ route('service-providers.index', ['category' => 'cleaning']) }}"
+                                class="tag-btn">Cleaning</a>
+                            <a href="{{ route('service-providers.index', ['category' => 'plumbing']) }}"
+                                class="tag-btn">Plumbing</a>
+                            <a href="{{ route('service-providers.index', ['category' => 'electrical']) }}"
+                                class="tag-btn">Electrical</a>
+                            <a href="{{ route('service-providers.index', ['category' => 'painting']) }}"
+                                class="tag-btn">Painting</a>
+                            <a href="{{ route('service-providers.index', ['category' => 'moving']) }}"
+                                class="tag-btn">Moving</a>
+                        </div>
+                    </form>
+
+
+                </div>
+
+                <!-- Right: Hero Image -->
+                <div class="col-lg-6 mt-5 mt-lg-0">
+                    <div class="hero-image-wrapper">
+                        <!-- Decorative ring -->
+                        <div class="hero-image-ring"></div>
+
+                        <!-- Main Image -->
+                        <img src="{{ asset('images/banner.png') }}" alt="Speeda Services" class="img-fluid hero-image"
+                            loading="lazy">
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-4 py-md-4">
+        <div class="container">
+            <h2 class="text-center section-heading">{{ __('home.how_it_works_title') }}</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <h4>{{ __('home.step1_title') }}</h4>
+                        <p>{{ __('home.step1_description') }}</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h4>{{ __('home.step2_title') }}</h4>
+                        <p>{{ __('home.step2_description') }}</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h4>{{ __('home.step3_title') }}</h4>
+                        <p>{{ __('home.step3_description') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <p class="text-center text-muted fst-italic">{{ __('home.platform_disclaimer') }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits-section">
+        <div class="container">
+            <h2 class="text-center section-heading">{{ __('home.benefits_title') }}</h2>
+            <div class="row g-4">
+                <!-- Client Card -->
+                <div class="col-lg-6">
+                    <div class="benefit-card client-card">
+                        <h3 class="card-title">{{ __('home.client_benefits_title') }}</h3>
+                        <div class="promo-badge client-promo">
+                            <i class="fas fa-star me-2"></i>
+                            <strong>{{ __('home.client_free_forever') }}</strong>
+                            {{ __('home.client_free_forever_desc') }}
+                        </div>
+                        <ul class="benefit-list">
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.client_benefit1_title') }}</strong>
+                                    {{ __('home.client_benefit1_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.client_benefit2_title') }}</strong>
+                                    {{ __('home.client_benefit2_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.client_benefit3_title') }}</strong>
+                                    {{ __('home.client_benefit3_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.client_benefit4_title') }}</strong>
+                                    {{ __('home.client_benefit4_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.client_benefit5_title') }}</strong>
+                                    {{ __('home.client_benefit5_desc') }}
+                                </div>
+                            </li>
+                        </ul>
+                        <p class="text-center fw-bold mb-3">{{ __('home.client_closing') }}</p>
+                        <a href="{{ route('service-providers.index') }}" class="btn btn-warning text-white">
+                            <i class="fas fa-rocket me-2"></i> {{ __('home.start_project') }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Provider Card -->
+                <div class="col-lg-6">
+                    <div class="benefit-card provider-card">
+                        <h3 class="card-title">{{ __('home.provider_benefits_title') }}</h3>
+                        <div class="promo-badge provider-promo">
+                            <i class="fas fa-clock me-2"></i>
+                            <strong>{{ __('home.provider_join_free') }}</strong>
+                            {{ __('home.provider_join_free_desc') }}
+                        </div>
+                        <ul class="benefit-list">
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.provider_benefit1_title') }}</strong>
+                                    {{ __('home.provider_benefit1_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.provider_benefit2_title') }}</strong>
+                                    {{ __('home.provider_benefit2_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.provider_benefit3_title') }}</strong>
+                                    {{ __('home.provider_benefit3_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.provider_benefit4_title') }}</strong>
+                                    {{ __('home.provider_benefit4_desc') }}
+                                </div>
+                            </li>
+                            <li>
+                                <span class="icon"><i class="fas fa-check-circle"></i></span>
+                                <div>
+                                    <strong>{{ __('home.provider_benefit5_title') }}</strong>
+                                    {{ __('home.provider_benefit5_desc') }}
+                                </div>
+                            </li>
+                        </ul>
+                        <p class="text-center fw-bold mb-3">{{ __('home.provider_closing') }}</p>
+                        <a href="{{ route('register') }}" class="btn btn-success text-white">
+                            <i class="fas fa-user-plus me-2"></i> {{ __('home.join_today') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>{{ __('home.cta_title') }}</h2>
+            <p>{{ __('home.cta_description') }}</p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{{ route('service-providers.index') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search me-2"></i> {{ __('home.find_service') }}
+                </a>
+                <a href="{{ route('register') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-user-tie me-2"></i> {{ __('home.register_pro') }}
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @include('layouts.footer')
+
+    <div id="cookie-overlay"></div>
+
+    <!-- ===== Cookie Consent Banner ===== -->
+    <div id="cookie-banner">
+        🍪 {{ __('home.cookie_message') }}
+        {{ __('home.cookie_agree') }}
+        <a href="/terms-of-service" target="_blank">{{ __('home.terms_service') }}</a> {{ __('home.and') }}
+        <a href="/privacy-policy" target="_blank">{{ __('home.privacy_policy') }}</a>.
+        <br>
+        <button id="accept-cookies">{{ __('home.accept') }}</button>
+    </div>
+
+
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Home page loaded successfully');
+
+            // Add loading animation to cards
+            const featureCards = document.querySelectorAll('.feature-card, .benefit-card');
+            featureCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Animate hero stat numbers on scroll into view
+            const statNumbers = document.querySelectorAll('.hero-stat-number');
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        statsObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const banner = document.getElementById("cookie-banner");
+            const overlay = document.getElementById("cookie-overlay");
+            const acceptBtn = document.getElementById("accept-cookies");
+
+            // Function to show banner & block access
+            function showBanner() {
+                banner.style.display = "block";
+                overlay.style.display = "block";
+                document.body.style.overflow = "hidden"; // disable scrolling
+            }
+
+            // Function to hide banner & allow access
+            function hideBanner() {
+                banner.style.display = "none";
+                overlay.style.display = "none";
+                document.body.style.overflow = "auto"; // enable scrolling
+            }
+
+            // Check if user already accepted
+            if (!localStorage.getItem("cookieConsentAccepted")) {
+                showBanner();
+            }
+
+            // When user accepts
+            acceptBtn.addEventListener("click", function () {
+                localStorage.setItem("cookieConsentAccepted", "true");
+                hideBanner();
+            });
+        });
+
+    </script>
+</body>
+
+</html>

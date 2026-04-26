@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\LocaleController;
@@ -30,7 +32,7 @@ Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('local
 Route::get('/current-locale', [LocaleController::class, 'getCurrentLocale'])->name('locale.current');
 
 // ==================== PUBLIC ROUTES ====================
-Route::view('/', 'home')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Test translation route (internal diagnostics only)
 Route::middleware(['auth', 'admin'])->get('/test-translations', function () {
@@ -72,6 +74,8 @@ Route::middleware(['auth', 'admin'])->get('/diagnostic', function () {
 Route::get('/locations', [LocationController::class, 'index'])->name('location');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+Route::get('/blogs/{post:slug}', [BlogController::class, 'show'])->name('blogs.show');
 Route::view('/privacy-policy', 'Static.PrivacyPolicy')->name('privacy-policy');
 Route::view('/terms-of-service', 'Static.terms-of-service')->name('terms-of-service');
 Route::view('/help-center', 'Static.help-center')->name('help-center');
@@ -221,6 +225,11 @@ Route::middleware(['auth'])->prefix('comments')->name('comments.')->group(functi
 
 // ==================== ADMIN ROUTES ====================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Redirect /admin to /admin/dashboard
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
+
     // Activity Logs
     Route::get('/activity-logs', [App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity_logs');
 
@@ -238,10 +247,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('categories.destroy');
     Route::patch('/categories/{category}/toggle', [AdminController::class, 'toggleCategoryStatus'])->name('categories.toggle');
 
-    // Users Management (using IDs, no slugs)
+    // Users Management
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/trash', [AdminController::class, 'usersTrash'])->name('users.trash');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
     Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleUserStatus'])->name('users.toggle');
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
+    Route::post('/users/{id}/restore', [AdminController::class, 'restoreUser'])->name('users.restore');
+    Route::delete('/users/{id}/force', [AdminController::class, 'forceDeleteUser'])->name('users.force_delete');
 
     // Locations
     Route::get('/locations', [AdminController::class, 'locations'])->name('locations');

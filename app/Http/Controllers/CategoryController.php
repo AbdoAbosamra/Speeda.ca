@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Location;
-use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -13,11 +12,11 @@ class CategoryController extends Controller
     /**
      * Display all main sections and stats (Frontend)
      */
-    public function index(Request $request)
+    public function index(Request $request, \App\Domain\SEO\Services\SeoMetaService $seoService)
     {
         // Use caching for better performance
-        $cacheKey = 'categories_frontend_v2_' . app()->getLocale() . '_' . md5($request->fullUrl());
-        
+        $cacheKey = 'categories_frontend_v2_'.app()->getLocale().'_'.md5($request->fullUrl());
+
         $data = Cache::remember($cacheKey, 300, function () use ($request) {
             // Get search query if provided
             $search = $request->input('search');
@@ -38,10 +37,10 @@ class CategoryController extends Controller
             // Apply search filter
             if ($search) {
                 $categoriesQuery->where(function ($q) use ($search) {
-                    $q->where('name', 'LIKE', '%' . $search . '%')
-                      ->orWhere('name_ar', 'LIKE', '%' . $search . '%')
-                      ->orWhere('name_en', 'LIKE', '%' . $search . '%')
-                      ->orWhere('name_fr', 'LIKE', '%' . $search . '%');
+                    $q->where('name', 'LIKE', '%'.$search.'%')
+                        ->orWhere('name_ar', 'LIKE', '%'.$search.'%')
+                        ->orWhere('name_en', 'LIKE', '%'.$search.'%')
+                        ->orWhere('name_fr', 'LIKE', '%'.$search.'%');
                 });
             }
 
@@ -91,6 +90,9 @@ class CategoryController extends Controller
                 'search' => $search,
             ];
         });
+
+        // Apply SEO
+        $seoService->apply('category');
 
         return view('categories', $data);
     }

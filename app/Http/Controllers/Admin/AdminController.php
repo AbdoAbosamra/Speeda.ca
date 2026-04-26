@@ -667,7 +667,7 @@ class AdminController extends Controller
     /**
      * Display list of all users with status management
      */
-    public function users()
+    public function users(Request $request)
     {
         try {
             $users = User::with('serviceProvider')
@@ -834,6 +834,88 @@ class AdminController extends Controller
             });
         } catch (\Exception $e) {
             Log::error('Permanent user deletion failed: ' . $e->getMessage());
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Display soft deleted users
+     */
+    public function usersTrash()
+    {
+        $users = User::onlyTrashed()->latest()->paginate(20);
+        return view('admin.users.trash', compact('users'));
+    }
+
+    /**
+     * Edit user data and role
+     */
+    public function editUser(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    /**
+     * Update user data and role
+     */
+    public function updateUser(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'required|in:admin,client,service_provider',
+            'is_active' => 'boolean',
+        ]);
+
+        $user->update($request->only('name', 'email', 'role', 'is_active'));
+
+        ErrorHelper::flashNotification(__('admin.user_updated_successfully'), 'success');
+        return redirect()->route('admin.users');
+    }
+
+    /**
+     * Restore a soft deleted user
+     */
+    public function restoreUser($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+
+        ErrorHelper::flashNotification(__('admin.user_restored_successfully'), 'success');
+        return redirect()->back();
+    }
+
+    /**
+     * Permanently delete a user
+     */
+    public function forceDeleteUser($id)
+    {
+        try {
+            DB::transaction(function () use ($id) {
+                $user = User::withTrashed()->findOrFail($id);
+                
+                if ($user->id === auth()->id()) {
+                    throw new \Exception(__('admin.cannot_delete_yourself'));
+                }
+
+                // Cleanup related data (similar to deleteUser logic but for force delete)
+                if ($user->isServiceProvider()) {
+                    $provider = $user->serviceProvider;
+                    if ($provider) {
+                        $provider->reviews()->delete();
+                        $provider->endorsements()->delete();
+                        $provider->delete();
+                    }
+                }
+
+                $user->forceDelete();
+            });
+
+            ErrorHelper::flashNotification(__('admin.user_permanently_deleted'), 'success');
+            return redirect()->back();
+        } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
             return redirect()->back();

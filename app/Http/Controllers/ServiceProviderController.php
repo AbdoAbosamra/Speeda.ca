@@ -23,13 +23,23 @@ class ServiceProviderController extends Controller
     /**
      * Display a listing of service providers (public index page)
      */
-    public function index(Request $request)
+    public function index(Request $request, \App\Domain\SEO\Services\SeoMetaService $seoService)
     {
         if ($request->input('category') === 'construction-services') {
             $redirectParams = $request->query();
             $redirectParams['category'] = 'renovation-construction';
 
             return redirect()->route('service-providers.index', $redirectParams)->setStatusCode(301);
+        }
+
+        // Apply SEO
+        if ($request->filled('search') || $request->filled('city')) {
+            $seoService->apply('search');
+        } elseif ($request->filled('category')) {
+            $cat = Category::resolveFilterValue($request->input('category'));
+            $seoService->apply('category', $cat);
+        } else {
+            $seoService->apply('category');
         }
 
         // Eager-load Spatie media to avoid N+1 queries in provider cards.
@@ -181,14 +191,12 @@ class ServiceProviderController extends Controller
         }
     }
 
-    /**
-     * Display the specified service provider's profile (public view)
-     * Anyone can view but only owner can edit
-     */
-    // @change 2026-04-12 TASK-1 | Added public gallery eager loading and view variables | Allow non-providers to view the gallery | risk:LOW
-    public function show(Request $request, ServiceProvider $serviceProvider)
+    public function show(Request $request, ServiceProvider $serviceProvider, \App\Domain\SEO\Services\SeoMetaService $seoService)
     {
         try {
+            // Apply SEO
+            $seoService->apply('provider', $serviceProvider);
+
             // Check if the service provider's user is active
             $user = $serviceProvider->user;
             if ($user && !$user->is_active) {

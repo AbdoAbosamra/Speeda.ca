@@ -547,6 +547,7 @@
                 'food-services' => asset('images/sections/Food Services .jpeg'),
                 'grocery-supermarkets' => asset('images/sections/supermarket.jpeg'),
                 'technical-repair-services' => asset('images/sections/Techincal.jpeg'),
+                'construction-services' => asset('images/sections/construction.png'),
                 'others' => asset('images/sections/other.jpeg')
             ];
             $fallbackImages = [

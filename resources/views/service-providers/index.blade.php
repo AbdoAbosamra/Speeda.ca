@@ -15,9 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    {{-- Meta (Facebook) Pixel --}}
-    @include('partials.meta-pixel')
-
     <style>
         /* ===== نظام التصميم الأساسي ===== */
         :root {
@@ -1669,101 +1666,6 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        /* ===== Premium Pagination Design ===== */
-        .premium-pagination-wrapper {
-            margin-top: 5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-            animation: fadeIn 1s ease-out;
-        }
-
-        .pagination-status {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: var(--shadow-sm);
-            font-size: 0.9375rem;
-            color: var(--gray-600);
-            font-weight: 500;
-        }
-
-        .pagination-status b {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .premium-pagination-nav {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(20px);
-            padding: 0.75rem;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: var(--shadow-xl), 0 10px 30px -5px rgba(79, 70, 229, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            position: relative;
-        }
-
-        .pagination-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 48px;
-            height: 48px;
-            padding: 0 1rem;
-            border-radius: 16px;
-            color: var(--gray-700);
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .pagination-link:hover {
-            background: rgba(79, 70, 229, 0.1);
-            color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .pagination-link.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: var(--shadow-primary);
-        }
-
-        .pagination-nav-btn {
-            width: 54px;
-            height: 54px;
-            background: white;
-            border: 1px solid var(--gray-200);
-            border-radius: 18px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .pagination-nav-btn:hover:not(:disabled) {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.05);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
-
-        .pagination-nav-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            color: var(--gray-400);
-        }
-
         .pagination-dots {
             padding: 0 0.5rem;
             color: var(--gray-400);
@@ -2051,64 +1953,7 @@
 
         <!-- الترقيم الصفحي الفاخر (Premium Pagination) -->
         @if($serviceProviders->hasPages())
-            <div class="premium-pagination-wrapper">
-                {{-- معلومات النتائج --}}
-                <div class="pagination-status">
-                    @if(app()->getLocale() === 'ar')
-                        عرض من <b>{{ $serviceProviders->firstItem() }}</b> إلى <b>{{ $serviceProviders->lastItem() }}</b> من أصل <b>{{ $serviceProviders->total() }}</b> نتيجة
-                    @else
-                        Showing <b>{{ $serviceProviders->firstItem() }}</b> to <b>{{ $serviceProviders->lastItem() }}</b> of <b>{{ $serviceProviders->total() }}</b> results
-                    @endif
-                </div>
-
-                {{-- روابط الترقيم --}}
-                <nav class="premium-pagination-nav" aria-label="Professional Page Navigation">
-                    {{-- السابق --}}
-                    @if ($serviceProviders->onFirstPage())
-                        <button class="pagination-nav-btn" disabled>
-                            <i class="fas fa-chevron-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
-                        </button>
-                    @else
-                        <a href="{{ $serviceProviders->previousPageUrl() }}" class="pagination-nav-btn" title="Previous Page">
-                            <i class="fas fa-chevron-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
-                        </a>
-                    @endif
-
-                    {{-- أرقام الصفحات --}}
-                    <div class="d-none d-md-flex align-items-center gap-1">
-                        @foreach ($serviceProviders->getUrlRange(max(1, $serviceProviders->currentPage() - 2), min($serviceProviders->lastPage(), $serviceProviders->currentPage() + 2)) as $page => $url)
-                            <a href="{{ $url }}" class="pagination-link {{ $page == $serviceProviders->currentPage() ? 'active' : '' }}">
-                                {{ $page }}
-                            </a>
-                        @endforeach
-
-                        @if($serviceProviders->currentPage() < $serviceProviders->lastPage() - 2)
-                            <span class="pagination-dots">...</span>
-                            <a href="{{ $serviceProviders->url($serviceProviders->lastPage()) }}" class="pagination-link">
-                                {{ $serviceProviders->lastPage() }}
-                            </a>
-                        @endif
-                    </div>
-
-                    {{-- عرض مبسط للجوال --}}
-                    <div class="d-flex d-md-none align-items-center bg-light px-3 py-1 rounded-pill mx-2">
-                        <span class="fw-bold text-primary">{{ $serviceProviders->currentPage() }}</span>
-                        <span class="mx-2 text-muted">/</span>
-                        <span class="text-muted">{{ $serviceProviders->lastPage() }}</span>
-                    </div>
-
-                    {{-- التالي --}}
-                    @if ($serviceProviders->hasMorePages())
-                        <a href="{{ $serviceProviders->nextPageUrl() }}" class="pagination-nav-btn" title="Next Page">
-                            <i class="fas fa-chevron-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}"></i>
-                        </a>
-                    @else
-                        <button class="pagination-nav-btn" disabled>
-                            <i class="fas fa-chevron-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}"></i>
-                        </button>
-                    @endif
-                </nav>
-            </div>
+            {{ $serviceProviders->links('components.global-pagination') }}
         @endif
     </div>
 
@@ -2520,30 +2365,6 @@
     </script>
 
     @include('layouts.footer')
-
-    {{-- Meta Pixel: Search Event --}}
-    @if(config('facebook.enabled') && !request()->routeIs('admin.*'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                if (typeof fbq === 'function') {
-                    var urlParams = new URLSearchParams(window.location.search);
-                    var searchString = urlParams.get('search') || '';
-                    var category = urlParams.get('category') || '';
-                    var location = urlParams.get('location') || '';
-
-                    // Only fire Search event if at least one filter is active
-                    if (searchString || category || location) {
-                        fbq('track', 'Search', {
-                            search_string: searchString,
-                            content_category: category,
-                            content_type: 'service_provider',
-                            language: '{{ app()->getLocale() }}'
-                        });
-                    }
-                }
-            });
-        </script>
-    @endif
 
 </body>
 

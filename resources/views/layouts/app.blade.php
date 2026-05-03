@@ -215,7 +215,7 @@
         }
 
         main.py-4 {
-            padding-top: 2rem !important;
+            padding-top: 0 !important;
             padding-bottom: 3rem !important;
         }
 

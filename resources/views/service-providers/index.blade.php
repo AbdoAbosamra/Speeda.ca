@@ -338,22 +338,7 @@
             border-color: var(--primary-light);
         }
 
-        .verified-check {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            width: 28px;
-            height: 28px;
-            background: var(--success);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            border: 3px solid white;
-            box-shadow: var(--shadow-md);
-        }
+
 
         .provider-info h3 {
             font-size: 1.375rem;
@@ -1556,10 +1541,7 @@
             flex-direction: row-reverse;
         }
 
-        [dir="rtl"] .verified-check {
-            right: auto;
-            left: -5px;
-        }
+
 
         [dir="rtl"] .provider-info {
             text-align: right;
@@ -1779,11 +1761,7 @@
                                     loading="lazy" decoding="async"
                                     onerror="this.onerror=null;this.src='{{ $provider->default_image_url }}';">
 
-                                @if($provider->certification)
-                                    <div class="verified-check">
-                                        <i class="fas fa-check"></i>
-                                    </div>
-                                @endif
+
                             </div>
 
                             <div class="provider-info">

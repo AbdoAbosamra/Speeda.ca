@@ -252,16 +252,7 @@
             gap: 5px;
         }
 
-        .verification-badge {
-            background: rgba(76, 175, 80, 0.2);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
+
 
         /* Contact Card Styles */
         .contact-card {
@@ -1149,14 +1140,7 @@
                                     <x-endorsement-button :service-provider="$serviceProvider" />
                                 @endif
 
-                                <!-- Certified Badge (only visible to owner) -->
-                                @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->certification)
-                                    <div class="verification-badge"
-                                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                                        <i class="fas fa-certificate"></i>
-                                        <span>{{ __('service_provider.certified') }}</span>
-                                    </div>
-                                @endif
+
                             </div>
                         </div>
 
@@ -1780,31 +1764,7 @@
                                             @endif
                                             {{-- End Gallery Inline Widget --}}
 
-                                            <div class="mb-3">
-                                                <label
-                                                    class="form-label fw-bold">{{ __('service_provider.certification') }}</label>
-                                                <input type="file" name="certification" id="certificationInput"
-                                                    class="form-control"
-                                                    accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
-                                                    onchange="validateFileSize(this, 2)">
-                                                <small class="text-muted d-block">
-                                                    <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.certificate_or_license') }} -
-                                                    {{ __('service_provider.max_size_2mb') }}
-                                                </small>
-                                                @if($serviceProvider->certification)
-                                                    <div class="mt-2">
-                                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i>
-                                                            {{ __('service_provider.certificate_uploaded') }}</span>
-                                                        <a href="{{ Storage::url($serviceProvider->certification) }}"
-                                                            target="_blank" class="badge bg-primary"><i class="fas fa-eye"></i>
-                                                            {{ __('service_provider.view') }}</a>
-                                                    </div>
-                                                @endif
-                                                @error('certification')
-                                                    <small class="text-danger d-block">{{ $message }}</small>
-                                                @enderror
-                                            </div>
+
                                         </div>
                                     </div>
 
@@ -2169,37 +2129,10 @@
                                             class="text-decoration-none">
                                             {{ $serviceProvider->user->email }}
                                         </a>
+                                    </h6>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Certification (Only visible to owner) -->
-                        @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->is_certified && $serviceProvider->certification)
-                            <div class="contact-item">
-                                <div class="d-flex align-items-center">
-                                    <div class="contact-icon"
-                                        style="background: linear-gradient(135deg, #10b981, #059669);">
-                                        <i class="fas fa-certificate"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-bold">{{ __('service_provider.certification') }}</h6>
-                                        @if(Str::endsWith($serviceProvider->certification, '.pdf'))
-                                            <a href="{{ Storage::url($serviceProvider->certification) }}" target="_blank"
-                                                class="text-decoration-none">
-                                                <i class="fas fa-file-pdf text-danger"></i>
-                                                {{ __('service_provider.view_certificate_pdf') }}
-                                            </a>
-                                        @else
-                                            <a href="{{ Storage::url($serviceProvider->certification) }}" target="_blank"
-                                                class="text-decoration-none">
-                                                <i class="fas fa-image text-primary"></i>
-                                                {{ __('service_provider.view_certificate') }}
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
 
                         {{-- Business Views: keep public, hide from the provider owner --}}
                         @if(!auth()->check() || auth()->id() !== $serviceProvider->user_id)

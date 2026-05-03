@@ -443,94 +443,7 @@ class ServiceProviderController extends Controller
             // Profile image is now handled via AJAX auto-save (uploadProfileImage method)
             // so we no longer process it in the main update form.
 
-            // CRITICAL FIX: Handle certification upload (image or PDF) with enhanced validation
-            if ($request->hasFile('certification')) {
-                try {
-                    $certFile = $request->file('certification');
 
-                    // Validate file was uploaded successfully
-                    if (!$certFile->isValid()) {
-                        throw new \Exception(__('service_provider.upload_error'));
-                    }
-
-                    $extension = strtolower($certFile->getClientOriginalExtension());
-
-                    // Validate file based on type
-                    if ($extension === 'pdf') {
-                        // Enhanced PDF validation
-                        $mime = $certFile->getMimeType();
-                        if (!in_array($mime, ['application/pdf', 'application/x-pdf'])) {
-                            throw new \Exception(__('service_provider.invalid_pdf_file'));
-                        }
-
-                        // Check if PDF is corrupted by reading first few bytes
-                        $handle = @fopen($certFile->getRealPath(), 'r');
-                        if ($handle === false) {
-                            throw new \Exception(__('service_provider.cannot_read_file'));
-                        }
-
-                        $header = fread($handle, 5);
-                        fclose($handle);
-
-                        if ($header !== '%PDF-') {
-                            throw new \Exception(__('service_provider.corrupted_pdf_file'));
-                        }
-
-                    } else {
-                        // Validate certification image
-                        $imageSize = @getimagesize($certFile->getRealPath());
-                        if ($imageSize === false) {
-                            throw new \Exception(__('service_provider.invalid_certification_image'));
-                        }
-
-                        // Validate certification image dimensions
-                        if ($imageSize[0] < 300 || $imageSize[1] < 300) {
-                            throw new \Exception(__('service_provider.certification_too_small'));
-                        }
-
-                        if ($imageSize[0] > 10000 || $imageSize[1] > 10000) {
-                            throw new \Exception(__('service_provider.certification_too_large'));
-                        }
-                    }
-
-                    // Generate secure filename
-                    $certFilename = 'certification_' . $serviceProvider->id . '_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $extension;
-                    $certPath = $certFile->storeAs('certifications', $certFilename, 'public');
-
-                    if (!$certPath) {
-                        throw new \Exception(__('service_provider.failed_upload_certification'));
-                    }
-
-                    $uploadedFiles[] = $certPath;
-
-                    // Delete old certification only after new one uploaded successfully
-                    if ($serviceProvider->certification && Storage::disk('public')->exists($serviceProvider->certification)) {
-                        Storage::disk('public')->delete($serviceProvider->certification);
-                    }
-
-                    $validated['certification'] = $certPath;
-                    $validated['is_certified'] = true;
-
-                    // Log certification upload
-                    Log::info('Certification uploaded successfully', [
-                        'user_id' => auth()->id(),
-                        'sp_id' => $serviceProvider->id,
-                        'file_type' => $extension,
-                        'file_size' => $certFile->getSize(),
-                        'file_name' => $certFilename,
-                        'stored_path' => $certPath
-                    ]);
-
-                } catch (\Exception $certError) {
-                    Log::error('Certification upload failed', [
-                        'user_id' => auth()->id(),
-                        'sp_id' => $serviceProvider->id,
-                        'error' => $certError->getMessage(),
-                        'file_size' => $certFile->getSize() ?? 0
-                    ]);
-                    throw new \Exception(__('service_provider.failed_upload_certification') . ': ' . $certError->getMessage());
-                }
-            }
 
             // Prepare update data with proper field mapping (NO 'description' field!)
             $updateData = [
@@ -580,11 +493,7 @@ class ServiceProviderController extends Controller
                 $updateData['profile_image'] = $validated['profile_image'];
             }
 
-            // Add certification if uploaded
-            if (isset($validated['certification'])) {
-                $updateData['certification'] = $validated['certification'];
-                $updateData['is_certified'] = true;
-            }
+
 
             // Add category if provided and allowed (FormRequest already filters/removes it if not allowed)
             if (isset($validated['category_id'])) {

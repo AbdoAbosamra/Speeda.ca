@@ -58,14 +58,14 @@ class HomeController extends Controller
         });
 
         // Latest Blogs (Cache for 1 hour)
-        $latestPosts = Cache::remember('home_latest_posts', 3600, function () {
+        $latestBlogPosts = Cache::remember('home_latest_blog_posts', 3600, function () {
             return Post::published()
                 ->with(['category', 'author'])
                 ->latestPublished()
-                ->take(6)
+                ->take(3)
                 ->get();
         });
 
-        return view('home', compact('categories', 'locationClusters', 'providerStats', 'topProviders', 'latestPosts'));
+        return view('home', compact('categories', 'locationClusters', 'providerStats', 'topProviders', 'latestBlogPosts'));
     }
 }

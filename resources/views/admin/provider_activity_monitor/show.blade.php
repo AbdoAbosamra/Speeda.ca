@@ -14,7 +14,7 @@
                     <a href="{{ route('service-providers.show', $provider->id) }}" class="btn btn-outline-secondary rounded-pill">
                         <i class="fas fa-user me-2"></i>View Profile
                     </a>
-                    <a href="{{ route('admin.provider_activity_monitor') }}" class="btn btn-outline-secondary rounded-pill">
+                    <a href="{{ route('admin.provider_activity_monitor.index') }}" class="btn btn-outline-secondary rounded-pill">
                         <i class="fas fa-arrow-left me-2"></i>Back
                     </a>
                 </div>

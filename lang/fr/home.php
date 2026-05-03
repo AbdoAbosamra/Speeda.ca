@@ -117,5 +117,7 @@ return [
     'latest_blogs_title' => 'Derniers blogs et conseils',
     'latest_blogs_desc' => 'Conseils d\'experts, guides de services et recommandations locales pour mieux choisir vos prestataires.',
     'read_more' => 'Lire la suite',
+    'min_read' => 'min de lecture',
     'view_all_blogs' => 'Voir tous les blogs',
+    'view_all_categories' => 'Voir toutes les catégories',
 ];

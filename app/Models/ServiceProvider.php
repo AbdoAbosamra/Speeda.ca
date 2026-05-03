@@ -417,10 +417,6 @@ class ServiceProvider extends Model implements HasMedia
      */
     public function getVerificationBadgeAttribute(): string
     {
-        if ($this->certification) {
-            return '<span class="badge bg-success"><i class="fas fa-certificate"></i> Certified</span>';
-        }
-
         return '';
     }
 

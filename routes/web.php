@@ -270,6 +270,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/visitors/live-count', [VisitorAnalyticsController::class, 'getLiveCount'])->name('visitors.live-count');
     Route::get('/visitors/export', [VisitorAnalyticsController::class, 'export'])->name('visitors.export');
 
+    // Provider Activity Monitor (WhatsApp Clicks & Views)
+    Route::get('/provider-activity-monitor', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'index'])->name('provider_activity_monitor.index');
+    Route::get('/provider-activity-monitor/{serviceProvider}', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'show'])->name('provider_activity_monitor.show');
+
     // Utility - Clear caches to ensure admin changes reflect immediately
     Route::post('/clear-cache', [AdminController::class, 'clearCache'])->name('clear-cache');
 

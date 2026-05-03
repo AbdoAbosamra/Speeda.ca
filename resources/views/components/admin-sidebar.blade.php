@@ -1,384 +1,175 @@
 @once
 <style>
-    /* Hide main navigation in admin pages - Multiple selectors for compatibility */
-    body:has(.admin-sidebar) .sp-nav,
-    body:has(.admin-content-wrapper) .sp-nav,
-    .admin-content-wrapper ~ .sp-nav,
-    .admin-content-wrapper + .sp-nav {
-        display: none !important;
-    }
-
     .admin-sidebar {
         position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
+        inset: 0 auto 0 0;
         width: 280px;
-        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-        z-index: 1050;
+        height: 100vh;
+        z-index: 1090;
         overflow-y: auto;
-        transition: transform 0.3s ease;
-    }
-
-    .admin-sidebar::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .admin-sidebar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .admin-sidebar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 3px;
+        background: #0f172a;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 18px 0 45px -32px rgba(15, 23, 42, 0.7);
     }
 
     .admin-sidebar-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 2;
+        padding: 1.25rem;
+        background: rgba(15, 23, 42, 0.96);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .admin-sidebar-logo {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-        text-decoration: none;
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        transition: all 0.3s ease;
-    }
-
-    .admin-sidebar-logo:hover {
-        color: #6366f1;
-        transform: translateX(5px);
+        color: #fff;
+        font-weight: 800;
+        font-size: 1.1rem;
     }
 
     .admin-sidebar-logo i {
-        font-size: 2rem;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: #eef2ff;
+        color: #4338ca;
     }
 
     .admin-sidebar-nav {
-        padding: 1rem 0;
+        padding: 1rem 0.75rem 1.5rem;
+    }
+
+    .admin-nav-group {
+        margin-bottom: 1rem;
+    }
+
+    .admin-nav-label {
+        padding: 0.75rem 0.75rem 0.5rem;
+        color: #94a3b8;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
     }
 
     .admin-nav-item {
         display: flex;
         align-items: center;
-        padding: 0.75rem 1rem;
-        color: rgba(255, 255, 255, 0.95);
-        text-decoration: none;
-        transition: all 0.18s ease;
-        border-left: 3px solid transparent;
-        position: relative;
-        margin: 0.25rem 0.4rem;
-        border-radius: 8px;
-        font-size: 0.95rem;
-    }
-
-    .admin-nav-item:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border-left-color: #6366f1;
-        transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-    }
-
-    .admin-nav-item.active {
-        background: rgba(99, 102, 241, 0.2);
-        color: white;
-        border-left-color: #6366f1;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
-    .admin-nav-item.active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: linear-gradient(180deg, #6366f1, #8b5cf6);
+        gap: 0.75rem;
+        min-height: 46px;
+        padding: 0.7rem 0.85rem;
+        margin-bottom: 0.25rem;
+        border-radius: 12px;
+        color: #cbd5e1;
+        font-weight: 700;
+        font-size: 0.92rem;
+        transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
     .admin-nav-item i {
-        width: 36px;
-        height: 36px;
-        margin-right: 0.75rem;
-        font-size: 0.95rem;
-        text-align: center;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        background: rgba(255,255,255,0.03);
-        box-shadow: inset 0 -2px 0 rgba(0,0,0,0.05);
+        width: 22px;
+        color: currentColor;
     }
 
-    .admin-content-wrapper {
-        margin-left: 280px;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        padding-top: 0;
-        transition: margin-left 0.3s ease;
+    .admin-nav-item:hover,
+    .admin-nav-item.active {
+        color: #fff;
+        background: rgba(99, 102, 241, 0.22);
+        transform: translateX(2px);
     }
 
-    .admin-mobile-toggle {
-        display: none;
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 1001;
-        background: linear-gradient(135deg, #1e293b, #0f172a);
-        color: white;
-        border: none;
-        padding: 0.75rem 1rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .admin-mobile-toggle:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    .admin-sidebar-divider {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin-top: 1rem;
+    .admin-nav-item.admin-nav-public {
+        margin-top: 0.75rem;
+        background: rgba(255, 255, 255, 0.06);
     }
 
     @media (max-width: 768px) {
         .admin-sidebar {
             transform: translateX(-100%);
+            transition: transform 0.25s ease;
         }
 
+        body.sidebar-collapsed .admin-sidebar,
         .admin-sidebar.open {
             transform: translateX(0);
-        }
-
-        .admin-content-wrapper {
-            margin-left: 0;
-        }
-
-        .admin-mobile-toggle {
-            display: block;
         }
     }
 </style>
 @endonce
 
-<button class="admin-mobile-toggle" onclick="toggleAdminSidebar()">
-    <i class="fas fa-bars"></i>
-</button>
-
-<aside class="admin-sidebar" id="adminSidebar">
+<aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
     <div class="admin-sidebar-header">
         <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-logo">
             <i class="fas fa-shield-alt"></i>
             <span>Speeda Admin</span>
         </a>
     </div>
+
     <nav class="admin-sidebar-nav">
-        {{-- Site navigation (rich, route-safe quick links) --}}
-        <div style="padding:0.75rem 0.75rem 0.25rem 0.75rem;">
-            <h6 style="color:rgba(255,255,255,0.85); font-size:0.9rem; margin:0 0 0.6rem 0;">{{ __('general.site_navigation') ?? 'Site' }}</h6>
-            <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0.25rem;">
-                @if(Route::has('home'))
-                <li>
-                    <a href="{{ route('home') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-home" style="color:#fff; background: linear-gradient(90deg,#6366f1,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('general.home') ?? 'Home' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('location'))
-                <li>
-                    <a href="{{ route('service-providers.index') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-map-marker-alt" style="color:#fff; background: linear-gradient(90deg,#ef4444,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('general.locations') ?? 'Locations' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('categories'))
-                <li>
-                    <a href="{{ route('categories') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-th-large" style="color:#fff; background: linear-gradient(90deg,#10b981,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('general.categories') ?? 'Categories' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('service-providers.index'))
-                <li>
-                    <a href="{{ route('service-providers.index') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-users" style="color:#fff; background: linear-gradient(90deg,#8b5cf6,#64748b); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('service_provider.service_providers') ?? 'Providers' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('service-providers.create'))
-                <li>
-                    <a href="{{ route('service-providers.create') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-user-plus" style="color:#fff; background: linear-gradient(90deg,#06b6d4,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('service_provider.add_provider') ?? 'Add Provider' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('about-us'))
-                <li>
-                    <a href="{{ route('about-us') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-info-circle" style="color:#fff; background: linear-gradient(90deg,#f59e0b,#ef4444); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('general.about_us') ?? 'About' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('help-center'))
-                <li>
-                    <a href="{{ route('help-center') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-question-circle" style="color:#fff; background: linear-gradient(90deg,#60a5fa,#7c3aed); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('general.help_center') ?? 'Help' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('privacy-policy'))
-                <li>
-                    <a href="{{ route('privacy-policy') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-user-secret" style="color:#fff; background: linear-gradient(90deg,#06b6d4,#4ade80); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('general.privacy') ?? 'Privacy' }}</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(Route::has('terms-of-service'))
-                <li>
-                    <a href="{{ route('terms-of-service') }}" class="admin-nav-item" style="color:#fff !important; background: rgba(255,255,255,0.02) !important;">
-                        <i class="fas fa-file-contract" style="color:#fff; background: linear-gradient(90deg,#22c55e,#16a34a); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"></i>
-                        <span>{{ __('general.terms') ?? 'Terms' }}</span>
-                    </a>
-                </li>
-                @endif
-            </ul>
-        </div>
-
-        <div class="admin-sidebar-divider"></div>
-
-        <div style="padding:0.75rem 0.75rem 0.25rem 0.75rem;">
-            <h6 style="color:rgba(255,255,255,0.85); font-size:0.9rem; margin:0 0 0.6rem 0;">{{ __('admin.nav_core') ?? 'System Management' }}</h6>
-        </div>
-
-        <a href="{{ route('admin.dashboard') }}"
-           class="admin-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-            <i class="fas fa-tachometer-alt"></i>
-            <span>{{ __('admin.dashboard') ?? 'Dashboard' }}</span>
-        </a>
-        <a href="{{ route('admin.locations') }}"
-           class="admin-nav-item {{ request()->routeIs('admin.locations*') ? 'active' : '' }}">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>{{ __('admin.manage_locations') ?? 'Locations' }}</span>
-        </a>
-        <a href="{{ route('admin.categories') }}"
-           class="admin-nav-item {{ request()->routeIs('admin.categories*') ? 'active' : '' }}">
-            <i class="fas fa-folder"></i>
-            <span>{{ __('admin.manage_categories') ?? 'Categories' }}</span>
-        </a>
-        <a href="{{ route('admin.users') }}"
-           class="admin-nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
-            <i class="fas fa-user-shield"></i>
-            <span>{{ __('admin.manage_users') ?? 'Users' }}</span>
-        </a>
-        <a href="{{ route('admin.notifications.index') }}"
-           class="admin-nav-item {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}">
-            <i class="fas fa-bell"></i>
-            <span>{{ __('admin.manage_notifications') ?? 'Notifications' }}</span>
-        </a>
-
-        <div class="admin-sidebar-divider"></div>
-
-        <div style="padding:0.75rem 0.75rem 0.25rem 0.75rem;">
-            <h6 style="color:rgba(255,255,255,0.85); font-size:0.9rem; margin:0 0 0.6rem 0;">{{ __('admin.nav_analytics') ?? 'Analytics & Moderation' }}</h6>
-        </div>
-
-        @if(Route::has('admin.reviews'))
-            <a href="{{ route('admin.reviews') }}"
-               class="admin-nav-item {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
+        <div class="admin-nav-group">
+            <div class="admin-nav-label">Workspace</div>
+            <a href="{{ route('admin.dashboard') }}" class="admin-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <i class="fas fa-gauge-high"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ route('admin.users') }}" class="admin-nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+                <span>Manage Users</span>
+            </a>
+            <a href="{{ route('admin.provider_activity_monitor.index') }}" class="admin-nav-item {{ request()->routeIs('admin.provider_activity_monitor*') ? 'active' : '' }}">
+                <i class="fas fa-briefcase"></i>
+                <span>Manage Providers</span>
+            </a>
+            <a href="{{ route('admin.reviews') }}" class="admin-nav-item {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
                 <i class="fas fa-star"></i>
-                <span>{{ __('admin.manage_reviews') ?? 'Reviews' }}</span>
+                <span>Manage Reviews</span>
             </a>
-        @endif
+            <a href="{{ route('admin.blog.posts.index') }}" class="admin-nav-item {{ request()->routeIs('admin.blog.posts*') ? 'active' : '' }}">
+                <i class="fas fa-newspaper"></i>
+                <span>Manage Blogs</span>
+            </a>
+        </div>
 
-        @if(Route::has('admin.comments'))
-            <a href="{{ route('admin.comments') }}"
-               class="admin-nav-item {{ request()->routeIs('admin.comments*') ? 'active' : '' }}">
+        <div class="admin-nav-group">
+            <div class="admin-nav-label">Content & Data</div>
+            <a href="{{ route('admin.categories') }}" class="admin-nav-item {{ request()->routeIs('admin.categories*') ? 'active' : '' }}">
+                <i class="fas fa-folder-tree"></i>
+                <span>Categories</span>
+            </a>
+            <a href="{{ route('admin.locations') }}" class="admin-nav-item {{ request()->routeIs('admin.locations*') ? 'active' : '' }}">
+                <i class="fas fa-location-dot"></i>
+                <span>Locations</span>
+            </a>
+            <a href="{{ route('admin.comments') }}" class="admin-nav-item {{ request()->routeIs('admin.comments*') ? 'active' : '' }}">
                 <i class="fas fa-comments"></i>
-                <span>{{ __('admin.manage_comments') ?? 'Comments' }}</span>
+                <span>Comments</span>
             </a>
-        @endif
-
-        <a href="{{ route('admin.visitors') }}"
-           class="admin-nav-item {{ request()->routeIs('admin.visitors*') ? 'active' : '' }}">
-            <i class="fas fa-chart-line"></i>
-            <span>{{ __('admin.visitor_analytics') ?? 'Visitor Analytics' }}</span>
-        </a>
-
-        @if(Route::has('admin.provider_activity_monitor'))
-            <a href="{{ route('admin.provider_activity_monitor') }}"
-               class="admin-nav-item {{ request()->routeIs('admin.provider_activity_monitor*') ? 'active' : '' }}">
-                <i class="fas fa-history"></i>
-                <span>{{ __('admin.provider_monitor') ?? 'Provider Activity' }}</span>
+            <a href="{{ route('admin.notifications.index') }}" class="admin-nav-item {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
             </a>
-        @endif
+        </div>
 
-        @if(Route::has('admin.activity_logs'))
-            <a href="{{ route('admin.activity_logs') }}"
-               class="admin-nav-item {{ request()->routeIs('admin.activity_logs*') ? 'active' : '' }}">
+        <div class="admin-nav-group">
+            <div class="admin-nav-label">Insights</div>
+            <a href="{{ route('admin.visitors') }}" class="admin-nav-item {{ request()->routeIs('admin.visitors*') ? 'active' : '' }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Visitor Analytics</span>
+            </a>
+            <a href="{{ route('admin.activity_logs') }}" class="admin-nav-item {{ request()->routeIs('admin.activity_logs*') ? 'active' : '' }}">
                 <i class="fas fa-clipboard-list"></i>
-                <span>{{ __('admin.activity_logs') ?? 'Activity Logs' }}</span>
+                <span>Activity Logs</span>
             </a>
-        @endif
-
-        <div class="admin-sidebar-divider">
-            <a href="{{ route('service-providers.index') }}" class="admin-nav-item">
-                <i class="fas fa-external-link-alt"></i>
-                <span>{{ __('admin.view_site') ?? 'View Public Site' }}</span>
+            <a href="{{ route('home') }}" class="admin-nav-item admin-nav-public">
+                <i class="fas fa-arrow-up-right-from-square"></i>
+                <span>View Public Site</span>
             </a>
         </div>
     </nav>
 </aside>
-
-<script>
-function toggleAdminSidebar() {
-    document.getElementById('adminSidebar').classList.toggle('open');
-}
-
-// Close sidebar when clicking outside on mobile
-document.addEventListener('click', function(event) {
-    const sidebar = document.getElementById('adminSidebar');
-    const toggle = document.querySelector('.admin-mobile-toggle');
-
-    if (window.innerWidth <= 768 &&
-        sidebar &&
-        !sidebar.contains(event.target) &&
-        !toggle.contains(event.target) &&
-        sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-    }
-});
-</script>

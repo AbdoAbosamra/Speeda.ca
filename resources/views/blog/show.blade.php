@@ -20,6 +20,8 @@
                                 src="{{ $post->image_url }}"
                                 alt="{{ $post->localized_featured_image_alt }}"
                                 class="w-100"
+                                loading="eager"
+                                decoding="async"
                                 style="width: 100%; height: 100%; object-fit: cover;"
                             >
                             <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%);"></div>
@@ -35,16 +37,16 @@
                                 @endif
 
                                 <span class="small text-muted" style="display: flex; align-items: center; gap: 6px;">
-                                    <span>📅</span> {{ $post->published_date }}
+                                    <i class="fas fa-calendar"></i> {{ $post->published_date }}
                                 </span>
 
                                 <span class="small text-muted" style="display: flex; align-items: center; gap: 6px;">
-                                    <span>✍️</span> {{ __('blog.by_author', ['name' => $post->author?->name ?? config('app.name')]) }}
+                                    <i class="fas fa-user"></i> {{ __('blog.by_author', ['name' => $post->author?->name ?? config('app.name')]) }}
                                 </span>
 
                                 @if($post->reading_time_minutes)
                                     <span class="small text-muted" style="display: flex; align-items: center; gap: 6px;">
-                                        <span>⏱️</span> {{ __('blog.reading_time', ['minutes' => $post->reading_time_minutes]) }}
+                                        <i class="fas fa-clock"></i> {{ __('blog.reading_time', ['minutes' => $post->reading_time_minutes]) }}
                                     </span>
                                 @endif
                             </div>
@@ -68,8 +70,8 @@
                     @if($relatedPosts->count() > 0)
                         <section class="mt-8 pt-6 border-top">
                             <div class="d-flex align-items-center justify-content-between mb-6">
-                                <h2 class="h3 fw-bold text-dark mb-0">📚 {{ __('blog.related_heading') }}</h2>
-                                <a href="{{ route('blogs.index') }}" class="fw-bold text-primary text-decoration-none" style="display: flex; align-items: center; gap: 6px;">{{ __('blog.view_all') }} →</a>
+                                <h2 class="h3 fw-bold text-dark mb-0">{{ __('blog.related_heading') }}</h2>
+                                <a href="{{ route('blogs.index') }}" class="fw-bold text-primary text-decoration-none" style="display: flex; align-items: center; gap: 6px;">{{ __('blog.view_all') }} <i class="fas fa-arrow-right"></i></a>
                             </div>
 
                             <div class="row g-4">
@@ -82,13 +84,15 @@
                                                         src="{{ $relatedPost->image_url }}"
                                                         alt="{{ $relatedPost->localized_featured_image_alt }}"
                                                         class="w-100"
+                                                        loading="lazy"
+                                                        decoding="async"
                                                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;"
                                                         onmouseover="this.style.transform='scale(1.08)'"
                                                         onmouseout="this.style.transform='scale(1)'"
                                                     >
                                                 </div>
                                                 <div class="card-body p-4 d-flex flex-column">
-                                                    <span class="small text-muted mb-2" style="display: flex; align-items: center; gap: 4px;"><span>📅</span> {{ $relatedPost->published_date }}</span>
+                                                    <span class="small text-muted mb-2" style="display: flex; align-items: center; gap: 4px;">{{ $relatedPost->published_date }}</span>
                                                     <h3 class="h5 fw-bold text-dark mb-2" style="line-height: 1.4;">{{ $relatedPost->localized_title }}</h3>
                                                     <p class="text-muted mb-0 flex-grow-1">{{ $relatedPost->localized_excerpt }}</p>
                                                 </div>
@@ -104,4 +108,3 @@
         </div>
     </section>
 @endsection
-

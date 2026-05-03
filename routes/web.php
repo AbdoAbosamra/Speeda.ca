@@ -17,6 +17,7 @@ use App\Http\Controllers\ServiceProviderAnalyticsController;
 use App\Http\Controllers\ServiceProviderController;
 use App\Http\Controllers\Admin\AdminCommentController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\VisitorAnalyticsController;
 use App\Http\Controllers\DebugController;
@@ -239,6 +240,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+    // Blog CMS
+    Route::resource('blog/posts', BlogPostController::class)
+        ->except(['show'])
+        ->names('blog.posts')
+        ->parameters(['posts' => 'post']);
+
     // Categories Management (using IDs, no slugs)
     Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
@@ -305,6 +312,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 // Service Provider Notification Routes
 Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
 });
 

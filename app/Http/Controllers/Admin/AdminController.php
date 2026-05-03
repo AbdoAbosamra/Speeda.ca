@@ -12,6 +12,8 @@ use App\Models\Location;
 use App\Models\Category;
 use App\Models\Visitor;
 use App\Models\Review;
+use App\Models\Post;
+use App\Models\ServiceProvider;
 use App\Models\User;
 use App\Services\VisitorTrackingService;
 use App\Traits\LogsAdminActions;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 use App\Models\AdminLog;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -52,6 +55,7 @@ class AdminController extends Controller
             $stats = [
                 'liveVisitors' => $visitorStats['live_visitors'] ?? 0,
                 'visitorsToday' => $this->getVisitorsToday(),
+                'visitorsThisMonth' => $this->getVisitorsThisMonth(),
                 'last7Days' => $visitorStats['last_7_days'] ?? 0,
                 'last30Days' => $visitorStats['last_30_days'] ?? 0,
                 'last12Months' => $visitorStats['last_12_months'] ?? 0,
@@ -61,6 +65,9 @@ class AdminController extends Controller
                 'totalLocations' => Location::count(),
                 'totalCategories' => Category::count(),
                 'totalUsers' => User::count(),
+                'totalProviders' => ServiceProvider::count(),
+                'totalClients' => User::where('role', 'client')->count(),
+                'totalBlogs' => Post::count(),
                 // Pending moderation counts
                 'pendingReviews' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
                 'totalReviews' => Review::count(),
@@ -77,6 +84,7 @@ class AdminController extends Controller
             $stats = [
                 'liveVisitors' => 0,
                 'visitorsToday' => 0,
+                'visitorsThisMonth' => 0,
                 'last7Days' => 0,
                 'last30Days' => 0,
                 'last12Months' => 0,
@@ -86,6 +94,9 @@ class AdminController extends Controller
                 'totalLocations' => 0,
                 'totalCategories' => 0,
                 'totalUsers' => 0,
+                'totalProviders' => 0,
+                'totalClients' => 0,
+                'totalBlogs' => 0,
                 'pendingReviews' => 0,
                 'totalReviews' => 0,
                 'newUsersToday' => 0,
@@ -99,7 +110,27 @@ class AdminController extends Controller
      */
     private function getVisitorsToday(): int
     {
-        return Visitor::whereDate('visited_at', today())
+        $canadaNow = Carbon::now(config('app.timezone', 'America/Toronto'));
+
+        return Visitor::whereBetween('visited_at', [
+                $canadaNow->copy()->startOfDay(),
+                $canadaNow->copy()->endOfDay(),
+            ])
+            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
+            ->count();
+    }
+
+    /**
+     * Get visitors for the current Canadian calendar month.
+     */
+    private function getVisitorsThisMonth(): int
+    {
+        $canadaNow = Carbon::now(config('app.timezone', 'America/Toronto'));
+
+        return Visitor::whereBetween('visited_at', [
+                $canadaNow->copy()->startOfMonth(),
+                $canadaNow->copy()->endOfMonth(),
+            ])
             ->selectRaw('DISTINCT ip_hash, user_agent_hash')
             ->count();
     }

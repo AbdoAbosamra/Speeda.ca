@@ -30,6 +30,18 @@
             ['label' => __('admin.users'), 'url' => route('admin.users')]
         ];
     }
+    elseif (str_starts_with($currentRoute ?? '', 'admin.blog.posts') && Route::has('admin.blog.posts.index')) {
+        $breadcrumbs = [
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Blogs', 'url' => route('admin.blog.posts.index')]
+        ];
+        if ($currentRoute === 'admin.blog.posts.create') {
+            $breadcrumbs[] = ['label' => 'Create', 'url' => '#'];
+        }
+        if ($currentRoute === 'admin.blog.posts.edit') {
+            $breadcrumbs[] = ['label' => 'Edit', 'url' => '#'];
+        }
+    }
     elseif (str_starts_with($currentRoute ?? '', 'admin.reviews') && Route::has('admin.reviews')) {
         $breadcrumbs = [
             ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
@@ -167,7 +179,7 @@
 
 :root {
     --admin-top-bar-height: 68px; /* Slightly slimmer for a more modern look */
-    --admin-sidebar-width: 280px;
+    --admin-sidebar-width: 0px;
     --top-bar-blur: 16px; /* Increased blur for premium glassmorphism */
     --dropdown-shadow: 0 25px 40px -10px rgba(0,0,0,0.08), 0 10px 15px -5px rgba(0,0,0,0.04);
     --accent-indigo-gradient: linear-gradient(135deg, #4f46e5, #6366f1); /* Subtle gradient for depth */
@@ -178,7 +190,7 @@
 /* === Top Bar Container === */
 .admin-top-bar {
     position: fixed;
-    left: var(--admin-sidebar-width);
+    left: 0;
     right: 0;
     top: 0;
     height: var(--admin-top-bar-height);
@@ -197,15 +209,7 @@
 
 [dir="rtl"] .admin-top-bar {
     left: 0;
-    right: var(--admin-sidebar-width);
-}
-
-.sidebar-collapsed .admin-top-bar {
-    left: 80px;
-}
-[dir="rtl"] .sidebar-collapsed .admin-top-bar {
-    right: 80px;
-    left: 0;
+    right: 0;
 }
 
 .admin-top-bar:hover {
@@ -742,6 +746,7 @@ document.addEventListener('alpine:init', () => {
             this.sidebarCollapsed = !this.sidebarCollapsed;
             localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
             document.body.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
+            document.getElementById('adminSidebar')?.classList.toggle('open', this.sidebarCollapsed);
             window.dispatchEvent(new CustomEvent('sidebar-toggled', { detail: { collapsed: this.sidebarCollapsed } }));
         }
     }));

@@ -1101,7 +1101,6 @@
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     if (nav.classList.contains('is-open')) { toggleMenu(); toggle?.focus(); }
-                    if (notifDropdown?.getAttribute('aria-hidden') === 'false') notifTrigger?.focus();
                 }
             });
         });
@@ -1116,44 +1115,12 @@
             <img class="sp-brand__img" src="{{ asset('images/main-logo.png') }}" alt="{{ config('app.name', 'Speeda') }}" loading="eager">
         </a>
 
-        @if($isServiceProvider && isset($activeNotifications))
+        @if($isServiceProvider)
             <div class="sp-notif sp-notif--mobile {{ $hasUnread ? 'sp-notif--unread' : '' }}">
-                <button class="sp-notif__trigger js-notif-trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false">
+                <a href="{{ route('notifications.index') }}" class="sp-notif__trigger" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}">
                     <i class="fas fa-bell" aria-hidden="true"></i>
-                    <span class="sp-notif__badge js-notif-badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
-                </button>
-
-                <div class="sp-notif__dropdown js-notif-dropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
-                    <div class="sp-notif__header">
-                        <div class="sp-notif__header-left">
-                            <i class="fas fa-bell" aria-hidden="true"></i> {{ __('admin.notifications') }}
-                        </div>
-                        @if($hasUnread)
-                            <span class="sp-notif__header-count js-notif-header-count">{{ $unreadCount }} {{ __('general.new') }}</span>
-                            <button class="sp-notif__footer-btn js-mark-read-btn" type="button">
-                                <i class="fas fa-check-double" aria-hidden="true"></i> {{ __('general.mark_all_read') }}
-                            </button>
-                        @endif
-                    </div>
-                    <div class="sp-notif__list js-notif-list">
-                        @forelse($activeNotifications as $notif)
-                            <div class="sp-notif__item {{ (!in_array($notif->id, $readIds)) ? 'sp-notif__item--unread' : '' }}" data-notif-title="{{ $notif->title }}" data-notif-message="{{ $notif->message }}" data-notif-time="{{ $notif->created_at->diffForHumans() }}">
-                                <div class="sp-notif__title">
-                                    @if(!in_array($notif->id, $readIds))<span class="sp-notif__dot" aria-hidden="true"></span>@endif
-                                    {{ $notif->title }}
-                                </div>
-                                <div class="sp-notif__message">{{ Str::limit($notif->message, 120) }}</div>
-                                <div class="sp-notif__time"><i class="fas fa-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</div>
-                            </div>
-                        @empty
-                            <div class="sp-notif__empty">
-                                <i class="fas fa-bell-slash" aria-hidden="true"></i>
-                                <div class="sp-notif__empty-text">{{ __('admin.no_notifications') }}</div>
-                                <div class="sp-notif__empty-sub">{{ __('general.all_caught_up') }}</div>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
+                    <span class="sp-notif__badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
+                </a>
             </div>
         @endif
 
@@ -1179,44 +1146,12 @@
             <div class="sp-actions">
                 @include('components.language-switcher')
 
-                @if($isServiceProvider && isset($activeNotifications))
+                @if($isServiceProvider)
                     <div class="sp-notif sp-notif--desktop {{ $hasUnread ? 'sp-notif--unread' : '' }}">
-                        <button class="sp-notif__trigger js-notif-trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false">
+                        <a href="{{ route('notifications.index') }}" class="sp-notif__trigger" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}">
                             <i class="fas fa-bell" aria-hidden="true"></i>
-                            <span class="sp-notif__badge js-notif-badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
-                        </button>
-
-                        <div class="sp-notif__dropdown js-notif-dropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
-                            <div class="sp-notif__header">
-                                <div class="sp-notif__header-left">
-                                    <i class="fas fa-bell" aria-hidden="true"></i> {{ __('admin.notifications') }}
-                                </div>
-                                @if($hasUnread)
-                                    <span class="sp-notif__header-count js-notif-header-count">{{ $unreadCount }} {{ __('general.new') }}</span>
-                                    <button class="sp-notif__footer-btn js-mark-read-btn" type="button">
-                                        <i class="fas fa-check-double" aria-hidden="true"></i> {{ __('general.mark_all_read') }}
-                                    </button>
-                                @endif
-                            </div>
-                            <div class="sp-notif__list js-notif-list">
-                                @forelse($activeNotifications as $notif)
-                                    <div class="sp-notif__item {{ (!in_array($notif->id, $readIds)) ? 'sp-notif__item--unread' : '' }}" data-notif-title="{{ $notif->title }}" data-notif-message="{{ $notif->message }}" data-notif-time="{{ $notif->created_at->diffForHumans() }}">
-                                        <div class="sp-notif__title">
-                                            @if(!in_array($notif->id, $readIds))<span class="sp-notif__dot" aria-hidden="true"></span>@endif
-                                            {{ $notif->title }}
-                                        </div>
-                                        <div class="sp-notif__message">{{ Str::limit($notif->message, 120) }}</div>
-                                        <div class="sp-notif__time"><i class="fas fa-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</div>
-                                    </div>
-                                @empty
-                                    <div class="sp-notif__empty">
-                                        <i class="fas fa-bell-slash" aria-hidden="true"></i>
-                                        <div class="sp-notif__empty-text">{{ __('admin.no_notifications') }}</div>
-                                        <div class="sp-notif__empty-sub">{{ __('general.all_caught_up') }}</div>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
+                            <span class="sp-notif__badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
+                        </a>
                     </div>
                 @endif
 

@@ -1,18 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid px-4" style="padding-top: 4rem; padding-bottom: 3rem;">
-        <div class="mb-6">
-            <h1 class="display-6 fw-bold text-dark mb-2">✍️ {{ __('Create Blog Post') }}</h1>
-            <p class="text-muted">{{ __('Add a new blog post to your website') }}</p>
-            <div style="height: 3px; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); width: 80px; border-radius: 2px; margin-top: 1rem;"></div>
+    <div class="admin-cms-page" dir="ltr">
+        <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
+            <section class="admin-page-header">
+                <div>
+                    <p class="admin-section-eyebrow">Blog CMS</p>
+                    <h1>Create Blog</h1>
+                    <p>Write a new draft or publish an article directly to the public blog.</p>
+                </div>
+                <a href="{{ route('admin.blog.posts.index') }}" class="admin-btn admin-btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Blogs</span>
+                </a>
+            </section>
+
+            @include('admin.blog.posts.partials.form', [
+                'action' => route('admin.blog.posts.store'),
+                'method' => 'POST',
+                'post' => $post,
+                'categories' => $categories,
+            ])
         </div>
-        @include('admin.blog.posts.partials.form', [
-            'action' => route('admin.blog.posts.store'),
-            'method' => 'POST',
-            'post' => null,
-            'categories' => $categories,
-            'statuses' => $statuses,
-        ])
     </div>
 @endsection

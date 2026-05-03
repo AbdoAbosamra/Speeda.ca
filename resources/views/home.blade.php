@@ -2,32 +2,6 @@
 
 @push('styles')
     @vite('resources/css/app.css')
-    <style>
-        .hero-banner-custom {
-            transform: scale(1.25) translateX(4%);
-            transform-origin: center;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        [dir="rtl"] .hero-banner-custom {
-            transform: scale(1.25) translateX(-4%);
-        }
-
-        @media (max-width: 1199.98px) {
-
-            .hero-banner-custom,
-            [dir="rtl"] .hero-banner-custom {
-                transform: scale(1);
-                margin-top: 1.5rem;
-                transform-origin: center;
-                width: 100%;
-                max-width: 500px;
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-        }
-    </style>
 @endpush
 
 @section('content')
@@ -139,8 +113,8 @@
                             <div class="home-hero-visual fade-in-up" style="position: relative; z-index: 1;">
                                 <div class="home-hero-orb home-hero-orb-primary"></div>
                                 <div class="home-hero-orb home-hero-orb-secondary"></div>
-                                <img src="{{ asset('images/New Banner.jpeg') }}" alt="{{ __('home.banner_alt') }}"
-                                    class="img-fluid home-hero-image hero-banner-custom" loading="lazy">
+                                <img src="{{ asset('images/hero-banner.jpeg') }}" alt="{{ __('home.banner_alt') }}"
+                                    class="img-fluid home-hero-image hero-banner-custom" loading="eager" fetchpriority="high">
                             </div>
                         </div>
                     </div>

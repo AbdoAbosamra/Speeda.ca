@@ -9,6 +9,26 @@ use Illuminate\Support\Facades\Auth;
 class NotificationController extends Controller
 {
     /**
+     * Display a listing of notifications for the provider.
+     */
+    public function index()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        $notifications = AdminNotification::active()
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        $readNotificationIds = $user->readAdminNotifications()
+            ->whereIn('admin_notification_id', $notifications->pluck('id'))
+            ->pluck('admin_notification_id')
+            ->toArray();
+
+        return view('notifications', compact('notifications', 'readNotificationIds'));
+    }
+
+    /**
      * Mark all active notifications as read for the current user.
      */
     // @change 2026-04-14 TASK-5 | Tightened provider notification read-state updates and returned unread metadata | The dropdown badge must clear reliably after opening or clicking a notification | risk:LOW

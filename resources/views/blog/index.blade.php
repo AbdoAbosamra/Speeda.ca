@@ -18,7 +18,7 @@
                     </div>
                     <div class="col-lg-5">
                         <form action="{{ route('blogs.index') }}" method="GET" class="d-grid gap-3">
-                            <label for="blog-search" class="form-label fw-bold mb-0">🔍 {{ __('blog.search_label') }}</label>
+                            <label for="blog-search" class="form-label fw-bold mb-0">{{ __('blog.search_label') }}</label>
                             <div class="input-group input-group-lg">
                                 <input
                                     id="blog-search"
@@ -39,7 +39,7 @@
             <!-- Featured Posts Section -->
             @if($featuredPosts->count() > 0)
                 <div class="mb-8 pb-6 border-bottom">
-                    <h2 class="h4 fw-bold text-dark mb-4">⭐ {{ __('blog.featured_label') }}</h2>
+                    <h2 class="h4 fw-bold text-dark mb-4">{{ __('blog.featured_label') }}</h2>
                     <div class="row g-4">
                         @foreach($featuredPosts as $featuredPost)
                             <div class="col-lg-4">
@@ -50,6 +50,8 @@
                                                 src="{{ $featuredPost->image_url }}"
                                                 alt="{{ $featuredPost->localized_featured_image_alt }}"
                                                 class="w-100"
+                                                loading="lazy"
+                                                decoding="async"
                                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;"
                                                 onmouseover="this.style.transform='scale(1.08)'"
                                                 onmouseout="this.style.transform='scale(1)'"
@@ -58,7 +60,7 @@
                                         <div class="card-body p-4">
                                             <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
                                                 <span class="badge text-bg-warning">{{ __('blog.featured_label') }}</span>
-                                                <span class="small text-muted">📅 {{ $featuredPost->published_date }}</span>
+                                                <span class="small text-muted">{{ $featuredPost->published_date }}</span>
                                             </div>
                                             <h2 class="h5 fw-bold text-dark mb-2" style="line-height: 1.4;">{{ $featuredPost->localized_title }}</h2>
                                             <p class="text-muted mb-0">{{ $featuredPost->localized_excerpt }}</p>
@@ -72,7 +74,7 @@
             @endif
 
             <!-- Posts Grid -->
-            <h2 class="h4 fw-bold text-dark mb-5">📚 {{ __('blog.latest_posts') ?? 'Latest Posts' }}</h2>
+            <h2 class="h4 fw-bold text-dark mb-5">{{ __('blog.latest_posts') ?? 'Latest Posts' }}</h2>
             <div class="row g-4">
                 @forelse($posts as $post)
                     <div class="col-md-6 col-lg-4">
@@ -83,6 +85,8 @@
                                         src="{{ $post->image_url }}"
                                         alt="{{ $post->localized_featured_image_alt }}"
                                         class="w-100"
+                                        loading="lazy"
+                                        decoding="async"
                                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;"
                                         onmouseover="this.style.transform='scale(1.08)'"
                                         onmouseout="this.style.transform='scale(1)'"
@@ -95,13 +99,13 @@
                                 </div>
                                 <div class="card-body p-4 d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                                        <span class="small text-muted" style="display: flex; align-items: center; gap: 4px;"><span>📅</span> {{ $post->published_date }}</span>
+                                        <span class="small text-muted" style="display: flex; align-items: center; gap: 4px;">{{ $post->published_date }}</span>
                                     </div>
                                     <h3 class="h5 fw-bold text-dark mb-2" style="line-height: 1.4; min-height: 2.8rem;">{{ $post->localized_title }}</h3>
                                     <p class="text-muted flex-grow-1 mb-4">{{ $post->localized_excerpt }}</p>
                                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                        <span class="small text-muted" style="display: flex; align-items: center; gap: 4px;"><span>✍️</span> {{ $post->author?->name ?? config('app.name') }}</span>
-                                        <span class="fw-bold text-primary" style="display: flex; align-items: center; gap: 4px;">{{ __('blog.read_more') }} →</span>
+                                        <span class="small text-muted" style="display: flex; align-items: center; gap: 4px;">{{ $post->author?->name ?? config('app.name') }}</span>
+                                        <span class="fw-bold text-primary" style="display: flex; align-items: center; gap: 4px;">{{ __('blog.read_more') }} <i class="fas fa-arrow-right"></i></span>
                                     </div>
                                 </div>
                             </a>
@@ -111,7 +115,7 @@
                     <div class="col-12">
                         <div class="card border-0 shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 3rem;">
                             <div class="text-center">
-                                <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                                <div style="font-size: 3rem; margin-bottom: 1rem;"><i class="fas fa-newspaper"></i></div>
                                 <h2 class="h4 fw-bold text-dark mb-2">{{ __('blog.empty_title') }}</h2>
                                 <p class="text-muted mb-0">{{ __('blog.empty_description') }}</p>
                             </div>
@@ -129,4 +133,3 @@
         </div>
     </section>
 @endsection
-

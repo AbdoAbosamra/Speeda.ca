@@ -47,45 +47,4 @@
         </div>
     </div>
 </footer>
-
-<style>
-    /* Footer */
-    footer {
-        background: linear-gradient(135deg, #212529 0%, #343a40 100%);
-        color: #ccc;
-        padding: 3rem 0 1.5rem;
-    }
-
-    footer h5, footer h6 {
-        color: white;
-        margin-bottom: 1rem;
-    }
-
-    footer a {
-        color: #ccc;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    footer a:hover {
-        color: #03a9f4;
-    }
-
-    .footer-links {
-        list-style: none;
-        padding: 0;
-    }
-
-    .footer-links li {
-        margin-bottom: 0.5rem;
-    }
-
-    .copyright {
-        border-top: 1px solid #444;
-        padding-top: 1.5rem;
-        margin-top: 2rem;
-        text-align: center;
-        font-size: 0.9rem;
-        color: #999;
-    }
-</style>
+{{-- Footer styles are in resources/css/app.css --}}

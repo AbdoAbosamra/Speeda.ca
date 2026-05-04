@@ -1198,7 +1198,6 @@
         </div>
     </div>
 </nav>
-
 <!-- Notification Detail Modal -->
 <div class="modal fade" id="notifDetailModal" tabindex="-1" aria-labelledby="notifDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1220,3 +1219,4 @@
         </div>
     </div>
 </div>
+

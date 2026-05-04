@@ -42,17 +42,23 @@ class HomeController extends Controller
             ];
         });
 
-        // Top Providers - Enforcing Multi-Level Priority Order (Cache for 1 hour)
+        // Top Providers - Enforcing Multi-Level Priority Order (Rating > Completion)
         $topProviders = Cache::remember('home_top_providers', 3600, function () {
             return ServiceProvider::verified()
                 ->with(['user', 'category', 'location', 'media'])
                 ->withCount(['reviews', 'endorsements'])
-                // Priority 1: Rating DESC, then reviews_count DESC
-                ->orderByRaw('rating IS NOT NULL DESC')
+                // Constraint: Must have at least one rating OR 80%+ profile completion
+                ->where(function ($query) {
+                    $query->whereNotNull('rating')
+                        ->orWhere('profile_completion_percent', '>=', 80);
+                })
+                // Priority 1: Average Rating (Highest stars first)
+                ->orderByRaw('rating IS NULL ASC') // Push NULLs to end of rating group
                 ->orderBy('rating', 'desc')
-                ->orderBy('reviews_count', 'desc')
-                // Priority 2: Profile Completeness
+                // Priority 2: Profile Completeness (Tie-breaker or for unrated)
                 ->orderBy('profile_completion_percent', 'desc')
+                // Priority 3: Quantity of feedback
+                ->orderBy('reviews_count', 'desc')
                 ->take(8)
                 ->get();
         });

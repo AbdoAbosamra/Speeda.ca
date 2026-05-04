@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <h5>Speeda</h5>
-                <p>{{ __('home.disclaimer') }}</p>
+                <p style="font-size: 13px;">Speeda is a connection-only platform; all agreements and payments occur directly between clients and providers. We do not verify qualifications or guarantee service performance.</p>
             </div>
             <div class="col-lg-2 col-md-6 mb-4">
                 <ul class="footer-links">
@@ -42,8 +42,8 @@
             </div>
         </div>
         <div class="copyright">
-            <p class="mb-2">&copy; 2025 Speeda. {{ __('home.all_rights_reserved') }}</p>
-            <p class="small text-muted">{{ __('home.disclaimer') }}</p>
+            <p class="mb-2" style="font-size: 13px;">&copy; 2025 Speeda. {{ __('home.all_rights_reserved') }}</p>
+            <p class="small text-muted" style="font-size: 11px;">Speeda is a connection-only platform; all agreements and payments occur directly between clients and providers. We do not verify qualifications or guarantee service performance.</p>
         </div>
     </div>
 </footer>

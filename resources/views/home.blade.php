@@ -46,15 +46,8 @@
                                     {{ __('home.hero_subtitle') }}
                                 </p>
                             </div>
-
                             <form id="homeSearchForm" class="premium-search-bar home-search-panel fade-in-up"
                                 action="{{ route('service-providers.index') }}" method="GET">
-                                <div class="premium-search-input">
-                                    <i class="fas fa-search icon-left"></i>
-                                    <input type="text" name="search" placeholder="{{ __('home.search_placeholder') }}"
-                                        aria-label="{{ __('home.search') }}">
-                                </div>
-
                                 <div class="premium-search-input">
                                     <i class="fas fa-map-marker-alt icon-left"></i>
                                     <select name="location" aria-label="{{ __('home.location') }}">
@@ -87,7 +80,7 @@
                                 </button>
                             </form>
 
-                            <div class="d-flex align-items-center gap-3 flex-wrap popular-tags fade-in-up">
+                            <div class="d-flex align-items-center gap-3 flex-wrap popular-tags mt-4 fade-in-up">
                                 <span class="fw-semibold home-text-muted">{{ __('home.popular') }}</span>
                                 <a href="{{ route('service-providers.index', ['search' => __('home.plumbing')]) }}"
                                     class="premium-lang-badge text-decoration-none">
@@ -114,7 +107,8 @@
                                 <div class="home-hero-orb home-hero-orb-primary"></div>
                                 <div class="home-hero-orb home-hero-orb-secondary"></div>
                                 <img src="{{ asset('images/hero-banner.jpeg') }}" alt="{{ __('home.banner_alt') }}"
-                                    class="img-fluid home-hero-image hero-banner-custom" loading="eager" fetchpriority="high">
+                                    class="img-fluid home-hero-image hero-banner-custom" loading="eager"
+                                    fetchpriority="high">
                             </div>
                         </div>
                     </div>
@@ -136,15 +130,25 @@
                         </a>
                     </div>
 
-                    <div class="home-categories-grid">
-                        @foreach($staticCategories as $subcat)
-                            <article class="home-category-card">
-                                <div class="premium-subcat-icon">
-                                    <i class="fas fa-{{ $subcat['icon'] }}"></i>
-                                </div>
-                                <h3 class="premium-subcat-title">{{ $subcat['name'] }}</h3>
-                            </article>
-                        @endforeach
+                    <div class="premium-category-slider-wrapper" id="categorySlider">
+                        <button class="slider-nav-btn prev" aria-label="Previous" onclick="document.getElementById('categorySliderTrack').scrollBy({left: -300, behavior: 'smooth'})">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="premium-category-slider-track" id="categorySliderTrack">
+                            @foreach($staticCategories as $subcat)
+                                <article class="home-category-card">
+                                    <div class="premium-subcat-icon">
+                                        <i class="fas fa-{{ $subcat['icon'] }}"></i>
+                                    </div>
+                                    <h3 class="premium-subcat-title">{{ $subcat['name'] }}</h3>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <button class="slider-nav-btn next" aria-label="Next" onclick="document.getElementById('categorySliderTrack').scrollBy({left: 300, behavior: 'smooth'})">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -168,8 +172,7 @@
                         <div class="premium-marquee-wrapper">
                             <div class="premium-marquee-track">
                                 @foreach($featuredProviders->concat($featuredProviders) as $provider)
-                                    <a href="{{ route('service-providers.show', $provider) }}"
-                                        class="premium-provider-card-link">
+                                    <a href="{{ route('service-providers.show', $provider) }}" class="premium-provider-card-link">
                                         <article class="premium-provider-card home-provider-card">
                                             <div class="premium-provider-img">
                                                 @if($provider->media && $provider->media->first())
@@ -189,7 +192,7 @@
                                                     <h3 class="fw-bold mb-1 home-text-dark text-truncate provider-name">
                                                         {{ $provider->user->name ?? __('home.view_profile') }}
                                                     </h3>
-                    
+
                                                 </div>
 
                                                 <p class="small home-text-muted mb-3 text-truncate provider-category">

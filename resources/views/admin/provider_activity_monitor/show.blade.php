@@ -65,7 +65,7 @@
                             <thead style="background: linear-gradient(135deg, #f8fafc, #f1f5f9);">
                                 <tr>
                                     <th class="fw-bold py-3">Type</th>
-                                    <th class="fw-bold py-3">IP</th>
+                                    <th class="fw-bold py-3">Event</th>
                                     <th class="fw-bold py-3">Created At</th>
                                 </tr>
                             </thead>
@@ -77,7 +77,7 @@
                                                 {{ $e->action_type }}
                                             </span>
                                         </td>
-                                        <td><span class="text-muted">{{ $e->ip_address }}</span></td>
+                                        <td><span class="text-muted">Privacy-safe event metadata</span></td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span class="fw-semibold">
@@ -108,4 +108,3 @@
         </div>
     </div>
 @endsection
-

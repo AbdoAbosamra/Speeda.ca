@@ -49,17 +49,22 @@
                 <div class="table-responsive">
                     <table class="admin-data-table">
                         <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Status</th>
-                                <th>Created Date</th>
-                                <th class="text-end">Actions</th>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Title</th>
+                                    <th>Status</th>
+                                    <th>Published</th>
+                                    <th>Created Date</th>
+                                    <th class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($posts as $post)
                                 @php($postStatus = $post->status ?: ($post->is_published ? 'published' : 'draft'))
                                 <tr>
+                                    <td>
+                                        <img src="{{ $post->image_url }}" alt="{{ $post->title_en ?: $post->title }}" class="admin-table-thumb" loading="lazy">
+                                    </td>
                                     <td>
                                         <div class="admin-table-title">{{ $post->title_en ?: $post->title }}</div>
                                         <div class="admin-table-subtitle">{{ $post->slug }}</div>
@@ -69,9 +74,16 @@
                                             {{ ucfirst($postStatus) }}
                                         </span>
                                     </td>
+                                    <td>{{ optional($post->published_at)->format('M d, Y') ?: '-' }}</td>
                                     <td>{{ optional($post->created_at)->format('M d, Y') }}</td>
                                     <td>
                                         <div class="admin-row-actions">
+                                            @if($postStatus === 'published')
+                                                <a href="{{ route('blogs.show', $post) }}" class="admin-icon-action" title="View public blog" target="_blank" rel="noopener">
+                                                    <i class="fas fa-arrow-up-right-from-square"></i>
+                                                    <span>View</span>
+                                                </a>
+                                            @endif
                                             <a href="{{ route('admin.blog.posts.edit', $post) }}" class="admin-icon-action" title="Edit blog">
                                                 <i class="fas fa-pen"></i>
                                                 <span>Edit</span>
@@ -89,7 +101,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="6">
                                         <div class="admin-empty-state">
                                             <i class="fas fa-newspaper"></i>
                                             <h2>No blog posts found</h2>

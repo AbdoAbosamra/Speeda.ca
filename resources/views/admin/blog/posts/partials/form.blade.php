@@ -78,6 +78,51 @@
                 </label>
             </div>
         </section>
+
+        <section class="admin-form-card">
+            <div class="admin-form-section-head">
+                <h2>SEO Metadata</h2>
+                <p>These fields control search snippets and social previews. Empty fields use the title and excerpt.</p>
+            </div>
+
+            <div class="admin-form-grid">
+                <label class="admin-field admin-field-wide">
+                    <span>SEO Title EN</span>
+                    <input type="text" name="seo_title_en" value="{{ old('seo_title_en', $post->seo_title_en) }}" maxlength="255" placeholder="Recommended 50-60 characters">
+                    @error('seo_title_en')<small>{{ $message }}</small>@enderror
+                </label>
+
+                <label class="admin-field admin-field-wide">
+                    <span>SEO Description EN</span>
+                    <textarea name="seo_description_en" rows="3" maxlength="500" placeholder="Recommended 150-160 characters">{{ old('seo_description_en', $post->seo_description_en) }}</textarea>
+                    @error('seo_description_en')<small>{{ $message }}</small>@enderror
+                </label>
+
+                <label class="admin-field admin-field-wide">
+                    <span>SEO Title AR</span>
+                    <input type="text" name="seo_title_ar" value="{{ old('seo_title_ar', $post->seo_title_ar) }}" maxlength="255" dir="rtl">
+                    @error('seo_title_ar')<small>{{ $message }}</small>@enderror
+                </label>
+
+                <label class="admin-field admin-field-wide">
+                    <span>SEO Description AR</span>
+                    <textarea name="seo_description_ar" rows="3" maxlength="500" dir="rtl">{{ old('seo_description_ar', $post->seo_description_ar) }}</textarea>
+                    @error('seo_description_ar')<small>{{ $message }}</small>@enderror
+                </label>
+
+                <label class="admin-field admin-field-wide">
+                    <span>SEO Title FR</span>
+                    <input type="text" name="seo_title_fr" value="{{ old('seo_title_fr', $post->seo_title_fr) }}" maxlength="255">
+                    @error('seo_title_fr')<small>{{ $message }}</small>@enderror
+                </label>
+
+                <label class="admin-field admin-field-wide">
+                    <span>SEO Description FR</span>
+                    <textarea name="seo_description_fr" rows="3" maxlength="500">{{ old('seo_description_fr', $post->seo_description_fr) }}</textarea>
+                    @error('seo_description_fr')<small>{{ $message }}</small>@enderror
+                </label>
+            </div>
+        </section>
     </div>
 
     <aside class="admin-form-side">
@@ -145,6 +190,12 @@
                 <i class="fas fa-floppy-disk"></i>
                 <span>Save Blog</span>
             </button>
+            @if($post->exists && ($post->status === 'published' || $post->is_published))
+                <a href="{{ route('blogs.show', $post) }}" class="admin-btn admin-btn-secondary" target="_blank" rel="noopener">
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                    <span>View Public Page</span>
+                </a>
+            @endif
             <a href="{{ route('admin.blog.posts.index') }}" class="admin-btn admin-btn-secondary">Cancel</a>
         </div>
     </aside>

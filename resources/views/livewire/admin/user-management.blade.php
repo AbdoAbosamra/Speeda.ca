@@ -12,6 +12,7 @@ new class extends Component
 
     public $search = '';
     public $role = '';
+    public $status = '';
     public $showInactive = true;
     public $selectedUsers = [];
     public $selectAll = false;
@@ -19,6 +20,7 @@ new class extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'role' => ['except' => ''],
+        'status' => ['except' => ''],
         'page' => ['except' => 1],
     ];
 
@@ -92,6 +94,8 @@ new class extends Component
                 });
             })
             ->when($this->role, fn($query) => $query->where('role', $this->role))
+            ->when($this->status === 'active', fn($query) => $query->where('is_active', true))
+            ->when($this->status === 'inactive', fn($query) => $query->where('is_active', false))
             ->when(!$this->showInactive, fn($query) => $query->where('is_active', true))
             ->withCount(['reviews', 'comments'])
             ->latest()
@@ -202,6 +206,13 @@ new class extends Component
                         <option value="client">Client</option>
                         <option value="service_provider">Service Provider</option>
                         <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select wire:model.live="status" class="form-select border-0 bg-light">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
                 <div class="col-md-2">

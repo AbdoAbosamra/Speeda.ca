@@ -14,6 +14,7 @@ use App\Models\Visitor;
 use App\Models\Review;
 use App\Models\Post;
 use App\Models\ServiceProvider;
+use App\Models\AdminNotification;
 use App\Models\User;
 use App\Services\VisitorTrackingService;
 use App\Traits\LogsAdminActions;
@@ -68,6 +69,8 @@ class AdminController extends Controller
                 'totalProviders' => ServiceProvider::count(),
                 'totalClients' => User::where('role', 'client')->count(),
                 'totalBlogs' => Post::count(),
+                'notificationsSent' => AdminNotification::count(),
+                'activeNotifications' => AdminNotification::active()->count(),
                 // Pending moderation counts
                 'pendingReviews' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
                 'totalReviews' => Review::count(),
@@ -97,6 +100,8 @@ class AdminController extends Controller
                 'totalProviders' => 0,
                 'totalClients' => 0,
                 'totalBlogs' => 0,
+                'notificationsSent' => 0,
+                'activeNotifications' => 0,
                 'pendingReviews' => 0,
                 'totalReviews' => 0,
                 'newUsersToday' => 0,

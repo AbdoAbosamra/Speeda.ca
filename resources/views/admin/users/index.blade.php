@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('admin.users_management'))
+@section('title', 'Users Management')
 
 @section('content')
 <div class="admin-content-wrapper">

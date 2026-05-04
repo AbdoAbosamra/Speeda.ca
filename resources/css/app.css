@@ -2763,6 +2763,15 @@ footer a:hover {
     font-size: 0.86rem;
 }
 
+.admin-table-thumb {
+    width: 64px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+
 .admin-badge {
     display: inline-flex;
     align-items: center;
@@ -2945,9 +2954,112 @@ footer a:hover {
     gap: 0.75rem;
 }
 
+.admin-analytics-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.admin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.25rem 0;
+}
+
+.admin-card-header h2 {
+    margin: 0 0 0.25rem;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.admin-card-header p,
+.admin-muted-note {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.admin-chart-card {
+    padding-bottom: 1rem;
+}
+
+.admin-chart-row {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr) 52px;
+    gap: 0.8rem;
+    align-items: center;
+    padding: 0.7rem 1.25rem;
+}
+
+.admin-chart-row span {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.admin-chart-row strong {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.admin-chart-bar-track {
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #eef2f7;
+}
+
+.admin-chart-bar {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+}
+
+.admin-modal {
+    border: 0;
+    border-radius: 20px;
+    box-shadow: 0 24px 55px -28px rgba(15, 23, 42, 0.45);
+}
+
+.admin-language-preview {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #f8fafc;
+}
+
+.admin-language-preview strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #4f46e5;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.admin-language-preview h3 {
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.admin-language-preview p {
+    margin: 0;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+}
+
 @media (max-width: 991.98px) {
     .admin-blog-form,
-    .admin-filter-bar {
+    .admin-filter-bar,
+    .admin-analytics-grid {
         grid-template-columns: 1fr;
     }
 

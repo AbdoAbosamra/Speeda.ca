@@ -72,6 +72,15 @@
                         <strong class="admin-stat-value">{{ $stats['totalBlogs'] ?? 0 }}</strong>
                         <span class="admin-stat-foot">Admin-managed articles</span>
                     </article>
+
+                    <article class="admin-stat-card">
+                        <div class="admin-stat-head">
+                            <span class="admin-stat-icon admin-stat-icon-teal"><i class="fas fa-bell"></i></span>
+                            <span class="admin-stat-label">Notifications Sent</span>
+                        </div>
+                        <strong class="admin-stat-value">{{ $stats['notificationsSent'] ?? 0 }}</strong>
+                        <span class="admin-stat-foot">{{ $stats['activeNotifications'] ?? 0 }} active broadcasts</span>
+                    </article>
                 </div>
             </section>
 
@@ -116,6 +125,24 @@
                         <div class="admin-command-content">
                             <h3>Manage Blogs</h3>
                             <p>Create drafts, publish articles, upload images, and edit SEO-friendly slugs.</p>
+                        </div>
+                        <i class="fas fa-arrow-right admin-command-arrow"></i>
+                    </a>
+
+                    <a href="{{ route('admin.visitors') }}" class="admin-command-card">
+                        <span class="admin-command-icon admin-command-indigo"><i class="fas fa-chart-line"></i></span>
+                        <div class="admin-command-content">
+                            <h3>View Analytics</h3>
+                            <p>Review privacy-safe visitor trends and top public pages.</p>
+                        </div>
+                        <i class="fas fa-arrow-right admin-command-arrow"></i>
+                    </a>
+
+                    <a href="{{ route('admin.notifications.index') }}" class="admin-command-card">
+                        <span class="admin-command-icon admin-command-slate"><i class="fas fa-bell"></i></span>
+                        <div class="admin-command-content">
+                            <h3>Manage Notifications</h3>
+                            <p>Create and review active provider broadcasts.</p>
                         </div>
                         <i class="fas fa-arrow-right admin-command-arrow"></i>
                     </a>

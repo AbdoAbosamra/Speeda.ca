@@ -62,7 +62,7 @@ class AdminNotificationController extends Controller
                 'expires_at' => now()->addDays(30),
             ]);
 
-            ErrorHelper::flashNotification(__('admin.notification_created_successfully'), 'success');
+            ErrorHelper::flashNotification('Notification sent successfully.', 'success');
             return redirect()->route('admin.notifications.index');
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -78,7 +78,7 @@ class AdminNotificationController extends Controller
     {
         try {
             $notification->delete();
-            ErrorHelper::flashNotification(__('admin.notification_deleted_successfully'), 'success');
+            ErrorHelper::flashNotification('Notification deleted successfully.', 'success');
             return redirect()->route('admin.notifications.index');
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);

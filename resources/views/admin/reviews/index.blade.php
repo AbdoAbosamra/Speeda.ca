@@ -151,6 +151,9 @@
                                         </td>
                                         <td class="py-3 text-center">
                                             <div class="btn-group">
+                                                <a href="{{ route('admin.reviews.show', $review) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1" title="View details">
+                                                    <i class="fas fa-eye me-1"></i>View
+                                                </a>
                                                 @if(!$review->is_active && !$review->admin_approved_at)
                                                     <!-- Pending Review Actions -->
                                                     <form action="{{ route('admin.reviews.approve', $review) }}" method="POST"

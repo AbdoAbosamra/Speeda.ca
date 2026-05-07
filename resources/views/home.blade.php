@@ -48,6 +48,7 @@
                             </div>
                             <form id="homeSearchForm" class="premium-search-bar home-search-panel fade-in-up"
                                 action="{{ route('service-providers.index') }}" method="GET">
+                                <input type="hidden" name="exact_location" value="1">
                                 <div class="premium-search-input">
                                     <i class="fas fa-map-marker-alt icon-left"></i>
                                     <select name="location" aria-label="{{ __('home.location') }}">

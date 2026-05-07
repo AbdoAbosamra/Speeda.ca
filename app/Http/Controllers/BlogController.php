@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Domain\SEO\Services\SeoMetaService;
+use App\Models\Category;
+use App\Models\Location;
 use App\Models\Post;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -16,11 +18,15 @@ class BlogController extends Controller
         $seoService->apply('blog_index');
 
         $search = trim((string) $request->string('search'));
+        $categoryId = $request->input('category_id');
+        $locationId = $request->input('location_id');
 
         $posts = Post::query()
             ->published()
-            ->with(['author', 'category'])
-            ->searchPublic($search)
+            ->with(['author', 'category', 'location'])
+            ->when($search !== '', fn($q) => $q->searchPublic($search))
+            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
+            ->when($locationId, fn($q) => $q->where('location_id', $locationId))
             ->latestPublished()
             ->paginate(9)
             ->withQueryString();
@@ -42,10 +48,41 @@ class BlogController extends Controller
             });
         }
 
+        $categories = Cache::remember('blog_categories', 3600, function () {
+            $othersNames = ['others', 'other', 'أخرى'];
+            
+            return Category::active()
+                ->where(function($q) {
+                    $q->where('is_section', false)
+                      ->orWhereDoesntHave('allChildren');
+                })
+                ->get()
+                ->sort(function ($a, $b) use ($othersNames) {
+                    $aName = strtolower(trim($a->localized_name));
+                    $bName = strtolower(trim($b->localized_name));
+                    
+                    $aIsOthers = in_array($aName, $othersNames);
+                    $bIsOthers = in_array($bName, $othersNames);
+                    
+                    if ($aIsOthers && !$bIsOthers) return 1;
+                    if (!$aIsOthers && $bIsOthers) return -1;
+                    
+                    return strcmp($aName, $bName);
+                });
+        });
+
+        $locations = Cache::remember('blog_locations', 3600, function () {
+            return Location::active()->get()->sortBy('city');
+        });
+
         return view('blog.index', [
             'posts' => $posts,
             'featuredPosts' => $featuredPosts,
             'search' => $search,
+            'categories' => $categories,
+            'locations' => $locations,
+            'categoryId' => $categoryId,
+            'locationId' => $locationId,
         ]);
     }
 

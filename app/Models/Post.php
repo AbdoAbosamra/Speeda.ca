@@ -64,6 +64,7 @@ class Post extends Model
         'canonical_url',
         'meta_robots',
         'reading_time_minutes',
+        'location_id',
         'is_published',
     ];
 
@@ -97,6 +98,11 @@ class Post extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 
     public function getRouteKeyName(): string

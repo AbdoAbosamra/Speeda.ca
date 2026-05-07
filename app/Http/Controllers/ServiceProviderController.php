@@ -98,7 +98,12 @@ class ServiceProviderController extends Controller
             if (array_key_exists($selectedLocation, $locationClusters)) {
                 $clusterIds = $clusterService->getClusterIdsByKey($selectedLocation);
             } elseif (ctype_digit($selectedLocation)) {
-                $clusterIds = $clusterService->getClusterIds((int) $selectedLocation);
+                // @change 2026-05-04 | Added exact_location bypass to support individual city selection from homepage without clustering | risk:LOW
+                if ($request->filled('exact_location')) {
+                    $clusterIds = [(int) $selectedLocation];
+                } else {
+                    $clusterIds = $clusterService->getClusterIds((int) $selectedLocation);
+                }
             } else {
                 $clusterIds = [];
             }

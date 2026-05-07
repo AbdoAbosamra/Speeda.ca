@@ -17,19 +17,61 @@
                         <div class="mt-4" style="height: 3px; background: linear-gradient(90deg, #667eea 0%, transparent 100%); width: 60px; border-radius: 2px;"></div>
                     </div>
                     <div class="col-lg-5">
-                        <form action="{{ route('blogs.index') }}" method="GET" class="d-grid gap-3">
-                            <label for="blog-search" class="form-label fw-bold mb-0">{{ __('blog.search_label') }}</label>
-                            <div class="input-group input-group-lg">
-                                <input
-                                    id="blog-search"
-                                    type="text"
-                                    name="search"
-                                    value="{{ $search }}"
-                                    class="form-control"
-                                    style="border-radius: 8px 0 0 8px; border: 1px solid #e0e0e0;"
-                                    placeholder="{{ __('blog.search_placeholder') }}"
-                                >
-                                <button type="submit" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 0 8px 8px 0; border: none; font-weight: 600;">{{ __('blog.search_button') }}</button>
+                        <form action="{{ route('blogs.index') }}" method="GET" class="card border-0 shadow-sm p-4" style="border-radius: 16px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
+                            <div class="row g-3">
+                                <!-- Search -->
+                                <div class="col-12">
+                                    <label for="blog-search" class="form-label fw-bold small text-muted text-uppercase mb-2" style="letter-spacing: 0.5px;">{{ __('blog.search_label') }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;"><i class="fas fa-search text-muted"></i></span>
+                                        <input
+                                            id="blog-search"
+                                            type="text"
+                                            name="search"
+                                            value="{{ $search }}"
+                                            class="form-control border-start-0"
+                                            style="border-radius: 0 10px 10px 0; border: 1px solid #dee2e6; font-size: 0.95rem;"
+                                            placeholder="{{ __('blog.search_placeholder') }}"
+                                        >
+                                    </div>
+                                </div>
+
+                                <!-- Category Filter -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-muted text-uppercase mb-2" style="letter-spacing: 0.5px;">{{ __('general.category') }}</label>
+                                    <select name="category_id" class="form-select" style="border-radius: 10px; border: 1px solid #dee2e6; font-size: 0.95rem;" onchange="this.form.submit()">
+                                        <option value="">{{ __('service_provider.all_categories') }}</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ $categoryId == $category->id ? 'selected' : '' }}>
+                                                {{ $category->localized_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Location Filter -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-muted text-uppercase mb-2" style="letter-spacing: 0.5px;">{{ __('general.location') }}</label>
+                                    <select name="location_id" class="form-select" style="border-radius: 10px; border: 1px solid #dee2e6; font-size: 0.95rem;" onchange="this.form.submit()">
+                                        <option value="">{{ __('service_provider.all_locations') }}</option>
+                                        @foreach($locations as $location)
+                                            <option value="{{ $location->id }}" {{ $locationId == $location->id ? 'selected' : '' }}>
+                                                {{ $location->city }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-12 mt-3 d-flex gap-2">
+                                    <button type="submit" class="btn flex-grow-1 py-2 fw-bold text-white transition" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; border: none; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                                        {{ __('blog.search_button') }}
+                                    </button>
+                                    @if($search || $categoryId || $locationId)
+                                        <a href="{{ route('blogs.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" style="border-radius: 10px; width: 44px;" title="Clear Filters">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -92,8 +134,13 @@
                                         onmouseout="this.style.transform='scale(1)'"
                                     >
                                     @if($post->category)
-                                        <div style="position: absolute; top: 12px; right: 12px; background: rgba(102, 126, 234, 0.95); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
-                                            {{ $post->category->translated_name ?? $post->category->name }}
+                                        <div style="position: absolute; top: 12px; right: 12px; background: rgba(102, 126, 234, 0.95); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 2;">
+                                            <i class="fas fa-tag me-1"></i> {{ $post->category->translated_name ?? $post->category->name }}
+                                        </div>
+                                    @endif
+                                    @if($post->location)
+                                        <div style="position: absolute; top: 12px; left: 12px; background: rgba(255, 255, 255, 0.9); color: #4a5568; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                            <i class="fas fa-map-marker-alt text-danger me-1"></i> {{ $post->location->city }}
                                         </div>
                                     @endif
                                 </div>

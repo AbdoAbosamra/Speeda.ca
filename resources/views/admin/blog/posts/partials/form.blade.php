@@ -153,11 +153,24 @@
                     <option value="">No category</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" @selected((string) old('category_id', $post->category_id) === (string) $category->id)>
-                            {{ $category->name_en ?: $category->name }}
+                            {{ $category->localized_name }}
                         </option>
                     @endforeach
                 </select>
                 @error('category_id')<small>{{ $message }}</small>@enderror
+            </label>
+
+            <label class="admin-field">
+                <span>Location</span>
+                <select name="location_id">
+                    <option value="">No location (Global)</option>
+                    @foreach($locations as $location)
+                        <option value="{{ $location->id }}" @selected((string) old('location_id', $post->location_id) === (string) $location->id)>
+                            {{ $location->city }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('location_id')<small>{{ $message }}</small>@enderror
             </label>
 
             <label class="admin-check-row">

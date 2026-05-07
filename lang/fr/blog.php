@@ -18,4 +18,5 @@ return [
     'view_all' => 'Voir tous les articles',
     'by_author' => 'Par :name',
     'reading_time' => ':minutes min de lecture',
+    'latest_posts' => 'Derniers articles',
 ];

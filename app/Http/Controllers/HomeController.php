@@ -27,10 +27,12 @@ class HomeController extends Controller
                 ->values();
         });
 
-        // Location clusters for dropdown
+        // Individual locations for homepage dropdown
         $locationClusters = [
-            'cluster_montreal' => 'Laval – Montréal',
-            'cluster_ottawa' => 'Ottawa – Gatineau',
+            '2' => 'Montreal',
+            '1' => 'Laval',
+            '4' => 'Gatineau',
+            '3' => 'Ottawa',
         ];
 
         // Provider Stats (Cache for 1 hour)

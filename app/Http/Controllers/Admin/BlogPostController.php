@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Location;
 use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,6 +52,7 @@ class BlogPostController extends Controller
         return view('admin.blog.posts.create', [
             'post' => new Post(['status' => 'draft', 'allow_indexing' => true]),
             'categories' => $this->categories(),
+            'locations' => $this->locations(),
         ]);
     }
 
@@ -71,6 +73,7 @@ class BlogPostController extends Controller
         return view('admin.blog.posts.edit', [
             'post' => $post,
             'categories' => $this->categories(),
+            'locations' => $this->locations(),
         ]);
     }
 
@@ -119,6 +122,7 @@ class BlogPostController extends Controller
             'seo_description_ar' => ['nullable', 'string', 'max:500'],
             'seo_description_fr' => ['nullable', 'string', 'max:500'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'location_id' => ['nullable', 'exists:locations,id'],
             'status' => ['required', Rule::in(['draft', 'published'])],
             'published_at' => ['nullable', 'date'],
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
@@ -163,6 +167,7 @@ class BlogPostController extends Controller
             'seo_description_ar' => $validated['seo_description_ar'] ?: $excerptAr,
             'seo_description_fr' => $validated['seo_description_fr'] ?: $excerptFr,
             'category_id' => $validated['category_id'] ?? null,
+            'location_id' => $validated['location_id'] ?? null,
             'status' => $status,
             'is_published' => $status === 'published',
             'published_at' => $publishedAt,
@@ -208,10 +213,34 @@ class BlogPostController extends Controller
 
     protected function categories()
     {
+        $othersNames = ['others', 'other', 'أخرى'];
+
         return Category::query()
-            ->where('is_active', true)
-            ->orderBy('name_en')
-            ->orderBy('name')
+            ->active()
+            ->where(function($q) {
+                $q->where('is_section', false)
+                  ->orWhereDoesntHave('allChildren');
+            })
+            ->get()
+            ->sort(function ($a, $b) use ($othersNames) {
+                $aName = strtolower(trim($a->localized_name));
+                $bName = strtolower(trim($b->localized_name));
+                
+                $aIsOthers = in_array($aName, $othersNames);
+                $bIsOthers = in_array($bName, $othersNames);
+                
+                if ($aIsOthers && !$bIsOthers) return 1;
+                if (!$aIsOthers && $bIsOthers) return -1;
+                
+                return strcmp($aName, $bName);
+            });
+    }
+
+    protected function locations()
+    {
+        return Location::query()
+            ->active()
+            ->orderBy('city')
             ->get();
     }
 

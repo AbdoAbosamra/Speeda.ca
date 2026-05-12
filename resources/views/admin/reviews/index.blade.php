@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- Admin Reviews Management -->
-    <div class="admin-content-wrapper" style="margin-left: 0 !important;">
+    <div class="admin-content-wrapper" style="margin-inline-start: 0 !important;">
         <div class="container py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>

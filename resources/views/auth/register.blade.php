@@ -1902,10 +1902,10 @@
                         </div>
                         <div class="select-options" id="city-options">
                             <div class="select-option" data-value="">{{ __('auth.select_city') }}</div>
-                            <div class="select-option" data-value="Laval">Laval</div>
-                            <div class="select-option" data-value="Montreal">Montreal</div>
-                            <div class="select-option" data-value="Ottawa">Ottawa</div>
-                            <div class="select-option" data-value="Gatineau">Gatineau</div>
+                            <div class="select-option" data-value="Laval">{{ __('cities.laval') }}</div>
+                            <div class="select-option" data-value="Montreal">{{ __('cities.montreal') }}</div>
+                            <div class="select-option" data-value="Ottawa">{{ __('cities.ottawa') }}</div>
+                            <div class="select-option" data-value="Gatineau">{{ __('cities.gatineau') }}</div>
                         </div>
                         <input type="hidden" name="city" id="city-input" value="{{ old('city') }}">
                     </div>

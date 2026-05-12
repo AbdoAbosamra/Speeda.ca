@@ -42,21 +42,45 @@ class AdminNotification extends Model
     }
 
     /**
-     * Get the title based on the current locale.
+     * Get localized column value with proper fallback chain.
+     * Fallback: current locale → English → Arabic → French → empty string
+     *
+     * @param string $column Base column name (e.g., 'title', 'message')
+     * @return string Localized value or empty string
      */
-    public function getTitleAttribute()
+    private function getLocalizedColumn(string $column): string
     {
         $locale = app()->getLocale();
-        return $this->{"title_{$locale}"} ?? $this->title_en;
+        $fallbackChain = [$locale, 'en', 'ar', 'fr'];
+
+        foreach ($fallbackChain as $lang) {
+            $column_name = $column . '_' . $lang;
+            $value = $this->$column_name ?? null;
+
+            if (!empty(trim((string) $value))) {
+                return $value;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Get the title based on the current locale.
+     * Fallback: current locale → English → Arabic → French → empty string
+     */
+    public function getTitleAttribute(): string
+    {
+        return $this->getLocalizedColumn('title');
     }
 
     /**
      * Get the message based on the current locale.
+     * Fallback: current locale → English → Arabic → French → empty string
      */
-    public function getMessageAttribute()
+    public function getMessageAttribute(): string
     {
-        $locale = app()->getLocale();
-        return $this->{"message_{$locale}"} ?? $this->message_en;
+        return $this->getLocalizedColumn('message');
     }
 
     /**

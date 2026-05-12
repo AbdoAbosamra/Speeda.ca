@@ -28,6 +28,54 @@ class Location extends Model
         'longitude' => 'double',
     ];
 
+    protected $appends = [
+        'translated_name',
+        'localized_name',
+    ];
+
+    public function getTranslatedNameAttribute(): string
+    {
+        return $this->getLocalizedColumn('city');
+    }
+
+    public function getLocalizedNameAttribute(): string
+    {
+        return $this->getLocalizedColumn('city');
+    }
+
+    public function getLocalizedColumn(string $column): string
+    {
+        $locale = app()->getLocale();
+        
+        // 1. Try the requested locale's specific column (if it exists in DB later)
+        $localeColumn = $column . '_' . $locale;
+        if (isset($this->attributes[$localeColumn]) && !empty(trim((string)$this->attributes[$localeColumn]))) {
+            return $this->attributes[$localeColumn];
+        }
+
+        // 2. Try Laravel translation files as fallback (cities.php or location.php)
+        if ($column === 'city' && !empty($this->city)) {
+            $key = strtolower(trim($this->city));
+            
+            // Try cities.php
+            $translationKey = 'cities.' . $key;
+            $translated = __($translationKey);
+            if ($translated !== $translationKey && !empty($translated)) {
+                return $translated;
+            }
+
+            // Try location.php
+            $translationKey = 'location.' . $key;
+            $translated = __($translationKey);
+            if ($translated !== $translationKey && !empty($translated)) {
+                return $translated;
+            }
+        }
+
+        // 3. Try the base column
+        return $this->$column ?? '';
+    }
+
     // Backwards-compatible accessor: many views expect a `name` property
     // on locations. Map `name` to the `city` column so templates can
     // continue using `$location->name` without changes.
@@ -76,7 +124,6 @@ class Location extends Model
     public function activeServiceProviders()
     {
         return $this->serviceProviders()
-                    ->where('is_verified', true)
                     ->where('is_active', true);
     }
 }

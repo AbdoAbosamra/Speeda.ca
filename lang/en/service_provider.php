@@ -18,6 +18,8 @@ return [
     'services_offered_input_hint' => 'Services Offered (comma separated)',
     'services_offered_title' => 'Services Offered',
     'no_services_listed' => 'No services listed for this provider yet.',
+    'no_gallery_images' => 'No gallery images',
+    'no_gallery_hint' => 'This provider hasn\'t added any photos yet.',
     'gallery_title' => 'Gallery',
     'gallery_image_alt' => 'Gallery Image',
     'view_all_images' => 'View All Images',
@@ -198,7 +200,7 @@ return [
     'featured' => 'Featured',
 
     // Profile completion banner
-    'profile_completion_banner_title' => 'Complete your profile ({percent}%)',
+    'profile_completion_banner_title' => 'Complete your profile (:percent%)',
     'profile_completion_banner_missing_label' => 'Add the following to reach 100%:',
     'profile_completion_banner_generic' => 'Your profile is on the right track. Keep going!',
     'completion_missing_logo' => 'Add your logo/profile image',
@@ -214,7 +216,7 @@ return [
     'completion_popup_missing_fields_title' => 'To unlock more opportunities, please complete:',
     'completion_popup_message' => "Completed profiles appear more to clients and receive more contacts.\nComplete your profile now to unlock all opportunities on Speeda.\n\nCompleted profiles rank higher in search results.\n\nComplete your profile now.",
     'completion_popup_cta' => 'Complete my profile now',
-    'completion_popup_current_score' => 'Current completion: {percent}%',
+    'completion_popup_current_score' => 'Current completion: :percent%',
     'completion_field_profile_photo' => 'Profile photo',
     'completion_field_experience_years' => 'Years of experience',
     'completion_field_address' => 'Address',

@@ -112,4 +112,39 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Users Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This option defines the admin users who have full access to the admin
+    | panel. These email addresses are loaded from the ADMINS and ADMIN_EMAIL
+    | environment variables and cached when config:cache is run.
+    |
+    | IMPORTANT: Always use config('auth.admins') instead of env() directly
+    | to prevent admin access issues when configuration is cached.
+    |
+    */
+
+    'admins' => array_filter(
+        array_map('trim', explode(',', env('ADMINS', env('ADMIN_EMAIL', ''))))
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-Create Admin Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These options control the automatic creation of an admin user during
+    | application boot. This is typically used during initial deployment.
+    |
+    */
+
+    'auto_create_admin' => [
+        'enabled' => env('AUTO_CREATE_ADMIN', false),
+        'email' => env('ADMIN_EMAIL'),
+        'password' => env('ADMIN_PASSWORD'),
+        'name' => env('ADMIN_NAME', 'Administrator'),
+    ],
+
 ];

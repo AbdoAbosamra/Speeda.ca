@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Location;
+use App\Services\CategoryCacheService;
+use App\Services\LocationCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -59,28 +61,11 @@ class CategoryController extends Controller
 
             $categories = $categoriesQuery->paginate(20)->withQueryString();
 
-            // Get only active locations for frontend
-            $locations = Location::where('is_active', true)
-                ->orderBy('city')
-                ->get();
+            // PERFORMANCE: Use cached locations from Redis (24h TTL)
+            $locations = app(LocationCacheService::class)->getActiveLocations();
 
-            // Prepare sections data for the existing view
-            $sections = Category::where('is_section', true)
-                ->where('is_active', true)
-                ->where('slug', '!=', 'others-1')
-                ->with(['children' => function ($query) {
-                    $query->where('is_active', true)
-                        ->orderBy('sort_order')
-                        ->orderBy('name')
-                        ->with(['children' => function ($childQuery) {
-                            $childQuery->where('is_active', true)
-                                ->orderBy('sort_order')
-                                ->orderBy('name');
-                        }]);
-                }])
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->get();
+            // PERFORMANCE: Use cached sections tree from Redis (24h TTL)
+            $sections = app(CategoryCacheService::class)->getCategoryTree();
 
             return [
                 'sections' => $sections,

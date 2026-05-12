@@ -2,6 +2,22 @@
 
 @push('styles')
     @vite('resources/css/app.css')
+    <style>
+        .hero-subtitle-badge {
+            display: inline-flex !important;
+            align-items: center !important;
+            padding: 0.6rem 1.4rem !important;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+            color: #ffffff !important;
+            border-radius: 50px !important;
+            font-weight: 700 !important;
+            font-size: 0.95rem !important;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3) !important;
+            margin-bottom: 2rem !important;
+            letter-spacing: 0.01em !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -25,7 +41,7 @@
             ['name' => __('categories.general_construction'), 'icon' => 'building'],
         ];
 
-        $featuredProviders = collect($topProviders ?? [])->take(8);
+        $featuredProviders = collect($featuredProviders ?? $topProviders ?? [])->take(8);
     @endphp
 
     <div class="home-page">
@@ -42,9 +58,9 @@
                                     <span class="hero-title-highlight">{{ __('home.hero_tagline') }}</span>
                                 </h1>
 
-                                <p class="lead home-text-muted mb-4 hero-subtitle">
+                                <div class="hero-subtitle-badge fade-in-up">
                                     {{ __('home.hero_subtitle') }}
-                                </p>
+                                </div>
                             </div>
                             <form id="homeSearchForm" class="premium-search-bar home-search-panel fade-in-up"
                                 action="{{ route('service-providers.index') }}" method="GET">
@@ -123,7 +139,6 @@
                     <div class="home-section-head">
                         <div>
                             <h2 class="section-title mb-2">{{ __('home.explore_services') }}</h2>
-                            <p class="section-subtitle mb-0">{{ __('home.explore_services_desc') }}</p>
                         </div>
                         <a href="{{ route('service-providers.index') }}" class="premium-btn-primary home-inline-action">
                             {{ __('home.view_all_categories') }}
@@ -135,7 +150,7 @@
                         <button class="slider-nav-btn prev" aria-label="Previous" onclick="document.getElementById('categorySliderTrack').scrollBy({left: -300, behavior: 'smooth'})">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        
+
                         <div class="premium-category-slider-track" id="categorySliderTrack">
                             @foreach($staticCategories as $subcat)
                                 <article class="home-category-card">
@@ -176,22 +191,15 @@
                                     <a href="{{ route('service-providers.show', $provider) }}" class="premium-provider-card-link">
                                         <article class="premium-provider-card home-provider-card">
                                             <div class="premium-provider-img">
-                                                @if($provider->media && $provider->media->first())
-                                                    <img src="{{ $provider->media->first()->getUrl() }}"
-                                                        alt="{{ $provider->user->name ?? __('home.view_profile') }}" loading="lazy"
-                                                        class="w-100 h-100 object-fit-cover provider-img">
-                                                @else
-                                                    <div
-                                                        class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-secondary">
-                                                        <i class="fas fa-user-circle fa-4x"></i>
-                                                    </div>
-                                                @endif
+                                                <img src="{{ $provider->profile_image_url }}"
+                                                    alt="{{ $provider->user->name ?? __('home.view_profile') }}" loading="lazy"
+                                                    class="w-100 h-100 object-fit-cover provider-img">
                                             </div>
 
                                             <div class="premium-provider-body">
                                                 <div class="home-provider-heading">
                                                     <h3 class="fw-bold mb-1 home-text-dark text-truncate provider-name">
-                                                        {{ $provider->user->name ?? __('home.view_profile') }}
+                                                        {{ $provider->localized_company_name ?? $provider->user->name }}
                                                     </h3>
 
                                                 </div>
@@ -202,8 +210,8 @@
 
                                                 <div class="d-flex align-items-center gap-2 mb-3">
                                                     <div class="premium-stars">
-                                                        @if($provider->live_rating || $provider->rating)
-                                                            @php $rating = $provider->live_rating ?? $provider->rating; @endphp
+                                                        @if($provider->calculated_rating || $provider->rating)
+                                                            @php $rating = $provider->calculated_rating ?? $provider->rating; @endphp
                                                             @for($j = 0; $j < floor($rating); $j++)
                                                                 <i class="fas fa-star"></i>
                                                             @endfor
@@ -231,7 +239,7 @@
                                                 @if($provider->location)
                                                     <p class="small home-text-muted mb-0 provider-location home-provider-location">
                                                         <i class="fas fa-map-marker-alt"></i>
-                                                        {{ $provider->location->translated_name ?? $provider->location->city ?? __('home.location') }}
+                                                        {{ $provider->location->localized_name ?? __('home.location') }}
                                                     </p>
                                                 @endif
                                             </div>

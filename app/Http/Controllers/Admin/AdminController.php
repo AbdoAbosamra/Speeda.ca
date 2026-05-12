@@ -16,6 +16,8 @@ use App\Models\Post;
 use App\Models\ServiceProvider;
 use App\Models\AdminNotification;
 use App\Models\User;
+use App\Services\CategoryCacheService;
+use App\Services\LocationCacheService;
 use App\Services\VisitorTrackingService;
 use App\Traits\LogsAdminActions;
 use Illuminate\Http\Request;
@@ -53,6 +55,85 @@ class AdminController extends Controller
             // Get visitor statistics
             $visitorStats = $this->visitorService->getStatistics();
 
+            // WhatsApp Analytics Calculations
+            $now = Carbon::now();
+            
+            $dailyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereDate('created_at', $now->toDateString())
+                ->count();
+
+            $yesterdayWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereDate('created_at', $now->copy()->subDay()->toDateString())
+                ->count();
+                
+            $dailyWhatsappTrend = $yesterdayWhatsappClicks > 0 
+                ? (($dailyWhatsappClicks - $yesterdayWhatsappClicks) / $yesterdayWhatsappClicks) * 100 
+                : ($dailyWhatsappClicks > 0 ? 100 : 0);
+
+            $weeklyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereBetween('created_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
+                ->count();
+
+            $lastWeekWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereBetween('created_at', [$now->copy()->subWeek()->startOfWeek(), $now->copy()->subWeek()->endOfWeek()])
+                ->count();
+                
+            $weeklyWhatsappTrend = $lastWeekWhatsappClicks > 0 
+                ? (($weeklyWhatsappClicks - $lastWeekWhatsappClicks) / $lastWeekWhatsappClicks) * 100 
+                : ($weeklyWhatsappClicks > 0 ? 100 : 0);
+
+            $monthlyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereBetween('created_at', [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()])
+                ->count();
+
+            $lastMonthWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereBetween('created_at', [$now->copy()->subMonth()->startOfMonth(), $now->copy()->subMonth()->endOfMonth()])
+                ->count();
+                
+            $monthlyWhatsappTrend = $lastMonthWhatsappClicks > 0 
+                ? (($monthlyWhatsappClicks - $lastMonthWhatsappClicks) / $lastMonthWhatsappClicks) * 100 
+                : ($monthlyWhatsappClicks > 0 ? 100 : 0);
+
+            $totalWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')->count();
+
+            $mostClickedCategoryData = DB::table('analytics')
+                ->join('service_providers', 'analytics.provider_id', '=', 'service_providers.id')
+                ->join('categories', 'service_providers.category_id', '=', 'categories.id')
+                ->where('analytics.action_type', 'click_whatsapp')
+                ->select('categories.name_en as name', DB::raw('count(analytics.id) as total_clicks'))
+                ->groupBy('categories.id', 'categories.name_en')
+                ->orderByDesc('total_clicks')
+                ->first();
+                
+            $mostClickedCategory = null;
+            if ($mostClickedCategoryData) {
+                $mostClickedCategory = [
+                    'name' => $mostClickedCategoryData->name ?: 'Unknown',
+                    'clicks' => $mostClickedCategoryData->total_clicks,
+                    'percentage' => $totalWhatsappClicks > 0 
+                        ? round(($mostClickedCategoryData->total_clicks / $totalWhatsappClicks) * 100, 1) 
+                        : 0
+                ];
+            }
+
+            $topProvidersPerformance = DB::table('service_providers')
+                ->join('analytics', 'service_providers.id', '=', 'analytics.provider_id')
+                ->where('analytics.created_at', '>=', $now->copy()->subDays(30))
+                ->select('service_providers.id', 'service_providers.company_name',
+                    DB::raw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) as total_views'),
+                    DB::raw('SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) as total_whatsapp_clicks')
+                )
+                ->groupBy('service_providers.id', 'service_providers.company_name')
+                ->havingRaw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) > 0')
+                ->orderByRaw('(SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) / SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END)) DESC')
+                ->limit(5)
+                ->get()
+                ->map(function($provider) {
+                    $rate = ($provider->total_whatsapp_clicks / $provider->total_views) * 100;
+                    $provider->performance_rate = round($rate, 1);
+                    return $provider;
+                });
+
             $stats = [
                 'liveVisitors' => $visitorStats['live_visitors'] ?? 0,
                 'visitorsToday' => $this->getVisitorsToday(),
@@ -77,7 +158,17 @@ class AdminController extends Controller
                 'newUsersToday' => User::whereDate('created_at', today())->count(),
             ];
 
-            return view('admin.dashboard', compact('stats'));
+            return view('admin.dashboard', compact(
+                'stats', 
+                'dailyWhatsappClicks', 
+                'dailyWhatsappTrend', 
+                'weeklyWhatsappClicks', 
+                'weeklyWhatsappTrend',
+                'monthlyWhatsappClicks',
+                'monthlyWhatsappTrend',
+                'mostClickedCategory',
+                'topProvidersPerformance'
+            ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             Log::error('Admin dashboard error: ' . $e->getMessage());
@@ -996,6 +1087,10 @@ class AdminController extends Controller
             Artisan::call('route:clear');
             Artisan::call('config:clear');
             Artisan::call('cache:clear');
+
+            // PERFORMANCE: Invalidate category and location caches
+            app(CategoryCacheService::class)->invalidateCache();
+            app(LocationCacheService::class)->invalidateCache();
         } catch (\Exception $e) {
             Log::warning('Failed to clear application caches', [
                 'error' => $e->getMessage(),

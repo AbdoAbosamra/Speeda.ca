@@ -5,7 +5,7 @@ return [
     'meta_title' => ':app_name - Connect Clients & Service Providers Instantly',
     'hero_title' => 'Find Trusted Service Providers',
     'hero_tagline' => 'In Montreal, Gatineau, Laval and Ottawa',
-    'hero_subtitle' => 'Connect with professionals in your area. Get quality services at competitive prices.',
+    'hero_subtitle' => 'Connect with professionals in your area.',
     'find_provider' => 'Find a Provider',
     'join_provider' => 'Join as Provider',
     'how_it_works_title' => 'How It Works',

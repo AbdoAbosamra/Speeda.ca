@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @push('styles')
     @vite(['resources/css/providers.css'])
@@ -83,7 +83,7 @@
                         <div class="provider-header">
                             <div class="avatar-container">
                                 <img src="{{ $provider->display_image_url }}"
-                                    alt="{{ $provider->company_name ?? $provider->user->name }}" class="provider-avatar"
+                                    alt="{{ $provider->localized_company_name ?? $provider->user->name }}" class="provider-avatar"
                                     loading="lazy" decoding="async"
                                     onerror="this.onerror=null;this.src='{{ $provider->default_image_url }}';">
 
@@ -91,14 +91,15 @@
                             </div>
 
                             <div class="provider-info">
-                                <h3>{{ $provider->company_name ?? $provider->user->name }}</h3>
+                                <h3>{{ $provider->localized_company_name ?? $provider->user->name }}</h3>
                                 <p class="provider-category">
                                     {{ $provider->category->translated_name ?? __('service_provider.uncategorized') }}
                                 </p>
                                 <div class="rating-display" data-provider-id="{{ $provider->id }}">
                                     <div class="stars">
                                         @php
-                                            $displayRating = $provider->live_rating ?? $provider->rating ?? 0;
+                                            // PERFORMANCE: Use cached calculated_rating column (no subquery)
+                                            $displayRating = $provider->calculated_rating ?? $provider->rating ?? 0;
                                             $reviewCount = $provider->reviews_count ?? 0;
                                         @endphp
                                         @for ($i = 1; $i <= 5; $i++)
@@ -119,7 +120,7 @@
                             <i class="fas fa-map-marker-alt location-icon"></i>
                             <div class="address-text">
                                 @if($provider->location)
-                                    <div class="mb-1 fw-bold text-primary">{{ $provider->location->city }}</div>
+                                    <div class="mb-1 fw-bold text-primary">{{ $provider->location->localized_name }}</div>
                                 @endif
                                 <span class="address-content hidden-address" style="display: block;">
                                     @if($provider->address)
@@ -161,7 +162,9 @@
                         <div class="action-buttons">
                             @if(auth()->check() && auth()->user()->isClient())
                                 @php
-                                    $isEndorsed = $provider->isEndorsedBy(auth()->id());
+                                    // PERFORMANCE: Use preloaded is_endorsed attribute (from withExists in controller)
+                                    // This avoids N+1 query that would occur with isEndorsedBy() in a loop
+                                    $isEndorsed = $provider->is_endorsed ?? false;
                                 @endphp
                                 <form action="{{ route('endorsements.toggle', $provider->id) }}" method="POST"
                                     style="display: inline;">
@@ -181,7 +184,7 @@
 
                             @if(auth()->check())
                                 <button class="btn-action btn-rate"
-                                    onclick="openRateModal({{ $provider->id }}, '{{ addslashes($provider->company_name ?? $provider->user->name) }}')">
+                                    onclick="openRateModal({{ $provider->id }}, '{{ addslashes($provider->localized_company_name ?? $provider->user->name) }}')">
                                     <i class="fas fa-star"></i>
                                     <span>{{ __('service_provider.rate_provider') }}</span>
                                 </button>

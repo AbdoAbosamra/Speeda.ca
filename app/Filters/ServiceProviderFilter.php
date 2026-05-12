@@ -10,8 +10,7 @@ class ServiceProviderFilter
 {
     public static function apply(Builder $query, Request $request): Builder
     {
-        $query->where('is_verified', true)
-              ->with(['user', 'location', 'category', 'reviews']);
+        $query->with(['user', 'location', 'category', 'reviews']);
 
         // Location filters
         if ($request->filled('location_id')) {

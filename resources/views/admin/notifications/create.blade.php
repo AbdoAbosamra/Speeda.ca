@@ -7,84 +7,508 @@
                 <div>
                     <p class="admin-section-eyebrow">Notifications</p>
                     <h1>Create Notification</h1>
-                    <p>Send a multilingual broadcast to active service providers.</p>
+                    <p>Broadcast a multilingual message to all active service providers.</p>
                 </div>
                 <a href="{{ route('admin.notifications.index') }}" class="admin-btn admin-btn-secondary">
                     <i class="fas fa-arrow-left"></i>
-                    <span>Back to Notifications</span>
+                    <span>Back to List</span>
                 </a>
             </section>
 
-            <form action="{{ route('admin.notifications.store') }}" method="POST" class="admin-blog-form">
-                @csrf
-
+            <div class="admin-form-layout">
                 <div class="admin-form-main">
-                    <section class="admin-form-card">
-                        <div class="admin-form-section-head">
-                            <h2>Message Content</h2>
-                            <p>All three languages are required because providers may use different public languages.</p>
+                    <form action="{{ route('admin.notifications.store') }}" method="POST" id="notificationForm">
+                        @csrf
+
+                        {{-- Arabic Section --}}
+                        <div class="admin-form-section" dir="rtl">
+                            <div class="section-header">
+                                <span class="flag-icon">🇸🇦</span>
+                                <h3>Arabic Content</h3>
+                            </div>
+                            <div class="form-group">
+                                <label for="title_ar">Title (Arabic) <span class="required">*</span></label>
+                                <input type="text" name="title_ar" id="title_ar" value="{{ old('title_ar') }}" placeholder="أدخل العنوان بالعربية" required>
+                                @error('title_ar')
+                                    <span class="admin-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="message_ar">Message (Arabic) <span class="required">*</span></label>
+                                <textarea name="message_ar" id="message_ar" rows="4" placeholder="أدخل الرسالة بالعربية" required>{{ old('message_ar') }}</textarea>
+                                @error('message_ar')
+                                    <span class="admin-error">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div class="admin-form-grid">
-                            <label class="admin-field admin-field-wide">
-                                <span>Title AR <strong>*</strong></span>
-                                <input type="text" name="title_ar" value="{{ old('title_ar') }}" required dir="rtl">
-                                @error('title_ar')<small>{{ $message }}</small>@enderror
-                            </label>
-                            <label class="admin-field admin-field-wide">
-                                <span>Message AR <strong>*</strong></span>
-                                <textarea name="message_ar" rows="5" required dir="rtl">{{ old('message_ar') }}</textarea>
-                                @error('message_ar')<small>{{ $message }}</small>@enderror
-                            </label>
-                            <label class="admin-field admin-field-wide">
-                                <span>Title EN <strong>*</strong></span>
-                                <input type="text" name="title_en" value="{{ old('title_en') }}" required>
-                                @error('title_en')<small>{{ $message }}</small>@enderror
-                            </label>
-                            <label class="admin-field admin-field-wide">
-                                <span>Message EN <strong>*</strong></span>
-                                <textarea name="message_en" rows="5" required>{{ old('message_en') }}</textarea>
-                                @error('message_en')<small>{{ $message }}</small>@enderror
-                            </label>
-                            <label class="admin-field admin-field-wide">
-                                <span>Title FR <strong>*</strong></span>
-                                <input type="text" name="title_fr" value="{{ old('title_fr') }}" required>
-                                @error('title_fr')<small>{{ $message }}</small>@enderror
-                            </label>
-                            <label class="admin-field admin-field-wide">
-                                <span>Message FR <strong>*</strong></span>
-                                <textarea name="message_fr" rows="5" required>{{ old('message_fr') }}</textarea>
-                                @error('message_fr')<small>{{ $message }}</small>@enderror
-                            </label>
+                        {{-- English Section --}}
+                        <div class="admin-form-section">
+                            <div class="section-header">
+                                <span class="flag-icon">🇺🇸</span>
+                                <h3>English Content</h3>
+                            </div>
+                            <div class="form-group">
+                                <label for="title_en">Title (English) <span class="required">*</span></label>
+                                <input type="text" name="title_en" id="title_en" value="{{ old('title_en') }}" placeholder="Enter title in English" required>
+                                @error('title_en')
+                                    <span class="admin-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="message_en">Message (English) <span class="required">*</span></label>
+                                <textarea name="message_en" id="message_en" rows="4" placeholder="Enter message in English" required>{{ old('message_en') }}</textarea>
+                                @error('message_en')
+                                    <span class="admin-error">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                    </section>
+
+                        {{-- French Section --}}
+                        <div class="admin-form-section">
+                            <div class="section-header">
+                                <span class="flag-icon">🇫🇷</span>
+                                <h3>French Content</h3>
+                            </div>
+                            <div class="form-group">
+                                <label for="title_fr">Title (French) <span class="required">*</span></label>
+                                <input type="text" name="title_fr" id="title_fr" value="{{ old('title_fr') }}" placeholder="Entrez le titre en français" required>
+                                @error('title_fr')
+                                    <span class="admin-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="message_fr">Message (French) <span class="required">*</span></label>
+                                <textarea name="message_fr" id="message_fr" rows="4" placeholder="Entrez le message en français" required>{{ old('message_fr') }}</textarea>
+                                @error('message_fr')
+                                    <span class="admin-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="admin-form-actions">
+                            <button type="button" class="admin-btn admin-btn-secondary" id="previewBtn">
+                                <i class="fas fa-eye"></i>
+                                <span>Preview</span>
+                            </button>
+                            <button type="submit" class="admin-btn admin-btn-primary text-white">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send Notification</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                <aside class="admin-form-side">
-                    <section class="admin-form-card">
-                        <div class="admin-form-section-head">
-                            <h2>Delivery</h2>
-                            <p>This notification will be visible to active service providers for 30 days.</p>
+                <div class="admin-form-sidebar">
+                    <div class="admin-info-card">
+                        <div class="info-card-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h4>Information</h4>
                         </div>
-                        <div class="admin-language-preview">
-                            <strong>Target Audience</strong>
-                            <p>Active service providers only.</p>
-                        </div>
-                        <div class="admin-language-preview">
-                            <strong>Expiration</strong>
-                            <p>Automatically expires 30 days after sending.</p>
-                        </div>
-                    </section>
-
-                    <div class="admin-sticky-actions">
-                        <button type="submit" class="admin-btn admin-btn-primary">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>Send Notification</span>
-                        </button>
-                        <a href="{{ route('admin.notifications.index') }}" class="admin-btn admin-btn-secondary">Cancel</a>
+                        <ul class="info-list">
+                            <li>
+                                <i class="fas fa-users"></i>
+                                <span><strong>Target:</strong> Service Providers Only</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <span><strong>Expires:</strong> 30 days from creation</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-globe"></i>
+                                <span><strong>Languages:</strong> Arabic, English, French</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-bell"></i>
+                                <span><strong>Badge:</strong> Unread count shown in navbar</span>
+                            </li>
+                        </ul>
                     </div>
-                </aside>
-            </form>
+
+                    <div class="admin-tips-card">
+                        <div class="tips-card-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h4>Tips</h4>
+                        </div>
+                        <ul class="tips-list">
+                            <li>Keep titles concise (max 255 characters)</li>
+                            <li>Messages should be clear and actionable</li>
+                            <li>Use the preview to check all languages</li>
+                            <li>Expired notifications are automatically hidden</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    {{-- Preview Modal --}}
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content admin-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title">Notification Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="preview-tabs">
+                        <button type="button" class="preview-tab active" data-lang="ar">
+                            <span class="flag-icon">🇸🇦</span> Arabic
+                        </button>
+                        <button type="button" class="preview-tab" data-lang="en">
+                            <span class="flag-icon">🇺🇸</span> English
+                        </button>
+                        <button type="button" class="preview-tab" data-lang="fr">
+                            <span class="flag-icon">🇫🇷</span> French
+                        </button>
+                    </div>
+                    
+                    <div class="preview-content">
+                        <div class="preview-notification-card" id="previewCard">
+                            <div class="preview-notification-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="preview-notification-body">
+                                <h3 class="preview-notification-title" id="previewTitle"></h3>
+                                <p class="preview-notification-message" id="previewMessage"></p>
+                                <span class="preview-notification-time">
+                                    <i class="fas fa-clock"></i> Just now
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="admin-btn admin-btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                        <span>Close</span>
+                    </button>
+                    <button type="button" class="admin-btn admin-btn-primary text-white" id="confirmSend">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Send Notification</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .admin-form-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 2rem;
+    }
+
+    .admin-form-main {
+        min-width: 0;
+    }
+
+    .admin-form-section {
+        background: white;
+        border: 1px solid var(--border-default, #e2e8f0);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-default, #e2e8f0);
+    }
+
+    .section-header h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        color: var(--text-primary, #0f172a);
+    }
+
+    .required {
+        color: #ef4444;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-default, #e2e8f0);
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        color: var(--text-primary, #0f172a);
+        transition: all 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-500, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .admin-error {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #ef4444;
+    }
+
+    .admin-form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .admin-form-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .admin-info-card,
+    .admin-tips-card {
+        background: white;
+        border: 1px solid var(--border-default, #e2e8f0);
+        border-radius: 16px;
+        padding: 1.25rem;
+    }
+
+    .info-card-header,
+    .tips-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-default, #e2e8f0);
+    }
+
+    .info-card-header i {
+        color: var(--primary-500, #3b82f6);
+    }
+
+    .tips-card-header i {
+        color: #f59e0b;
+    }
+
+    .info-card-header h4,
+    .tips-card-header h4 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .info-list,
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li,
+    .tips-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        font-size: 0.875rem;
+        color: var(--text-secondary, #475569);
+    }
+
+    .info-list li i {
+        color: var(--primary-500, #3b82f6);
+        margin-top: 2px;
+    }
+
+    .tips-list li {
+        position: relative;
+        padding-left: 1rem;
+    }
+
+    .tips-list li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #f59e0b;
+    }
+
+    /* Preview Modal Styles */
+    .preview-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .preview-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: white;
+        border: 2px solid var(--border-default, #e2e8f0);
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-secondary, #475569);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .preview-tab:hover {
+        border-color: var(--primary-300, #93c5fd);
+    }
+
+    .preview-tab.active {
+        background: linear-gradient(135deg, var(--primary-500, #3b82f6), var(--primary-600, #2563eb));
+        border-color: transparent;
+        color: white;
+    }
+
+    .preview-content {
+        padding: 1.5rem;
+        background: var(--surface-subtle, #f8fafc);
+        border-radius: 16px;
+    }
+
+    .preview-notification-card {
+        display: flex;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        background: white;
+        border: 1px solid var(--border-default, #e2e8f0);
+        border-radius: 16px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .preview-notification-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.15));
+        color: var(--primary-500, #3b82f6);
+        flex-shrink: 0;
+    }
+
+    .preview-notification-body {
+        flex: 1;
+    }
+
+    .preview-notification-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem;
+        color: var(--text-primary, #0f172a);
+    }
+
+    .preview-notification-message {
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: var(--text-secondary, #475569);
+        margin: 0 0 0.75rem;
+    }
+
+    .preview-notification-time {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+        color: var(--text-muted, #94a3b8);
+    }
+
+    @media (max-width: 992px) {
+        .admin-form-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-form-sidebar {
+            order: -1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-form-actions {
+            flex-direction: column;
+        }
+
+        .preview-tabs {
+            flex-wrap: wrap;
+        }
+    }
+    </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('notificationForm');
+        const previewBtn = document.getElementById('previewBtn');
+        const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        const confirmSendBtn = document.getElementById('confirmSend');
+        const previewTabs = document.querySelectorAll('.preview-tab');
+        
+        let currentLang = 'ar';
+
+        // Update preview content
+        function updatePreview(lang) {
+            const titleInput = document.getElementById(`title_${lang}`);
+            const messageInput = document.getElementById(`message_${lang}`);
+            const previewTitle = document.getElementById('previewTitle');
+            const previewMessage = document.getElementById('previewMessage');
+            const previewCard = document.getElementById('previewCard');
+            
+            previewTitle.textContent = titleInput.value || '(No title)';
+            previewMessage.textContent = messageInput.value || '(No message)';
+            
+            // Set RTL for Arabic
+            previewCard.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        }
+
+        // Preview button click
+        previewBtn.addEventListener('click', function() {
+            updatePreview(currentLang);
+            previewModal.show();
+        });
+
+        // Tab switching
+        previewTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                previewTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentLang = this.dataset.lang;
+                updatePreview(currentLang);
+            });
+        });
+
+        // Confirm send button
+        confirmSendBtn.addEventListener('click', function() {
+            previewModal.hide();
+            form.submit();
+        });
+    });
+    </script>
 @endsection

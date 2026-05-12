@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\Category;
 use App\Models\User;
 use App\Services\AuthService;
+use App\Services\CategoryCacheService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -20,19 +21,19 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        // Load terminal categories (actual professions — no children) with parent chain.
-        $professions = Category::with('parent.parent')
-            ->terminal()
-            ->orderBy('name')
-            ->get();
+        // PERFORMANCE: Use cached terminal categories from Redis (24h TTL)
+        $professions = app(CategoryCacheService::class)->getTerminalCategories();
+
+        // Eager load ALL active categories into a lookup map to resolve roots without lazy loading
+        $allCategories = Category::where('is_active', true)->get()->keyBy('id');
 
         // Group terminal professions by their top-level root section (Level 1) for hierarchical optgroup rendering
         $professionGroups = $professions
-            ->groupBy(function ($category) {
-                // Find the root section (top ancestor where parent_id is null)
+            ->groupBy(function ($category) use ($allCategories) {
+                // Find the root section (top ancestor where parent_id is null) using the lookup map
                 $root = $category;
-                while ($root->parent) {
-                    $root = $root->parent;
+                while ($root->parent_id && isset($allCategories[$root->parent_id])) {
+                    $root = $allCategories[$root->parent_id];
                 }
                 return $root->localized_name;
             })

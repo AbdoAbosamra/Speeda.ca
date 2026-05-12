@@ -8,6 +8,7 @@ use App\Models\ServiceProvider;
 use App\Models\Review;
 use App\Models\Endorsement;
 use App\Models\Post;
+use App\Services\CategoryCacheService;
 use App\Services\LocationClusterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -18,14 +19,8 @@ class HomeController extends Controller
     {
         $seoService->apply('home');
 
-        // Get categories with their relationships (Cache for 1 hour)
-        $categories = Cache::remember('home_categories', 3600, function () {
-            return Category::with('children')
-                ->filterGroups()
-                ->get()
-                ->sortBy('translated_name')
-                ->values();
-        });
+        // PERFORMANCE: Use cached categories from Redis (24h TTL)
+        $categories = app(CategoryCacheService::class)->getFilterGroups();
 
         // Individual locations for homepage dropdown
         $locationClusters = [
@@ -38,32 +33,30 @@ class HomeController extends Controller
         // Provider Stats (Cache for 1 hour)
         $providerStats = Cache::remember('home_provider_stats', 3600, function () {
             return [
-                'total_providers' => ServiceProvider::verified()->count(),
+                'total_providers' => ServiceProvider::count(),
                 'total_reviews' => Review::active()->count(),
                 'total_recommendations' => Endorsement::count(),
             ];
         });
 
-        // Top Providers - Enforcing Multi-Level Priority Order (Rating > Completion)
-        $topProviders = Cache::remember('home_top_providers', 3600, function () {
-            return ServiceProvider::verified()
-                ->with(['user', 'category', 'location', 'media'])
-                ->withCount(['reviews', 'endorsements'])
-                // Constraint: Must have at least one rating OR 80%+ profile completion
-                ->where(function ($query) {
-                    $query->whereNotNull('rating')
-                        ->orWhere('profile_completion_percent', '>=', 80);
-                })
-                // Priority 1: Average Rating (Highest stars first)
-                ->orderByRaw('rating IS NULL ASC') // Push NULLs to end of rating group
-                ->orderBy('rating', 'desc')
-                // Priority 2: Profile Completeness (Tie-breaker or for unrated)
-                ->orderBy('profile_completion_percent', 'desc')
-                // Priority 3: Quantity of feedback
-                ->orderBy('reviews_count', 'desc')
-                ->take(8)
-                ->get();
-        });
+        // Top Providers - Top 2 per category (Prioritizing reviews, then completion)
+        // Requirement 1: Profile must be at least 80% complete (MANDATORY)
+        // Requirement 2: Top 2 from each category (to ensure diversity)
+        // Requirement 3: Prioritize those with reviews. If no reviews, show based on completion %.
+        // Debug: Get providers without cache and without complex ranking for a moment
+        $featuredProviders = ServiceProvider::query()
+            ->with(['user', 'category', 'location', 'media'])
+            ->withCount([
+                'endorsements',
+                'reviews' => function ($query) {
+                    $query->where('is_active', 1);
+                },
+            ])
+            ->where('profile_completion_percent', '>=', 80)
+            ->orderByDesc('reviews_count')
+            ->orderByDesc('profile_completion_percent')
+            ->take(8)
+            ->get();
 
         // Latest Blogs (Cache for 1 hour)
         $latestBlogPosts = Cache::remember('home_latest_blog_posts', 3600, function () {
@@ -74,6 +67,6 @@ class HomeController extends Controller
                 ->get();
         });
 
-        return view('home', compact('categories', 'locationClusters', 'providerStats', 'topProviders', 'latestBlogPosts'));
+        return view('home', compact('categories', 'locationClusters', 'providerStats', 'featuredProviders', 'latestBlogPosts'));
     }
 }

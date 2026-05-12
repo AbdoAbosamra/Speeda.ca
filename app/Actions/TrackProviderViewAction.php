@@ -65,7 +65,7 @@ class TrackProviderViewAction
             return '';
         }
 
-        return hash('sha256', $sessionId . '|' . $userAgent);
+        return hash('sha256', config('app.analytics_salt') . $sessionId . '|' . $userAgent);
     }
 
     /**

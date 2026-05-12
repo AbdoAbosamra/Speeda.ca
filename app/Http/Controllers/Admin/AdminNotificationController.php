@@ -7,6 +7,7 @@ use App\Models\AdminNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ErrorHelper;
+use Illuminate\Support\Facades\Cache;
 
 class AdminNotificationController extends Controller
 {
@@ -16,15 +17,45 @@ class AdminNotificationController extends Controller
     }
 
     /**
-     * Display a listing of notifications.
+     * Display a listing of notifications with search and filters.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = AdminNotification::with('admin')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = AdminNotification::with('admin')
+            ->orderBy('created_at', 'desc');
+        
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title_en', 'like', "%{$search}%")
+                  ->orWhere('title_ar', 'like', "%{$search}%")
+                  ->orWhere('title_fr', 'like', "%{$search}%")
+                  ->orWhere('message_en', 'like', "%{$search}%")
+                  ->orWhere('message_ar', 'like', "%{$search}%")
+                  ->orWhere('message_fr', 'like', "%{$search}%");
+            });
+        }
+        
+        // Status filter
+        if ($request->filled('status')) {
+            if ($request->input('status') === 'active') {
+                $query->where('expires_at', '>', now());
+            } elseif ($request->input('status') === 'expired') {
+                $query->where('expires_at', '<=', now());
+            }
+        }
+        
+        $notifications = $query->paginate(15)->appends($request->query());
+        
+        // Stats for dashboard cards
+        $stats = [
+            'total' => AdminNotification::count(),
+            'active' => AdminNotification::active()->count(),
+            'expired' => AdminNotification::where('expires_at', '<=', now())->count(),
+        ];
 
-        return view('admin.notifications.index', compact('notifications'));
+        return view('admin.notifications.index', compact('notifications', 'stats'));
     }
 
     /**
@@ -61,6 +92,9 @@ class AdminNotificationController extends Controller
                 'created_by' => Auth::id(),
                 'expires_at' => now()->addDays(30),
             ]);
+            
+            // Clear all notification caches since a new notification was added
+            $this->clearAllNotificationCaches();
 
             ErrorHelper::flashNotification('Notification sent successfully.', 'success');
             return redirect()->route('admin.notifications.index');
@@ -78,12 +112,30 @@ class AdminNotificationController extends Controller
     {
         try {
             $notification->delete();
+            
+            // Clear all notification caches
+            $this->clearAllNotificationCaches();
+            
             ErrorHelper::flashNotification('Notification deleted successfully.', 'success');
             return redirect()->route('admin.notifications.index');
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
             return redirect()->back();
+        }
+    }
+    
+    /**
+     * Clear all notification caches for all users.
+     */
+    private function clearAllNotificationCaches(): void
+    {
+        // Get all service provider user IDs and clear their caches
+        // This ensures the dropdown shows updated notifications
+        $providerIds = \App\Models\User::whereHas('serviceProvider')->pluck('id');
+        
+        foreach ($providerIds as $userId) {
+            Cache::forget("nav_notifications_{$userId}");
         }
     }
 }

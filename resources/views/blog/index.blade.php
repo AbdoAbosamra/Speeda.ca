@@ -56,7 +56,7 @@
                                         <option value="">{{ __('service_provider.all_locations') }}</option>
                                         @foreach($locations as $location)
                                             <option value="{{ $location->id }}" {{ $locationId == $location->id ? 'selected' : '' }}>
-                                                {{ $location->city }}
+                                                {{ $location->localized_name }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -140,7 +140,7 @@
                                     @endif
                                     @if($post->location)
                                         <div style="position: absolute; top: 12px; left: 12px; background: rgba(255, 255, 255, 0.9); color: #4a5568; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                            <i class="fas fa-map-marker-alt text-danger me-1"></i> {{ $post->location->city }}
+                                            <i class="fas fa-map-marker-alt text-danger me-1"></i> {{ $post->location->localized_name }}
                                         </div>
                                     @endif
                                 </div>

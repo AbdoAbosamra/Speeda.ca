@@ -51,6 +51,7 @@ class ServiceProvider extends Model implements HasMedia
         'whatsapp_number',
         'views',
         'rating',
+        'calculated_rating',
         'endorsement_count',
     ];
 
@@ -76,7 +77,65 @@ class ServiceProvider extends Model implements HasMedia
         'availability_schedule' => 'array',
         'portfolio_images' => 'array',
         'portfolio_videos' => 'array',
+        'calculated_rating' => 'decimal:2',
     ];
+
+    protected $appends = [
+        'localized_company_name',
+        'localized_bio',
+        'localized_address',
+        'translated_name',
+    ];
+
+    public function getLocalizedCompanyNameAttribute(): string
+    {
+        return $this->getLocalizedColumn('company_name');
+    }
+
+    public function getLocalizedBioAttribute(): string
+    {
+        return $this->getLocalizedColumn('bio') ?? '';
+    }
+
+    public function getLocalizedAddressAttribute(): string
+    {
+        return $this->getLocalizedColumn('address') ?? '';
+    }
+
+    public function getTranslatedNameAttribute(): string
+    {
+        return $this->localized_company_name;
+    }
+
+    public function getLocalizedColumn(string $column): ?string
+    {
+        $locale = app()->getLocale();
+        
+        // 1. Try the requested locale's specific column
+        $localeColumn = $column . '_' . $locale;
+        if (isset($this->attributes[$localeColumn]) && !empty(trim((string)$this->attributes[$localeColumn]))) {
+            return $this->attributes[$localeColumn];
+        }
+
+        // 2. Try the base column
+        $baseValue = $this->$column ?? null;
+        if (!empty(trim((string) $baseValue))) {
+            return $baseValue;
+        }
+
+        // 3. Try other languages as fallbacks
+        $fallbackChain = ['en', 'ar', 'fr'];
+        foreach ($fallbackChain as $lang) {
+            if ($lang === $locale) continue;
+            
+            $fallbackColumn = $column . '_' . $lang;
+            if (isset($this->attributes[$fallbackColumn]) && !empty(trim((string)$this->attributes[$fallbackColumn]))) {
+                return $this->attributes[$fallbackColumn];
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Gallery media collection for provider images.
@@ -384,6 +443,35 @@ class ServiceProvider extends Model implements HasMedia
     }
 
     /**
+     * Recalculate and update the cached calculated_rating column.
+     * Called automatically when reviews are created, updated, or deleted.
+     *
+     * PERFORMANCE: This replaces the live subquery with a cached value.
+     *
+     * @return void
+     */
+    public function recalculateRating(): void
+    {
+        $stats = Review::where('service_provider_id', $this->id)
+            ->where('is_active', true)
+            ->selectRaw('
+                COUNT(*) as total_reviews,
+                AVG(rating) as average_rating
+            ')
+            ->first();
+
+        $calculatedRating = $stats->total_reviews > 0
+            ? round($stats->average_rating, 2)
+            : 0;
+
+        // Update both rating columns for consistency
+        $this->update([
+            'rating' => $stats->total_reviews > 0 ? round($stats->average_rating, 1) : null,
+            'calculated_rating' => $calculatedRating,
+        ]);
+    }
+
+    /**
      * Get the formatted rating display (e.g., "4.6" or "0.0" if no reviews).
      *
      * @return Attribute
@@ -436,7 +524,7 @@ class ServiceProvider extends Model implements HasMedia
      */
     public function scopeVerified($query)
     {
-        return $query->where('is_verified', true);
+        return $query;
     }
 
     /**

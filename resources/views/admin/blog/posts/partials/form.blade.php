@@ -199,7 +199,7 @@
         </section>
 
         <div class="admin-sticky-actions">
-            <button type="submit" class="admin-btn admin-btn-primary">
+            <button type="submit" class="admin-btn admin-btn-primary text-white">
                 <i class="fas fa-floppy-disk"></i>
                 <span>Save Blog</span>
             </button>

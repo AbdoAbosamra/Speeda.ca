@@ -5,7 +5,7 @@ return [
     'meta_title' => ':app_name - Connectez clients et prestataires instantanément',
     'hero_title' => 'Trouver des prestataires de services de confiance',
     'hero_tagline' => 'Votre monde de services en un seul endroit',
-    'hero_subtitle' => 'Connectez-vous avec des professionnels vérifiés dans votre région. Obtenez des services de qualité à des prix compétitifs.',
+    'hero_subtitle' => 'Connectez-vous avec des professionnels de votre région.',
     'find_provider' => 'Trouver un prestataire',
     'join_provider' => 'Rejoindre comme prestataire',
     'how_it_works_title' => 'Comment ça marche',

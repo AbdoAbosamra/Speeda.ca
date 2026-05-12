@@ -85,7 +85,7 @@
 
             <!-- Danger Zone -->
             @if($user->id !== auth()->id() && $user->role !== 'admin')
-                <div class="card border-0 shadow-sm mt-4" style="border-radius: 20px; border-left: 5px solid #ef4444 !important;">
+                <div class="card border-0 shadow-sm mt-4" style="border-radius: 20px; border-inline-start: 5px solid #ef4444 !important;">
                     <div class="card-body p-4 d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="text-danger fw-bold mb-1">Delete User</h5>

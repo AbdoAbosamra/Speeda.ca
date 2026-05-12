@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Actions\CalculateProfileCompletionAction;
 use App\Actions\TrackProviderViewAction;
+use App\Services\CategoryCacheService;
 use App\Services\FacebookConversionService;
+use App\Services\LocationCacheService;
 use App\Services\LocationClusterService;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -43,17 +45,16 @@ class ServiceProviderController extends Controller
         }
 
         // Eager-load Spatie media to avoid N+1 queries in provider cards.
+        // PERFORMANCE: Use withExists for endorsement check to avoid N+1 in view loop
+        // PERFORMANCE: Use cached calculated_rating column instead of live subquery
         $query = ServiceProvider::with(['user', 'category.parent.parent', 'location', 'media'])
             ->withCount(['activeReviews as reviews_count', 'endorsements as endorsements_count'])
-            // Calculate live average rating from active reviews (SINGLE QUERY PER PROVIDER)
-            ->selectRaw(
-                'service_providers.*,
-                COALESCE(
-                    (SELECT AVG(rating) FROM service_provider_reviews
-                     WHERE service_provider_id = service_providers.id AND is_active = true),
-                    0
-                ) as live_rating'
-            );
+            ->when(auth()->check() && auth()->user()->isClient(), function ($q) {
+                // PERFORMANCE: Preload whether current user has endorsed each provider (avoids N+1)
+                $q->withExists(['endorsements as is_endorsed' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                }]);
+            });
 
         // Only show providers whose users are active
         $query->whereHas('user', function ($userQuery) {
@@ -115,17 +116,14 @@ class ServiceProviderController extends Controller
             }
         }
 
-        // Order by LIVE rating (from subquery) instead of stored rating
-        $serviceProviders = $query->orderByRaw('live_rating DESC')
+        // Order by cached calculated_rating (no more subquery)
+        $serviceProviders = $query->orderByDesc('calculated_rating')
             ->orderBy('views', 'desc')
             ->paginate(12)
             ->withQueryString();
 
-        $categories = Category::with('children')
-            ->filterGroups()
-            ->get()
-            ->sortBy('translated_name')
-            ->values();
+        // PERFORMANCE: Use cached categories from Redis (24h TTL)
+        $categories = app(CategoryCacheService::class)->getFilterGroups();
 
         // Get list of revealed contacts from session
         $revealedContacts = session('revealed_contacts', []);
@@ -150,14 +148,9 @@ class ServiceProviderController extends Controller
             // Eager load relationships
             $serviceProvider->loadMissing(['user', 'category.parent.parent', 'location']);
 
-            // Get all locations for dropdown
-            $locations = Location::orderBy('city')->get();
-
-            // Get all child categories (all 55 professions)
-            $categories = Category::with('parent.parent')
-                ->terminal()
-                ->orderBy('name')
-                ->get();
+            // PERFORMANCE: Use cached locations and categories from Redis (24h TTL)
+            $locations = app(LocationCacheService::class)->getAllLocations();
+            $categories = app(CategoryCacheService::class)->getTerminalCategories();
 
             // Check if user is owner (always true for this route)
             $isOwner = true;
@@ -303,17 +296,21 @@ class ServiceProviderController extends Controller
                 ->paginate(5, ['*'], 'reviews_page')
                 ->withQueryString();
 
-            // Get all locations for dropdown (not needed for public view, only for owner edit)
-            $locations = Location::orderBy('city')->get();
+            // PERFORMANCE: Use cached locations from Redis (24h TTL)
+            $locations = app(LocationCacheService::class)->getAllLocations();
 
             // Get similar providers in same category (excluding self)
-            // Eager-load Spatie media to render gallery thumbnails in similar-provider cards.
+            // Eager-load relationships and counts to avoid N+1 in similar-provider cards
             $similarProviders = ServiceProvider::with(['category', 'location', 'user', 'media'])
+                ->withCount(['activeReviews', 'endorsements'])
                 ->where('category_id', $serviceProvider->category_id)
                 ->where('id', '!=', $serviceProvider->id)
                 ->orderBy('rating', 'desc')
                 ->limit(4)
                 ->get();
+
+            // PERFORMANCE: Use cached categories from Redis (24h TTL)
+            $categories = app(CategoryCacheService::class)->getTerminalCategories();
 
             // Format phone number for WhatsApp
             $formattedNumber = preg_replace('/[^0-9]/', '', $serviceProvider->whatsapp_number ?? $serviceProvider->phone ?? '');
@@ -324,10 +321,7 @@ class ServiceProviderController extends Controller
 
             // Get all child categories (all professions) for category dropdown in edit form
             // Must match the categories loaded in profile() method to ensure consistency
-            $categories = Category::with('parent.parent')
-                ->terminal()
-                ->orderBy('name')
-                ->get();
+            $categories = app(CategoryCacheService::class)->getTerminalCategories();
 
             // Check if current user has already reviewed this provider
             $hasReviewed = auth()->check() && auth()->user()->isClient()
@@ -728,6 +722,19 @@ class ServiceProviderController extends Controller
             ->where('model_id', $serviceProvider->id)
             ->where('collection_name', 'provider_gallery')
             ->firstOrFail();
+    }
+
+    /**
+     * Mark the profile completion popup as dismissed in session for the current provider
+     */
+    public function dismissCompletionPopup(Request $request)
+    {
+        session(['profile_completion_popup_dismissed' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Completion popup dismissed for current session'
+        ]);
     }
 
     /**

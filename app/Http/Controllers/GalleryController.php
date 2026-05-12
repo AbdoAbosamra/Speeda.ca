@@ -29,7 +29,7 @@ class GalleryController extends Controller
      */
     public function store(Request $request, ServiceProvider $serviceProvider): JsonResponse
     {
-        $this->authorizeOwner($serviceProvider);
+        $this->authorize('manageGallery', $serviceProvider);
 
         // Enforce 4-image limit
         $currentCount = $serviceProvider->getMedia('gallery')->count();
@@ -98,7 +98,7 @@ class GalleryController extends Controller
      */
     public function update(Request $request, ServiceProvider $serviceProvider, int $mediaId): JsonResponse
     {
-        $this->authorizeOwner($serviceProvider);
+        $this->authorize('manageGallery', $serviceProvider);
 
         $request->validate([
             'gallery_image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
@@ -162,7 +162,7 @@ class GalleryController extends Controller
      */
     public function destroy(ServiceProvider $serviceProvider, int $mediaId): JsonResponse
     {
-        $this->authorizeOwner($serviceProvider);
+        $this->authorize('manageGallery', $serviceProvider);
 
         try {
             $media = $this->resolveMedia($serviceProvider, $mediaId);
@@ -191,13 +191,6 @@ class GalleryController extends Controller
     }
 
     // ─── Private helpers ─────────────────────────────────────────
-
-    private function authorizeOwner(ServiceProvider $serviceProvider): void
-    {
-        if (!auth()->check() || auth()->id() !== $serviceProvider->user_id) {
-            abort(403, __('service_provider.unauthorized_access'));
-        }
-    }
 
     private function resolveMedia(ServiceProvider $serviceProvider, int $mediaId): Media
     {

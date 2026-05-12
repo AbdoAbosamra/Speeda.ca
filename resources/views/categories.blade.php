@@ -1,22 +1,6 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-    dir="{{ in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']) ? 'rtl' : 'ltr' }}">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('categories.page_title') }} - {{ config('app.name', 'Speeda') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Custom Styles -->
+@push('styles')
     <style>
         :root {
             --primary-color: #4F46E5; /* Indigo */
@@ -49,16 +33,13 @@
             z-index: 9999 !important;
         }
 
-        body {
-            font-family: 'Inter', 'Cairo', sans-serif;
-            color: var(--dark-text);
+        /* Override some layout defaults for this page */
+        main.py-4 {
             background-color: var(--light-bg);
             background-image:
                 radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%),
                 radial-gradient(at 50% 0%, hsla(225,39%,30%,0) 0, transparent 50%),
                 radial-gradient(at 100% 0%, hsla(339,49%,30%,0) 0, transparent 50%);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
         }
 
         /* Navigation Adjustments */
@@ -72,14 +53,14 @@
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border: none;
             border-radius: var(--radius-md);
-            padding: 0.6rem 1.8rem; /* Slightly reduced padding */
+            padding: 0.6rem 1.8rem;
             font-weight: 600;
             letter-spacing: 0.025em;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
             position: relative;
             overflow: hidden;
-            font-size: 0.95rem; /* Slightly smaller text */
+            font-size: 0.95rem;
         }
 
         .btn-primary::after {
@@ -106,7 +87,7 @@
             color: var(--primary-color);
             background: transparent;
             border-radius: var(--radius-md);
-            padding: 0.4rem 1.4rem; /* Reduced padding */
+            padding: 0.4rem 1.4rem;
             font-weight: 600;
             font-size: 0.9rem;
             transition: all 0.3s ease;
@@ -122,7 +103,7 @@
         .btn-light {
             border-radius: var(--radius-md);
             font-weight: 600;
-            padding: 0.6rem 1.8rem; /* Reduced padding */
+            padding: 0.6rem 1.8rem;
             color: var(--primary-dark);
             background: #fff;
             border: none;
@@ -138,7 +119,7 @@
         /* Breadcrumb */
         .breadcrumb {
             background: transparent;
-            padding: 0.8rem 0; /* Reduced padding */
+            padding: 0.8rem 0;
             font-size: 0.85rem;
         }
         .breadcrumb-item a {
@@ -155,12 +136,12 @@
 
         /* Page Header */
         .page-header {
-            padding: 1.8rem 0 0.8rem 0; /* Reduced padding */
+            padding: 1.8rem 0 0.8rem 0;
             text-align: center;
         }
         .page-header h1 {
             font-weight: 800;
-            font-size: 2.2rem; /* Reduced size */
+            font-size: 2.2rem;
             background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -169,7 +150,7 @@
         }
         .page-header p {
             color: var(--muted-text);
-            font-size: 1.05rem; /* Reduced size */
+            font-size: 1.05rem;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -178,8 +159,8 @@
         .search-section {
             background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
             border-radius: var(--radius-lg);
-            padding: 3rem 1.5rem; /* Reduced padding */
-            margin-bottom: 3.5rem; /* Reduced margin */
+            padding: 3rem 1.5rem;
+            margin-bottom: 3.5rem;
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-lg);
@@ -212,11 +193,11 @@
         .search-content { position: relative; z-index: 1; }
         .search-section h3 {
             font-weight: 700;
-            font-size: 1.5rem; /* Reduced size */
+            font-size: 1.5rem;
             color: var(--dark-text);
             margin-bottom: 0.5rem;
         }
-        .search-section p { font-size: 0.95rem; } /* Reduced size */
+        .search-section p { font-size: 0.95rem; }
 
         .input-group-lg {
             border-radius: var(--radius-md);
@@ -232,14 +213,14 @@
         .input-group-text {
             background: white;
             border: none;
-            padding-left: 1.2rem; /* Reduced padding */
+            padding-left: 1.2rem;
             color: var(--secondary-color);
         }
         .form-control {
             border: none;
             font-weight: 500;
             color: var(--dark-text);
-            font-size: 0.95rem; /* Reduced size */
+            font-size: 0.95rem;
         }
         .form-control:focus { box-shadow: none; }
 
@@ -247,14 +228,14 @@
         .quick-nav {
             background: var(--surface-color);
             border-radius: var(--radius-lg);
-            padding: 1.8rem; /* Reduced padding */
-            margin-bottom: 3.5rem; /* Reduced margin */
+            padding: 1.8rem;
+            margin-bottom: 3.5rem;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
         }
         .quick-nav-title {
             font-weight: 700;
-            font-size: 1.15rem; /* Reduced size */
+            font-size: 1.15rem;
             margin-bottom: 1.2rem;
             color: var(--dark-text);
             text-align: center;
@@ -272,7 +253,7 @@
 
         .quick-nav-item {
             text-align: center;
-            padding: 1.2rem 0.8rem; /* Reduced padding */
+            padding: 1.2rem 0.8rem;
             border-radius: var(--radius-md);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
@@ -291,21 +272,20 @@
         }
 
         .quick-nav-icon {
-            width: 60px; /* Reduced size */
+            width: 60px;
             height: 60px;
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 0.8rem;
-            font-size: 1.5rem; /* Reduced size */
+            font-size: 1.5rem;
             color: white;
             box-shadow: var(--shadow-md);
             transition: transform 0.3s ease;
         }
         .quick-nav-item:hover .quick-nav-icon { transform: scale(1.1) rotate(5deg); }
 
-        /* Center last row items when there are fewer than 6 items */
         .quick-nav .row {
             justify-content: center;
         }
@@ -327,7 +307,6 @@
             transform-origin: center;
         }
 
-        /* Rotate chevron when accordion is open */
         button[aria-expanded="true"] .transition-icon {
             transform: rotate(180deg);
         }
@@ -338,7 +317,7 @@
 
         .subcategory-link:hover {
             color: var(--primary-color) !important;
-            padding-inline-start: 4px; /* for RTL support */
+            padding-inline-start: 4px;
         }
 
         [dir="rtl"] .rtl-flip {
@@ -349,7 +328,7 @@
         .stat-card {
             background: white;
             border-radius: var(--radius-md);
-            padding: 1.5rem; /* Reduced padding */
+            padding: 1.5rem;
             text-align: center;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
@@ -369,7 +348,7 @@
 
         /* Empty State */
         .empty-state {
-            padding: 3rem 2rem; /* Reduced padding */
+            padding: 3rem 2rem;
             text-align: center;
             background: white;
             border-radius: var(--radius-lg);
@@ -380,7 +359,7 @@
 
         /* Modal Redesign */
         .modal-content { border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-hover); overflow: hidden; }
-        .modal-header { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border: none; padding: 1.2rem; } /* Reduced padding */
+        .modal-header { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border: none; padding: 1.2rem; }
         .modal-body { padding: 1.5rem; background: #f8fafc; }
         .modal-footer { border: none; padding: 1.2rem; background: white; }
         .form-control, .form-control:focus {
@@ -398,34 +377,12 @@
         @media (max-width: 768px) {
             .page-header h1 { font-size: 1.8rem; }
             .search-section { padding: 2rem 1.2rem; margin-bottom: 2.5rem; }
-            .section-card { padding: 1.5rem 1.2rem; margin-bottom: 2.5rem; }
-            .section-header { flex-direction: column; text-align: center; gap: 1rem; }
-            .section-icon { margin: 0; }
-            [dir="rtl"] .section-icon { margin: 0; }
             .quick-nav { padding: 1.2rem; }
         }
-
-        /* Gradient Utilities */
-        .grad-automotive { background: linear-gradient(135deg, #DC2626, #EF4444); }
-        .grad-home { background: linear-gradient(135deg, #059669, #10B981); }
-        .grad-professional { background: linear-gradient(135deg, #2563EB, #3B82F6); }
-        .grad-personal { background: linear-gradient(135deg, #EC4899, #F472B6); }
-        .grad-technical { background: linear-gradient(135deg, #7C3AED, #8B5CF6); }
-        .grad-event { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
-        .grad-health { background: linear-gradient(135deg, #EF4444, #F87171); }
-
-        .cat-bg-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .cat-bg-2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .cat-bg-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .cat-bg-4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .cat-bg-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
-        .cat-bg-6 { background: linear-gradient(135deg, #30cfd0, #330867); }
     </style>
-</head>
+@endpush
 
-<body>
-    @include('components.main-nav')
-
+@section('content')
     <div class="container mt-4">
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb">
@@ -439,14 +396,14 @@
         <div class="page-header reveal">
             <h1>
                 @if($selectedCity)
-                    {{ __('categories.professional_services_in', ['city' => $selectedCity->city]) }}
+                    {{ __('categories.professional_services_in', ['city' => $selectedCity->localized_name]) }}
                 @else
                     {{ __('categories.browse_categories') }}
                 @endif
             </h1>
             <p>
                 @if($selectedCity)
-                    {{ __('categories.find_trusted_in_city', ['city' => $selectedCity->city]) }}
+                    {{ __('categories.find_trusted_in_city', ['city' => $selectedCity->localized_name]) }}
                 @else
                     {{ __('categories.discover_professionals') }}
                 @endif
@@ -522,15 +479,12 @@
             </div>
         </div>
 
-        {{-- Unified Error Handler --}}
-        <x-error-handler />
-
         <!-- Location Alert -->
         @if($selectedCity)
             <div class="alert location-alert d-flex align-items-center mb-5 reveal" role="alert">
                 <i class="fas fa-map-marker-alt fa-2x me-3 text-primary"></i>
                 <div class="flex-grow-1">
-                    <strong>{{ __('categories.showing_services_in') }} {{ $selectedCity->city }}</strong>
+                    <strong>{{ __('categories.showing_services_in') }} {{ $selectedCity->localized_name }}</strong>
                 </div>
                 <a href="{{ route('categories') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
                     {{ __('categories.show_all_cities') }}
@@ -565,7 +519,7 @@
                     $coverImage = $sectionImages[$section->slug] ?? $fallbackImages[$loop->index % count($fallbackImages)];
                 @endphp
                 <div class="col-xl-4 col-lg-6 reveal" id="{{ $section->anchor_id }}">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden section-grid-card transition-all" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden section-grid-card transition-all">
 
                         <!-- Expressive Cover Image -->
                         <div class="card-img-top position-relative" style="height: 220px;">
@@ -573,7 +527,6 @@
                             <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%);"></div>
                             <div class="position-absolute bottom-0 start-0 p-4 text-white">
                                 <h3 class="fw-bold mb-1 fs-4 text-white">{{ $section->translated_name }}</h3>
-                                <!-- Replaced static placeholder description with dynamic translation for generic use -->
                                 <p class="mb-0 small text-white-50">{{ $section->description ?? __('general.explore_services', ['name' => $section->translated_name]) }}</p>
                             </div>
                         </div>
@@ -606,7 +559,7 @@
                                                         @endforeach
                                                         <li class="py-2 mt-1">
                                                            <a href="{{ route('service-providers.index', array_filter(['category' => $category->slug, 'location' => $selectedCity?->id])) }}" class="text-primary fw-bold text-decoration-none d-flex align-items-center">
-                                                               {{ __('general.view_all') ?? 'View All' }} <i class="fas fa-arrow-right ms-2 rtl-flip small"></i>
+                                                                {{ __('general.view_all') ?? 'View All' }} <i class="fas fa-arrow-right ms-2 rtl-flip small"></i>
                                                            </a>
                                                         </li>
                                                     </ul>
@@ -624,7 +577,7 @@
                                     </div>
                                 @empty
                                     <div class="text-center text-muted py-3">
-                                        <i class="fas fa-folder-open mb-2 ds-block fs-4 text-light"></i>
+                                        <i class="fas fa-folder-open mb-2 d-block fs-4 text-light"></i>
                                         <p class="small mb-0">{{ __('categories.none_available') }}</p>
                                     </div>
                                 @endforelse
@@ -646,7 +599,7 @@
 
         <!-- Call to Action Section -->
         @if(isset($sections) && count($sections) > 0)
-            <div class="section-card text-center bg-white reveal">
+            <div class="section-card text-center bg-white reveal mb-5 p-5 rounded-4 shadow-sm">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
                         <div class="mb-4 d-inline-block p-3 rounded-circle bg-light text-primary">
@@ -716,18 +669,14 @@
             </div>
         </div>
     </div>
+@endsection
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JS -->
+@push('scripts')
     <script>
         const requiredFieldsMessage = @json(__('validation.fill_required_fields'));
         const suggestionSuccessMessage = @json(__('categories.suggestion_success'));
 
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('Enhanced Categories page loaded successfully');
-
             // Scroll Reveal Animation using Intersection Observer
             const observerOptions = {
                 root: null,
@@ -782,18 +731,11 @@
             const messengerUrl = `https://m.me/61583422931690?text=${encodeURIComponent(message)}`;
             window.open(messengerUrl, '_blank');
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById('suggestionModal'));
+            const modalElement = document.getElementById('suggestionModal');
+            const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
             modal.hide();
 
             document.getElementById('suggestionForm').reset();
         }
     </script>
-
-    {{-- Toast Notification System --}}
-    <x-toast-notification />
-
-    @include('layouts.footer')
-
-</body>
-
-</html>
+@endpush

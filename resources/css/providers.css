@@ -1025,7 +1025,7 @@ a {
     padding: 1rem;
     background: linear-gradient(135deg, #f9fafb, #f3f4f6);
     border-radius: 12px;
-    border-left: 4px solid #f59e0b;
+    border-inline-start: 4px solid #f59e0b;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -1085,7 +1085,7 @@ a {
 
 /* ===== Character Counter ===== */
 .char-count {
-    text-align: right;
+    text-align: end;
     font-size: 0.85rem;
     color: #6b7280;
     margin-top: 0.8rem;
@@ -1530,7 +1530,7 @@ a {
 
 
 [dir="rtl"] .provider-info {
-    text-align: right;
+    text-align: end;
 }
 
 [dir="rtl"] .location-info {
@@ -1538,7 +1538,7 @@ a {
 }
 
 [dir="rtl"] .address-text {
-    text-align: right;
+    text-align: end;
 }
 
 [dir="rtl"] .action-buttons {

@@ -40,7 +40,7 @@
         {{-- Floating admin button – refined pill --}}
         @auth
             @if(auth()->user()->isAdmin() && !request()->routeIs('admin.*'))
-                <a href="{{ route('admin.dashboard') }}" class="admin-quick-link" title="{{ __('admin.dashboard') }}">
+                <a href="{{ route('admin.dashboard') }}" class="admin-quick-link text-white" title="{{ __('admin.dashboard') }}">
                     <i class="fas fa-shield-alt fa-fw"></i>
                     <span>{{ __('admin.dashboard') }}</span>
                 </a>

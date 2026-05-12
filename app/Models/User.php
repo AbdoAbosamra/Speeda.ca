@@ -117,12 +117,12 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        // Consider user admin if role is 'admin' OR email is in ADMINS env list (comma separated)
+        // Consider user admin if role is 'admin' OR email is in admins config list
         if ($this->role === 'admin') {
             return true;
         }
 
-        $admins = array_filter(array_map('trim', explode(',', env('ADMINS', env('ADMIN_EMAIL', '')))));
+        $admins = config('auth.admins', []);
         if ($this->email && in_array($this->email, $admins, true)) {
             return true;
         }

@@ -9,7 +9,7 @@
                     <h1>Blog Management</h1>
                     <p>Create, search, edit, publish, and safely delete public blog articles.</p>
                 </div>
-                <a href="{{ route('admin.blog.posts.create') }}" class="admin-btn admin-btn-primary">
+                <a href="{{ route('admin.blog.posts.create') }}" class="admin-btn admin-btn-primary text-white">
                     <i class="fas fa-plus"></i>
                     <span>Create Blog</span>
                 </a>
@@ -36,7 +36,7 @@
                         </select>
                     </label>
                     <div class="admin-filter-actions">
-                        <button type="submit" class="admin-btn admin-btn-primary">
+                        <button type="submit" class="admin-btn admin-btn-primary text-white">
                             <i class="fas fa-magnifying-glass"></i>
                             <span>Apply</span>
                         </button>
@@ -106,7 +106,7 @@
                                             <i class="fas fa-newspaper"></i>
                                             <h2>No blog posts found</h2>
                                             <p>Create a blog post or adjust the current filters.</p>
-                                            <a href="{{ route('admin.blog.posts.create') }}" class="admin-btn admin-btn-primary">Create Blog</a>
+                                            <a href="{{ route('admin.blog.posts.create') }}" class="admin-btn admin-btn-primary text-white">Create Blog</a>
                                         </div>
                                     </td>
                                 </tr>

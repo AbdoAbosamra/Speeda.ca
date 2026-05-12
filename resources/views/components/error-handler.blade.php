@@ -19,7 +19,7 @@ Features:
                     <i class="fas fa-check-circle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.success') }}!</strong>
-                        <div>{!! session('success') !!}</div>
+                        <div>{{ session('success') }}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -32,7 +32,7 @@ Features:
                     <i class="fas fa-exclamation-circle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.error') }}!</strong>
-                        <div>{!! session('error') !!}</div>
+                        <div>{{ session('error') }}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -45,7 +45,7 @@ Features:
                     <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.warning') }}!</strong>
-                        <div>{!! session('warning') !!}</div>
+                        <div>{{ session('warning') }}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -58,7 +58,7 @@ Features:
                     <i class="fas fa-info-circle me-2 fs-5"></i>
                     <div class="flex-grow-1">
                         <strong>{{ __('general.info') }}!</strong>
-                        <div>{!! session('info') !!}</div>
+                        <div>{{ session('info') }}</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

@@ -177,6 +177,10 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
     // Dismiss engagement popup
     Route::post('/profile/popup-dismissed', [ServiceProviderController::class, 'dismissEngagementPopup'])
         ->name('service-providers.popup-dismissed');
+
+    // Dismiss completion popup (session-based)
+    Route::post('/profile/completion-popup-dismiss', [ServiceProviderController::class, 'dismissCompletionPopup'])
+        ->name('service-providers.dismiss-completion-popup');
 });
 
 // ==================== REVIEWS ROUTES (Client) ====================
@@ -314,6 +318,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
 });
 
 

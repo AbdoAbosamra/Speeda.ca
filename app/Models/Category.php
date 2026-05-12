@@ -75,7 +75,7 @@ class Category extends Model
 
     public function activeServiceProviders()
     {
-        return $this->hasMany(ServiceProvider::class)->where('is_verified', true);
+        return $this->hasMany(ServiceProvider::class);
     }
 
     public function grandchildren()
@@ -160,43 +160,80 @@ class Category extends Model
     // Methods
 
     /**
-     * Get localized name based on current locale
-     * Fallback: locale-specific → English → default name
+     * Get localized column value with proper fallback chain.
+     * Fallback: current locale → English → Arabic → French → empty string
+     *
+     * @param string $column Base column name (e.g., 'name', 'description')
+     * @return string Localized value or empty string
+     */
+    private function getLocalizedColumn(string $column): string
+    {
+        $locale = app()->getLocale();
+        
+        // 1. Try the requested locale's specific column
+        $localeColumn = in_array($locale, ['en', 'ar', 'fr']) ? $column . '_' . $locale : $column;
+        $value = $this->$localeColumn ?? null;
+        if (!empty(trim((string) $value))) {
+            return $value;
+        }
+
+        // 2. Try Laravel translation files as fallback (using multiple key variations)
+        if ($column === 'name' && !empty($this->slug)) {
+            $slugKey = str_replace('-', '_', $this->slug);
+            $possibleKeys = [
+                $this->slug,
+                $slugKey,
+                $slugKey . '_services',
+                $slugKey . '_cat',
+                str_replace('_services', '', $slugKey), // reversed
+            ];
+
+            foreach ($possibleKeys as $key) {
+                $translationKey = 'categories.' . $key;
+                $translated = __($translationKey);
+                if ($translated !== $translationKey && !empty($translated)) {
+                    return $translated;
+                }
+            }
+        }
+
+        // 3. Try the base column (often contains the primary/English text)
+        $baseValue = $this->$column ?? null;
+        if (!empty(trim((string) $baseValue))) {
+            return $baseValue;
+        }
+
+        // 4. Try other languages as fallbacks
+        $fallbackChain = ['en', 'ar', 'fr'];
+        foreach ($fallbackChain as $lang) {
+            if ($lang === $locale) continue;
+            
+            $fallbackColumn = $column . '_' . $lang;
+            $fallbackValue = $this->$fallbackColumn ?? null;
+            if (!empty(trim((string) $fallbackValue))) {
+                return $fallbackValue;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Get localized name based on current locale.
+     * Fallback: current locale → English → Arabic → French → base name → empty string
      */
     public function getLocalizedNameAttribute(): string
     {
-        $locale = app()->getLocale();
-
-        // Try locale-specific column first (e.g., name_ar for Arabic)
-        $field = 'name_'.$locale;
-        if (! empty($this->$field)) {
-            return $this->$field;
-        }
-
-        // Fallback: Try English
-        if (! empty($this->name_en)) {
-            return $this->name_en;
-        }
-
-        // Last resort: Original name column
-        return $this->name ?? '';
+        return $this->getLocalizedColumn('name');
     }
 
     /**
      * Get localized description based on current locale.
-     *
-     * Strategy:
-     * 1. For non-English locales (ar, fr, etc):
-     *    - ALWAYS use template generation to ensure pure language (never English fallback)
-     * 2. For English locale:
-     *    - Use database column if populated
-     *    - Otherwise generate from template
-     *
-     * This ensures NO MIXED LANGUAGE rendering in any locale.
+     * Fallback: current locale → English → Arabic → French → base description → empty string
      */
     public function getLocalizedDescriptionAttribute(): string
     {
-        return '';
+        return $this->getLocalizedColumn('description');
     }
 
     /**

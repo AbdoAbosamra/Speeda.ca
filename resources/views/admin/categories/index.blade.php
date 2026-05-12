@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Admin Categories Management with Tailwind + Alpine.js -->
-<div class="admin-content-wrapper" style="margin-left: 0 !important;" x-data="{ 
+<div class="admin-content-wrapper" style="margin-inline-start: 0 !important;" x-data="{ 
     showInactive: true, 
     searchQuery: '', 
     selectedSection: 'all',

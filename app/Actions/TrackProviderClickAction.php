@@ -49,10 +49,10 @@ class TrackProviderClickAction
         $userAgent = request()->userAgent() ?? 'unknown';
 
         if (empty($sessionId)) {
-            return hash('sha256', 'anonymous|' . $userAgent);
+            return hash('sha256', config('app.analytics_salt') . 'anonymous|' . $userAgent);
         }
 
-        return hash('sha256', $sessionId . '|' . $userAgent);
+        return hash('sha256', config('app.analytics_salt') . $sessionId . '|' . $userAgent);
     }
 
     /**

@@ -261,17 +261,29 @@ class Post extends Model
     protected function getLocalizedValue(string $baseColumn): ?string
     {
         $locale = app()->getLocale();
-        $candidates = [
-            "{$baseColumn}_{$locale}",
-            "{$baseColumn}_en",
-            $baseColumn,
-        ];
+        
+        // 1. Try the requested locale's specific column
+        $localeColumn = in_array($locale, ['en', 'ar', 'fr']) ? $baseColumn . '_' . $locale : $baseColumn;
+        $value = $this->getAttribute($localeColumn);
+        if (is_string($value) && trim($value) !== '') {
+            return $value;
+        }
 
-        foreach ($candidates as $candidate) {
-            $value = $this->getAttribute($candidate);
+        // 2. Try the base column (often contains the primary/English text)
+        $baseValue = $this->getAttribute($baseColumn);
+        if (is_string($baseValue) && trim($baseValue) !== '') {
+            return $baseValue;
+        }
 
-            if (is_string($value) && trim($value) !== '') {
-                return $value;
+        // 3. Try other languages as fallbacks
+        $fallbackChain = ['en', 'ar', 'fr'];
+        foreach ($fallbackChain as $lang) {
+            if ($lang === $locale) continue;
+            
+            $fallbackColumn = $baseColumn . '_' . $lang;
+            $fallbackValue = $this->getAttribute($fallbackColumn);
+            if (is_string($fallbackValue) && trim($fallbackValue) !== '') {
+                return $fallbackValue;
             }
         }
 

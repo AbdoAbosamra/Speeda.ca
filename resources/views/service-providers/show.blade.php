@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @push('styles')
     @vite(['resources/css/provider-profile.css'])
@@ -17,21 +17,10 @@
                 <li class="breadcrumb-item"><a href="{{ route('service-providers.index') }}"><i
                             class="fas fa-list me-1"></i>{{ __('service_provider.providers_label') }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                    {{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}
                 </li>
             </ol>
         </nav>
-
-        <!-- Flash Messages -->
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        {{-- Unified Error Handler --}}
-        <x-error-handler />
 
         <div class="row">
             <!-- Main Provider Information -->
@@ -43,7 +32,7 @@
                     <!-- Profile Image -->
                     <div class="profile-image-container" @if(auth()->check() && auth()->id() === $serviceProvider->user_id) id="profileImageClickable" style="cursor: pointer;" title="{{ __('service_provider.click_to_change_image') }}" @endif>
                         <img src="{{ $serviceProvider->display_image_url }}"
-                            alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
+                            alt="{{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}"
                             class="profile-image" loading="lazy" id="profileImagePreview"
                             onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
                         {{-- Camera overlay for owner --}}
@@ -64,7 +53,7 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <h1 class="fw-bold mb-2">
-                                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                                    {{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}
                                 </h1>
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-briefcase me-1"></i>
@@ -110,9 +99,6 @@
                         @if(auth()->id() === $serviceProvider->user_id)
                             <!-- Owner-only Edit Section -->
 
-                            {{-- Engagement Popup / Banner --}}
-                            <x-profile-completion-popup :serviceProvider="$serviceProvider" />
-
                             {{-- Profile Completion Progress Bar --}}
                             @php $pct = $serviceProvider->profile_completion_percent ?? 0; @endphp
                             <div class="mb-4 p-3 rounded-4 shadow-sm" style="background: white;">
@@ -132,7 +118,9 @@
                                         class="fas fa-edit me-2"></i>{{ __('service_provider.edit_profile') }}</h4>
 
                                 <form action="{{ route('service-providers.profile.update', $serviceProvider->id) }}"
-                                    method="POST" enctype="multipart/form-data" id="profileUpdateForm">
+                                    method="POST" enctype="multipart/form-data" id="profileUpdateForm"
+                                    x-data="{ loading: false }"
+                                    @submit="loading = true; $el.submit()">
                                     @csrf
                                     @method('PUT')
 
@@ -423,7 +411,7 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-tools text-warning"></i>
                                                     </span>
-                                                    <input type="text" name="services_offered"
+                                                    <input type="text" name="services_offered" id="servicesInput"
                                                         class="form-control form-control-lg border-start-0"
                                                         value="{{ old('services_offered', is_array($serviceProvider->services_offered) ? implode(', ', $serviceProvider->services_offered) : $serviceProvider->services_offered) }}"
                                                         placeholder="{{ __('general.example') }}: {{ __('service_provider.services_offered_input_hint') }}">
@@ -752,9 +740,10 @@
                                                         <i class="fas fa-times-circle me-2"></i>{{ __('general.cancel') }}
                                                     </a>
                                                     <button type="submit" class="btn btn-primary btn-lg px-5"
-                                                        style="border-radius: 12px; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);">
-                                                        <i class="fas fa-save me-2"></i>{{ __('general.save_changes') }}
-                                                        <i class="fas fa-arrow-left ms-2"></i>
+                                                        style="border-radius: 12px; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);"
+                                                        :disabled="loading">
+                                                        <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-save'" class="me-2"></i>
+                                                        <span x-text="loading ? '{{ __('general.saving') }}...' : '{{ __('general.save_changes') }}'"></span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -771,7 +760,7 @@
                             <h4 class="fw-bold text-primary mb-3">
                                 <i class="fas fa-info-circle me-2"></i>{{ __('service_provider.about_us') }}
                             </h4>
-                            <p class="fs-6">{{ $serviceProvider->bio ?? __('service_provider.no_description') }}</p>
+                            <p class="fs-6">{{ $serviceProvider->localized_bio ?? __('service_provider.no_description') }}</p>
                         </div>
 
                         @if($galleryImages->count() > 0)
@@ -836,6 +825,13 @@
                                         </div>
                                     </div>
                                 </template>
+                            </div>
+                        @else
+                            {{-- Empty state for gallery --}}
+                            <div class="mb-4 text-center py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 16px;">
+                                <i class="fas fa-images fa-3x text-muted mb-3 opacity-50"></i>
+                                <h5 class="text-muted mb-2">{{ __('service_provider.no_gallery_images') }}</h5>
+                                <p class="text-muted small mb-0">{{ __('service_provider.no_gallery_hint') }}</p>
                             </div>
                         @endif
 
@@ -1043,7 +1039,7 @@
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1 fw-bold">{{ __('general.location') }}</h6>
                                     <p class="mb-0">
-                                        {{ $serviceProvider->location->city ?? __('service_provider.location_not_specified') }}
+                                        {{ $serviceProvider->location->localized_name ?? __('service_provider.location_not_specified') }}
                                     </p>
                                 </div>
                             </div>
@@ -1251,7 +1247,9 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <form id="reviewForm" action="{{ route('reviews.store') }}" method="POST">
+                <form id="reviewForm" action="{{ route('reviews.store') }}" method="POST"
+                    x-data="{ loading: false }"
+                    @submit="loading = true; $el.submit()">
                     @csrf
                     <input type="hidden" name="service_provider_id" value="{{ $serviceProvider->id }}">
                     <div class="modal-body p-4">
@@ -1282,8 +1280,10 @@
                             {{ __('general.cancel') }}
                         </button>
                         <button type="submit" class="btn btn-primary"
-                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                            <i class="fas fa-paper-plane me-2"></i>{{ __('reviews.submit_review') }}
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;"
+                            :disabled="loading">
+                            <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-paper-plane'" class="me-2"></i>
+                            <span x-text="loading ? '{{ __('general.saving') }}...' : '{{ __('reviews.submit_review') }}'"></span>
                         </button>
                     </div>
                 </form>

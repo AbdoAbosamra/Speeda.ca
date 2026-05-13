@@ -37,7 +37,7 @@ class RegisterRequest extends FormRequest
         if ($this->input('role') === 'service_provider') {
             $rules['name'][0] = 'required';
             $rules['mobile'] = ['required', 'string', new CanadianPhoneNumber(), 'unique:service_providers,phone'];
-            $rules['whatsapp_number'] = ['nullable', 'string', new CanadianPhoneNumber()];
+            $rules['whatsapp_number'] = ['nullable', 'string', new CanadianPhoneNumber(), 'unique:service_providers,whatsapp_number'];
             $rules['profession'] = ['required', function($attribute, $value, $fail) {
                 if ($value === 'other') {
                     return; // Allow "other" value
@@ -69,6 +69,7 @@ class RegisterRequest extends FormRequest
             'role.in' => __('validation.role_invalid'),
             'mobile.required' => __('validation.mobile_required_provider'),
             'mobile.unique' => __('validation.mobile_unique'),
+            'whatsapp_number.unique' => __('validation.mobile_unique'),
             'profession.required' => __('validation.profession_required'),
             'profession.exists' => __('validation.profession_invalid'),
             'city.required' => __('validation.city_required'),

@@ -978,7 +978,7 @@
                 const originalHTML = btnElement?.innerHTML;
                 try {
                     if (btnElement) {
-                        btnElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> جارٍ...';
+                        btnElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> {{ __('general.loading') }}';
                         btnElement.disabled = true;
                     }
                     const res = await fetch('{{ route("notifications.mark-as-read") }}', {

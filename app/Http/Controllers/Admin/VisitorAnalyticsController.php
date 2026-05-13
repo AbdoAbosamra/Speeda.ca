@@ -94,7 +94,7 @@ class VisitorAnalyticsController extends Controller
 
                 foreach ($analytics['top_pages'] as $page) {
                     fputcsv($file, [
-                        $page->path,
+                        $page->page_name ?? $page->path,
                         $page->visits,
                         $page->unique_visitors,
                     ]);

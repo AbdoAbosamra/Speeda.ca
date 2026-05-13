@@ -125,7 +125,10 @@
                             <tbody>
                                 @forelse($analytics['top_pages'] as $page)
                                     <tr>
-                                        <td><span class="admin-table-title">{{ $page->path }}</span></td>
+                                        <td>
+                                            <span class="admin-table-title">{{ $page->page_name ?? $page->path }}</span>
+                                            <span class="admin-muted-note d-block">{{ $page->path }}</span>
+                                        </td>
                                         <td>{{ number_format($page->visits) }}</td>
                                         <td>{{ number_format($page->unique_visitors) }}</td>
                                     </tr>

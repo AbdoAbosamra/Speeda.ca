@@ -133,7 +133,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'max:16',
                 // Allow optional leading +, digits, spaces, and dashes; we'll normalize before save
                 'regex:/^\+?[0-9\s\-]{10,16}$/',
-                // WhatsApp number can be same as phone
+                Rule::unique('service_providers', 'whatsapp_number')->ignore($serviceProviderId),
             ],
 
             'address' => [

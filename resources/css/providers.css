@@ -502,9 +502,14 @@ a {
 }
 
 .btn-recommend {
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
-    color: white;
-    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+    background: #5859F3 !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    box-shadow: 0 6px 20px rgba(88, 89, 243, 0.3) !important;
+}
+
+.btn-recommend i {
+    color: #FFFFFF !important;
 }
 
 .btn-recommend:hover {
@@ -513,9 +518,14 @@ a {
 }
 
 .btn-rate {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-    color: var(--gray-900);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+    background: #FFB82B !important;
+    color: #212529 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 6px 20px rgba(255, 184, 43, 0.3) !important;
+}
+
+.btn-rate i {
+    color: #212529 !important;
 }
 
 .btn-rate:hover {
@@ -526,11 +536,11 @@ a {
 .btn-profile {
     width: 100%;
     padding: 1.125rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
+    background: linear-gradient(to right, #5859F3, #2196F3) !important;
+    color: #FFFFFF !important;
     border: none;
     border-radius: 14px;
-    font-weight: 700;
+    font-weight: 600 !important;
     font-size: 1rem;
     display: flex;
     align-items: center;
@@ -539,6 +549,10 @@ a {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
+}
+
+.btn-profile i {
+    color: #FFFFFF !important;
 }
 
 .btn-profile::before {

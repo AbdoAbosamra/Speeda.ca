@@ -16,22 +16,16 @@ class ProviderActivityMonitorController extends Controller
         $this->middleware('admin');
     }
 
-    /**
-     * Admin: Provider Activity Monitor (paginated).
-     */
     public function index(Request $request)
     {
         $perPage = (int) $request->input('per_page', 15);
         $perPage = max(5, min(50, $perPage));
 
-        $providers = $this->activityService->paginateProviders($perPage);
+        $providers = $this->activityService->paginateProviders($perPage, $request);
 
         return view('admin.provider_activity_monitor.index', compact('providers'));
     }
 
-    /**
-     * Admin: provider analytics details (events list).
-     */
     public function show(ServiceProvider $serviceProvider, Request $request)
     {
         $perPage = (int) $request->input('per_page', 30);
@@ -42,4 +36,3 @@ class ProviderActivityMonitorController extends Controller
         return view('admin.provider_activity_monitor.show', $details);
     }
 }
-

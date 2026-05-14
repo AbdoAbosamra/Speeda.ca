@@ -2899,6 +2899,341 @@ footer a:hover {
     font-size: 0.9rem;
 }
 
+/* ════════════════════════════════════════════
+   PAGINATION STYLING — SPEEDA DESIGN SYSTEM
+   ════════════════════════════════════════════ */
+
+/* ── Pagination Container ── */
+.speeda-pagination {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.speeda-pagination__card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.97));
+    border: 1px solid var(--speeda-gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ── Pagination Meta (Summary & Progress) ── */
+.speeda-pagination__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--speeda-gray-100);
+}
+
+/* ── Summary Section ── */
+.speeda-pagination__summary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.speeda-pagination__emoji {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.speeda-pagination__summary-text {
+    font-size: 0.95rem;
+    color: var(--speeda-text-body);
+    line-height: 1.4;
+}
+
+.speeda-pagination__number {
+    font-weight: 600;
+}
+
+.speeda-pagination__number--accent {
+    color: var(--speeda-blue);
+    font-weight: 700;
+}
+
+.speeda-pagination__number--dark {
+    color: var(--speeda-text-dark);
+    font-weight: 700;
+}
+
+/* ── Progress Section ── */
+.speeda-pagination__progress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--speeda-text-secondary);
+}
+
+.speeda-pagination__progress-bar {
+    height: 4px;
+    width: 120px;
+    border-radius: var(--radius-full);
+    background: var(--speeda-gray-200);
+    border: none;
+    accent-color: var(--speeda-blue);
+}
+
+.speeda-pagination__progress-bar::-webkit-progress-bar {
+    background: var(--speeda-gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.speeda-pagination__progress-bar::-webkit-progress-value {
+    background: linear-gradient(90deg, var(--speeda-blue), var(--speeda-blue-dark));
+    border-radius: var(--radius-full);
+}
+
+.speeda-pagination__progress-bar::-moz-progress-bar {
+    background: linear-gradient(90deg, var(--speeda-blue), var(--speeda-blue-dark));
+    border-radius: var(--radius-full);
+}
+
+/* ── Main Buttons Area ── */
+.speeda-pagination__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ── Navigation Buttons (Previous/Next) ── */
+.speeda-pagination__nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    height: 40px;
+    background: var(--speeda-gray-50);
+    border: 1.5px solid var(--speeda-gray-200);
+    border-radius: var(--radius-md);
+    color: var(--speeda-text-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.speeda-pagination__nav:hover:not(.speeda-pagination__nav--disabled) {
+    background: var(--speeda-blue);
+    border-color: var(--speeda-blue);
+    color: white;
+    box-shadow: var(--shadow-blue);
+    transform: translateY(-1px);
+}
+
+.speeda-pagination__nav--disabled {
+    background: var(--speeda-gray-100);
+    border-color: var(--speeda-gray-200);
+    color: var(--speeda-text-subtle);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.speeda-pagination__nav-label {
+    display: inline;
+}
+
+@media (max-width: 576px) {
+    .speeda-pagination__nav-label {
+        display: none;
+    }
+
+    .speeda-pagination__nav {
+        padding: 0.625rem;
+        font-size: 0.9rem;
+        border-radius: var(--radius-md);
+    }
+}
+
+/* ── Page Numbers Container ── */
+.speeda-pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+/* ── Individual Page Numbers ── */
+.speeda-pagination__page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0.625rem;
+    background: var(--speeda-gray-50);
+    border: 1.5px solid var(--speeda-gray-200);
+    border-radius: var(--radius-md);
+    color: var(--speeda-text-dark);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.speeda-pagination__page:hover {
+    background: var(--speeda-blue-light);
+    border-color: var(--speeda-blue);
+    color: var(--speeda-blue);
+    transform: translateY(-1px);
+}
+
+.speeda-pagination__page--active {
+    background: linear-gradient(135deg, var(--speeda-blue), var(--speeda-blue-dark));
+    border-color: var(--speeda-blue-dark);
+    color: white;
+    font-weight: 700;
+    box-shadow: var(--shadow-blue);
+}
+
+/* ── Dots Separator ── */
+.speeda-pagination__dots {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--speeda-text-subtle);
+    font-weight: 600;
+    user-select: none;
+}
+
+/* ── Mobile Pagination Counter ── */
+.speeda-pagination__mobile-count {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.95rem;
+    color: var(--speeda-text-body);
+    font-weight: 600;
+}
+
+.speeda-pagination__mobile-current {
+    color: var(--speeda-blue);
+    font-weight: 700;
+}
+
+.speeda-pagination__mobile-separator {
+    color: var(--speeda-text-subtle);
+}
+
+/* ── Mobile Responsive Adjustments ── */
+@media (max-width: 576px) {
+    .speeda-pagination__card {
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .speeda-pagination__meta {
+        gap: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    .speeda-pagination__progress {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .speeda-pagination__progress-bar {
+        flex: 1;
+        width: auto;
+    }
+
+    .speeda-pagination__buttons {
+        gap: 0.25rem;
+        width: 100%;
+        order: -1;
+    }
+
+    .speeda-pagination__pages {
+        gap: 0.2rem;
+        order: 1;
+        width: 100%;
+    }
+
+    .speeda-pagination__page {
+        min-width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+
+    .speeda-pagination__nav {
+        flex: 1;
+        justify-content: center;
+        min-width: auto;
+    }
+
+    .speeda-pagination__mobile-count {
+        display: flex;
+    }
+
+    .speeda-pagination__dots {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* ── RTL Support ── */
+[dir="rtl"] .speeda-pagination__nav {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .speeda-pagination__summary {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .speeda-pagination__progress {
+    flex-direction: row-reverse;
+}
+
+/* ── Dark Mode Support (if needed) ── */
+@media (prefers-color-scheme: dark) {
+    .speeda-pagination__card {
+        background: rgba(30, 41, 59, 0.95);
+        border-color: rgba(100, 116, 139, 0.3);
+    }
+
+    .speeda-pagination__meta {
+        border-bottom-color: rgba(100, 116, 139, 0.2);
+    }
+
+    .speeda-pagination__nav {
+        background: rgba(51, 65, 85, 0.5);
+        border-color: rgba(100, 116, 139, 0.3);
+        color: rgba(248, 250, 252, 0.9);
+    }
+
+    .speeda-pagination__page {
+        background: rgba(51, 65, 85, 0.5);
+        border-color: rgba(100, 116, 139, 0.3);
+        color: rgba(248, 250, 252, 0.9);
+    }
+
+    .speeda-pagination__page:hover {
+        background: rgba(37, 99, 235, 0.2);
+        border-color: var(--speeda-blue);
+    }
+}
+
 .admin-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3123,4 +3458,267 @@ footer a:hover {
 
 .hero-banner-custom:hover {
     transform: scale(1.12) translateY(-5px) !important;
+}
+
+/* ============================================
+   SPEEDA GLOBAL ENTERPRISE PAGINATION
+   ============================================ */
+.speeda-pagination {
+    display: block;
+    width: 100%;
+    margin: 2rem 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+}
+
+.speeda-pagination__card {
+    padding: 1rem 1.5rem;
+    border: 1px solid rgba(203, 213, 225, 0.4);
+    border-radius: 28px;
+    background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+}
+
+.speeda-pagination__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.speeda-pagination__summary,
+.speeda-pagination__progress {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    border-radius: 999px;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.speeda-pagination__summary {
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    background: #f8fafc;
+    font-size: 0.875rem;
+}
+
+.speeda-pagination__progress {
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: #f1f5f9;
+    font-size: 0.8125rem;
+}
+
+.speeda-pagination__summary-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.speeda-pagination__emoji {
+    font-weight: 500;
+}
+
+.speeda-pagination__number {
+    margin-inline: 0.25rem;
+    font-weight: 600;
+}
+
+.speeda-pagination__number--accent {
+    color: #3b82f6;
+}
+
+.speeda-pagination__number--dark {
+    color: #1e293b;
+}
+
+.speeda-pagination__progress-bar {
+    width: 60px;
+    height: 4px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px;
+    background: #e2e8f0;
+    appearance: none;
+}
+
+.speeda-pagination__progress-bar::-webkit-progress-bar {
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.speeda-pagination__progress-bar::-webkit-progress-value {
+    border-radius: 999px;
+    background: #3b82f6;
+    transition: width 0.3s ease-out;
+}
+
+.speeda-pagination__progress-bar::-moz-progress-bar {
+    border-radius: 999px;
+    background: #3b82f6;
+}
+
+.speeda-pagination__buttons,
+.speeda-pagination__pages {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.speeda-pagination__nav,
+.speeda-pagination__page,
+.speeda-pagination__dots,
+.speeda-pagination__mobile-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.speeda-pagination__nav,
+.speeda-pagination__page {
+    min-width: 40px;
+    height: 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1),
+        border-color 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1),
+        box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1),
+        transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+.speeda-pagination__nav {
+    padding-inline: 0.875rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.speeda-pagination__page {
+    padding-inline: 0.75rem;
+    color: #334155;
+}
+
+.speeda-pagination__nav:hover,
+.speeda-pagination__page:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #1e293b;
+    transform: translateY(-2px);
+}
+
+.speeda-pagination__page:hover {
+    background: #f1f5f9;
+}
+
+.speeda-pagination__nav:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+}
+
+.speeda-pagination__nav:focus-visible,
+.speeda-pagination__page:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.28);
+}
+
+.speeda-pagination__nav--disabled {
+    border-color: transparent;
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: default;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.speeda-pagination__page--active {
+    min-width: 44px;
+    height: 44px;
+    border-color: #3b82f6;
+    border-radius: 16px;
+    background: #3b82f6;
+    color: #ffffff;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: default;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25);
+    transform: scale(1.02);
+}
+
+.speeda-pagination__page--active:hover {
+    background: #3b82f6;
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.speeda-pagination__dots {
+    min-width: 40px;
+    height: 40px;
+    color: #94a3b8;
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
+
+.speeda-pagination__mobile-count {
+    display: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.875rem;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.speeda-pagination__mobile-current {
+    color: #3b82f6;
+    font-weight: 700;
+}
+
+.speeda-pagination__mobile-separator {
+    margin-inline: 0.5rem;
+    color: #94a3b8;
+}
+
+[dir="rtl"] .speeda-pagination__nav-label {
+    margin-inline-start: 0.25rem;
+    margin-inline-end: 0;
+}
+
+@media (max-width: 640px) {
+    .speeda-pagination__card {
+        padding: 1rem;
+        border-radius: 24px;
+    }
+
+    .speeda-pagination__meta {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .speeda-pagination__summary {
+        width: 100%;
+        justify-content: center;
+        white-space: normal;
+    }
+
+    .speeda-pagination__progress,
+    .speeda-pagination__pages {
+        display: none;
+    }
+
+    .speeda-pagination__mobile-count {
+        display: inline-flex;
+    }
+
+    .speeda-pagination__nav-label {
+        display: none;
+    }
 }

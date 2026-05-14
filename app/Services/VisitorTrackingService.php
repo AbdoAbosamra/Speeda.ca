@@ -17,6 +17,21 @@ class VisitorTrackingService
     protected const CACHE_DURATION = 5;
 
     /**
+     * Apply admin exclusion to any visitor query.
+     * Admins are already excluded at recording level (TrackVisitor middleware),
+     * this provides a safety net for any existing admin entries in the DB.
+     */
+    private function excludeAdmins($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('user_id')
+              ->orWhereDoesntHave('user', function ($q) {
+                  $q->where('role', 'admin');
+              });
+        });
+    }
+
+    /**
      * Get visitor statistics for various time periods.
      */
     public function getStatistics(): array
@@ -37,7 +52,8 @@ class VisitorTrackingService
      */
     public function getTotalVisitors(): int
     {
-        return Visitor::selectRaw('DISTINCT ip_hash, user_agent_hash')
+        return $this->excludeAdmins(Visitor::query())
+            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
             ->count();
     }
 
@@ -46,7 +62,7 @@ class VisitorTrackingService
      */
     public function getVisitorsLast7Days(): int
     {
-        return Visitor::last7Days()
+        return $this->excludeAdmins(Visitor::last7Days())
             ->selectRaw('DISTINCT ip_hash, user_agent_hash')
             ->count();
     }
@@ -56,7 +72,7 @@ class VisitorTrackingService
      */
     public function getVisitorsLast30Days(): int
     {
-        return Visitor::last30Days()
+        return $this->excludeAdmins(Visitor::last30Days())
             ->selectRaw('DISTINCT ip_hash, user_agent_hash')
             ->count();
     }
@@ -66,7 +82,7 @@ class VisitorTrackingService
      */
     public function getVisitorsLast12Months(): int
     {
-        return Visitor::last12Months()
+        return $this->excludeAdmins(Visitor::last12Months())
             ->selectRaw('DISTINCT ip_hash, user_agent_hash')
             ->count();
     }
@@ -77,7 +93,7 @@ class VisitorTrackingService
     public function getLiveVisitors(): int
     {
         return Cache::remember('live_visitors_count', now()->addMinutes(1), function () {
-            return Visitor::live()
+            return $this->excludeAdmins(Visitor::live())
                 ->selectRaw('DISTINCT ip_hash, user_agent_hash')
                 ->count();
         });
@@ -88,30 +104,32 @@ class VisitorTrackingService
      */
     public function getDetailedAnalytics(string $period = 'last_30_days'): array
     {
-        $query = Visitor::query();
+        $query = $this->excludeAdmins(Visitor::query());
 
         switch ($period) {
             case 'last_7_days':
-                $query = $query->last7Days();
+                $query->last7Days();
                 break;
             case 'last_12_months':
-                $query = $query->last12Months();
+                $query->last12Months();
                 break;
             case 'last_30_days':
             default:
-                $query = $query->last30Days();
+                $query->last30Days();
                 break;
         }
 
+        $baseQuery = $query;
+
         // Get visitors grouped by date
-        $visitorsByDate = (clone $query)
+        $visitorsByDate = (clone $baseQuery)
             ->selectRaw('DATE(visited_at) as date, COUNT(DISTINCT ip_hash, user_agent_hash) as count')
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->get();
 
         // Get top pages visited
-        $topPages = (clone $query)
+        $topPages = (clone $baseQuery)
             ->selectRaw('path, COUNT(*) as visits, COUNT(DISTINCT ip_hash, user_agent_hash) as unique_visitors')
             ->groupBy('path')
             ->orderBy('visits', 'desc')
@@ -119,15 +137,14 @@ class VisitorTrackingService
             ->get()
             ->map(function ($page) {
                 $page->page_name = $this->getPageDisplayName($page->path);
-
                 return $page;
             });
 
         return [
             'visitors_by_date' => $visitorsByDate,
             'top_pages' => $topPages,
-            'total_visits' => (clone $query)->count(),
-            'unique_visitors' => (clone $query)->selectRaw('DISTINCT ip_hash, user_agent_hash')->count(),
+            'total_visits' => (clone $baseQuery)->count(),
+            'unique_visitors' => (clone $baseQuery)->selectRaw('DISTINCT ip_hash, user_agent_hash')->count(),
         ];
     }
 

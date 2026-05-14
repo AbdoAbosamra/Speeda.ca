@@ -118,7 +118,7 @@
 
             @if($posts->hasPages())
                 <div class="admin-pagination-wrap">
-                    {{ $posts->links() }}
+                    {{ $posts->links('components.pagination.default') }}
                 </div>
             @endif
         </div>

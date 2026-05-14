@@ -212,6 +212,10 @@ class AdminController extends Controller
                 $canadaNow->copy()->startOfDay(),
                 $canadaNow->copy()->endOfDay(),
             ])
+            ->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhereDoesntHave('user', fn ($q) => $q->where('role', 'admin'));
+            })
             ->selectRaw('DISTINCT ip_hash, user_agent_hash')
             ->count();
     }
@@ -227,6 +231,10 @@ class AdminController extends Controller
                 $canadaNow->copy()->startOfMonth(),
                 $canadaNow->copy()->endOfMonth(),
             ])
+            ->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhereDoesntHave('user', fn ($q) => $q->where('role', 'admin'));
+            })
             ->selectRaw('DISTINCT ip_hash, user_agent_hash')
             ->count();
     }

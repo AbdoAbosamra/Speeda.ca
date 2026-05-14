@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
 use App\Models\User;
 use App\Models\ServiceProvider as ServiceProviderModel;
 use Illuminate\Support\ServiceProvider;
@@ -47,6 +48,9 @@ class AppServiceProvider extends ServiceProvider
         // PERFORMANCE: Prevent lazy loading in development/staging to catch N+1 queries
         // CRITICAL: This is NOT enabled in production to avoid breaking the live site
         Model::preventLazyLoading(app()->environment(['local', 'staging']));
+
+        Paginator::defaultView('components.pagination.default');
+        Paginator::defaultSimpleView('components.pagination.default');
 
         View::share('supportedLocales', config('app.supported_locales'));
 
@@ -124,4 +128,3 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 }
-

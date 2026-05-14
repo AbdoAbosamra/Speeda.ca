@@ -12,6 +12,13 @@ return [
     |
     */
 
-    'previous' => '&laquo; Précédent',
-    'next' => 'Suivant &raquo;',
+    'previous' => 'Page précédente',
+    'next' => 'Page suivante',
+    'previous_short' => 'Préc.',
+    'next_short' => 'Suiv.',
+    'navigation_label' => 'Navigation de pagination',
+    'showing_results' => 'Affichage de :first à :last sur :total résultats',
+    'showing_page' => 'Affichage de la page :page',
+    'page_progress' => 'Page :current sur :last',
+    'go_to_page' => 'Aller à la page :page',
 ];

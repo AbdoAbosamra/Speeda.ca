@@ -4,15 +4,15 @@ namespace App\Services;
 
 use App\Models\ServiceProvider;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminProviderActivityMonitorService
 {
-    public function paginateProviders(int $perPage = 15): LengthAwarePaginator
+    public function paginateProviders(int $perPage = 15, ?Request $request = null): LengthAwarePaginator
     {
         $serviceProviderMorphType = (new ServiceProvider())->getMorphClass();
 
-        // Aggregate analytics per provider (views + WhatsApp clicks + last activity).
         $analyticsAgg = DB::table('analytics')
             ->selectRaw('
                 provider_id,
@@ -22,7 +22,6 @@ class AdminProviderActivityMonitorService
             ')
             ->groupBy('provider_id');
 
-        // Aggregate gallery count per provider.
         $galleryAgg = DB::table('media')
             ->selectRaw('
                 model_id as provider_id,
@@ -46,8 +45,50 @@ class AdminProviderActivityMonitorService
                 a.last_activity_at,
                 COALESCE(g.gallery_count, 0) as gallery_count,
                 CASE WHEN sp.profile_image IS NOT NULL AND sp.profile_image <> "" THEN 1 ELSE 0 END as has_profile_photo
-            ')
-            ->orderByRaw('COALESCE(a.last_activity_at, sp.created_at) DESC');
+            ');
+
+        // Apply search filter
+        if ($request && $search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('sp.id', 'LIKE', "%{$search}%")
+                  ->orWhere('sp.company_name', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Apply completion status filter
+        if ($request && $status = $request->input('completion_status')) {
+            switch ($status) {
+                case 'complete':
+                    $query->where('sp.profile_completion_percent', '>=', 100);
+                    break;
+                case 'partial':
+                    $query->whereBetween('sp.profile_completion_percent', [1, 99]);
+                    break;
+                case 'incomplete':
+                    $query->where('sp.profile_completion_percent', '<=', 0);
+                    break;
+            }
+        }
+
+        // Apply activity date filter
+        if ($request && $activity = $request->input('activity')) {
+            switch ($activity) {
+                case 'today':
+                    $query->whereDate('a.last_activity_at', today());
+                    break;
+                case 'week':
+                    $query->where('a.last_activity_at', '>=', now()->subWeek());
+                    break;
+                case 'month':
+                    $query->where('a.last_activity_at', '>=', now()->subMonth());
+                    break;
+                case 'never':
+                    $query->whereNull('a.last_activity_at');
+                    break;
+            }
+        }
+
+        $query->orderByRaw('COALESCE(a.last_activity_at, sp.created_at) DESC');
 
         return $query->paginate($perPage)->withQueryString();
     }
@@ -75,4 +116,3 @@ class AdminProviderActivityMonitorService
         ];
     }
 }
-

@@ -191,7 +191,7 @@
             </section>
 
             @if($notifications->hasPages())
-                <div class="admin-pagination-wrap">{{ $notifications->links() }}</div>
+                <div class="admin-pagination-wrap">{{ $notifications->links('components.pagination.default') }}</div>
             @endif
         </div>
     </div>

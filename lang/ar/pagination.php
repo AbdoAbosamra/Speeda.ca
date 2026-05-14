@@ -12,6 +12,13 @@ return [
     |
     */
 
-    'previous' => '&laquo; السابق',
-    'next' => 'التالي &raquo;',
+    'previous' => 'الصفحة السابقة',
+    'next' => 'الصفحة التالية',
+    'previous_short' => 'السابق',
+    'next_short' => 'التالي',
+    'navigation_label' => 'التنقل بين الصفحات',
+    'showing_results' => 'عرض :first إلى :last من :total نتيجة',
+    'showing_page' => 'عرض الصفحة :page',
+    'page_progress' => 'الصفحة :current من :last',
+    'go_to_page' => 'الانتقال إلى الصفحة :page',
 ];

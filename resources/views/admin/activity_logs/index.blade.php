@@ -120,7 +120,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-4 d-flex justify-content-center">
-                        {{ $logs->links() }}
+                        {{ $logs->links('components.pagination.default') }}
                     </div>
                 </div>
             </div>

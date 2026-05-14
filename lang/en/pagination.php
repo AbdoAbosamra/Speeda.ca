@@ -13,7 +13,14 @@ return [
     |
     */
 
-    'previous' => '&laquo; Previous',
-    'next' => 'Next &raquo;',
+    'previous' => 'Previous page',
+    'next' => 'Next page',
+    'previous_short' => 'Prev',
+    'next_short' => 'Next',
+    'navigation_label' => 'Pagination Navigation',
+    'showing_results' => 'Showing :first to :last of :total results',
+    'showing_page' => 'Showing page :page',
+    'page_progress' => 'Page :current of :last',
+    'go_to_page' => 'Go to page :page',
 
 ];

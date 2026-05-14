@@ -224,7 +224,7 @@
                 </div>
                 @if($reviews->hasPages())
                     <div class="card-footer bg-white" style="border-top: 2px solid #f1f5f9; border-radius: 0 0 16px 16px;">
-                        {{ $reviews->appends(request()->query())->links() }}
+                        {{ $reviews->appends(request()->query())->links('components.pagination.default') }}
                     </div>
                 @endif
             </div>

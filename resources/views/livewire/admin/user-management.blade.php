@@ -327,7 +327,7 @@ new class extends Component
             </table>
         </div>
         <div class="card-footer bg-white border-0 py-3">
-            {{ $users->links('components.global-pagination') }}
+            {{ $users->links('components.pagination.default') }}
         </div>
     </div>
 

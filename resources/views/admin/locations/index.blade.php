@@ -238,7 +238,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-4 d-flex justify-content-center">
-                        {{ $locations->links() }}
+                        {{ $locations->links('components.pagination.default') }}
                     </div>
                 </div>
             </div>

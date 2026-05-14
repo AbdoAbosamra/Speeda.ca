@@ -101,7 +101,7 @@
                     </div>
 
                     <div class="mt-4 d-flex justify-content-center">
-                        {{ $events->links() }}
+                        {{ $events->links('components.pagination.default') }}
                     </div>
                 </div>
             </div>

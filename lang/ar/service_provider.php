@@ -258,7 +258,7 @@ return [
   'arabic' => 'العربية',
   'english' => 'الإنجليزية',
   'french' => 'الفرنسية',
-  'login_required' => 'Please login to access this page.',
-  'unauthorized_access' => 'You are not authorized to view this profile. You can only access your own profile.',
-  'account_disabled' => 'This service provider account is no longer available.',
+  'login_required' => 'يرجى تسجيل الدخول للوصول إلى هذه الصفحة.',
+  'unauthorized_access' => 'غير مصرح لك بعرض هذا الملف الشخصي. يمكنك فقط الوصول إلى ملفك الشخصي.',
+  'account_disabled' => 'حساب مزود الخدمة هذا غير متاح حالياً.',
 ];

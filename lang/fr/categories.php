@@ -270,9 +270,6 @@ return [
     'legal_services' => 'Services Juridiques',
     'photography_videography' => 'Photographie et Vidéographie',
     'electric_hybrid_car_service' => 'Service Voiture Électrique & Hybride',
-    'tire_balancing_wheel_alignment' => 'Équilibrage & Alignement',
     'locksmith_services' => 'Services de Serrurier',
     'house_cleaning' => 'Nettoyage de Maison',
-    'home_renovation' => 'Rénovation de Maison',
-    'marketing_advertising' => 'Marketing et Publicité',
 ];

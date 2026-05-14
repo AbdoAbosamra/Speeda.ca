@@ -270,9 +270,6 @@ return [
     'legal_services' => 'خدمات قانونية',
     'photography_videography' => 'تصوير فوتوغرافي وفيديو',
     'electric_hybrid_car_service' => 'خدمات السيارات الكهربائية والهجينة',
-    'tire_balancing_wheel_alignment' => 'ضبط توازن الإطارات وزوايا العجلات',
     'locksmith_services' => 'خدمات الأقفال والمفاتيح',
     'house_cleaning' => 'تنظيف المنازل',
-    'home_renovation' => 'تجديد المنازل',
-    'marketing_advertising' => 'التسويق والإعلان',
 ];

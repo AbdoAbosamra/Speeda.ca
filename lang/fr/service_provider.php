@@ -259,6 +259,6 @@ Complétez votre profil maintenant.',
   'arabic' => 'Arabe',
   'english' => 'Anglais',
   'french' => 'Français',
-  'login_required' => 'Please login to access this page.',
-  'unauthorized_access' => 'You are not authorized to view this profile. You can only access your own profile.',
+  'login_required' => 'Veuillez vous connecter pour accéder à cette page.',
+  'unauthorized_access' => 'Vous n\'êtes pas autorisé à voir ce profil. Vous ne pouvez accéder qu\'à votre propre profil.',
 ];

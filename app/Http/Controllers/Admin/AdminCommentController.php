@@ -49,7 +49,7 @@ class AdminCommentController extends Controller
                 $query->where('user_id', $request->get('user_id'));
             }
 
-            $comments = $query->paginate(20);
+            $comments = $query->paginate(20)->withQueryString();
 
             return view('admin.comments.index', compact('comments'));
         } catch (\Exception $e) {

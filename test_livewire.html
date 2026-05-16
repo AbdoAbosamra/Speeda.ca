@@ -1,0 +1,1344 @@
+<div wire:snapshot="{&quot;data&quot;:{&quot;search&quot;:&quot;&quot;,&quot;role&quot;:&quot;&quot;,&quot;status&quot;:&quot;&quot;,&quot;showInactive&quot;:true,&quot;selectedUsers&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;selectAll&quot;:false,&quot;sortField&quot;:&quot;created_at&quot;,&quot;sortDirection&quot;:&quot;desc&quot;,&quot;paginators&quot;:[{&quot;page&quot;:1},{&quot;s&quot;:&quot;arr&quot;}]},&quot;memo&quot;:{&quot;id&quot;:&quot;ujl7HRqOUcGqknWRdrnG&quot;,&quot;name&quot;:&quot;admin.user-management&quot;,&quot;path&quot;:&quot;\/&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;release&quot;:&quot;a-a-a&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;en&quot;,&quot;islands&quot;:[]},&quot;checksum&quot;:&quot;c28a6638dc64e00e7be49a98cd1eaa897c2b242ed520ef0fa85a05bda9eed30d&quot;}" wire:effects="{&quot;url&quot;:{&quot;search&quot;:{&quot;as&quot;:&quot;search&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;role&quot;:{&quot;as&quot;:&quot;role&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;status&quot;:{&quot;as&quot;:&quot;status&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;&quot;},&quot;sortField&quot;:{&quot;as&quot;:&quot;sortField&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;created_at&quot;},&quot;sortDirection&quot;:{&quot;as&quot;:&quot;sortDirection&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:&quot;desc&quot;},&quot;page&quot;:{&quot;as&quot;:&quot;page&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:1},&quot;paginators.page&quot;:{&quot;as&quot;:&quot;page&quot;,&quot;use&quot;:&quot;push&quot;,&quot;alwaysShow&quot;:false,&quot;except&quot;:null}}}" wire:id="ujl7HRqOUcGqknWRdrnG" wire:name="admin.user-management" class="us-mgmt" x-data="{ bulkOpen: false }">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    
+    <div class="us-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+                <h1 class="us-header-title">Users Management</h1>
+                <p class="us-header-sub">Manage all users, their roles, and account status</p>
+            </div>
+            <a href="http://localhost/admin/users/trash" class="us-btn us-btn-ghost">
+                <i class="fas fa-trash-alt"></i> Trash Bin
+            </a>
+        </div>
+    </div>
+
+    
+    <div class="us-stats">
+        <div class="us-stat">
+            <div class="us-stat-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="us-stat-label">Total Users</div>
+                        <div class="us-stat-value">64</div>
+                    </div>
+                    <div class="us-stat-icon us-stat-icon-total">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="us-stat">
+            <div class="us-stat-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="us-stat-label">Active</div>
+                        <div class="us-stat-value us-stat-value-success">64</div>
+                    </div>
+                    <div class="us-stat-icon us-stat-icon-active">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="us-stat">
+            <div class="us-stat-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="us-stat-label">Inactive</div>
+                        <div class="us-stat-value us-stat-value-warning">0</div>
+                    </div>
+                    <div class="us-stat-icon us-stat-icon-inactive">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="us-stat">
+            <div class="us-stat-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="us-stat-label">Providers</div>
+                        <div class="us-stat-value us-stat-value-info">53</div>
+                    </div>
+                    <div class="us-stat-icon us-stat-icon-providers">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="us-filters">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-3">
+                <div class="us-search-wrap">
+                    <i class="fas fa-search us-search-icon"></i>
+                    <input type="text" wire:model.live.debounce.300ms="search" class="us-search-input" placeholder="Search by name or email...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select wire:model.live="role" class="us-select">
+                    <option value="">All Roles</option>
+                    <option value="client">Client</option>
+                    <option value="service_provider">Provider</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select wire:model.live="status" class="us-select">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="us-toggle-label">
+                    <input type="checkbox" class="us-toggle-input" wire:model.live="showInactive">
+                    <span class="us-toggle-switch"></span>
+                    <span class="us-toggle-text">Show Inactive</span>
+                </label>
+            </div>
+            <div class="col-md-3 text-end">
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        </div>
+    </div>
+
+    
+    <div class="us-table-wrap">
+        <div class="table-responsive">
+            <table class="us-table" role="table" aria-label="Users list">
+                <thead>
+                    <tr>
+                        <th class="us-th us-th-check">
+                            <input type="checkbox" class="us-check" wire:model.live="selectAll" aria-label="Select all users">
+                        </th>
+                        <th class="us-th us-th-sort" wire:click="sortBy('name')" role="columnheader" aria-sort="none" tabindex="0">
+                            User
+                            <!--[if BLOCK]><![endif]--> <i class="fas fa-sort text-muted opacity-25"></i> <!--[if ENDBLOCK]><![endif]-->                        </th>
+                        <th class="us-th us-th-sort" wire:click="sortBy('role')" role="columnheader" aria-sort="none" tabindex="0">
+                            Role
+                            <!--[if BLOCK]><![endif]--> <i class="fas fa-sort text-muted opacity-25"></i> <!--[if ENDBLOCK]><![endif]-->                        </th>
+                        <th class="us-th">Activity</th>
+                        <th class="us-th us-th-sort" wire:click="sortBy('is_active')" role="columnheader" aria-sort="none" tabindex="0">
+                            Status
+                            <!--[if BLOCK]><![endif]--> <i class="fas fa-sort text-muted opacity-25"></i> <!--[if ENDBLOCK]><![endif]-->                        </th>
+                        <th class="us-th us-th-sort" wire:click="sortBy('created_at')" role="columnheader" aria-sort="descending" tabindex="0">
+                            Created
+                            <!--[if BLOCK]><![endif]--> <i class="fas fa-sort-down"></i> <!--[if ENDBLOCK]><![endif]-->                        </th>
+                        <th class="us-th us-th-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--[if BLOCK]><![endif]-->                        <tr wire:key="user-66" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="66" aria-label="Select khaledd">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        K
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">khaledd</div>
+                                        <div class="us-user-email">test17@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for khaledd">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(66)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>May 12, 2026</span>
+                                <span class="us-date-time">14:17</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/66/edit" class="us-action-btn" title="Edit khaledd" aria-label="Edit khaledd">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(66)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete khaledd" aria-label="Delete khaledd">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-65" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="65" aria-label="Select khaled">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        K
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">khaled</div>
+                                        <div class="us-user-email">khaled20@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for khaled">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(65)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>May 12, 2026</span>
+                                <span class="us-date-time">12:04</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/65/edit" class="us-action-btn" title="Edit khaled" aria-label="Edit khaled">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(65)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete khaled" aria-label="Delete khaled">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-64" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="64" aria-label="Select hosssssam">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        H
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">hosssssam</div>
+                                        <div class="us-user-email">hossssam@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for hosssssam">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(64)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>May 10, 2026</span>
+                                <span class="us-date-time">16:59</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/64/edit" class="us-action-btn" title="Edit hosssssam" aria-label="Edit hosssssam">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(64)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete hosssssam" aria-label="Delete hosssssam">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-63" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="63" aria-label="Select hossssam">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        H
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">hossssam</div>
+                                        <div class="us-user-email">hosssam@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for hossssam">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(63)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>May 10, 2026</span>
+                                <span class="us-date-time">16:53</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/63/edit" class="us-action-btn" title="Edit hossssam" aria-label="Edit hossssam">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(63)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete hossssam" aria-label="Delete hossssam">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-61" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="61" aria-label="Select Administrator">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        A
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Administrator</div>
+                                        <div class="us-user-email">admin@speeda.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-admin">
+                                    Admin
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Administrator">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(61)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Apr 23, 2026</span>
+                                <span class="us-date-time">20:34</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/61/edit" class="us-action-btn" title="Edit Administrator" aria-label="Edit Administrator">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-20" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="20" aria-label="Select Sister Nikolaus">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        S
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Sister Nikolaus</div>
+                                        <div class="us-user-email">provider.20.UCRDGx@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Sister Nikolaus">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(20)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Apr 06, 2026</span>
+                                <span class="us-date-time">04:16</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/20/edit" class="us-action-btn" title="Edit Sister Nikolaus" aria-label="Edit Sister Nikolaus">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(20)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Sister Nikolaus" aria-label="Delete Sister Nikolaus">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-6" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="6" aria-label="Select Ramiro Crona">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        R
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Ramiro Crona</div>
+                                        <div class="us-user-email">provider.6.WTELRE@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Ramiro Crona">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(6)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Apr 02, 2026</span>
+                                <span class="us-date-time">11:19</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/6/edit" class="us-action-btn" title="Edit Ramiro Crona" aria-label="Edit Ramiro Crona">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(6)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Ramiro Crona" aria-label="Delete Ramiro Crona">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-17" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="17" aria-label="Select Josefina Hartmann">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        J
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Josefina Hartmann</div>
+                                        <div class="us-user-email">provider.17.Wnfgq5@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Josefina Hartmann">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(17)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Apr 01, 2026</span>
+                                <span class="us-date-time">21:40</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/17/edit" class="us-action-btn" title="Edit Josefina Hartmann" aria-label="Edit Josefina Hartmann">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(17)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Josefina Hartmann" aria-label="Delete Josefina Hartmann">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-58" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="58" aria-label="Select Moises Schmitt">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        M
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Moises Schmitt</div>
+                                        <div class="us-user-email">client.8.qkinrC@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-client">
+                                    Client
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Moises Schmitt">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(58)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Mar 25, 2026</span>
+                                <span class="us-date-time">19:56</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/58/edit" class="us-action-btn" title="Edit Moises Schmitt" aria-label="Edit Moises Schmitt">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(58)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Moises Schmitt" aria-label="Delete Moises Schmitt">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-57" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="57" aria-label="Select Dorothy Gleichner">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        D
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Dorothy Gleichner</div>
+                                        <div class="us-user-email">client.7.hNeUJH@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-client">
+                                    Client
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Dorothy Gleichner">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(57)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Mar 25, 2026</span>
+                                <span class="us-date-time">09:09</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/57/edit" class="us-action-btn" title="Edit Dorothy Gleichner" aria-label="Edit Dorothy Gleichner">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(57)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Dorothy Gleichner" aria-label="Delete Dorothy Gleichner">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-50" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="50" aria-label="Select Jaquan Raynor">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        J
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Jaquan Raynor</div>
+                                        <div class="us-user-email">provider.50.n1iZFM@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Jaquan Raynor">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(50)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Mar 05, 2026</span>
+                                <span class="us-date-time">08:02</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/50/edit" class="us-action-btn" title="Edit Jaquan Raynor" aria-label="Edit Jaquan Raynor">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(50)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Jaquan Raynor" aria-label="Delete Jaquan Raynor">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-53" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="53" aria-label="Select Lacy Becker">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        L
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Lacy Becker</div>
+                                        <div class="us-user-email">client.3.VS4X2k@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-client">
+                                    Client
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Lacy Becker">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(53)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Feb 20, 2026</span>
+                                <span class="us-date-time">17:47</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/53/edit" class="us-action-btn" title="Edit Lacy Becker" aria-label="Edit Lacy Becker">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(53)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Lacy Becker" aria-label="Delete Lacy Becker">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-14" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="14" aria-label="Select Elinor Spencer">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        E
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Elinor Spencer</div>
+                                        <div class="us-user-email">provider.14.TlBfHV@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Elinor Spencer">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(14)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Feb 19, 2026</span>
+                                <span class="us-date-time">13:25</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/14/edit" class="us-action-btn" title="Edit Elinor Spencer" aria-label="Edit Elinor Spencer">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(14)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Elinor Spencer" aria-label="Delete Elinor Spencer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-44" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="44" aria-label="Select Mya Leffler">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        M
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Mya Leffler</div>
+                                        <div class="us-user-email">provider.44.CZeZId@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-service_provider">
+                                    Provider
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Mya Leffler">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(44)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Feb 17, 2026</span>
+                                <span class="us-date-time">09:03</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/44/edit" class="us-action-btn" title="Edit Mya Leffler" aria-label="Edit Mya Leffler">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(44)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Mya Leffler" aria-label="Delete Mya Leffler">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                                            <tr wire:key="user-60" class="us-tr ">
+                            <td class="us-td us-td-check">
+                                <input type="checkbox" class="us-check" wire:model.live="selectedUsers" value="60" aria-label="Select Effie Kuhlman">
+                            </td>
+                            <td class="us-td">
+                                <div class="us-user-cell">
+                                    <div class="us-avatar" style="background: linear-gradient(135deg, #4f46e5, #6366f1);" aria-hidden="true">
+                                        E
+                                    </div>
+                                    <div>
+                                        <div class="us-user-name">Effie Kuhlman</div>
+                                        <div class="us-user-email">client.10.sVEZlG@test-speeda.ca</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <span class="us-role us-role-client">
+                                    Client
+                                </span>
+                            </td>
+                            <td class="us-td">
+                                <div class="us-activity">
+                                    <span title="Reviews"><i class="fas fa-star us-activity-icon us-activity-icon-star"></i>0</span>
+                                    <span title="Comments"><i class="fas fa-comment us-activity-icon us-activity-icon-comment"></i>0</span>
+                                </div>
+                            </td>
+                            <td class="us-td">
+                                <label class="us-toggle-label us-toggle-sm" aria-label="Toggle status for Effie Kuhlman">
+                                    <input type="checkbox" class="us-toggle-input" wire:click="toggleStatus(60)" checked >
+                                    <span class="us-toggle-switch"></span>
+                                    <span class="us-toggle-text us-toggle-text-status text-success">
+                                        Active
+                                    </span>
+                                </label>
+                            </td>
+                            <td class="us-td us-td-date">
+                                <span>Feb 09, 2026</span>
+                                <span class="us-date-time">19:00</span>
+                            </td>
+                            <td class="us-td us-td-actions">
+                                <div class="us-action-group">
+                                    <a href="http://localhost/admin/users/60/edit" class="us-action-btn" title="Edit Effie Kuhlman" aria-label="Edit Effie Kuhlman">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <!--[if BLOCK]><![endif]-->                                        <button wire:click="deleteUser(60)" wire:confirm="Move this user to trash?" class="us-action-btn us-action-btn-danger" title="Delete Effie Kuhlman" aria-label="Delete Effie Kuhlman">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    <!--[if ENDBLOCK]><![endif]-->                                </div>
+                            </td>
+                        </tr>
+                    <!--[if ENDBLOCK]><![endif]-->                </tbody>
+            </table>
+        </div>
+        
+                <div class="us-pagination-wrap">
+            <!--[if BLOCK]><![endif]-->        <nav class="speeda-pagination" dir="ltr" role="navigation" aria-label="Pagination Navigation">
+        <div class="speeda-pagination__card">
+            <div class="speeda-pagination__meta">
+                <div class="speeda-pagination__summary">
+                    <span class="speeda-pagination__emoji" aria-hidden="true">📄</span>
+                    <span class="speeda-pagination__summary-text">
+                        Showing <strong class="speeda-pagination__number speeda-pagination__number--accent">1</strong> to <strong class="speeda-pagination__number speeda-pagination__number--accent">15</strong> of <strong class="speeda-pagination__number speeda-pagination__number--dark">64</strong> results
+                    </span>
+                </div>
+                <div class="speeda-pagination__progress">
+                    <span class="speeda-pagination__emoji" aria-hidden="true">📊</span>
+                    <span aria-label="Page 1 of 5">
+                        1 / 5
+                    </span>
+                    <progress class="speeda-pagination__progress-bar" value="1" max="5" aria-hidden="true"></progress>
+                </div>
+            </div>
+
+            <div class="speeda-pagination__buttons">
+                
+                <!--[if BLOCK]><![endif]-->                    <span class="speeda-pagination__nav speeda-pagination__nav--disabled" aria-disabled="true" aria-label="Previous page">
+                        ← <span class="speeda-pagination__nav-label">Prev</span>
+                    </span>
+                <!--[if ENDBLOCK]><![endif]-->
+                
+                <div class="speeda-pagination__pages">
+                    <!--[if BLOCK]><![endif]-->                        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->                        <!--[if BLOCK]><![endif]-->                            <!--[if BLOCK]><![endif]-->                                <!--[if BLOCK]><![endif]-->                                    <span class="speeda-pagination__page speeda-pagination__page--active" aria-current="page">1</span>
+                                <!--[if ENDBLOCK]><![endif]-->                                                            <!--[if BLOCK]><![endif]-->                                    <a href="/admin/users?page=2" class="speeda-pagination__page" aria-label="Go to page 2">2</a>
+                                <!--[if ENDBLOCK]><![endif]-->                                                            <!--[if BLOCK]><![endif]-->                                    <a href="/admin/users?page=3" class="speeda-pagination__page" aria-label="Go to page 3">3</a>
+                                <!--[if ENDBLOCK]><![endif]-->                                                            <!--[if BLOCK]><![endif]-->                                    <a href="/admin/users?page=4" class="speeda-pagination__page" aria-label="Go to page 4">4</a>
+                                <!--[if ENDBLOCK]><![endif]-->                                                            <!--[if BLOCK]><![endif]-->                                    <a href="/admin/users?page=5" class="speeda-pagination__page" aria-label="Go to page 5">5</a>
+                                <!--[if ENDBLOCK]><![endif]-->                            <!--[if ENDBLOCK]><![endif]-->                        <!--[if ENDBLOCK]><![endif]-->                    <!--[if ENDBLOCK]><![endif]-->                </div>
+
+                
+                <div class="speeda-pagination__mobile-count">
+                    <span class="speeda-pagination__mobile-current">1</span>
+                    <span class="speeda-pagination__mobile-separator">/</span>
+                    <span>5</span>
+                </div>
+
+                
+                <!--[if BLOCK]><![endif]-->                    <a href="/admin/users?page=2" rel="next" class="speeda-pagination__nav" aria-label="Next page">
+                        <span class="speeda-pagination__nav-label">Next</span> →
+                    </a>
+                <!--[if ENDBLOCK]><![endif]-->            </div>
+        </div>
+    </nav>
+
+    <style>
+    .speeda-pagination {
+        width: 100%;
+        margin-top: 1.5rem;
+    }
+    .speeda-pagination__card {
+        background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+        border-radius: 28px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+        padding: 16px 24px;
+        border: 1px solid rgba(203, 213, 225, 0.4);
+    }
+    .speeda-pagination__meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eef2f6;
+    }
+    .speeda-pagination__summary {
+        font-size: 14px;
+        color: #475569;
+        background: #f8fafc;
+        padding: 6px 14px;
+        border-radius: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .speeda-pagination__emoji {
+        font-weight: 500;
+    }
+    .speeda-pagination__number--accent {
+        color: #3b82f6;
+        margin: 0 4px;
+    }
+    .speeda-pagination__number--dark {
+        color: #1e293b;
+        margin: 0 4px;
+    }
+    .speeda-pagination__progress {
+        font-size: 13px;
+        color: #475569;
+        background: #f1f5f9;
+        padding: 4px 12px;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .speeda-pagination__progress-bar {
+        width: 60px;
+        height: 4px;
+        border-radius: 10px;
+        overflow: hidden;
+        appearance: none;
+        border: none;
+    }
+    .speeda-pagination__progress-bar::-webkit-progress-bar {
+        background: #e2e8f0;
+        border-radius: 10px;
+    }
+    .speeda-pagination__progress-bar::-webkit-progress-value {
+        background: #3b82f6;
+        border-radius: 10px;
+    }
+    .speeda-pagination__progress-bar::-moz-progress-bar {
+        background: #3b82f6;
+        border-radius: 10px;
+    }
+    .speeda-pagination__buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .speeda-pagination__nav {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 14px;
+        background: #ffffff;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        cursor: pointer;
+        line-height: 1;
+    }
+    .speeda-pagination__nav:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.03);
+    }
+    .speeda-pagination__nav--disabled {
+        background: #f1f5f9;
+        color: #94a3b8;
+        cursor: default;
+        opacity: 0.6;
+        pointer-events: none;
+        box-shadow: none;
+    }
+    .speeda-pagination__nav-label {
+        display: none;
+    }
+    @media (min-width: 640px) {
+        .speeda-pagination__nav-label {
+            display: inline;
+        }
+    }
+    .speeda-pagination__pages {
+        display: none;
+        align-items: center;
+        gap: 4px;
+    }
+    @media (min-width: 768px) {
+        .speeda-pagination__pages {
+            display: flex;
+        }
+    }
+    .speeda-pagination__page {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        background: #ffffff;
+        color: #334155;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .speeda-pagination__page:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+    .speeda-pagination__page--active {
+        background: #3b82f6;
+        color: white;
+        box-shadow: 0 4px 8px rgba(59,130,246,0.25);
+        transform: scale(1.02);
+        cursor: default;
+        border-color: #3b82f6;
+    }
+    .speeda-pagination__page--active:hover {
+        background: #3b82f6;
+        transform: scale(1.02);
+    }
+    .speeda-pagination__dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        color: #94a3b8;
+        font-size: 18px;
+        font-weight: 500;
+    }
+    .speeda-pagination__mobile-count {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 14px;
+        background: #f1f5f9;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+    @media (min-width: 768px) {
+        .speeda-pagination__mobile-count {
+            display: none;
+        }
+    }
+    .speeda-pagination__mobile-current {
+        font-weight: 700;
+        color: #3b82f6;
+    }
+    .speeda-pagination__mobile-separator {
+        color: #94a3b8;
+    }
+    </style>
+<!--[if ENDBLOCK]><![endif]-->        </div>
+    </div>
+
+    <style>
+    /* ===== Users Management — Premium Design ===== */
+    .us-mgmt { padding-top: 0; }
+
+    /* Toast */
+    .us-toast {
+        position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999;
+        background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+        padding: 0.85rem 1.5rem; border-radius: 1rem; font-weight: 600;
+        display: flex; align-items: center; gap: 0.75rem;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    }
+
+    /* Header */
+    .us-header {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(249,250,252,0.9));
+        border-radius: 1.25rem; border: 1px solid #eef2f6;
+        margin-bottom: 1.5rem;
+    }
+    .us-header-title { font-size: 1.75rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
+    .us-header-sub { font-size: 0.95rem; color: #475569; margin-bottom: 0; }
+
+    /* Buttons */
+    .us-btn {
+        display: inline-flex; align-items: center; gap: 0.45rem;
+        padding: 0.55rem 1.1rem; border-radius: 0.75rem;
+        font-size: 0.85rem; font-weight: 600; text-decoration: none;
+        transition: all 0.2s; border: none; cursor: pointer; line-height: 1;
+    }
+    .us-btn:hover { transform: translateY(-1px); }
+    .us-btn-ghost { background: #f8fafc; color: #475569; border: 1px solid #eef2f6; }
+    .us-btn-ghost:hover { background: #eef2ff; color: #4f46e5; border-color: rgba(79,70,229,0.2); }
+    .us-btn-bulk {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: white; box-shadow: 0 4px 12px rgba(79,70,229,0.2);
+    }
+    .us-btn-bulk:hover { box-shadow: 0 6px 16px rgba(79,70,229,0.3); color: white; }
+
+    /* Stats */
+    .us-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .us-stat {
+        background: white; border-radius: 1.25rem; border: 1px solid #eef2f6;
+        padding: 1.25rem 1.5rem; transition: all 0.3s ease;
+    }
+    .us-stat:hover { box-shadow: 0 12px 24px -8px rgba(0,0,0,0.06); transform: translateY(-2px); }
+    .us-stat-label { font-size: 0.8rem; color: #475569; text-transform: uppercase; letter-spacing: 0.03em; font-weight: 600; margin-bottom: 0.25rem; }
+    .us-stat-value { font-size: 1.75rem; font-weight: 800; color: #0f172a; line-height: 1.1; }
+    .us-stat-value-success { color: #059669; }
+    .us-stat-value-warning { color: #d97706; }
+    .us-stat-value-info { color: #2563eb; }
+    .us-stat-icon {
+        width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+        border-radius: 12px; font-size: 1.1rem;
+    }
+    .us-stat-icon-total { background: #eef2ff; color: #4f46e5; }
+    .us-stat-icon-active { background: #ecfdf5; color: #059669; }
+    .us-stat-icon-inactive { background: #fefce8; color: #d97706; }
+    .us-stat-icon-providers { background: #eff6ff; color: #2563eb; }
+
+    /* Filters */
+    .us-filters {
+        background: white; border-radius: 1.25rem; border: 1px solid #eef2f6;
+        padding: 1rem 1.5rem; margin-bottom: 1.5rem; position: relative;
+    }
+    .us-search-wrap { position: relative; }
+    .us-search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem; }
+    .us-search-input {
+        width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem;
+        border: 1px solid #eef2f6; border-radius: 0.75rem; font-size: 0.9rem;
+        background: #f8fafc; transition: all 0.2s;
+    }
+    .us-search-input:focus { outline: none; border-color: #4f46e5; background: white; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    .us-select {
+        width: 100%; padding: 0.6rem 2rem 0.6rem 1rem;
+        border: 1px solid #eef2f6; border-radius: 0.75rem; font-size: 0.85rem;
+        background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+        appearance: none; cursor: pointer; transition: all 0.2s;
+    }
+    .us-select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+
+    /* Toggle */
+    .us-toggle-label { display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.85rem; }
+    .us-toggle-input { display: none; }
+    .us-toggle-switch {
+        width: 36px; height: 20px; background: #cbd5e1; border-radius: 10px;
+        position: relative; transition: background 0.2s; flex-shrink: 0;
+    }
+    .us-toggle-switch::before {
+        content: ''; position: absolute; top: 2px; left: 2px;
+        width: 16px; height: 16px; background: white; border-radius: 50%;
+        transition: transform 0.2s;
+    }
+    .us-toggle-input:checked + .us-toggle-switch { background: #4f46e5; }
+    .us-toggle-input:checked + .us-toggle-switch::before { transform: translateX(16px); }
+    .us-toggle-input:disabled + .us-toggle-switch { opacity: 0.5; cursor: not-allowed; }
+    .us-toggle-sm .us-toggle-switch { width: 30px; height: 18px; }
+    .us-toggle-sm .us-toggle-switch::before { width: 14px; height: 14px; }
+    .us-toggle-sm .us-toggle-input:checked + .us-toggle-switch::before { transform: translateX(12px); }
+    .us-toggle-text { font-weight: 500; }
+    .us-toggle-text-status { font-size: 0.82rem; }
+
+    /* Dropdown */
+    .us-dropdown {
+        position: absolute; top: calc(100% + 8px); right: 0; min-width: 200px;
+        background: white; border: 1px solid #eef2f6;
+        border-radius: 1rem; box-shadow: 0 20px 40px -12px rgba(0,0,0,0.12);
+        padding: 0.5rem; z-index: 50;
+    }
+    .us-dropdown-item {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.6rem 0.85rem; border-radius: 0.65rem;
+        font-size: 0.85rem; font-weight: 500; color: #0f172a;
+        text-decoration: none; transition: background 0.15s; cursor: pointer;
+    }
+    .us-dropdown-item:hover { background: #f8fafc; }
+    .us-dropdown-item-danger:hover { background: #fef2f2; }
+    .us-dropdown-item-danger i { color: #dc2626; }
+    .us-dropdown-divider { height: 1px; background: #eef2f6; margin: 0.35rem 0; }
+
+    /* Table */
+    .us-table-wrap {
+        background: white; border-radius: 1.25rem; border: 1px solid #eef2f6; overflow: hidden;
+    }
+    .us-table { width: 100%; border-collapse: collapse; }
+    .us-th {
+        padding: 1rem 0.75rem; font-size: 0.8rem; font-weight: 600;
+        color: #475569; text-transform: uppercase; letter-spacing: 0.04em;
+        background: #f8fafc; border-bottom: 1px solid #eef2f6; text-align: left;
+        white-space: nowrap;
+    }
+    .us-th-check { width: 48px; padding-left: 1.5rem; }
+    .us-th-sort { cursor: pointer; user-select: none; }
+    .us-th-sort:hover { color: #4f46e5; background: #f1f5f9; }
+    .us-th-sort i { margin-left: 0.35rem; font-size: 0.75rem; }
+    .us-th-actions { text-align: right; padding-right: 1.5rem; }
+
+    .us-td { padding: 0.85rem 0.75rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .us-td-check { padding-left: 1.5rem; }
+    .us-td-actions { text-align: right; padding-right: 1.5rem; }
+    .us-td-date { white-space: nowrap; }
+    .us-date-time { display: block; font-size: 0.75rem; color: #94a3b8; line-height: 1; }
+
+    .us-tr { transition: background 0.15s; }
+    .us-tr:hover { background: #fafbfc; }
+    .us-tr-inactive { opacity: 0.6; }
+    .us-tr-inactive:hover { opacity: 0.85; }
+
+    .us-check { width: 18px; height: 18px; accent-color: #4f46e5; cursor: pointer; }
+
+    /* User cell */
+    .us-user-cell { display: flex; align-items: center; gap: 0.85rem; }
+    .us-avatar {
+        width: 40px; height: 40px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 700; font-size: 1rem; flex-shrink: 0;
+    }
+    .us-user-name { font-weight: 600; color: #0f172a; font-size: 0.92rem; }
+    .us-user-email { font-size: 0.8rem; color: #64748b; }
+
+    /* Role badge */
+    .us-role {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        padding: 0.35rem 0.85rem; border-radius: 2rem;
+        font-size: 0.8rem; font-weight: 600;
+    }
+    .us-role-admin { background: #fef2f2; color: #dc2626; }
+    .us-role-service_provider { background: #ecfdf5; color: #059669; }
+    .us-role-client { background: #eff6ff; color: #2563eb; }
+
+    /* Activity */
+    .us-activity { display: flex; gap: 1rem; font-size: 0.82rem; color: #64748b; }
+    .us-activity-icon { margin-right: 0.35rem; }
+    .us-activity-icon-star { color: #f59e0b; }
+    .us-activity-icon-comment { color: #3b82f6; }
+
+    /* Action buttons */
+    .us-action-group { display: flex; gap: 0.35rem; justify-content: flex-end; }
+    .us-action-btn {
+        width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+        background: #f8fafc; color: #475569; border: 1px solid #eef2f6;
+        border-radius: 0.65rem; text-decoration: none; font-size: 0.8rem;
+        transition: all 0.2s; cursor: pointer;
+    }
+    .us-action-btn:hover { background: #eef2ff; color: #4f46e5; border-color: rgba(79,70,229,0.2); transform: translateY(-1px); }
+    .us-action-btn-danger:hover { background: #fef2f2; color: #dc2626; border-color: rgba(220,38,38,0.2); }
+
+    /* Empty */
+    .us-empty { text-align: center; padding: 4rem 2rem; }
+    .us-empty-icon { font-size: 3rem; color: #94a3b8; margin-bottom: 1rem; opacity: 0.3; }
+    .us-empty h4 { font-weight: 700; color: #0f172a; }
+    .us-empty p { color: #475569; margin-bottom: 0; }
+
+    /* Pagination wrap */
+    .us-pagination-wrap { padding: 1rem 1.5rem; border-top: 1px solid #eef2f6; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 992px) {
+        .us-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+        .us-header-title { font-size: 1.35rem; }
+        .us-stat { padding: 1rem; }
+        .us-stat-value { font-size: 1.35rem; }
+        .us-td-date, .us-th:nth-child(6) { display: none; }
+    }
+    @media (max-width: 576px) {
+        .us-stats { grid-template-columns: 1fr; }
+        .us-action-btn { width: 30px; height: 30px; font-size: 0.75rem; }
+        .us-toggle-text-status { display: none; }
+    }
+    </style>
+</div>

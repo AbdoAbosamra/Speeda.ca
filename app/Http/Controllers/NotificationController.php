@@ -17,33 +17,33 @@ class NotificationController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        
+
         // Get filter from query string (?filter=all|unread|read)
         $filter = $request->query('filter', 'all');
-        
+
         // Build query with pagination
         $query = AdminNotification::active()
             ->orderBy('created_at', 'desc');
-        
+
         // Get all active notification IDs for this user
         $allActiveIds = AdminNotification::active()->pluck('id');
-        
+
         // Get read notification IDs
         $readNotificationIds = $user->readAdminNotifications()
             ->whereIn('admin_notification_id', $allActiveIds)
             ->pluck('admin_notification_id')
             ->toArray();
-        
+
         // Apply filter
         if ($filter === 'unread') {
             $query->whereNotIn('id', $readNotificationIds);
         } elseif ($filter === 'read') {
             $query->whereIn('id', $readNotificationIds);
         }
-        
+
         // Paginate results (15 per page)
-        $notifications = $query->paginate(15)->appends($request->query());
-        
+        $notifications = $query->paginate(15)->withQueryString();
+
         // Calculate counts for filter badges
         $totalCount = AdminNotification::active()->count();
         $unreadCount = $totalCount - count($readNotificationIds);
@@ -66,7 +66,7 @@ class NotificationController extends Controller
     public function markAsRead(Request $request)
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json(['success' => false], 401);
         }
@@ -87,7 +87,7 @@ class NotificationController extends Controller
             foreach ($activeNotificationIds as $id) {
                 $syncData[$id] = ['read_at' => now()];
             }
-            
+
             $user->readAdminNotifications()->syncWithoutDetaching($syncData);
             $markedIds = $activeNotificationIds;
         }
@@ -105,7 +105,7 @@ class NotificationController extends Controller
             'unread_count' => $unreadCount,
         ]);
     }
-    
+
     /**
      * Get unread notification count for the current user.
      * Used for AJAX polling to update badge without full page refresh.
@@ -113,17 +113,17 @@ class NotificationController extends Controller
     public function unreadCount()
     {
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json(['count' => 0]);
         }
-        
+
         $readIds = $user->readAdminNotifications()->pluck('admin_notification_id');
-        
+
         $count = AdminNotification::active()
             ->whereNotIn('id', $readIds)
             ->count();
-            
+
         return response()->json(['count' => $count]);
     }
 }

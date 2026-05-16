@@ -226,7 +226,7 @@
                 </div>
                 @if($comments->hasPages())
                     <div class="card-footer bg-white" style="border-top: 2px solid #f1f5f9; border-radius: 0 0 16px 16px;">
-                        {{ $comments->appends(request()->query())->links('components.pagination.default') }}
+                        {{ $comments->links('components.global-pagination') }}
                     </div>
                 @endif
             </div>

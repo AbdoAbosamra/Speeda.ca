@@ -37,7 +37,7 @@
             @endforeach
         </div>
 
-        {{ $comments->links() }}
+        {{ $comments->links('components.global-pagination') }}
     @else
         <p class="text-center text-gray-500">{{ __('comments.no_comments') }}</p>
     @endif

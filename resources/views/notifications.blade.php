@@ -93,7 +93,7 @@
                 {{-- Pagination --}}
                 @if($notifications->hasPages())
                     <div class="notifications-pagination mt-5">
-                        {{ $notifications->links() }}
+                        {{ $notifications->links('components.global-pagination') }}
                     </div>
                 @endif
             </div>

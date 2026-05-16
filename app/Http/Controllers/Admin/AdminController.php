@@ -246,7 +246,7 @@ class AdminController extends Controller
     {
         try {
             // Show all locations to admin (active + inactive), ordering active ones first
-            $locations = Location::orderByDesc('is_active')->orderBy('city')->paginate(20);
+            $locations = Location::orderByDesc('is_active')->orderBy('city')->paginate(20)->withQueryString();
             return view('admin.locations.index', compact('locations'));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -805,9 +805,10 @@ class AdminController extends Controller
     public function users(Request $request)
     {
         try {
-            $users = User::with('serviceProvider')
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
+$users = User::with('serviceProvider')
+                 ->orderBy('created_at', 'desc')
+                 ->paginate(20)
+                 ->withQueryString();
 
             // Stats for dashboard - with safe checks for is_active column
             $hasActiveColumn = Schema::hasColumn('users', 'is_active');
@@ -980,7 +981,7 @@ class AdminController extends Controller
      */
     public function usersTrash()
     {
-        $users = User::onlyTrashed()->latest()->paginate(20);
+        $users = User::onlyTrashed()->latest()->paginate(20)->withQueryString();
         return view('admin.users.trash', compact('users'));
     }
 

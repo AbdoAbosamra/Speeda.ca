@@ -968,7 +968,7 @@
                                 <!-- Pagination -->
                                 @if($reviews->hasPages())
                                     <div class="d-flex justify-content-center mt-4">
-                                        {{ $reviews->links() }}
+                                        {{ $reviews->links('components.global-pagination') }}
                                     </div>
                                 @endif
                             @else

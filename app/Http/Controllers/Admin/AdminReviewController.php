@@ -51,7 +51,7 @@ class AdminReviewController extends Controller
                 $perPage = 20;
             }
 
-            $reviews = $query->paginate($perPage);
+            $reviews = $query->paginate($perPage)->withQueryString();
 
             // Get statistics for dashboard
             $stats = [

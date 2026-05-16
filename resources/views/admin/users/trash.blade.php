@@ -76,7 +76,7 @@
         </div>
         @if($users->hasPages())
             <div class="card-footer bg-white border-0 py-3">
-                {{ $users->links('components.pagination.default') }}
+                {{ $users->links('components.global-pagination') }}
             </div>
         @endif
     </div>

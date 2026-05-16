@@ -46,7 +46,7 @@ class AdminNotificationController extends Controller
             }
         }
         
-        $notifications = $query->paginate(15)->appends($request->query());
+        $notifications = $query->paginate(15)->withQueryString();
         
         // Stats for dashboard cards
         $stats = [

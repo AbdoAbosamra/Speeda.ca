@@ -22,10 +22,11 @@ class ReviewController extends Controller
     public function index(ServiceProvider $serviceProvider)
     {
         // Only show active (approved) reviews to public
-        $reviews = $serviceProvider->activeReviews()
-            ->with(['client', 'approvedBy'])
-            ->orderByDesc('created_at')
-            ->paginate(10);
+$reviews = $serviceProvider->activeReviews()
+             ->with(['client', 'approvedBy'])
+             ->orderByDesc('created_at')
+             ->paginate(10)
+             ->withQueryString();
 
         $provider = $serviceProvider;
 

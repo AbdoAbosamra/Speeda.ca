@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('location.choose_location') }} - {{ config('app.name', 'Speeda') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/New_logo.png') }}">
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->

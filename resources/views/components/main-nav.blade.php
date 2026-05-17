@@ -1142,7 +1142,7 @@
 <nav class="sp-nav" role="navigation" aria-label="{{ __('general.main_navigation') }}">
     <div class="sp-nav__inner">
         <a class="sp-brand" href="{{ route('home') }}" aria-label="{{ config('app.name', 'Speeda') }} - {{ __('general.home') }}">
-            <img class="sp-brand__img" src="{{ asset('images/main-logo.png') }}" alt="{{ config('app.name', 'Speeda') }}" loading="eager">
+            <img class="sp-brand__img" src="{{ asset('images/New_logo.png') }}" alt="{{ config('app.name', 'Speeda') }}" loading="eager">
         </a>
 
         @if($isServiceProvider)

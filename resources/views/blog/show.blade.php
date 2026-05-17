@@ -61,7 +61,7 @@
 
                             <!-- Content -->
                             <div class="blog-content" style="font-size: 1.05rem; line-height: 1.8; color: #495057;">
-                                {!! $post->localized_content !!}
+                                {{ $post->localized_content }}
                             </div>
                         </div>
                     </article>

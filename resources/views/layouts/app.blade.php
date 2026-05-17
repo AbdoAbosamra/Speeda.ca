@@ -8,7 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @include('seo.meta')
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/New_logo.png') }}">
 
     <!-- Google Font: Inter (clean, modern) -->
     <link

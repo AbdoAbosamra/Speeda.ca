@@ -46,7 +46,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/New_logo.png') }}">
     <title>Maintenance — Speeda</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -100,7 +100,7 @@
         <div class="max-w-4xl w-full">
 
             <div class="mb-10 flex justify-center animate-pulse">
-                <img src="/images/main-logo.png" alt="Speeda" class="maintenance-logo drop-shadow-2xl">
+                <img src="/images/New_logo.png" alt="Speeda" class="maintenance-logo drop-shadow-2xl">
             </div>
 
             <h1 class="text-3xl md:text-5xl font-black text-slate-800 mb-8 leading-tight tracking-tight">

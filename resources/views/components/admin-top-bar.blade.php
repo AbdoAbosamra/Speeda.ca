@@ -140,12 +140,12 @@
         <!-- Logo -->
         @if(Route::has('admin.dashboard'))
             <a href="{{ route('admin.dashboard') }}" class="admin-logo">
-                <img src="{{ asset('images/main-logo.png') }}" alt="Speeda" height="36">
+                <img src="{{ asset('images/New_logo.png') }}" alt="Speeda" height="36">
                 <span class="brand-name">Speeda</span>
             </a>
         @else
             <span class="admin-logo">
-                <img src="{{ asset('images/main-logo.png') }}" alt="Speeda" height="36">
+                <img src="{{ asset('images/New_logo.png') }}" alt="Speeda" height="36">
                 <span class="brand-name">Speeda</span>
             </span>
         @endif

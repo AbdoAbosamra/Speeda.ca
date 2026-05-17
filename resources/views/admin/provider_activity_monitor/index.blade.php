@@ -646,17 +646,34 @@
         {{-- Pagination --}}
         @if($providers->hasPages())
             <div class="mt-4">
-                {{ $providers->links('components.global-pagination') }}
-            </div>
-        @else
-            <div class="mt-4 p-3 bg-white rounded border text-center text-muted">
-                <small>
-                    Total: {{ $providers->total() }} | Per page: {{ $providers->perPage() }} | 
-                    Pages: {{ $providers->lastPage() }} | Current: {{ $providers->currentPage() }} |
-                    Has pages: {{ $providers->hasPages() ? 'yes' : 'no' }}
-                </small>
+                {!! $providers->links('components.global-pagination') !!}
             </div>
         @endif
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
     </div>
 </div>
 @endsection

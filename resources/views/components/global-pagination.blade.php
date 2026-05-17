@@ -3,10 +3,10 @@
         $currentPage = $paginator->currentPage();
         $lastPage = $paginator->lastPage();
     @endphp
-    <nav class="speeda-pagination" dir="ltr" role="navigation" aria-label="Pagination Navigation">
-        <div class="speeda-pagination__card">
-            <div class="speeda-pagination__meta">
-                <div class="speeda-pagination__summary">
+    <nav class="speeda-pagination" dir="ltr" role="navigation" aria-label="Pagination Navigation" style="display:block !important;">
+        <div class="speeda-pagination__card" style="display:flex !important; flex-direction:column !important;">
+            <div class="speeda-pagination__meta" style="display:flex !important;">
+                <div class="speeda-pagination__summary" style="display:inline-flex !important;">
                     <span class="speeda-pagination__emoji" aria-hidden="true">📄</span>
                     <span class="speeda-pagination__summary-text">
                         Showing <strong
@@ -18,7 +18,7 @@
                         results
                     </span>
                 </div>
-                <div class="speeda-pagination__progress">
+                <div class="speeda-pagination__progress" style="display:inline-flex !important;">
                     <span class="speeda-pagination__emoji" aria-hidden="true">📊</span>
                     <span aria-label="Page {{ $currentPage }} of {{ $lastPage }}">
                         {{ $currentPage }} / {{ $lastPage }}
@@ -28,33 +28,33 @@
                 </div>
             </div>
 
-            <div class="speeda-pagination__buttons">
+            <div class="speeda-pagination__buttons" style="display:flex !important;">
                 {{-- Previous Page --}}
                 @if ($paginator->onFirstPage())
                     <span class="speeda-pagination__nav speeda-pagination__nav--disabled" aria-disabled="true"
-                        aria-label="Previous page">
+                        aria-label="Previous page" style="display:inline-flex !important;">
                         ← <span class="speeda-pagination__nav-label">Prev</span>
                     </span>
                 @else
                     <a href="{{ $paginator->previousPageUrl() }}" class="speeda-pagination__nav" rel="prev"
-                        aria-label="Previous page">
+                        aria-label="Previous page" style="display:inline-flex !important;">
                         ← <span class="speeda-pagination__nav-label">Prev</span>
                     </a>
                 @endif
 
                 {{-- Page Numbers --}}
-                <div class="speeda-pagination__pages">
+                <div class="speeda-pagination__pages" style="display:flex !important;">
                     @foreach ($elements as $element)
                         @if (is_string($element))
-                            <span class="speeda-pagination__dots" aria-hidden="true">⋯</span>
+                            <span class="speeda-pagination__dots" aria-hidden="true" style="display:inline-flex !important;">⋯</span>
                         @endif
                         @if (is_array($element))
                             @foreach ($element as $page => $url)
                                 @if ($page == $currentPage)
                                     <span class="speeda-pagination__page speeda-pagination__page--active"
-                                        aria-current="page">{{ $page }}</span>
+                                        aria-current="page" style="display:inline-flex !important;">{{ $page }}</span>
                                 @else
-                                    <a href="{{ $url }}" class="speeda-pagination__page" aria-label="Go to page {{ $page }}">{{ $page }}</a>
+                                    <a href="{{ $url }}" class="speeda-pagination__page" aria-label="Go to page {{ $page }}" style="display:inline-flex !important;">{{ $page }}</a>
                                 @endif
                             @endforeach
                         @endif
@@ -62,7 +62,7 @@
                 </div>
 
                 {{-- Mobile Count --}}
-                <div class="speeda-pagination__mobile-count">
+                <div class="speeda-pagination__mobile-count" style="display:flex !important;">
                     <span class="speeda-pagination__mobile-current">{{ $currentPage }}</span>
                     <span class="speeda-pagination__mobile-separator">/</span>
                     <span>{{ $lastPage }}</span>
@@ -70,12 +70,12 @@
 
                 {{-- Next Page --}}
                 @if ($paginator->hasMorePages())
-                    <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="speeda-pagination__nav" aria-label="Next page">
+                    <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="speeda-pagination__nav" aria-label="Next page" style="display:inline-flex !important;">
                         <span class="speeda-pagination__nav-label">Next</span> →
                     </a>
                 @else
                     <span class="speeda-pagination__nav speeda-pagination__nav--disabled" aria-disabled="true"
-                        aria-label="Next page">
+                        aria-label="Next page" style="display:inline-flex !important;">
                         <span class="speeda-pagination__nav-label">Next</span> →
                     </span>
                 @endif

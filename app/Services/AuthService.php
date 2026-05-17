@@ -181,6 +181,6 @@ class AuthService
             return route('dashboard');
         }
 
-        return route('service-providers.index');
+        return route('home');
     }
 }

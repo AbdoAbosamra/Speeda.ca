@@ -466,7 +466,7 @@ class ServiceProvider extends Model implements HasMedia
 
         // Update both rating columns for consistency
         $this->update([
-            'rating' => $stats->total_reviews > 0 ? round($stats->average_rating, 1) : null,
+            'rating' => $stats->total_reviews > 0 ? round($stats->average_rating, 1) : 0,
             'calculated_rating' => $calculatedRating,
         ]);
     }

@@ -3,98 +3,115 @@
 namespace Database\Factories;
 
 use App\Models\Review;
-use App\Models\User;
 use App\Models\ServiceProvider;
-use App\Models\Booking;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Review>
- */
 class ReviewFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Review::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    private const ARABIC_REVIEWS = [
+        'خدمة ممتازة وسريعة، العامل كان محترفاً جداً وأنجز العمل في الوقت المحدد.',
+        'تجربة رائعة، سأوصي بهم لكل من يحتاج هذه الخدمة. جودة عالية وسعر مناسب.',
+        'العمل تم بشكل احترافي تام، لا يوجد أي شيء للشكوى منه. أنصح بالتعامل معهم.',
+        'خدمة جيدة ولكن التأخير في الوصول كان ملحوظاً. الجودة مقبولة بشكل عام.',
+        'لم أكن راضياً عن جودة العمل، المشكلة لم تُحل بشكل كامل.',
+        'سرعة في الاستجابة، الفريق محترف ومنظم، والنتيجة فاقت توقعاتي.',
+        'تعامل راقي وأسعار مناسبة. سأتعامل معهم مرة أخرى بالتأكيد.',
+        'أداء ممتاز والتزام بالمواعيد. أنصح الجميع بالتعامل مع هذه المؤسسة.',
+    ];
+
+    private const ENGLISH_REVIEWS = [
+        'Excellent service! Highly recommend.',
+        'Very professional and on time. Great quality work.',
+        'Good service but slightly overpriced.',
+        'Outstanding work, exceeded expectations.',
+        'Average experience, nothing special.',
+        'Would not recommend. Poor communication.',
+        'Perfect job, will definitely use again.',
+        'Amazing service, very responsive team.',
+    ];
+
     public function definition(): array
     {
         return [
             'service_provider_id' => ServiceProvider::factory(),
-            'user_id' => User::factory(),
+            'client_id' => User::factory(),
             'rating' => fake()->numberBetween(1, 5),
-            'comment' => fake()->optional(0.8)->paragraph(),
+            'review_text' => fake()->paragraph(),
+            'is_active' => false,
             'is_verified' => fake()->boolean(70),
+            'is_featured' => fake()->boolean(10),
         ];
     }
 
-    /**
-     * Create a 5-star review.
-     */
-    public function fiveStars(): static
+    public function pending(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'rating' => 5,
-            'comment' => fake()->randomElement([
-                'Excellent service! Highly recommend.',
-                'Outstanding work, very professional.',
-                'Perfect job, will definitely use again.',
-                'Amazing service, exceeded expectations.'
-            ])
+        return $this->state(fn() => [
+            'is_active' => false,
+            'admin_approved_at' => null,
+            'admin_approved_by' => null,
         ]);
     }
 
-    /**
-     * Create a 1-star review.
-     */
+    public function approved(): static
+    {
+        return $this->state(fn() => [
+            'is_active' => true,
+            'admin_approved_at' => fake()->dateTimeBetween('-60 days', '-1 day'),
+        ]);
+    }
+
+    public function rejected(): static
+    {
+        return $this->state(fn() => [
+            'is_active' => false,
+            'admin_approved_at' => fake()->dateTimeBetween('-60 days', '-1 day'),
+        ]);
+    }
+
+    public function fiveStar(): static
+    {
+        return $this->state(fn() => ['rating' => 5]);
+    }
+
     public function oneStar(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'rating' => 1,
-            'comment' => fake()->randomElement([
-                'Very disappointing service.',
-                'Poor quality work.',
-                'Not satisfied with the results.',
-                'Would not recommend.'
-            ])
-        ]);
+        return $this->state(fn() => ['rating' => 1]);
     }
 
-    /**
-     * Create with specific rating.
-     */
     public function withRating(int $rating): static
     {
-        return $this->state(fn (array $attributes) => [
-            'rating' => max(1, min(5, $rating)),
+        return $this->state(fn() => ['rating' => max(1, min(5, $rating))]);
+    }
+
+    public function arabic(): static
+    {
+        return $this->state(fn() => [
+            'review_text' => fake()->randomElement(self::ARABIC_REVIEWS),
         ]);
     }
 
-    /**
-     * Create for specific booking.
-     */
-    public function forBooking(int $bookingId): static
+    public function english(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'booking_id' => $bookingId,
+        return $this->state(fn() => [
+            'review_text' => fake()->randomElement(self::ENGLISH_REVIEWS),
         ]);
     }
 
-    /**
-     * Create without comment.
-     */
-    public function withoutComment(): static
+    public function featured(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'comment' => null,
-        ]);
+        return $this->state(fn() => ['is_featured' => true]);
+    }
+
+    public function forProvider(int $providerId): static
+    {
+        return $this->state(fn() => ['service_provider_id' => $providerId]);
+    }
+
+    public function byClient(int $clientId): static
+    {
+        return $this->state(fn() => ['client_id' => $clientId]);
     }
 }

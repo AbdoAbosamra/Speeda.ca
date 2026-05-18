@@ -25,7 +25,7 @@ class AdminReviewController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Review::with(['client', 'serviceProvider', 'approvedBy'])
+            $query = Review::with(['client', 'serviceProvider.user', 'approvedBy'])
                 ->orderByDesc('created_at');
 
             // Filter by status

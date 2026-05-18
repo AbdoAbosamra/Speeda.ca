@@ -738,9 +738,7 @@ class AdminController extends Controller
 
             // Clear category-specific caches
             $this->clearApplicationCaches();
-            Cache::forget('categories:tree');
-            Cache::forget('categories:sections');
-            Cache::forget('categories:active');
+
 
             // Log the action
             Log::info('Category status toggled by admin', [
@@ -800,19 +798,45 @@ class AdminController extends Controller
     }
 
     /**
-     * Display list of all users with status management
+     * Display list of all users with search, role filter, status filter, and sorting
      */
     public function users(Request $request)
     {
         try {
-$users = User::with('serviceProvider')
-                 ->orderBy('created_at', 'desc')
+            $allowedSortFields = ['name', 'email', 'role', 'is_active', 'created_at'];
+            $sortField = in_array($request->get('sortField', 'created_at'), $allowedSortFields)
+                ? $request->get('sortField', 'created_at') : 'created_at';
+            $sortDirection = $request->get('sortDirection', 'desc') === 'asc' ? 'asc' : 'desc';
+
+            $query = User::with('serviceProvider');
+
+            // Search filter
+            if ($search = $request->get('search')) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%');
+                });
+            }
+
+            // Role filter
+            if ($role = $request->get('role')) {
+                $query->where('role', $role);
+            }
+
+            // Status filter
+            if ($status = $request->get('status')) {
+                $hasActiveColumn = Schema::hasColumn('users', 'is_active');
+                if ($hasActiveColumn) {
+                    $query->where('is_active', $status === 'active');
+                }
+            }
+
+            $users = $query->orderBy($sortField, $sortDirection)
                  ->paginate(20)
                  ->withQueryString();
 
-            // Stats for dashboard - with safe checks for is_active column
+            // Stats
             $hasActiveColumn = Schema::hasColumn('users', 'is_active');
-            
             $stats = [
                 'total' => User::count(),
                 'active' => $hasActiveColumn ? User::where('is_active', true)->count() : User::count(),

@@ -132,6 +132,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Login Email
+    |--------------------------------------------------------------------------
+    |
+    | The email used when an admin types 'admin' as the login shortcut.
+    | Override via ADMIN_EMAIL in .env for security.
+    |
+    */
+
+    'admin_email' => env('ADMIN_EMAIL', 'admin@speeda.com'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Auto-Create Admin Configuration
     |--------------------------------------------------------------------------
     |

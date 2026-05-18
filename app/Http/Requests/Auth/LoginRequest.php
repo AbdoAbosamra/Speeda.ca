@@ -72,7 +72,7 @@ class LoginRequest extends FormRequest
         // Determine if login field is email or mobile
         // Special case: if user types 'admin', treat it as the admin email
         if ($loginField === 'admin') {
-            $loginField = 'admin@speeda.com';
+            $loginField = config('auth.admin_email', 'admin@speeda.com');
             $this->merge(['login' => $loginField]);
             $loginType = 'email';
         } else {
@@ -90,7 +90,7 @@ class LoginRequest extends FormRequest
         } else {
             // Mobile number login - only for service providers
             // Bypass for admin email even if misidentified
-            if ($selectedRole !== 'service_provider' && $loginField !== 'admin@speeda.com') {
+            if ($selectedRole !== 'service_provider' && $loginField !== config('auth.admin_email', 'admin@speeda.com')) {
                 RateLimiter::hit($this->throttleKey());
                 throw ValidationException::withMessages([
                     'login' => __('auth.mobile_only_for_providers'),

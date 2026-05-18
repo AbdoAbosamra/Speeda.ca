@@ -25,7 +25,7 @@
             $missing[] = __('service_provider.completion_missing_description');
         }
 
-        $galleryCount = $provider->getMedia('provider_gallery')->count();
+        $galleryCount = $provider->getMedia('gallery')->count();
         if ($galleryCount < 4) {
             $missing[] = __('service_provider.completion_missing_gallery');
         }

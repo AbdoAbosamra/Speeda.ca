@@ -13,7 +13,7 @@
 --}}
 
 @php
-    $galleryMedia = $serviceProvider->getMedia('provider_gallery');
+    $galleryMedia = $serviceProvider->getMedia('gallery');
     $isOwner = auth()->check() && auth()->id() === $serviceProvider->user_id;
     $maxImages = 4;
 @endphp

@@ -190,7 +190,7 @@ class ServiceProviderProfileController extends Controller
                 foreach ($request->file('gallery_images') as $image) {
                     $serviceProvider
                         ->addMedia($image)
-                        ->toMediaCollection('provider_gallery');
+                        ->toMediaCollection('gallery');
                 }
             }
 

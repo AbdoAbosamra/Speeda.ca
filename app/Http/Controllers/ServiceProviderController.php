@@ -526,7 +526,7 @@ class ServiceProviderController extends Controller
 
                     if (is_array($files)) {
                         foreach ($files as $file) {
-                            $serviceProvider->addMedia($file)->toMediaCollection('provider_gallery');
+                            $serviceProvider->addMedia($file)->toMediaCollection('gallery');
                         }
                     }
 
@@ -688,7 +688,7 @@ class ServiceProviderController extends Controller
 
             $serviceProvider
                 ->addMedia($request->file('gallery_image'))
-                ->toMediaCollection('provider_gallery');
+                ->toMediaCollection('gallery');
 
             $media->delete();
 
@@ -720,7 +720,7 @@ class ServiceProviderController extends Controller
             ->whereKey($mediaId)
             ->where('model_type', ServiceProvider::class)
             ->where('model_id', $serviceProvider->id)
-            ->where('collection_name', 'provider_gallery')
+            ->where('collection_name', 'gallery')
             ->firstOrFail();
     }
 

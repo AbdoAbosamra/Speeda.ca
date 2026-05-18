@@ -27,7 +27,7 @@ class AdminProviderActivityMonitorService
                 model_id as provider_id,
                 COUNT(*) as gallery_count
             ')
-            ->where('collection_name', 'provider_gallery')
+            ->where('collection_name', 'gallery')
             ->where('model_type', $serviceProviderMorphType)
             ->groupBy('model_id');
 

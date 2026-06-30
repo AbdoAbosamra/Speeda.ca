@@ -228,7 +228,7 @@
 /* Metrics Row */
 .pam-metrics {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 0.75rem;
     margin-bottom: 1.25rem;
 }
@@ -504,6 +504,12 @@
                 $missingPhoto = !$p->has_profile_photo;
                 $missingGallery = (int) $p->gallery_count < 4;
                 $initial = strtoupper(substr($p->company_name ?: ('Provider #' . $p->id), 0, 1));
+                $lastActivityType = match($p->last_action_type ?? null) {
+                    'view' => 'Profile View',
+                    'click_whatsapp' => 'WhatsApp Click',
+                    null => '-',
+                    default => \Illuminate\Support\Str::headline($p->last_action_type),
+                };
             @endphp
 
             <div class="pam-card">
@@ -539,6 +545,10 @@
                             <div class="pam-metric-label">WhatsApp Clicks</div>
                         </div>
                         <div class="pam-metric">
+                            <div class="pam-metric-value" style="font-size:0.95rem;">{{ $lastActivityType }}</div>
+                            <div class="pam-metric-label">Last Activity Type</div>
+                        </div>
+                        <div class="pam-metric">
                             <div class="pam-metric-value">{{ (int) $p->gallery_count }}<span class="pam-metric-value-sm">/4</span></div>
                             <div class="pam-metric-label">Gallery Images</div>
                         </div>
@@ -570,11 +580,7 @@
                             <span class="pam-breakdown-text">
                                 <strong>Profile Photo</strong> &middot; {{ $p->has_profile_photo ? 'Uploaded' : 'Missing' }}
                             </span>
-                            @if($missingPhoto)
-                                <a href="{{ route('service-providers.edit', $p->id) }}" class="pam-breakdown-cta" title="Upload profile photo">
-                                    <i class="fas fa-upload"></i> Upload
-                                </a>
-                            @endif
+
                         </div>
                         <div class="pam-breakdown-item">
                             <div class="pam-breakdown-icon pam-breakdown-icon-{{ $p->gallery_count >= 4 ? 'success' : 'warning' }}">
@@ -583,11 +589,7 @@
                             <span class="pam-breakdown-text">
                                 <strong>Gallery</strong> &middot; {{ (int) $p->gallery_count }}/4 images
                             </span>
-                            @if($missingGallery)
-                                <a href="{{ route('service-providers.edit', $p->id) }}" class="pam-breakdown-cta" title="Add gallery images">
-                                    <i class="fas fa-plus"></i> Add
-                                </a>
-                            @endif
+
                         </div>
                         <div class="pam-breakdown-item">
                             <div class="pam-breakdown-icon pam-breakdown-icon-success">
@@ -596,8 +598,6 @@
                             <span class="pam-breakdown-text">
                                 <strong>Services</strong> &middot; Listed
                             </span>
-                            <a href="{{ route('service-providers.edit', $p->id) }}" class="pam-breakdown-cta" title="Edit services">
-                                <i class="fas fa-pen"></i> Edit
                             </a>
                         </div>
                         <div class="pam-breakdown-item">
@@ -607,9 +607,6 @@
                             <span class="pam-breakdown-text">
                                 <strong>Description</strong> &middot; Set
                             </span>
-                            <a href="{{ route('service-providers.edit', $p->id) }}" class="pam-breakdown-cta" title="Edit profile">
-                                <i class="fas fa-pen"></i> Edit
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -623,9 +620,6 @@
                     <div class="pam-actions">
                         <a href="{{ route('service-providers.show', $p->id) }}" class="pam-btn pam-btn-ghost">
                             <i class="fas fa-user"></i> Profile
-                        </a>
-                        <a href="{{ route('service-providers.edit', $p->id) }}" class="pam-btn pam-btn-ghost">
-                            <i class="fas fa-cog"></i> Edit
                         </a>
                         <a href="{{ route('admin.provider_activity_monitor.show', $p->id) }}" class="pam-btn pam-btn-primary">
                             <i class="fas fa-chart-line"></i> Analytics

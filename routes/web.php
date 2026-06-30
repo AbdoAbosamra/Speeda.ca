@@ -285,6 +285,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/provider-activity-monitor', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'index'])->name('provider_activity_monitor.index');
     Route::get('/provider-activity-monitor/{serviceProvider}', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'show'])->name('provider_activity_monitor.show');
 
+    // WhatsApp Click Intelligence (read-only analytics)
+    Route::get('/whatsapp-analytics', [App\Http\Controllers\Admin\WhatsappAnalyticsController::class, 'index'])->name('whatsapp_analytics.index');
+
     // Utility - Clear caches to ensure admin changes reflect immediately
     Route::post('/clear-cache', [AdminController::class, 'clearCache'])->name('clear-cache');
 

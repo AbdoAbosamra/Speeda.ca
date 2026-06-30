@@ -99,6 +99,12 @@ return [
         ],
     ],
 
+    'password_reset' => [
+        'support_email' => env('SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS', 'support@speeda.ca')),
+        'rate_limit_per_minute' => env('PASSWORD_RESET_RATE_LIMIT_PER_MINUTE', 5),
+        'rate_limit_per_hour' => env('PASSWORD_RESET_RATE_LIMIT_PER_HOUR', 20),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout

@@ -31,6 +31,7 @@ class ProviderRegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
+        $response->dumpSession();
         $this->assertAuthenticated();
 
         $user = User::where('email', $email)->first();

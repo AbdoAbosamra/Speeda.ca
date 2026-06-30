@@ -119,6 +119,12 @@
                         <div class="location-info" data-provider-id="{{ $provider->id }}">
                             <i class="fas fa-map-marker-alt location-icon"></i>
                             <div class="address-text">
+                                @if(($provider->is_available_area ?? false) && !in_array($provider->location_id, $activeLocationIds ?? []))
+                                    <span class="badge rounded-pill mb-1"
+                                          style="background-color:#d1fae5;color:#065f46;border:1px solid #6ee7b7;font-weight:600;">
+                                        <i class="fas fa-circle-check me-1"></i>{{ __('service_provider.available_in_area') }}
+                                    </span>
+                                @endif
                                 @if($provider->location)
                                     <div class="mb-1 fw-bold text-primary">{{ $provider->location->localized_name }}</div>
                                 @endif

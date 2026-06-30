@@ -5,12 +5,16 @@ namespace App\Providers;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use App\Models\User;
 use App\Models\ServiceProvider as ServiceProviderModel;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\ServiceProviderObserver;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,6 +49,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('password-reset', function (Request $request) {
+            $email = Str::lower((string) $request->input('email'));
+            $ip = $request->ip() ?: 'unknown-ip';
+
+            return [
+                Limit::perMinute((int) config('auth.password_reset.rate_limit_per_minute', 5))->by($ip.'|'.$email),
+                Limit::perHour((int) config('auth.password_reset.rate_limit_per_hour', 20))->by($ip),
+            ];
+        });
+
         // PERFORMANCE: Prevent lazy loading in development/staging to catch N+1 queries
         // CRITICAL: This is NOT enabled in production to avoid breaking the live site
         Model::preventLazyLoading(app()->environment(['local', 'staging']));

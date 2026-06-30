@@ -22,13 +22,9 @@ class HomeController extends Controller
         // PERFORMANCE: Use cached categories from Redis (24h TTL)
         $categories = app(CategoryCacheService::class)->getFilterGroups();
 
-        // Individual locations for homepage dropdown
-        $locationClusters = [
-            '2' => 'Montreal',
-            '1' => 'Laval',
-            '4' => 'Gatineau',
-            '3' => 'Ottawa',
-        ];
+        // @change 2026-06-08 | Use the same public cluster filter as the service provider listing.
+        $locationClusters = app(LocationClusterService::class)->getPublicFilterClusters();
+
 
         // Provider Stats (Cache for 1 hour)
         $providerStats = Cache::remember('home_provider_stats', 3600, function () {
@@ -52,10 +48,14 @@ class HomeController extends Controller
                     $query->where('is_active', 1);
                 },
             ])
-            ->where('profile_completion_percent', '>=', 80)
+            ->where(function ($query) {
+                $query->where('rating', '>', 0)
+                      ->orWhere('calculated_rating', '>', 0);
+            })
+            ->orderByRaw('CASE WHEN profile_image IS NOT NULL AND profile_image != "" THEN 1 ELSE 0 END DESC')
+            ->orderByDesc('rating')
             ->orderByDesc('reviews_count')
-            ->orderByDesc('profile_completion_percent')
-            ->take(8)
+            ->take(12)
             ->get();
 
         // Latest Blogs (Cache for 1 hour)

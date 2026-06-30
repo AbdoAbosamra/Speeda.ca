@@ -17,6 +17,231 @@
             letter-spacing: 0.01em !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
+
+        /* Toronto Expansion Card Styles */
+        .expansion-banner-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f4f7ff 100%) !important;
+            border: 1.5px solid rgba(37, 99, 235, 0.18) !important;
+            border-radius: 24px !important;
+            padding: 1.6rem 2.2rem !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-shadow: 0 15px 35px -10px rgba(37, 99, 235, 0.08), 0 0 0 1px rgba(37, 99, 235, 0.02) !important;
+            margin: 1.5rem 0 2.5rem 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 1.8rem !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .expansion-banner-card:hover {
+            transform: translateY(-4px) !important;
+            border-color: rgba(37, 99, 235, 0.35) !important;
+            box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.16), 0 0 25px rgba(37, 99, 235, 0.06) !important;
+        }
+        .expansion-banner-icon-container {
+            width: 76px !important;
+            height: 76px !important;
+            border-radius: 50% !important;
+            background: #ffffff !important;
+            border: 1.5px solid rgba(37, 99, 235, 0.12) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15) !important;
+            flex-shrink: 0 !important;
+            position: relative !important;
+            z-index: 2 !important;
+        }
+        .expansion-banner-icon-container::before {
+            content: "" !important;
+            position: absolute !important;
+            top: -5px !important;
+            left: -5px !important;
+            right: -5px !important;
+            bottom: -5px !important;
+            border: 2px solid rgba(37, 99, 235, 0.3) !important;
+            border-radius: 50% !important;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.610, 0.355, 1) infinite !important;
+            pointer-events: none !important;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+        @keyframes float-rocket {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .expansion-banner-icon-container i {
+            font-size: 2.4rem !important;
+            color: #2563eb !important;
+            filter: drop-shadow(0 4px 8px rgba(37, 99, 235, 0.2)) !important;
+            animation: float-rocket 3s ease-in-out infinite !important;
+        }
+        .expansion-banner-content {
+            flex-grow: 1 !important;
+            position: relative !important;
+            z-index: 2 !important;
+        }
+        .expansion-banner-header {
+            display: flex !important;
+            align-items: center !important;
+            gap: 1rem !important;
+            flex-wrap: wrap !important;
+            margin-bottom: 0.6rem !important;
+        }
+        .expansion-banner-title {
+            font-size: 1.35rem !important;
+            font-weight: 850 !important;
+            color: #0f172a !important;
+            margin: 0 !important;
+            line-height: 1.4 !important;
+            letter-spacing: -0.01em !important;
+        }
+        .expansion-banner-title span.blue-highlight {
+            background: linear-gradient(135deg, #2563eb 0%, #6366f1 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            display: inline-block !important;
+            font-weight: 900 !important;
+        }
+        .expansion-banner-badge {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            background: rgba(37, 99, 235, 0.08) !important;
+            color: #2563eb !important;
+            padding: 0.35rem 0.85rem !important;
+            border-radius: 50px !important;
+            font-weight: 700 !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.02em !important;
+            border: 1px solid rgba(37, 99, 235, 0.15) !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05) !important;
+        }
+        .expansion-banner-badge::before {
+            content: "" !important;
+            width: 8px !important;
+            height: 8px !important;
+            background-color: #10b981 !important;
+            border-radius: 50% !important;
+            display: inline-block !important;
+            box-shadow: 0 0 8px #10b981 !important;
+            animation: live-dot 1.5s ease-in-out infinite alternate !important;
+        }
+        @keyframes live-dot {
+            0% { opacity: 0.4; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        .expansion-banner-bullets {
+            display: flex !important;
+            align-items: center !important;
+            gap: 1.5rem !important;
+            flex-wrap: wrap !important;
+            font-size: 0.95rem !important;
+            color: #334155 !important;
+            font-weight: 700 !important;
+        }
+        .expansion-banner-bullet {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.55rem !important;
+            transition: all 0.3s ease !important;
+        }
+        .expansion-banner-card:hover .expansion-banner-bullet {
+            transform: translateX(2px) !important;
+        }
+        [dir="rtl"] .expansion-banner-card:hover .expansion-banner-bullet {
+            transform: translateX(-2px) !important;
+        }
+        .expansion-banner-bullet i {
+            color: #4f46e5 !important;
+            font-size: 1.05rem !important;
+        }
+        .expansion-banner-bullet:not(:last-child)::after {
+            content: "" !important;
+            width: 1.5px !important;
+            height: 15px !important;
+            background-color: #cbd5e1 !important;
+            margin-left: 1.5rem !important;
+            display: inline-block !important;
+        }
+        .expansion-banner-skyline {
+            position: absolute !important;
+            right: 0 !important;
+            bottom: -5px !important;
+            height: 110% !important;
+            pointer-events: none !important;
+            opacity: 0.22 !important;
+            z-index: 1 !important;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .expansion-banner-card:hover .expansion-banner-skyline {
+            opacity: 0.35 !important;
+            transform: scale(1.05) !important;
+        }
+        [dir="rtl"] .expansion-banner-skyline {
+            right: auto !important;
+            left: 0 !important;
+            transform: scaleX(-1) !important;
+        }
+        [dir="rtl"] .expansion-banner-card:hover .expansion-banner-skyline {
+            transform: scaleX(-1) scale(1.05) !important;
+        }
+        [dir="rtl"] .expansion-banner-bullet:not(:last-child)::after {
+            margin-left: 0 !important;
+            margin-right: 1.5rem !important;
+        }
+        @media (max-width: 991.98px) {
+            .expansion-banner-card {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                padding: 1.6rem !important;
+                gap: 1.2rem !important;
+            }
+            .expansion-banner-icon-container {
+                width: 60px !important;
+                height: 60px !important;
+            }
+            .expansion-banner-icon-container i {
+                font-size: 1.9rem !important;
+            }
+            .expansion-banner-bullet:not(:last-child)::after {
+                display: none !important;
+            }
+            .expansion-banner-bullets {
+                gap: 0.85rem !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+            .expansion-banner-skyline {
+                opacity: 0.1 !important;
+                height: 80% !important;
+            }
+        }
+
+        .coverage-map-card {
+            overflow: hidden !important;
+            padding: 0 !important;
+            border-radius: 24px !important;
+            border: 1px solid rgba(37, 99, 235, 0.12) !important;
+            box-shadow: 0 24px 55px -28px rgba(15, 23, 42, 0.38) !important;
+            background: #ffffff !important;
+        }
+
+        .coverage-map-card img {
+            display: block !important;
+            width: 100% !important;
+            height: auto !important;
+            object-fit: contain !important;
+        }
+
+        @media (max-width: 767.98px) {
+            .coverage-map-card {
+                border-radius: 18px !important;
+            }
+        }
     </style>
 @endpush
 
@@ -41,7 +266,7 @@
             ['name' => __('categories.general_construction'), 'icon' => 'building'],
         ];
 
-        $featuredProviders = collect($featuredProviders ?? $topProviders ?? [])->take(8);
+        $featuredProviders = collect($featuredProviders ?? $topProviders ?? [])->take(12);
     @endphp
 
     <div class="home-page">
@@ -64,7 +289,6 @@
                             </div>
                             <form id="homeSearchForm" class="premium-search-bar home-search-panel fade-in-up"
                                 action="{{ route('service-providers.index') }}" method="GET">
-                                <input type="hidden" name="exact_location" value="1">
                                 <div class="premium-search-input">
                                     <i class="fas fa-map-marker-alt icon-left"></i>
                                     <select name="location" aria-label="{{ __('home.location') }}">
@@ -133,39 +357,43 @@
             </div>
         </section>
 
-        <section class="home-section">
+        <!-- Toronto Expansion Card Section -->
+        <section class="expansion-banner-section py-2">
             <div class="container">
-                <div class="home-shell home-section-panel fade-in-up">
-                    <div class="home-section-head">
-                        <div>
-                            <h2 class="section-title mb-2">{{ __('home.explore_services') }}</h2>
-                        </div>
-                        <a href="{{ route('service-providers.index') }}" class="premium-btn-primary home-inline-action">
-                            {{ __('home.view_all_categories') }}
-                            <i class="fas fa-arrow-right home-inline-arrow"></i>
-                        </a>
+                <div class="expansion-banner-card">
+                    <!-- Rocket Circular Icon with Float Animation -->
+                    <div class="expansion-banner-icon-container">
+                        <i class="fas fa-rocket"></i>
                     </div>
 
-                    <div class="premium-category-slider-wrapper" id="categorySlider">
-                        <button class="slider-nav-btn prev" aria-label="Previous" onclick="document.getElementById('categorySliderTrack').scrollBy({left: -300, behavior: 'smooth'})">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-
-                        <div class="premium-category-slider-track" id="categorySliderTrack">
-                            @foreach($staticCategories as $subcat)
-                                <article class="home-category-card">
-                                    <div class="premium-subcat-icon">
-                                        <i class="fas fa-{{ $subcat['icon'] }}"></i>
-                                    </div>
-                                    <h3 class="premium-subcat-title">{{ $subcat['name'] }}</h3>
-                                </article>
-                            @endforeach
+                    <!-- Banner Content -->
+                    <div class="expansion-banner-content">
+                        <div class="expansion-banner-header">
+                            <h2 class="expansion-banner-title">
+                                {!! __('home.expansion_title') !!}
+                            </h2>
+                            <span class="expansion-banner-badge">{{ __('home.expansion_badge') }}</span>
                         </div>
-
-                        <button class="slider-nav-btn next" aria-label="Next" onclick="document.getElementById('categorySliderTrack').scrollBy({left: 300, behavior: 'smooth'})">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+                        <div class="expansion-banner-bullets">
+                            <div class="expansion-banner-bullet">
+                                <i class="fas fa-users"></i>
+                                <span>{{ __('home.expansion_bullet1') }}</span>
+                            </div>
+                            <div class="expansion-banner-bullet">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ __('home.expansion_bullet2') }}</span>
+                            </div>
+                            <div class="expansion-banner-bullet">
+                                <i class="fas fa-user-check"></i>
+                                <span>{{ __('home.expansion_bullet3') }}</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Toronto Skyline Line Art Background -->
+                    <svg class="expansion-banner-skyline" viewBox="0 0 350 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5,100 L25,100 L25,85 L45,85 L45,100 L55,100 L55,75 L75,75 L75,100 L85,100 L85,60 L105,60 L105,100 L115,100 L115,80 L135,80 L135,100 L150,100 L156,70 L156,40 L150,38 L150,33 L156,31 L156,10 L157,10 L157,31 L163,33 L163,38 L157,40 L157,70 L165,100 L180,100 L180,70 L195,70 L195,100 L210,100 L210,55 L230,55 L230,100 L245,100 L245,80 L265,80 L265,100 L280,100 L280,65 L300,65 L300,100 L320,100 L320,85 L345,85 L345,100" stroke="#2563eb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
                 </div>
             </div>
         </section>
@@ -252,6 +480,53 @@
                 </div>
             </section>
         @endif
+
+        <section class="home-section">
+            <div class="container">
+                <div class="home-shell home-section-panel fade-in-up">
+                    <div class="home-section-head">
+                        <div>
+                            <h2 class="section-title mb-2">{{ __('home.explore_services') }}</h2>
+                        </div>
+                        <a href="{{ route('service-providers.index') }}" class="premium-btn-primary home-inline-action">
+                            {{ __('home.view_all_categories') }}
+                            <i class="fas fa-arrow-right home-inline-arrow"></i>
+                        </a>
+                    </div>
+
+                    <div class="premium-category-slider-wrapper" id="categorySlider">
+                        <button class="slider-nav-btn prev" aria-label="Previous" onclick="document.getElementById('categorySliderTrack').scrollBy({left: -300, behavior: 'smooth'})">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+
+                        <div class="premium-category-slider-track" id="categorySliderTrack">
+                            @foreach($staticCategories as $subcat)
+                                <article class="home-category-card">
+                                    <div class="premium-subcat-icon">
+                                        <i class="fas fa-{{ $subcat['icon'] }}"></i>
+                                    </div>
+                                    <h3 class="premium-subcat-title">{{ $subcat['name'] }}</h3>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <button class="slider-nav-btn next" aria-label="Next" onclick="document.getElementById('categorySliderTrack').scrollBy({left: 300, behavior: 'smooth'})">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="home-section">
+            <div class="container">
+                <div class="home-shell coverage-map-card fade-in-up">
+                    <img src="{{ asset('images/speeda-coverage-map.png') }}"
+                        alt="Speeda service coverage map for Ottawa, Gatineau, Montreal, Laval, and Toronto GTA"
+                        loading="lazy">
+                </div>
+            </div>
+        </section>
 
         <section class="home-section home-section-muted">
             <div class="container">

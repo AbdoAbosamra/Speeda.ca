@@ -87,14 +87,15 @@ class ServiceProviderController extends Controller
 
         // Location filter — with cluster mapping
         // @change 2026-04-12 TASK-3 | Switched public location filter to two named clusters with legacy ID fallback | Restrict dropdown choices without breaking existing cluster resolution | risk:LOW
-        $locationClusters = [
-            'cluster_montreal' => 'Laval – Montréal',
-            'cluster_ottawa' => 'Ottawa – Gatineau',
-        ];
+        // @change 2026-06-07 | Added 6 Ontario GTA clusters to public listing filter | risk:LOW
+        $clusterService = app(LocationClusterService::class);
+        $locationClusters = $clusterService->getPublicFilterClusters();
 
+
+        // @change 2026-06-28 | Location filter now also matches providers' added service areas | risk:LOW
+        $activeLocationIds = [];
         if ($request->filled('location')) {
             $selectedLocation = (string) $request->input('location');
-            $clusterService = app(LocationClusterService::class);
 
             if (array_key_exists($selectedLocation, $locationClusters)) {
                 $clusterIds = $clusterService->getClusterIdsByKey($selectedLocation);
@@ -112,12 +113,23 @@ class ServiceProviderController extends Controller
             if (empty($clusterIds)) {
                 $query->whereNull('id');
             } else {
-                $query->whereIn('location_id', $clusterIds);
+                $activeLocationIds = array_values(array_unique(array_map('intval', $clusterIds)));
+                // Match providers based here OR available here through an added service area.
+                $query->availableInLocations($activeLocationIds);
             }
         }
 
-        // Order by cached calculated_rating (no more subquery)
-        $serviceProviders = $query->orderByDesc('calculated_rating')
+        // Flag providers that match ONLY through an added service area, so the card
+        // can show an "available in this area" badge (avoids N+1 with a single subquery).
+        if (!empty($activeLocationIds)) {
+            $query->withExists(['serviceAreas as is_available_area' => function ($q) use ($activeLocationIds) {
+                $q->whereIn('location_id', $activeLocationIds)->where('is_active', true);
+            }]);
+        }
+
+        // Order by: providers with a profile picture first, then by cached calculated_rating
+        $serviceProviders = $query->orderByRaw('CASE WHEN profile_image IS NOT NULL AND profile_image != "" THEN 1 ELSE 0 END DESC')
+            ->orderByDesc('calculated_rating')
             ->orderBy('views', 'desc')
             ->paginate(12)
             ->withQueryString();
@@ -128,7 +140,7 @@ class ServiceProviderController extends Controller
         // Get list of revealed contacts from session
         $revealedContacts = session('revealed_contacts', []);
 
-        return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts'));
+        return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts', 'activeLocationIds'));
     }
 
     /**
@@ -202,8 +214,11 @@ class ServiceProviderController extends Controller
                 abort(404, __('service_provider.account_disabled'));
             }
 
-            // Increment views only if not the owner
-            if (!auth()->check() || auth()->id() !== $serviceProvider->user_id) {
+            // Increment views only for real visitors, not owners or admins monitoring the site.
+            $isAdmin = auth()->check() && auth()->user()->isAdmin();
+            $isOwner = auth()->check() && auth()->id() === $serviceProvider->user_id;
+
+            if (!$isAdmin && !$isOwner) {
                 DB::table('service_providers')
                     ->where('id', $serviceProvider->id)
                     ->increment('views');
@@ -273,8 +288,15 @@ class ServiceProviderController extends Controller
                 'activeReviews.client',
                 'activeReviews.approvedBy',
                 'endorsements',
+                'serviceAreas',
                 'media' => function($q) { $q->where('collection_name', 'gallery'); }
             ]);
+
+            // Location IDs the owner has marked as available (for the edit form pre-selection).
+            $serviceAreaLocationIds = $serviceProvider->serviceAreaLocationIds();
+
+            // Only offer regions that are reachable through the public location filter.
+            $serviceAreaLocations = app(LocationClusterService::class)->getFilterableLocations();
 
             // Prepare public gallery images payload
             $galleryImages = collect($serviceProvider->getMedia('gallery'))->map(function ($media) use ($serviceProvider) {
@@ -360,7 +382,9 @@ class ServiceProviderController extends Controller
                 'isContactRevealed',
                 'hasReviewed',
                 'userRating',
-                'galleryImages'
+                'galleryImages',
+                'serviceAreaLocationIds',
+                'serviceAreaLocations'
             ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -504,6 +528,25 @@ class ServiceProviderController extends Controller
 
             if (!$updated) {
                 throw new \Exception(__('service_provider.profile_update_failed'));
+            }
+
+            // === Service Areas: sync the additional locations the provider is available in ===
+            // The hidden `has_service_areas` marker lets us distinguish "no change" from
+            // "cleared all", so unchecking every box correctly removes existing areas.
+            if ($request->has('has_service_areas')) {
+                $primaryLocationId = (int) ($updateData['location_id'] ?? $serviceProvider->location_id);
+                $filterableIds = app(LocationClusterService::class)->getFilterableLocationIds();
+
+                $areaIds = collect($validated['service_areas'] ?? [])
+                    ->map(fn ($id) => (int) $id)
+                    ->filter(fn ($id) => in_array($id, $filterableIds, true)) // only filterable regions
+                    ->reject(fn ($id) => $id === $primaryLocationId) // primary location is implicit
+                    ->unique()
+                    ->values();
+
+                $serviceProvider->locations()->sync(
+                    $areaIds->mapWithKeys(fn ($id) => [$id => ['is_active' => true]])->all()
+                );
             }
 
             // Log successful update

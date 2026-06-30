@@ -31,6 +31,7 @@ class RegistrationTest extends TestCase
             'role' => 'client',
         ]);
 
+        $response->dumpSession();
         $this->assertAuthenticated();
         $response->assertRedirect(route('location', absolute: false));
     }

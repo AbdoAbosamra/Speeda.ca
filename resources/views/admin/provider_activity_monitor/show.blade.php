@@ -247,9 +247,6 @@
                     <a href="{{ route('service-providers.show', $provider->id) }}" class="pad-btn pad-btn-ghost">
                         <i class="fas fa-user"></i> View Profile
                     </a>
-                    <a href="{{ route('service-providers.edit', $provider->id) }}" class="pad-btn pad-btn-ghost">
-                        <i class="fas fa-cog"></i> Edit
-                    </a>
                     <a href="{{ route('admin.provider_activity_monitor.index') }}" class="pad-btn pad-btn-ghost">
                         <i class="fas fa-arrow-left"></i> Back
                     </a>

@@ -52,9 +52,35 @@ class VisitorTrackingService
      */
     public function getTotalVisitors(): int
     {
-        return $this->excludeAdmins(Visitor::query())
-            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-            ->count();
+        return $this->countUnique($this->excludeAdmins(Visitor::query()));
+    }
+
+    /**
+     * Count unique visitors (distinct ip_hash + user_agent_hash).
+     *
+     * NOTE: Laravel's ->count() discards a custom ->selectRaw('DISTINCT ...'),
+     * so it would silently count ALL rows (page-visits) instead of unique
+     * visitors. We must aggregate with COUNT(DISTINCT ...) explicitly.
+     */
+    private function countUnique($query): int
+    {
+        return (int) $query
+            ->selectRaw($this->uniqueVisitorExpression() . ' as aggregate')
+            ->value('aggregate');
+    }
+
+    /**
+     * Driver-portable "distinct (ip_hash, user_agent_hash)" count expression.
+     * MySQL supports multi-column COUNT(DISTINCT ...); SQLite (tests) does not,
+     * so fall back to concatenation there.
+     */
+    private function uniqueVisitorExpression(): string
+    {
+        $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+
+        return $driver === 'mysql'
+            ? 'COUNT(DISTINCT ip_hash, user_agent_hash)'
+            : "COUNT(DISTINCT ip_hash || '|' || user_agent_hash)";
     }
 
     /**
@@ -62,9 +88,7 @@ class VisitorTrackingService
      */
     public function getVisitorsLast7Days(): int
     {
-        return $this->excludeAdmins(Visitor::last7Days())
-            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-            ->count();
+        return $this->countUnique($this->excludeAdmins(Visitor::last7Days()));
     }
 
     /**
@@ -72,9 +96,7 @@ class VisitorTrackingService
      */
     public function getVisitorsLast30Days(): int
     {
-        return $this->excludeAdmins(Visitor::last30Days())
-            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-            ->count();
+        return $this->countUnique($this->excludeAdmins(Visitor::last30Days()));
     }
 
     /**
@@ -82,9 +104,7 @@ class VisitorTrackingService
      */
     public function getVisitorsLast12Months(): int
     {
-        return $this->excludeAdmins(Visitor::last12Months())
-            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-            ->count();
+        return $this->countUnique($this->excludeAdmins(Visitor::last12Months()));
     }
 
     /**
@@ -93,9 +113,7 @@ class VisitorTrackingService
     public function getLiveVisitors(): int
     {
         return Cache::remember('live_visitors_count', now()->addMinutes(1), function () {
-            return $this->excludeAdmins(Visitor::live())
-                ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-                ->count();
+            return $this->countUnique($this->excludeAdmins(Visitor::live()));
         });
     }
 
@@ -144,7 +162,7 @@ class VisitorTrackingService
             'visitors_by_date' => $visitorsByDate,
             'top_pages' => $topPages,
             'total_visits' => (clone $baseQuery)->count(),
-            'unique_visitors' => (clone $baseQuery)->selectRaw('DISTINCT ip_hash, user_agent_hash')->count(),
+            'unique_visitors' => $this->countUnique(clone $baseQuery),
         ];
     }
 

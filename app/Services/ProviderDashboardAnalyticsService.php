@@ -2,15 +2,19 @@
 
 namespace App\Services;
 
+use App\Support\AdminAnalyticsExclusion;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ProviderDashboardAnalyticsService
 {
-    /**
-     * Get summary stats for the provider dashboard.
-     */
+    private function excludeAdminIds($query): void
+    {
+        // NULL-safe: keeps guest rows (user_id IS NULL) while excluding admins.
+        AdminAnalyticsExclusion::apply($query);
+    }
+
     public function getStatsForProvider(int $providerId): array
     {
         $todayStart = Carbon::today()->startOfDay();
@@ -23,22 +27,23 @@ class ProviderDashboardAnalyticsService
         );
 
         $past = Cache::remember($pastCacheKey, now()->addMinutes(10), function () use ($providerId, $pastStart, $todayStart) {
-            return DB::table('analytics')
+            $q = DB::table('analytics')
                 ->where('provider_id', $providerId)
                 ->where('created_at', '>=', $pastStart)
-                ->where('created_at', '<', $todayStart)
-                ->selectRaw('
+                ->where('created_at', '<', $todayStart);
+            $this->excludeAdminIds($q);
+            return $q->selectRaw('
                     SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as views_past,
                     SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as clicks_whatsapp_past
                 ')
                 ->first();
         });
 
-        // Live query for today only.
-        $today = DB::table('analytics')
+        $todayQ = DB::table('analytics')
             ->where('provider_id', $providerId)
-            ->where('created_at', '>=', $todayStart)
-            ->selectRaw('
+            ->where('created_at', '>=', $todayStart);
+        $this->excludeAdminIds($todayQ);
+        $today = $todayQ->selectRaw('
                 SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as views_today,
                 SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as clicks_whatsapp_today
             ')
@@ -66,20 +71,15 @@ class ProviderDashboardAnalyticsService
         ];
     }
 
-    /**
-     * Get daily trend data for charts (last N days).
-     *
-     * Returns arrays of date labels and corresponding view/click counts
-     * suitable for rendering with Chart.js.
-     */
     public function getDailyTrends(int $providerId, int $days = 7): array
     {
         $startDate = Carbon::today()->subDays($days - 1)->startOfDay();
 
-        $rawData = DB::table('analytics')
+        $q = DB::table('analytics')
             ->where('provider_id', $providerId)
-            ->where('created_at', '>=', $startDate)
-            ->selectRaw('
+            ->where('created_at', '>=', $startDate);
+        $this->excludeAdminIds($q);
+        $rawData = $q->selectRaw('
                 DATE(created_at) as date,
                 SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as views,
                 SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as clicks
@@ -107,17 +107,15 @@ class ProviderDashboardAnalyticsService
         ];
     }
 
-    /**
-     * Get 30-day totals for the PDF export.
-     */
     public function getMonthlyStats(int $providerId): array
     {
         $start = Carbon::today()->subDays(29)->startOfDay();
 
-        $data = DB::table('analytics')
+        $q = DB::table('analytics')
             ->where('provider_id', $providerId)
-            ->where('created_at', '>=', $start)
-            ->selectRaw('
+            ->where('created_at', '>=', $start);
+        $this->excludeAdminIds($q);
+        $data = $q->selectRaw('
                 SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as total_views,
                 SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as total_clicks
             ')

@@ -71,4 +71,9 @@ return [
 
     // Category
     'sp_category_invalid' => 'La catégorie/profession sélectionnée est invalide',
+
+    // Zones de service
+    'sp_service_areas_invalid' => 'Sélection de zones de service invalide.',
+    'sp_service_areas_distinct' => 'Les lieux en double ne sont pas autorisés dans les zones de service.',
+    'sp_service_areas_exists' => 'Un ou plusieurs lieux sélectionnés sont invalides.',
 ];

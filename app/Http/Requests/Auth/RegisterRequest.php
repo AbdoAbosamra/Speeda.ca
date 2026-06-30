@@ -11,6 +11,25 @@ use Illuminate\Validation\Rules\Password;
  */
 class RegisterRequest extends FormRequest
 {
+    private const SIGNUP_CITIES = [
+        'montreal' => 'Montreal',
+        'laval' => 'Laval',
+        'gatineau' => 'Gatineau',
+        'ottawa' => 'Ottawa',
+        'mississauga' => 'Mississauga',
+        'brampton' => 'Brampton',
+        'oakville' => 'Oakville',
+        'burlington' => 'Burlington',
+        'milton' => 'Milton',
+        'markham' => 'Markham',
+        'vaughan' => 'Vaughan',
+        'richmond hill' => 'Richmond Hill',
+        'oshawa' => 'Oshawa',
+        'whitby' => 'Whitby',
+        'ajax' => 'Ajax',
+        'city of toronto' => 'City of Toronto',
+    ];
+
     public function authorize(): bool
     {
         return true;
@@ -46,7 +65,27 @@ class RegisterRequest extends FormRequest
                     $fail(__('validation.profession_invalid'));
                 }
             }];
-            $rules['city'] = ['required', 'string', 'max:100'];
+            // @change 2026-06-07 | Restrict signup cities to the approved province groups.
+            $rules['city'] = [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $normalizedCity = mb_strtolower(trim($value));
+                    if (!array_key_exists($normalizedCity, self::SIGNUP_CITIES)) {
+                        $fail(__('validation.city_invalid'));
+                        return;
+                    }
+
+                    $exists = \App\Models\Location::where('is_active', true)
+                        ->whereRaw('LOWER(city) = ?', [mb_strtolower(trim($value))])
+                        ->exists();
+                    if (!$exists) {
+                        $fail(__('validation.city_invalid'));
+                    }
+                },
+            ];
+
             $rules['terms'] = ['required', 'accepted'];
         }
 
@@ -97,10 +136,11 @@ class RegisterRequest extends FormRequest
             ]);
         }
 
-        // Normalize city name (capitalize first letter)
+        // Normalize city name to the canonical signup label.
         if ($this->has('city')) {
+            $cityKey = mb_strtolower(trim($this->input('city')));
             $this->merge([
-                'city' => ucfirst(strtolower(trim($this->input('city'))))
+                'city' => self::SIGNUP_CITIES[$cityKey] ?? trim($this->input('city')),
             ]);
         }
     }

@@ -593,15 +593,13 @@ a {
     }
 }
 
-/* ── Mobile Optimization: Scroll Snap instead of Marquee ── */
+/* ── Mobile Optimization: keep marquee moving automatically ── */
 @media (max-width: 768px) {
     .premium-marquee-wrapper {
         mask-image: none;
         -webkit-mask-image: none;
-        overflow-x: auto;
+        overflow: hidden;
         padding-bottom: 20px;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none; /* Hide scrollbar for clean look */
     }
 
     .premium-marquee-wrapper::-webkit-scrollbar {
@@ -609,12 +607,16 @@ a {
     }
 
     .premium-marquee-track {
-        animation: none !important;
-        padding: 0 1rem;
+        animation: scrollMarqueeLeft 32s linear infinite;
+        padding: 0;
+        will-change: transform;
+    }
+
+    [dir="rtl"] .premium-marquee-track {
+        animation: scrollMarqueeRight 32s linear infinite;
     }
 
     .premium-provider-card-link {
-        scroll-snap-align: center;
         min-width: 280px;
     }
 }

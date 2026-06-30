@@ -4,6 +4,27 @@
     <script type="application/ld+json">{!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
+@push('styles')
+    <style>
+        /* Typographic styles for the rich-text article body (rendered HTML). */
+        .blog-content > *:first-child { margin-top: 0; }
+        .blog-content h2 { font-size: 1.7rem; font-weight: 700; color: #1f2937; margin: 2rem 0 1rem; line-height: 1.3; }
+        .blog-content h3 { font-size: 1.35rem; font-weight: 700; color: #1f2937; margin: 1.75rem 0 .85rem; line-height: 1.35; }
+        .blog-content h4 { font-size: 1.15rem; font-weight: 700; color: #374151; margin: 1.5rem 0 .75rem; }
+        .blog-content p { margin: 0 0 1.15rem; }
+        .blog-content a { color: #2563eb; text-decoration: underline; text-underline-offset: 2px; }
+        .blog-content a:hover { color: #1d4ed8; }
+        .blog-content ul, .blog-content ol { margin: 0 0 1.15rem; padding-inline-start: 1.6rem; }
+        .blog-content li { margin-bottom: .5rem; }
+        .blog-content blockquote { margin: 1.5rem 0; padding: .85rem 1.25rem; border-inline-start: 4px solid #2563eb; background: #f8fafc; color: #475569; font-style: italic; border-radius: 6px; }
+        .blog-content img { max-width: 100%; height: auto; border-radius: 10px; margin: 1.25rem 0; }
+        .blog-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        .blog-content th, .blog-content td { border: 1px solid #e5e7eb; padding: .6rem .85rem; text-align: start; }
+        .blog-content th { background: #f9fafb; font-weight: 700; }
+        .blog-content hr { border: 0; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+    </style>
+@endpush
+
 @section('head')
     @include('seo.meta', ['seo' => $seo ?? null])
 @endsection
@@ -60,8 +81,17 @@
                             @endif
 
                             <!-- Content -->
-                            <div class="blog-content" style="font-size: 1.05rem; line-height: 1.8; color: #495057;">
-                                {{ $post->localized_content }}
+                            @php
+                                $articleBody = $post->localized_content;
+                                // New posts are authored as HTML in the editor; legacy posts are plain text.
+                                $bodyIsHtml = $articleBody !== strip_tags($articleBody);
+                            @endphp
+                            <div class="blog-content" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" style="font-size: 1.05rem; line-height: 1.8; color: #495057;">
+                                @if($bodyIsHtml)
+                                    {!! $articleBody !!}
+                                @else
+                                    {!! nl2br(e($articleBody)) !!}
+                                @endif
                             </div>
                         </div>
                     </article>

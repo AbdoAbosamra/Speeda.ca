@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
             $table->boolean('is_active')->default(true);
-            $table->enum('city', self::CITIES)->unique();
+            if (DB::getDriverName() === 'sqlite') {
+                $table->string('city')->unique();
+            } else {
+                $table->enum('city', self::CITIES)->unique();
+            }
             $table->timestamps();
         });
 

@@ -162,6 +162,10 @@
                 <i class="fas fa-chart-line"></i>
                 <span>Visitor Analytics</span>
             </a>
+            <a href="{{ route('admin.whatsapp_analytics.index') }}" class="admin-nav-item {{ request()->routeIs('admin.whatsapp_analytics*') ? 'active' : '' }}">
+                <i class="fab fa-whatsapp"></i>
+                <span>WhatsApp Analytics</span>
+            </a>
             <a href="{{ route('admin.activity_logs') }}" class="admin-nav-item {{ request()->routeIs('admin.activity_logs*') ? 'active' : '' }}">
                 <i class="fas fa-clipboard-list"></i>
                 <span>Activity Logs</span>

@@ -2,24 +2,34 @@
 
 namespace App\Actions;
 
-use Illuminate\Support\Facades\Cache;
+use App\Actions\Concerns\BuildsAnalyticsPayload;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 
 class TrackProviderClickAction
 {
+    use BuildsAnalyticsPayload;
+
     /**
      * Track a provider click event (e.g. WhatsApp button).
      *
-     * PRIVACY: No IP address is stored. A hashed session fingerprint
-     * is recorded for analytics purposes only.
+     * PRIVACY: No IP address and no raw User-Agent are stored. A hashed session
+     * fingerprint plus privacy-safe context (category, location, source page,
+     * locale, coarse device bucket) is recorded for lead analytics only.
+     *
+     * @param  array{source_page?:string|null}  $context
      */
-    public function execute(int $providerId, string $actionType): bool
+    public function execute(int $providerId, string $actionType, array $context = []): bool
     {
+        if (Auth::check() && Auth::user()->isAdmin()) {
+            return false;
+        }
+
         $sessionHash = $this->generateSessionHash();
         $now = now();
-        $payload = $this->buildAnalyticsPayload($providerId, $actionType, $sessionHash, $now);
+        $userId = Auth::id();
+        $payload = $this->buildAnalyticsPayload($providerId, $actionType, $sessionHash, $now, $userId, $context);
 
         if (empty($payload)) {
             return false;
@@ -38,62 +48,5 @@ class TrackProviderClickAction
 
             return false;
         }
-    }
-
-    /**
-     * Generate a privacy-safe session fingerprint hash.
-     */
-    private function generateSessionHash(): string
-    {
-        $sessionId = session()->getId();
-        $userAgent = request()->userAgent() ?? 'unknown';
-
-        if (empty($sessionId)) {
-            return hash('sha256', config('app.analytics_salt') . 'anonymous|' . $userAgent);
-        }
-
-        return hash('sha256', config('app.analytics_salt') . $sessionId . '|' . $userAgent);
-    }
-
-    /**
-     * Build an insert payload for whichever analytics schema is currently deployed.
-     */
-    private function buildAnalyticsPayload(int $providerId, string $actionType, string $sessionHash, $timestamp): array
-    {
-        $columns = $this->getAnalyticsColumns();
-        $payload = [];
-
-        if (in_array('provider_id', $columns, true)) {
-            $payload['provider_id'] = $providerId;
-        }
-
-        if (in_array('action_type', $columns, true)) {
-            $payload['action_type'] = $actionType;
-        }
-
-        if (in_array('session_hash', $columns, true)) {
-            $payload['session_hash'] = $sessionHash;
-        } elseif (in_array('ip_address', $columns, true)) {
-            $payload['ip_address'] = 'hash:' . substr($sessionHash, 0, 40);
-        }
-
-        if (in_array('created_at', $columns, true)) {
-            $payload['created_at'] = $timestamp;
-        }
-
-        if (in_array('updated_at', $columns, true)) {
-            $payload['updated_at'] = $timestamp;
-        }
-
-        return isset($payload['provider_id'], $payload['action_type']) ? $payload : [];
-    }
-
-    private function getAnalyticsColumns(): array
-    {
-        return Cache::rememberForever('analytics_table_columns', function () {
-            return Schema::hasTable('analytics')
-                ? Schema::getColumnListing('analytics')
-                : [];
-        });
     }
 }

@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\Category;
+use App\Models\Location;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\CategoryCacheService;
+use App\Services\LocationCacheService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +41,12 @@ class RegisteredUserController extends Controller
             })
             ->sortKeys();
 
-        return view('auth.register', compact('professions', 'professionGroups'));
+        // @change 2026-06-07 | Pass active locations to view for dynamic grouped city dropdown
+        // Locations are ordered by region then city name for readable grouping.
+        $locations = app(LocationCacheService::class)->getActiveLocations();
+
+        return view('auth.register', compact('professions', 'professionGroups', 'locations'));
+
     }
 
     /**

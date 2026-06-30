@@ -84,6 +84,10 @@ class UpdateServiceProviderProfileRequest extends FormRequest
     {
         $serviceProviderId = $this->route('serviceProvider')->id;
 
+        // Service areas may only point to locations that are reachable through the
+        // public location filter (same regions shown in the listing dropdown).
+        $filterableLocationIds = app(\App\Services\LocationClusterService::class)->getFilterableLocationIds();
+
         $rules = [
             'business_name' => [
                 'required',
@@ -185,6 +189,19 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'string',
                 'in:ar,en,fr'
             ],
+
+            // Additional locations where the provider is available (service areas).
+            // Restricted to filterable regions so the choice is always meaningful.
+            'service_areas' => [
+                'nullable',
+                'array',
+                'max:50',
+            ],
+            'service_areas.*' => [
+                'integer',
+                'distinct',
+                Rule::in($filterableLocationIds),
+            ],
         ];
 
         return $rules;
@@ -252,6 +269,12 @@ class UpdateServiceProviderProfileRequest extends FormRequest
 
             // Category (read-only)
             'category_id.exists' => __('sp_validation.sp_category_invalid'),
+
+            // Service areas (additional available locations)
+            'service_areas.array' => __('sp_validation.sp_service_areas_invalid'),
+            'service_areas.*.integer' => __('sp_validation.sp_service_areas_invalid'),
+            'service_areas.*.distinct' => __('sp_validation.sp_service_areas_distinct'),
+            'service_areas.*.in' => __('sp_validation.sp_service_areas_exists'),
         ];
     }
 
@@ -273,6 +296,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
             'profile_image' => __('general.profile_image'),
             'certification' => __('service_provider.certification'),
             'languages' => __('service_provider.languages_spoken'),
+            'service_areas' => __('service_provider.service_areas_section'),
         ];
     }
 }

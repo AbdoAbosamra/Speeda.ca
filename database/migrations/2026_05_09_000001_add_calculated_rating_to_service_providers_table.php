@@ -35,16 +35,18 @@ return new class extends Migration
         // STEP 2: Backfill existing data safely
         // Use a single UPDATE with subquery to populate calculated_rating
         // This is more efficient than iterating through records
-        DB::statement('
-            UPDATE service_providers sp
-            SET calculated_rating = COALESCE(
-                (SELECT AVG(r.rating) 
-                 FROM service_provider_reviews r 
-                 WHERE r.service_provider_id = sp.id 
-                 AND r.is_active = 1),
-                0
-            )
-        ');
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            DB::statement('
+                UPDATE service_providers sp
+                SET calculated_rating = COALESCE(
+                    (SELECT AVG(r.rating) 
+                     FROM service_provider_reviews r 
+                     WHERE r.service_provider_id = sp.id 
+                     AND r.is_active = 1),
+                    0
+                )
+            ');
+        }
 
         // STEP 3: Add index for sorting performance
         Schema::table('service_providers', function (Blueprint $table) {

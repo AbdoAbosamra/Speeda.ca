@@ -1,0 +1,11 @@
+Password Reset (Tests\Feature\Auth\PasswordReset)
+ [x] Reset password link screen can be rendered
+ [x] Reset password link can be requested
+ [x] Reset password screen can be rendered
+ [x] Password can be reset with valid token
+ [x] Unknown email gets generic response without notification
+ [x] Password reset requests are rate limited
+ [x] Password reset email uses speeda support sender
+ [x] Resetting password removes existing database sessions
+ [x] Password reset requires a strong new password
+

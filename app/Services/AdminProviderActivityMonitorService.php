@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ServiceProvider;
+use App\Support\AdminAnalyticsExclusion;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,8 +19,10 @@ class AdminProviderActivityMonitorService
                 provider_id,
                 SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as profile_views,
                 SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as whatsapp_clicks,
-                MAX(created_at) as last_activity_at
+                MAX(created_at) as last_activity_at,
+                SUBSTRING_INDEX(GROUP_CONCAT(action_type ORDER BY created_at DESC, id DESC), ",", 1) as last_action_type
             ')
+            ->tap(fn($q) => AdminAnalyticsExclusion::apply($q))
             ->groupBy('provider_id');
 
         $galleryAgg = DB::table('media')
@@ -43,6 +46,7 @@ class AdminProviderActivityMonitorService
                 COALESCE(a.profile_views, 0) as profile_views,
                 COALESCE(a.whatsapp_clicks, 0) as whatsapp_clicks,
                 a.last_activity_at,
+                a.last_action_type,
                 COALESCE(g.gallery_count, 0) as gallery_count,
                 CASE WHEN sp.profile_image IS NOT NULL AND sp.profile_image <> "" THEN 1 ELSE 0 END as has_profile_photo
             ');
@@ -99,6 +103,7 @@ class AdminProviderActivityMonitorService
 
         $eventsQuery = DB::table('analytics')
             ->where('provider_id', $provider->id)
+            ->tap(fn($q) => AdminAnalyticsExclusion::apply($q))
             ->orderByDesc('created_at');
 
         $events = $eventsQuery->paginate($perPage)->withQueryString();

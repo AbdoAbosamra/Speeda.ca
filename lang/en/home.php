@@ -4,7 +4,7 @@ return [
     'banner_alt' => 'Speeda Services',
     'meta_title' => ':app_name - Connect Clients & Service Providers Instantly',
     'hero_title' => 'Find Trusted Service Providers',
-    'hero_tagline' => 'In Montreal, Gatineau, Laval and Ottawa',
+    'hero_tagline' => 'In Montreal, Gatineau, Laval, Ottawa, Toronto & GTA.',
     'hero_subtitle' => 'Connect with professionals in your area.',
     'find_provider' => 'Find a Provider',
     'join_provider' => 'Join as Provider',
@@ -120,4 +120,9 @@ return [
     'min_read' => 'min read',
     'view_all_blogs' => 'View All Blogs',
     'view_all_categories' => 'View All Categories',
+    'expansion_title' => 'Speeda Continues to Grow',
+    'expansion_badge' => 'Now Live in Toronto & GTA',
+    'expansion_bullet1' => 'More trusted service providers.',
+    'expansion_bullet2' => 'More locations.',
+    'expansion_bullet3' => 'More convenience for local communities.',
 ];

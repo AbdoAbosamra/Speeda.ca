@@ -394,6 +394,81 @@
                                         </div>
                                     </div>
 
+                                    {{-- Available Service Areas (additional locations) --}}
+                                    <div class="card mb-3 border-0 shadow-sm">
+                                        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-map-location-dot me-2"></i>{{ __('service_provider.service_areas_section') }}
+                                            </h6>
+                                            <span class="badge bg-light text-primary" id="serviceAreasCount">0</span>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-3">
+                                                <i class="fas fa-info-circle text-info me-1"></i>{{ __('service_provider.service_areas_hint') }}
+                                            </p>
+
+                                            {{-- Marker so the controller can distinguish "no change" from "cleared all" --}}
+                                            <input type="hidden" name="has_service_areas" value="1">
+
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text bg-light border-end-0">
+                                                    <i class="fas fa-search text-primary"></i>
+                                                </span>
+                                                <input type="text" id="serviceAreaSearch"
+                                                    class="form-control form-control-lg border-start-0"
+                                                    placeholder="{{ __('service_provider.service_areas_search_placeholder') }}">
+                                            </div>
+
+                                            @php
+                                                $selectedAreas = collect(old('service_areas', $serviceAreaLocationIds ?? []))
+                                                    ->map(fn ($i) => (int) $i)->all();
+                                            @endphp
+
+                                            <div class="row g-2 px-1" id="serviceAreasGrid"
+                                                 style="max-height: 280px; overflow-y: auto;">
+                                                @forelse(($serviceAreaLocations ?? []) as $loc)
+                                                    @continue($serviceProvider->location_id && (int) $loc->id === (int) $serviceProvider->location_id)
+                                                    @php $isChecked = in_array((int) $loc->id, $selectedAreas, true); @endphp
+                                                    <div class="col-md-6 service-area-item"
+                                                         data-name="{{ \Illuminate\Support\Str::lower($loc->localized_name ?? $loc->city ?? $loc->name ?? '') }}">
+                                                        <div class="custom-checkbox-card {{ $isChecked ? 'checked' : '' }}"
+                                                             onclick="const cb=this.querySelector('input'); cb.checked=!cb.checked; this.classList.toggle('checked', cb.checked); window.updateServiceAreasCount && window.updateServiceAreasCount();">
+                                                            <input class="d-none service-area-checkbox" type="checkbox"
+                                                                name="service_areas[]" value="{{ $loc->id }}" {{ $isChecked ? 'checked' : '' }}>
+                                                            <div class="d-flex align-items-center justify-content-between p-3" style="cursor: pointer;">
+                                                                <span class="fw-semibold">
+                                                                    <i class="fas fa-map-marker-alt text-primary me-2"></i>{{ $loc->localized_name ?? $loc->city ?? $loc->name }}
+                                                                </span>
+                                                                <i class="fas fa-check-circle check-icon"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @empty
+                                                    <div class="col-12">
+                                                        <p class="text-muted small mb-0">{{ __('service_provider.no_locations_available') }}</p>
+                                                    </div>
+                                                @endforelse
+                                            </div>
+
+                                            @if($serviceProvider->location)
+                                                <small class="text-muted d-block mt-2">
+                                                    <i class="fas fa-star text-warning me-1"></i>
+                                                    {{ __('service_provider.primary_location_badge') }}:
+                                                    <strong>{{ $serviceProvider->location->localized_name }}</strong>
+                                                </small>
+                                            @endif
+
+                                            @error('service_areas')
+                                                <small class="text-danger d-block mt-1"><i
+                                                        class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                            @enderror
+                                            @error('service_areas.*')
+                                                <small class="text-danger d-block mt-1"><i
+                                                        class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+
                                     {{-- Services & Files --}}
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-warning text-dark">
@@ -1570,7 +1645,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify({ action_type: 'click_whatsapp' }),
+                    body: JSON.stringify({ action_type: 'click_whatsapp', source_page: 'provider_profile' }),
                     keepalive: true,
                 }).catch(() => {});
             }
@@ -1887,6 +1962,32 @@
                 showToast('{{ session("success") }}', 'success');
             });
         @endif
+    </script>
+
+    {{-- Service areas: live counter + instant client-side search --}}
+    <script>
+        (function () {
+            const grid = document.getElementById('serviceAreasGrid');
+            const search = document.getElementById('serviceAreaSearch');
+            const countBadge = document.getElementById('serviceAreasCount');
+            if (!grid) return;
+
+            window.updateServiceAreasCount = function () {
+                const n = grid.querySelectorAll('.service-area-checkbox:checked').length;
+                if (countBadge) countBadge.textContent = n;
+            };
+            window.updateServiceAreasCount();
+
+            if (search) {
+                search.addEventListener('input', function () {
+                    const term = this.value.trim().toLowerCase();
+                    grid.querySelectorAll('.service-area-item').forEach(function (item) {
+                        const name = item.getAttribute('data-name') || '';
+                        item.style.display = name.indexOf(term) !== -1 ? '' : 'none';
+                    });
+                });
+            }
+        })();
     </script>
 
     <style>

@@ -4,7 +4,7 @@ return [
     'banner_alt' => 'Services Speeda',
     'meta_title' => ':app_name - Connectez clients et prestataires instantanément',
     'hero_title' => 'Trouver des prestataires de services de confiance',
-    'hero_tagline' => 'Votre monde de services en un seul endroit',
+    'hero_tagline' => 'à Montréal, Gatineau, Laval, Ottawa, Toronto et dans la GTA.',
     'hero_subtitle' => 'Connectez-vous avec des professionnels de votre région.',
     'find_provider' => 'Trouver un prestataire',
     'join_provider' => 'Rejoindre comme prestataire',
@@ -120,4 +120,9 @@ return [
     'min_read' => 'min de lecture',
     'view_all_blogs' => 'Voir tous les blogs',
     'view_all_categories' => 'Voir toutes les catégories',
+    'expansion_title' => 'Speeda continue de grandir',
+    'expansion_badge' => 'Maintenant disponible a Toronto et dans la GTA',
+    'expansion_bullet1' => 'Plus de prestataires de services de confiance.',
+    'expansion_bullet2' => "Plus d'emplacements.",
+    'expansion_bullet3' => 'Plus de commodité pour les communautés locales.',
 ];

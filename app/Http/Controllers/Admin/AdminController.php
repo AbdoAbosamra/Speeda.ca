@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Services\CategoryCacheService;
 use App\Services\LocationCacheService;
 use App\Services\VisitorTrackingService;
+use App\Support\AdminAnalyticsExclusion;
 use App\Traits\LogsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,28 +71,32 @@ class AdminController extends Controller
                 ? (($dailyWhatsappClicks - $yesterdayWhatsappClicks) / $yesterdayWhatsappClicks) * 100 
                 : ($dailyWhatsappClicks > 0 ? 100 : 0);
 
+            // Rolling 7-day window vs the previous 7-day window (equal length =
+            // a fair comparison; avoids the "partial current week vs full last
+            // week" distortion that always reads negative early in the period).
             $weeklyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereBetween('created_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
+                ->where('created_at', '>=', $now->copy()->subDays(7))
                 ->count();
 
             $lastWeekWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereBetween('created_at', [$now->copy()->subWeek()->startOfWeek(), $now->copy()->subWeek()->endOfWeek()])
+                ->whereBetween('created_at', [$now->copy()->subDays(14), $now->copy()->subDays(7)])
                 ->count();
-                
-            $weeklyWhatsappTrend = $lastWeekWhatsappClicks > 0 
-                ? (($weeklyWhatsappClicks - $lastWeekWhatsappClicks) / $lastWeekWhatsappClicks) * 100 
+
+            $weeklyWhatsappTrend = $lastWeekWhatsappClicks > 0
+                ? (($weeklyWhatsappClicks - $lastWeekWhatsappClicks) / $lastWeekWhatsappClicks) * 100
                 : ($weeklyWhatsappClicks > 0 ? 100 : 0);
 
+            // Rolling 30-day window vs the previous 30-day window.
             $monthlyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereBetween('created_at', [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()])
+                ->where('created_at', '>=', $now->copy()->subDays(30))
                 ->count();
 
             $lastMonthWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereBetween('created_at', [$now->copy()->subMonth()->startOfMonth(), $now->copy()->subMonth()->endOfMonth()])
+                ->whereBetween('created_at', [$now->copy()->subDays(60), $now->copy()->subDays(30)])
                 ->count();
-                
-            $monthlyWhatsappTrend = $lastMonthWhatsappClicks > 0 
-                ? (($monthlyWhatsappClicks - $lastMonthWhatsappClicks) / $lastMonthWhatsappClicks) * 100 
+
+            $monthlyWhatsappTrend = $lastMonthWhatsappClicks > 0
+                ? (($monthlyWhatsappClicks - $lastMonthWhatsappClicks) / $lastMonthWhatsappClicks) * 100
                 : ($monthlyWhatsappClicks > 0 ? 100 : 0);
 
             $totalWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')->count();
@@ -100,6 +105,7 @@ class AdminController extends Controller
                 ->join('service_providers', 'analytics.provider_id', '=', 'service_providers.id')
                 ->join('categories', 'service_providers.category_id', '=', 'categories.id')
                 ->where('analytics.action_type', 'click_whatsapp')
+                ->tap(fn($q) => AdminAnalyticsExclusion::apply($q, 'analytics.user_id'))
                 ->select('categories.name_en as name', DB::raw('count(analytics.id) as total_clicks'))
                 ->groupBy('categories.id', 'categories.name_en')
                 ->orderByDesc('total_clicks')
@@ -116,15 +122,21 @@ class AdminController extends Controller
                 ];
             }
 
+            // Minimum views so the conversion-rate ranking is statistically
+            // meaningful (a 1-view/1-click provider should not outrank a
+            // 1000-view/400-click one). Falls back gracefully when data is sparse.
+            $minViewsForRanking = 10;
+
             $topProvidersPerformance = DB::table('service_providers')
                 ->join('analytics', 'service_providers.id', '=', 'analytics.provider_id')
                 ->where('analytics.created_at', '>=', $now->copy()->subDays(30))
+                ->tap(fn($q) => AdminAnalyticsExclusion::apply($q, 'analytics.user_id'))
                 ->select('service_providers.id', 'service_providers.company_name',
                     DB::raw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) as total_views'),
                     DB::raw('SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) as total_whatsapp_clicks')
                 )
                 ->groupBy('service_providers.id', 'service_providers.company_name')
-                ->havingRaw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) > 0')
+                ->havingRaw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) >= ?', [$minViewsForRanking])
                 ->orderByRaw('(SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) / SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END)) DESC')
                 ->limit(5)
                 ->get()
@@ -158,11 +170,15 @@ class AdminController extends Controller
                 'newUsersToday' => User::whereDate('created_at', today())->count(),
             ];
 
+            // Rich operations data (action center, KPIs+trends, funnel, feeds).
+            $dashboard = app(\App\Services\Admin\AdminDashboardService::class)->build();
+
             return view('admin.dashboard', compact(
-                'stats', 
-                'dailyWhatsappClicks', 
-                'dailyWhatsappTrend', 
-                'weeklyWhatsappClicks', 
+                'stats',
+                'dashboard',
+                'dailyWhatsappClicks',
+                'dailyWhatsappTrend',
+                'weeklyWhatsappClicks',
                 'weeklyWhatsappTrend',
                 'monthlyWhatsappClicks',
                 'monthlyWhatsappTrend',
@@ -197,7 +213,13 @@ class AdminController extends Controller
                 'totalReviews' => 0,
                 'newUsersToday' => 0,
             ];
-            return view('admin.dashboard', compact('stats'));
+            $dashboard = [
+                'action_center' => ['items' => [], 'total' => 0],
+                'kpis' => [], 'funnel' => [], 'visitor_trend' => ['labels' => [], 'values' => []],
+                'profile_health' => [], 'top_providers' => [], 'top_categories' => [],
+                'recent_signups' => [], 'recent_reviews' => [], 'recent_admin_actions' => [],
+            ];
+            return view('admin.dashboard', compact('stats', 'dashboard'));
         }
     }
 
@@ -208,7 +230,7 @@ class AdminController extends Controller
     {
         $canadaNow = Carbon::now(config('app.timezone', 'America/Toronto'));
 
-        return Visitor::whereBetween('visited_at', [
+        return (int) Visitor::whereBetween('visited_at', [
                 $canadaNow->copy()->startOfDay(),
                 $canadaNow->copy()->endOfDay(),
             ])
@@ -216,8 +238,8 @@ class AdminController extends Controller
                 $q->whereNull('user_id')
                   ->orWhereDoesntHave('user', fn ($q) => $q->where('role', 'admin'));
             })
-            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-            ->count();
+            ->selectRaw($this->uniqueVisitorExpression() . ' as aggregate')
+            ->value('aggregate');
     }
 
     /**
@@ -227,7 +249,7 @@ class AdminController extends Controller
     {
         $canadaNow = Carbon::now(config('app.timezone', 'America/Toronto'));
 
-        return Visitor::whereBetween('visited_at', [
+        return (int) Visitor::whereBetween('visited_at', [
                 $canadaNow->copy()->startOfMonth(),
                 $canadaNow->copy()->endOfMonth(),
             ])
@@ -235,8 +257,19 @@ class AdminController extends Controller
                 $q->whereNull('user_id')
                   ->orWhereDoesntHave('user', fn ($q) => $q->where('role', 'admin'));
             })
-            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-            ->count();
+            ->selectRaw($this->uniqueVisitorExpression() . ' as aggregate')
+            ->value('aggregate');
+    }
+
+    /**
+     * Driver-portable "distinct (ip_hash, user_agent_hash)" count expression.
+     * MySQL supports multi-column COUNT(DISTINCT ...); SQLite does not.
+     */
+    private function uniqueVisitorExpression(): string
+    {
+        return DB::connection()->getDriverName() === 'mysql'
+            ? 'COUNT(DISTINCT ip_hash, user_agent_hash)'
+            : "COUNT(DISTINCT ip_hash || '|' || user_agent_hash)";
     }
 
     /**
@@ -540,9 +573,7 @@ class AdminController extends Controller
 
                 $log = $this->logAction('create', $category);
                 $this->clearApplicationCaches();
-                Cache::forget('categories:tree');
-                Cache::forget('categories:sections');
-                Cache::forget('categories:active');
+
 
                 $this->flashSuccessWithUndo(__('admin.category_created_successfully'), $log);
 
@@ -622,9 +653,7 @@ class AdminController extends Controller
 
                 $log = $this->logUpdate($category, $oldValues);
                 $this->clearApplicationCaches();
-                Cache::forget('categories:tree');
-                Cache::forget('categories:sections');
-                Cache::forget('categories:active');
+
 
                 $this->flashSuccessWithUndo(__('admin.category_updated_successfully'), $log);
 

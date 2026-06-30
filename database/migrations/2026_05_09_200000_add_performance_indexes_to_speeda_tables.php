@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            return;
+        }
+
         // 1. service_providers table
         if (Schema::hasTable('service_providers')) {
             if (!$this->indexExists('service_providers', 'idx_sp_active_category_location')) {
@@ -49,6 +53,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            return;
+        }
+
         Schema::table('service_providers', function (Blueprint $table) {
             if ($this->indexExists('service_providers', 'idx_sp_active_category_location')) {
                 $table->dropIndex('idx_sp_active_category_location');

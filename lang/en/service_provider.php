@@ -270,4 +270,12 @@ return [
     'arabic' => 'Arabic',
     'english' => 'English',
     'french' => 'French',
+
+    // Service areas (additional available locations)
+    'service_areas_section' => 'Available Service Areas',
+    'service_areas_hint' => 'Select additional locations where you are available to serve clients. You will also appear in the location filter for these areas.',
+    'service_areas_search_placeholder' => 'Search locations...',
+    'no_locations_available' => 'No locations available.',
+    'primary_location_badge' => 'Primary location',
+    'available_in_area' => 'Available in this area',
 ];

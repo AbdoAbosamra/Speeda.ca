@@ -230,6 +230,51 @@ class ServiceProvider extends Model implements HasMedia
     }
 
     /**
+     * Get the IDs of the additional locations the provider has marked as available.
+     *
+     * @return array<int>
+     */
+    public function serviceAreaLocationIds(): array
+    {
+        $relation = $this->relationLoaded('serviceAreas')
+            ? $this->serviceAreas
+            : $this->serviceAreas()->get();
+
+        return $relation
+            ->where('is_active', true)
+            ->pluck('location_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    /**
+     * Scope: providers available in any of the given locations.
+     *
+     * A provider is "available" in a location when it is either their primary
+     * registered location OR an active entry in their service_areas.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  array<int>  $locationIds
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAvailableInLocations($query, array $locationIds)
+    {
+        $locationIds = array_values(array_unique(array_map('intval', $locationIds)));
+
+        if (empty($locationIds)) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($locationIds) {
+            $q->whereIn('location_id', $locationIds)
+                ->orWhereHas('serviceAreas', function ($sa) use ($locationIds) {
+                    $sa->whereIn('location_id', $locationIds)
+                        ->where('is_active', true);
+                });
+        });
+    }
+
+    /**
      * Get the category that the service provider belongs to.
      */
     public function category()

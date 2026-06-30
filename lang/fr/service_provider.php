@@ -261,4 +261,12 @@ Complétez votre profil maintenant.',
   'french' => 'Français',
   'login_required' => 'Veuillez vous connecter pour accéder à cette page.',
   'unauthorized_access' => 'Vous n\'êtes pas autorisé à voir ce profil. Vous ne pouvez accéder qu\'à votre propre profil.',
+
+  // Zones de service disponibles (lieux supplémentaires)
+  'service_areas_section' => 'Zones de service disponibles',
+  'service_areas_hint' => 'Sélectionnez d\'autres lieux où vous êtes disponible pour servir les clients. Vous apparaîtrez aussi dans le filtre de localisation pour ces zones.',
+  'service_areas_search_placeholder' => 'Rechercher un lieu...',
+  'no_locations_available' => 'Aucun lieu disponible.',
+  'primary_location_badge' => 'Lieu principal',
+  'available_in_area' => 'Disponible dans cette zone',
 ];

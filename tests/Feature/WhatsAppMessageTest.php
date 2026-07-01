@@ -245,11 +245,10 @@ class WhatsAppMessageTest extends TestCase
 
         $response->assertStatus(200);
 
-        // Check that JavaScript function exists
+        // Check that the contact-reveal JavaScript exists
         $response->assertSee('function revealContactInfo', false);
 
-        // Check that phone reveal functionality exists (HTML encoded in page source)
-        $response->assertSee('phoneNumber', false);
+        // Contact reveal is WhatsApp-centric in the current UI
         $response->assertSee('whatsappNumber', false);
     }
 

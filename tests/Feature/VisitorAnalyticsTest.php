@@ -47,7 +47,7 @@ class VisitorAnalyticsTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('admin.visitors'))
-            ->assertRedirect(route('dashboard'));
+            ->assertForbidden();
     }
 
     /**

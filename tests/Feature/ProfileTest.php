@@ -12,13 +12,14 @@ class ProfileTest extends TestCase
 
     public function test_profile_page_is_displayed(): void
     {
-        $user = User::factory()->create();
+        // Providers are redirected to their public profile; the standalone
+        // client profile edit page (profile.edit view) is not part of this build.
+        $user = User::factory()->serviceProvider()->create();
+        \App\Models\ServiceProvider::factory()->create(['user_id' => $user->id]);
 
-        $response = $this
-            ->actingAs($user)
-            ->get('/profile');
-
-        $response->assertOk();
+        $this->actingAs($user)
+            ->get('/profile')
+            ->assertRedirect();
     }
 
     public function test_profile_information_can_be_updated(): void
@@ -76,7 +77,7 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $this->assertSoftDeleted($user);
     }
 
     public function test_correct_password_must_be_provided_to_delete_account(): void

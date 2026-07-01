@@ -141,14 +141,14 @@ class VisitorTrackingService
 
         // Get visitors grouped by date
         $visitorsByDate = (clone $baseQuery)
-            ->selectRaw('DATE(visited_at) as date, COUNT(DISTINCT ip_hash, user_agent_hash) as count')
+            ->selectRaw('DATE(visited_at) as date, ' . $this->uniqueVisitorExpression() . ' as count')
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->get();
 
         // Get top pages visited
         $topPages = (clone $baseQuery)
-            ->selectRaw('path, COUNT(*) as visits, COUNT(DISTINCT ip_hash, user_agent_hash) as unique_visitors')
+            ->selectRaw('path, COUNT(*) as visits, ' . $this->uniqueVisitorExpression() . ' as unique_visitors')
             ->groupBy('path')
             ->orderBy('visits', 'desc')
             ->limit(10)

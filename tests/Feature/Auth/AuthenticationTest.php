@@ -27,10 +27,10 @@ class AuthenticationTest extends TestCase
         $response = $this->post('/login', [
             'login' => $user->email,
             'password' => 'password',
+            'role' => 'client',
         ]);
 
         $this->assertAuthenticated();
-        // Client redirects to locations
         $response->assertRedirect();
     }
 

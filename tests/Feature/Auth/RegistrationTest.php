@@ -25,14 +25,13 @@ class RegistrationTest extends TestCase
             '_token' => csrf_token(),
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'mobile' => '514-555-0000',
             'password' => 'password',
             'password_confirmation' => 'password',
             'role' => 'client',
         ]);
 
-        $response->dumpSession();
         $this->assertAuthenticated();
-        $response->assertRedirect(route('location', absolute: false));
+        // Clients land on the home page after registering.
+        $response->assertRedirect(route('home', absolute: false));
     }
 }

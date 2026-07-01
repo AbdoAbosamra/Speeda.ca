@@ -89,7 +89,7 @@ class ServiceProvider extends Model implements HasMedia
 
     public function getLocalizedCompanyNameAttribute(): string
     {
-        return $this->getLocalizedColumn('company_name');
+        return $this->getLocalizedColumn('company_name') ?? '';
     }
 
     public function getLocalizedBioAttribute(): string

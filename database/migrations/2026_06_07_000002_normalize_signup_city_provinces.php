@@ -27,6 +27,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         foreach (self::SIGNUP_LOCATIONS as $city => $province) {
             $exists = DB::table('locations')->where('city', $city)->exists();
 

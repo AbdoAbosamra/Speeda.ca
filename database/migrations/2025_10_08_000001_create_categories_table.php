@@ -33,6 +33,11 @@ return new class extends Migration
             $table->unique(['slug', 'parent_id'], 'categories_slug_parent_unique');
         });
 
+        // Skip reference-data seeding under tests; the suite manages its own categories.
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         // === الأقسام الرئيسية ===
         $sections = [
             ['name' => 'Automotive Services',       'icon' => 'fas fa-car',      'color' => '#dc3545', 'sort' => 1],

@@ -10,6 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         // Update existing category name
         DB::table('categories')
             ->where('id', 10)

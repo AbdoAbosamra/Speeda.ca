@@ -22,6 +22,11 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // Skip reference-data seeding under tests; the suite manages its own locations.
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         // إدخال الـ 4 مدن تلقائيًا (idempotent)
         foreach (self::CITIES as $city) {
             DB::table('locations')->updateOrInsert(

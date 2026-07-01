@@ -23,6 +23,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         foreach (self::GTA_LOCATIONS as $city) {
             $exists = DB::table('locations')->where('city', $city)->exists();
 

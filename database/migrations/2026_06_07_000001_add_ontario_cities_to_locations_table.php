@@ -35,6 +35,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         foreach (self::NEW_CITIES as $city) {
             DB::table('locations')->updateOrInsert(
                 ['city' => $city],

@@ -18,6 +18,12 @@ return new class extends Migration
         // This is safe and won't affect existing data
         if (in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
             DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('client', 'service_provider', 'admin') DEFAULT 'client'");
+        } else {
+            // SQLite/Postgres enforce enums via a CHECK constraint that rejects 'admin'.
+            // Convert the column to a plain string so all role values are accepted.
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('role')->default('client')->change();
+            });
         }
     }
 

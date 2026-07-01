@@ -127,10 +127,21 @@ class ServiceProviderController extends Controller
             }]);
         }
 
-        // Order by: providers with a profile picture first, then by cached calculated_rating
-        $serviceProviders = $query->orderByRaw('CASE WHEN profile_image IS NOT NULL AND profile_image != "" THEN 1 ELSE 0 END DESC')
-            ->orderByDesc('calculated_rating')
-            ->orderBy('views', 'desc')
+        // Display priority (applies to the default listing AND every filtered result,
+        // since all filters are applied to $query before this ordering):
+        //   1. Has a photo AND stars (rating)      → highest priority
+        //   2. Has a photo AND years of experience
+        //   3. Has a photo (only)                  → still above photo-less providers
+        //   Ties are broken by most views, then by registration seniority (oldest first).
+        $serviceProviders = $query
+            ->orderByRaw("CASE
+                WHEN profile_image IS NOT NULL AND profile_image != '' AND calculated_rating > 0 THEN 3
+                WHEN profile_image IS NOT NULL AND profile_image != '' AND experience_years > 0 THEN 2
+                WHEN profile_image IS NOT NULL AND profile_image != '' THEN 1
+                ELSE 0
+            END DESC")
+            ->orderByDesc('views')
+            ->orderBy('created_at')
             ->paginate(12)
             ->withQueryString();
 

@@ -43,6 +43,7 @@ class SystemAuditTest extends TestCase
         $this->category = Category::firstOrCreate(
             ['name_en' => 'Automotive Services'],
             [
+                'name' => 'Automotive Services',
                 'name_ar' => 'خدمات السيارات',
                 'name_fr' => 'Services automobiles',
                 'description_en' => 'Car repair and maintenance',

@@ -105,14 +105,14 @@ Comprehensive Login (Tests\Feature\Auth\ComprehensiveLogin)
  [ ] Login logs authentication attempts
 
 Comprehensive Registration (Tests\Feature\Auth\ComprehensiveRegistration)
- [ ] Registration page displays all required elements
+ [x] Registration page displays all required elements
  [ ] Client registers successfully with minimal data
  [ ] Service provider registers successfully with complete data
- [ ] Service provider registration requires all fields
+ [x] Service provider registration requires all fields
  [ ] Email validation works correctly
- [ ] Email uniqueness is enforced
- [ ] Password validation enforces security rules
- [ ] Mobile phone validation works
+ [x] Email uniqueness is enforced
+ [x] Password validation enforces security rules
+ [x] Mobile phone validation works
  [ ] Whatsapp number is optional but validated if provided
  [ ] Unicode names are supported
  [ ] Registration handles concurrent requests
@@ -263,7 +263,7 @@ Service Provider (Tests\Unit\Models\ServiceProvider)
  [x] It can increment views
  [x] It calculates average rating from reviews
  [x] It can scope available providers
- [ ] It can scope verified providers
+ [x] It can scope verified providers
  [x] Phone number is stored correctly
  [x] Whatsapp number can be different from phone
  [x] Whatsapp number can be null
@@ -278,7 +278,7 @@ Service Provider Profile (Tests\Feature\ServiceProviderProfile)
  [x] Whatsapp number validation
  [ ] Profile image upload
  [ ] Certification upload pdf
- [x] Certification upload image
+ [ ] Certification upload image
  [ ] Category update
  [ ] Services offered persists as json
  [x] Validation errors show notification
@@ -287,15 +287,15 @@ Service Provider Profile (Tests\Feature\ServiceProviderProfile)
  [x] Unauthorized user cannot update profile
 
 System Audit (Tests\Feature\SystemAudit)
- [ ] Service provider views own profile counter does not increase
- [ ] Client views provider profile counter increases
+ [x] Service provider views own profile counter does not increase
+ [x] Client views provider profile counter increases
  [ ] Service provider can update profile except profession
  [ ] Image upload with resizing and instant preview
  [ ] Multiple locations selection and saving
  [ ] Error handling with card notifications
  [ ] Registration with role based mobile validation
  [ ] Login with email or mobile
- [ ] Navigation consistency and profile links
+ [x] Navigation consistency and profile links
  [ ] Complete system validation
 
 Translation (Tests\Feature\Translation)

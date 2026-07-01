@@ -1,18 +1,12 @@
-Whats App Message (Tests\Feature\WhatsAppMessage)
- [x] Service provider page loads with whatsapp button
- [x] Whatsapp message contains business name
- [x] Whatsapp number formats correctly canadian
- [x] Whatsapp number falls back to phone if null
- [x] Whatsapp url format is correct
- [x] Company name not business name is used
- [x] Whatsapp message falls back to user name if no company name
- [x] Whatsapp number cleaning removes special characters
- [x] Whatsapp message in english
- [x] Whatsapp message in arabic
- [x] Whatsapp message in french
- [x] Multiple service providers all have valid whatsapp data
- [ ] Whatsapp button reveals contact info
- [x] Whatsapp number with egyptian format
- [x] Whatsapp error handling when translations missing
- [x] Whatsapp url encoding handles special characters
+Service Provider Profile (Tests\Feature\ServiceProviderProfile)
+ [x] Owner can view own profile
+ [x] Other provider can view public profile
+ [x] Guest can view public profile
+ [x] Owner can update profile
+ [x] Whatsapp number validation
+ [x] Category can be changed only when currently others
+ [x] Services offered persists as json
+ [x] Validation errors show notification
+ [x] Database transaction rollback on error
+ [x] Unauthorized user cannot update profile
 

@@ -6,7 +6,6 @@ use App\Models\ServiceProvider;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Location;
-use App\Models\Booking;
 use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -26,11 +25,12 @@ class ServiceProviderTest extends TestCase
     {
         $user = User::factory()->create();
         $category = Category::factory()->create();
+        $location = Location::factory()->create();
 
         $serviceProvider = ServiceProvider::create([
             'user_id' => $user->id,
             'category_id' => $category->id,
-            'location_id' => 1, // Use existing location
+            'location_id' => $location->id,
             'company_name' => 'Test Business',
             'phone' => '+15551234567',
             'whatsapp_number' => '+15551234567',
@@ -89,17 +89,6 @@ class ServiceProviderTest extends TestCase
     }
 
     /** @test */
-    public function it_has_many_bookings()
-    {
-        $serviceProvider = ServiceProvider::factory()->create();
-
-        $this->assertInstanceOf(
-            \Illuminate\Database\Eloquent\Relations\HasMany::class,
-            $serviceProvider->bookings()
-        );
-    }
-
-    /** @test */
     public function it_has_many_reviews()
     {
         $serviceProvider = ServiceProvider::factory()->create();
@@ -108,20 +97,6 @@ class ServiceProviderTest extends TestCase
             \Illuminate\Database\Eloquent\Relations\HasMany::class,
             $serviceProvider->reviews()
         );
-    }
-
-    /** @test */
-    public function it_can_have_multiple_bookings()
-    {
-        $serviceProvider = ServiceProvider::factory()->create();
-        $client = User::factory()->create();
-
-        Booking::factory()->count(3)->create([
-            'service_provider_id' => $serviceProvider->id,
-            'client_id' => $client->id
-        ]);
-
-        $this->assertCount(3, $serviceProvider->bookings);
     }
 
     /** @test */

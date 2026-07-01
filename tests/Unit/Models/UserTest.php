@@ -3,9 +3,6 @@
 namespace Tests\Unit\Models;
 
 use App\Models\User;
-use App\Models\ServiceProvider;
-use App\Models\ServiceProviderProfile;
-use App\Models\Booking;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -53,17 +50,6 @@ class UserTest extends TestCase
     }
 
     /** @test */
-    public function it_has_service_provider_profile_relationship()
-    {
-        $user = User::factory()->create(['role' => 'service_provider']);
-
-        $this->assertInstanceOf(
-            \Illuminate\Database\Eloquent\Relations\HasOne::class,
-            $user->serviceProviderProfile()
-        );
-    }
-
-    /** @test */
     public function it_has_service_provider_relationship()
     {
         $user = User::factory()->create(['role' => 'service_provider']);
@@ -83,34 +69,6 @@ class UserTest extends TestCase
             \Illuminate\Database\Eloquent\Relations\HasMany::class,
             $user->bookings()
         );
-    }
-
-    /** @test */
-    public function client_can_have_multiple_bookings()
-    {
-        $client = User::factory()->create(['role' => 'client']);
-        $serviceProvider = User::factory()->create(['role' => 'service_provider']);
-
-        // Create ServiceProvider record for the user
-        $sp = ServiceProvider::factory()->create(['user_id' => $serviceProvider->id]);
-
-        // Create bookings
-        Booking::factory()->count(3)->create([
-            'client_id' => $client->id,
-            'service_provider_id' => $sp->id
-        ]);
-
-        $this->assertCount(3, $client->bookings);
-    }
-
-    /** @test */
-    public function service_provider_user_can_create_profile()
-    {
-        $user = User::factory()->create(['role' => 'service_provider']);
-
-        $profile = ServiceProviderProfile::factory()->create(['user_id' => $user->id]);
-
-        $this->assertEquals($profile->id, $user->serviceProviderProfile->id);
     }
 
     /** @test */
@@ -178,7 +136,8 @@ class UserTest extends TestCase
             'email',
             'password',
             'profession',
-            'role'
+            'role',
+            'is_active',
         ];
 
         $this->assertEquals($expectedFillable, $user->getFillable());

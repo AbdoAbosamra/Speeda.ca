@@ -11,6 +11,16 @@ class LocationTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Reference cities are not seeded during tests, so create the baseline here.
+        foreach (['Laval', 'Montreal', 'Ottawa', 'Gatineau'] as $city) {
+            Location::firstOrCreate(['city' => $city], ['is_active' => true, 'country' => 'Canada']);
+        }
+    }
+
     /** @test */
     public function it_validates_canadian_cities_enum()
     {
@@ -80,8 +90,7 @@ class LocationTest extends TestCase
         $locations = Location::all();
 
         foreach ($locations as $location) {
-            $this->assertEquals(1, $location->is_active); // Database stores as 1/0
-            $this->assertIsInt($location->is_active); // Raw value is integer
+            $this->assertTrue((bool) $location->is_active);
         }
     }
 

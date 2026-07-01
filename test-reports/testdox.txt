@@ -1,20 +1,56 @@
-Security (Tests\Feature\Security\Security)
- [x] Unauthorized users cannot access protected routes
- [x] Clients cannot access service provider routes
- [x] Users can only access their own data
- [x] Password reset tokens are secure
- [x] Sql injection protection works
- [x] Xss protection works
- [x] Csrf protection prevents forged requests
- [x] File upload security works
- [x] Rate limiting prevents abuse
- [x] Session security is enforced
- [x] Sensitive data is not exposed in api
- [x] Password hashing is secure
- [x] Email verification prevents unauthorized access
- [ ] Two factor authentication works
- [ ] Admin routes require admin role
- [x] Api authentication works with tokens
- [x] Input validation prevents malicious data
- [x] Database queries use parameter binding
+Category (Tests\Unit\Models\Category)
+ [x] It can be created with valid data
+ [x] It has required attributes
+ [x] It can have parent child relationships
+ [x] It can have many service providers
+ [x] It uses soft deletes
+ [x] It can be restored after soft delete
+ [x] Factory creates valid categories
+ [x] It requires name field
+ [x] It can be marked as section
+
+Category Model (Tests\Unit\Models\CategoryModel)
+ [x] Slug is auto generated on create
+ [x] Is section method
+ [x] Is subcategory method
+
+Location (Tests\Unit\Models\Location)
+ [x] It validates canadian cities enum
+ [x] It has all canadian cities seeded
+ [x] It has correct city province mapping
+ [x] It can have many service providers
+ [ ] Locations are active by default
+ [x] It has proper timestamps
+
+Service Provider (Tests\Unit\Models\ServiceProvider)
+ [x] It can be created with valid data
+ [x] It belongs to user
+ [x] It belongs to category
+ [x] It belongs to location
+ [x] It has many reviews
+ [x] It can have multiple reviews
+ [x] Hourly rate is cast to decimal
+ [x] Boolean fields are cast correctly
+ [x] Views count defaults to zero
+ [x] It can increment views
+ [x] It calculates average rating from reviews
+ [x] It can scope available providers
+ [x] It can scope verified providers
+ [x] Phone number is stored correctly
+ [x] Whatsapp number can be different from phone
+ [x] Whatsapp number can be null
+ [x] It can have long services description
+ [x] Experience years must be non negative
+
+User (Tests\Unit\Models\User)
+ [x] It can be created with valid data
+ [x] Password is automatically hashed
+ [x] It has service provider relationship
+ [x] It has bookings relationship
+ [x] It hidden sensitive attributes
+ [x] Email verified at is cast to datetime
+ [x] It requires name
+ [x] It requires unique email
+ [x] It can check if user is service provider
+ [x] It can access fillable attributes
 

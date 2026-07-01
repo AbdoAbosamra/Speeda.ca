@@ -1,19 +1,12 @@
-Comprehensive Login (Tests\Feature\Auth\ComprehensiveLogin)
- [x] Login page redirects to register
- [x] User can login with correct credentials
- [x] Client redirects to home after login
- [x] Service provider redirects to profile after login
- [x] Login fails with incorrect email
- [x] Login fails with incorrect password
- [x] Login validation requires login password and role
- [x] Login fails for unknown credentials
- [x] Remember me functionality works
- [x] Login without remember me works
- [x] Rate limiting prevents brute force attacks
- [x] Rate limiting is per login identifier
- [x] Already authenticated user is redirected from login
- [x] Password is case sensitive
- [x] Login handles unicode passwords
- [x] Csrf protection is enforced on login
- [x] Login logs authentication attempts
+Admin Locations (Tests\Feature\AdminLocations)
+ [x] Admin can view locations list
+ [x] Non admin cannot view locations list
+ [x] Admin can create location
+ [x] Location city must be unique
+ [x] Admin can update location
+ [x] Admin can delete location with no providers
+ [x] Admin cannot delete location with providers
+ [x] Location city is required
+ [x] Location latitude validation
+ [x] Location longitude validation
 

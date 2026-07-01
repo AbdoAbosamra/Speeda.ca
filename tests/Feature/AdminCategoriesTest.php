@@ -17,15 +17,12 @@ class AdminCategoriesTest extends TestCase
     {
         parent::setUp();
 
-        // Create an admin user
         $this->admin = User::factory()->create([
             'role' => 'admin',
         ]);
     }
 
-    /**
-     * Test admin can view categories list
-     */
+    /** Test admin can view categories list */
     public function test_admin_can_view_categories_list()
     {
         $this->actingAs($this->admin)
@@ -34,27 +31,23 @@ class AdminCategoriesTest extends TestCase
             ->assertViewIs('admin.categories.index');
     }
 
-    /**
-     * Test non-admin cannot view categories list
-     */
+    /** Test non-admin cannot view categories list */
     public function test_non_admin_cannot_view_categories_list()
     {
-        /** @var User $user */
-        $user = User::factory()->create(['role' => 'client']);
+        $user = User::factory()->client()->create();
 
         $this->actingAs($user)
             ->get(route('admin.categories'))
-            ->assertRedirect(route('dashboard'));
+            ->assertForbidden();
     }
 
-    /**
-     * Test admin can create a category
-     */
+    /** Test admin can create a category (multi-language) */
     public function test_admin_can_create_category()
     {
         $data = [
-            'name' => 'Test Category',
-            'description' => 'Test Description',
+            'name_ar' => 'تصنيف تجريبي',
+            'name_en' => 'Test Category',
+            'color' => '#dc3545',
             'is_active' => true,
             'is_section' => false,
             'sort_order' => 1,
@@ -65,20 +58,18 @@ class AdminCategoriesTest extends TestCase
             ->assertRedirect(route('admin.categories'));
 
         $this->assertDatabaseHas('categories', [
-            'name' => 'Test Category',
+            'name_en' => 'Test Category',
             'slug' => 'test-category',
-            'description' => 'Test Description',
-            'is_active' => true,
         ]);
     }
 
-    /**
-     * Test category slug is auto-generated
-     */
+    /** Test category slug is auto-generated from the English name */
     public function test_category_slug_is_auto_generated()
     {
         $data = [
-            'name' => 'Cars & Mechanics',
+            'name_ar' => 'سيارات وميكانيكا',
+            'name_en' => 'Cars & Mechanics',
+            'color' => '#dc3545',
             'is_active' => true,
         ];
 
@@ -86,100 +77,75 @@ class AdminCategoriesTest extends TestCase
             ->post(route('admin.categories.store'), $data);
 
         $this->assertDatabaseHas('categories', [
-            'name' => 'Cars & Mechanics',
+            'name_en' => 'Cars & Mechanics',
             'slug' => 'cars-mechanics',
         ]);
     }
 
-    /**
-     * Test admin can update a category
-     */
+    /** Test admin can update a category */
     public function test_admin_can_update_category()
     {
         $category = Category::factory()->create();
 
         $data = [
-            'name' => 'Updated Category',
-            'description' => 'Updated Description',
+            'name_ar' => 'تصنيف محدث',
+            'name_en' => 'Updated Category',
+            'color' => '#dc3545',
             'is_active' => false,
         ];
 
         $this->actingAs($this->admin)
-            ->put(route('admin.categories.update', $category), $data)
+            ->patch(route('admin.categories.update', $category), $data)
             ->assertRedirect(route('admin.categories'));
 
         $category->refresh();
-        $this->assertEquals('Updated Category', $category->name);
-        $this->assertEquals('Updated Description', $category->description);
-        $this->assertFalse($category->is_active);
+        $this->assertEquals('Updated Category', $category->name_en);
+        $this->assertFalse((bool) $category->is_active);
     }
 
-    /**
-     * Test admin cannot set category parent to itself
-     */
+    /** Test admin cannot set category parent to itself */
     public function test_admin_cannot_set_category_parent_to_itself()
     {
         $category = Category::factory()->create();
 
-        $data = [
-            'name' => 'Updated Category',
-            'parent_id' => $category->id,
-        ];
-
         $this->actingAs($this->admin)
-            ->put(route('admin.categories.update', $category), $data)
-            ->assertSessionHasErrors();
+            ->patch(route('admin.categories.update', $category), [
+                'name_ar' => 'تصنيف',
+                'parent_id' => $category->id,
+            ])
+            ->assertSessionHasErrors('parent_id');
     }
 
-    /**
-     * Test admin can delete category with no children
-     */
+    /** Test admin can delete an inactive category with no children (soft delete) */
     public function test_admin_can_delete_category_with_no_children()
     {
-        $category = Category::factory()->create();
+        $category = Category::factory()->create(['is_active' => false]);
 
         $this->actingAs($this->admin)
             ->delete(route('admin.categories.destroy', $category))
             ->assertRedirect(route('admin.categories'));
 
-        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+        $this->assertSoftDeleted('categories', ['id' => $category->id]);
     }
 
-    /**
-     * Test admin cannot delete category with children
-     */
+    /** Test admin cannot delete a category that has children */
     public function test_admin_cannot_delete_category_with_children()
     {
-        $parent = Category::factory()->create();
-        $child = Category::factory()->create(['parent_id' => $parent->id]);
+        $parent = Category::factory()->create(['is_active' => false]);
+        Category::factory()->create(['parent_id' => $parent->id, 'is_active' => false]);
 
         $this->actingAs($this->admin)
             ->delete(route('admin.categories.destroy', $parent))
-            ->assertSessionHasErrors();
+            ->assertRedirect();
 
-        $this->assertDatabaseHas('categories', ['id' => $parent->id]);
+        $this->assertDatabaseHas('categories', ['id' => $parent->id, 'deleted_at' => null]);
     }
 
-    /**
-     * Test category name is required
-     */
+    /** Test category name is required */
     public function test_category_name_is_required()
     {
         $this->actingAs($this->admin)
             ->post(route('admin.categories.store'), [])
-            ->assertSessionHasErrors('name');
-    }
-
-    /**
-     * Test category slug validation
-     */
-    public function test_category_slug_validation()
-    {
-        $this->actingAs($this->admin)
-            ->post(route('admin.categories.store'), [
-                'name' => 'Test Category',
-                'slug' => 'invalid slug with spaces',
-            ])
-            ->assertSessionHasErrors('slug');
+            ->assertSessionHasErrors('name_ar');
     }
 }

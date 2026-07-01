@@ -598,7 +598,7 @@ class AdminController extends Controller
                 $oldValues = $category->getOriginal();
                 
                 // Prevent setting parent to itself
-                if ($validated['parent_id'] && $validated['parent_id'] == $category->id) {
+                if (($validated['parent_id'] ?? null) && $validated['parent_id'] == $category->id) {
                     throw new \Exception(__('admin.cannot_set_self_as_parent'));
                 }
 

@@ -433,13 +433,13 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary btn-lg">
+                                        <x-ui.button type="submit" class="btn btn-primary btn-lg">
                                             {{ __('categories.search_button') }}
-                                        </button>
+                                        </x-ui.button>
                                         @if($search)
-                                            <a href="{{ route('categories') }}" class="btn btn-light btn-sm mt-1">
-                                                <i class="fas fa-times me-1"></i> {{ __('categories.clear_search') }}
-                                            </a>
+                                            <x-ui.button :href="route('categories')" variant="secondary" size="sm" icon="fas fa-times" class="btn btn-light btn-sm mt-1">
+                                                {{ __('categories.clear_search') }}
+                                            </x-ui.button>
                                         @endif
                                     </div>
                                 </div>
@@ -588,11 +588,11 @@
             @empty
                 <!-- Empty State -->
                 <div class="col-12 reveal">
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <h3 class="text-muted fw-bold mb-3">{{ __('categories.none_available') }}</h3>
-                        <p class="text-muted mb-0">{{ __('categories.adding_categories_message') }}</p>
-                    </div>
+                    <x-public.empty-state
+                        icon="fas fa-folder-open"
+                        title="{{ __('categories.none_available') }}"
+                        description="{{ __('categories.adding_categories_message') }}"
+                    />
                 </div>
             @endforelse
         </div>

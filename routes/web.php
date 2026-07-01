@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\ServiceProviderController;
 use App\Http\Controllers\Admin\AdminCommentController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\LegalPageController as AdminLegalPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\VisitorAnalyticsController;
 use App\Http\Controllers\DebugController;
@@ -77,8 +79,11 @@ Route::get('/categories', [CategoryController::class, 'index'])->name('categorie
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
 Route::get('/blogs/{post:slug}', [BlogController::class, 'show'])->name('blogs.show');
-Route::view('/privacy-policy', 'Static.PrivacyPolicy')->name('privacy-policy');
-Route::view('/terms-of-service', 'Static.terms-of-service')->name('terms-of-service');
+Route::get('/privacy-policy', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-of-service', [LegalPageController::class, 'termsOfService'])->name('terms-of-service');
+Route::get('/legal/{slug}', [LegalPageController::class, 'show'])
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('legal-pages.show');
 Route::view('/help-center', 'Static.help-center')->name('help-center');
 Route::view('/legal-affairs', 'Static.legal-affairs')->name('legal-affairs');
 Route::view('/about-us', 'about-us')->name('about-us');
@@ -249,6 +254,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except(['show'])
         ->names('blog.posts')
         ->parameters(['posts' => 'post']);
+
+    // Legal Pages CMS
+    Route::resource('legal-pages', AdminLegalPageController::class)
+        ->except(['show'])
+        ->names('legal-pages');
 
     // Categories Management (using IDs, no slugs)
     Route::get('/categories', [AdminController::class, 'categories'])->name('categories');

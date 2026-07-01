@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
 
 class AdminNotification extends Model
 {
     use HasFactory;
+
+    private static ?bool $providerTargetingTableExists = null;
 
     protected $fillable = [
         'title_ar',
@@ -34,11 +38,72 @@ class AdminNotification extends Model
     }
 
     /**
+     * Service providers selected to receive this notification.
+     * Empty target set means broadcast to all service providers.
+     */
+    public function targetServiceProviders()
+    {
+        return $this->belongsToMany(ServiceProvider::class, 'admin_notification_service_provider')
+            ->withTimestamps();
+    }
+
+    /**
      * Scope a query to only include active (not expired) notifications.
      */
     public function scopeActive($query)
     {
         return $query->where('expires_at', '>', now());
+    }
+
+    /**
+     * Scope notifications visible to a specific provider user.
+     */
+    public function scopeVisibleToUser(Builder $query, ?User $user): Builder
+    {
+        $serviceProviderId = $user?->serviceProvider?->id;
+
+        if (!$serviceProviderId) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if (!self::supportsProviderTargeting()) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $q) use ($serviceProviderId) {
+            $q->whereDoesntHave('targetServiceProviders')
+                ->orWhereHas('targetServiceProviders', function (Builder $targetQuery) use ($serviceProviderId) {
+                    $targetQuery->where('service_providers.id', $serviceProviderId);
+                });
+        });
+    }
+
+    /**
+     * A notification with no selected providers is a broadcast.
+     */
+    public function isBroadcast(): bool
+    {
+        if (!self::supportsProviderTargeting()) {
+            return true;
+        }
+
+        if ($this->relationLoaded('targetServiceProviders')) {
+            return $this->targetServiceProviders->isEmpty();
+        }
+
+        return !$this->targetServiceProviders()->exists();
+    }
+
+    /**
+     * Whether the targeted provider pivot table has been migrated.
+     */
+    public static function supportsProviderTargeting(): bool
+    {
+        if (self::$providerTargetingTableExists !== null) {
+            return self::$providerTargetingTableExists;
+        }
+
+        return self::$providerTargetingTableExists = Schema::hasTable('admin_notification_service_provider');
     }
 
     /**

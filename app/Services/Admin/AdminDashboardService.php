@@ -63,12 +63,6 @@ class AdminDashboardService
             $pendingComments = Comment::pending()->count();
             $flaggedComments = Comment::flagged()->count();
 
-            // Lead leakage: a provider with no reachable WhatsApp/phone number.
-            $missingContact = ServiceProvider::query()
-                ->where(fn ($q) => $q->whereNull('whatsapp_number')->orWhere('whatsapp_number', ''))
-                ->where(fn ($q) => $q->whereNull('phone')->orWhere('phone', ''))
-                ->count();
-
             $incompleteProfiles = ServiceProvider::where('profile_completion_percent', '<', 100)->count();
 
             $items = [
@@ -86,11 +80,6 @@ class AdminDashboardService
                     'key' => 'flagged_comments', 'label' => 'Flagged comments',
                     'count' => $flaggedComments, 'route' => route('admin.comments', ['status' => 'flagged']),
                     'icon' => 'fa-flag', 'tone' => 'rose',
-                ],
-                [
-                    'key' => 'missing_contact', 'label' => 'Providers with no WhatsApp/phone (lost leads)',
-                    'count' => $missingContact, 'route' => route('admin.provider_activity_monitor.index'),
-                    'icon' => 'fa-phone-slash', 'tone' => 'rose',
                 ],
                 [
                     'key' => 'incomplete_profiles', 'label' => 'Incomplete provider profiles',
@@ -224,16 +213,11 @@ class AdminDashboardService
             $partial = DB::table('service_providers')->whereBetween('profile_completion_percent', [1, 99])->count();
             $empty = DB::table('service_providers')->where('profile_completion_percent', '<=', 0)->count();
 
-            $missingWhatsapp = DB::table('service_providers')
-                ->where(fn ($q) => $q->whereNull('whatsapp_number')->orWhere('whatsapp_number', ''))
-                ->count();
-
             return [
                 'total' => $total,
                 'complete' => $complete,
                 'partial' => $partial,
                 'incomplete' => $empty,
-                'missing_whatsapp' => $missingWhatsapp,
                 'complete_pct' => $this->rate($complete, $total),
             ];
         });

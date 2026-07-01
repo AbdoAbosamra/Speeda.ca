@@ -23,10 +23,13 @@ class NotificationController extends Controller
 
         // Build query with pagination
         $query = AdminNotification::active()
+            ->visibleToUser($user)
             ->orderBy('created_at', 'desc');
 
         // Get all active notification IDs for this user
-        $allActiveIds = AdminNotification::active()->pluck('id');
+        $allActiveIds = AdminNotification::active()
+            ->visibleToUser($user)
+            ->pluck('id');
 
         // Get read notification IDs
         $readNotificationIds = $user->readAdminNotifications()
@@ -45,7 +48,9 @@ class NotificationController extends Controller
         $notifications = $query->paginate(15)->withQueryString();
 
         // Calculate counts for filter badges
-        $totalCount = AdminNotification::active()->count();
+        $totalCount = AdminNotification::active()
+            ->visibleToUser($user)
+            ->count();
         $unreadCount = $totalCount - count($readNotificationIds);
         $readCount = count($readNotificationIds);
 
@@ -72,7 +77,9 @@ class NotificationController extends Controller
         }
 
         $notificationId = $request->integer('notification_id');
-        $activeNotificationIds = AdminNotification::active()->pluck('id');
+        $activeNotificationIds = AdminNotification::active()
+            ->visibleToUser($user)
+            ->pluck('id');
         $markedIds = collect();
 
         if ($request->filled('notification_id') && $activeNotificationIds->contains($notificationId)) {
@@ -96,6 +103,7 @@ class NotificationController extends Controller
         Cache::forget("nav_notifications_{$user->id}");
 
         $unreadCount = AdminNotification::active()
+            ->visibleToUser($user)
             ->whereNotIn('id', $user->readAdminNotifications()->pluck('admin_notification_id'))
             ->count();
 
@@ -121,6 +129,7 @@ class NotificationController extends Controller
         $readIds = $user->readAdminNotifications()->pluck('admin_notification_id');
 
         $count = AdminNotification::active()
+            ->visibleToUser($user)
             ->whereNotIn('id', $readIds)
             ->count();
 

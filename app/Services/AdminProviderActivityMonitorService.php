@@ -12,50 +12,15 @@ class AdminProviderActivityMonitorService
 {
     public function paginateProviders(int $perPage = 15, ?Request $request = null): LengthAwarePaginator
     {
-        $serviceProviderMorphType = (new ServiceProvider())->getMorphClass();
-
-        $analyticsAgg = DB::table('analytics')
-            ->selectRaw('
-                provider_id,
-                SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as profile_views,
-                SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as whatsapp_clicks,
-                MAX(created_at) as last_activity_at,
-                SUBSTRING_INDEX(GROUP_CONCAT(action_type ORDER BY created_at DESC, id DESC), ",", 1) as last_action_type
-            ')
-            ->tap(fn($q) => AdminAnalyticsExclusion::apply($q))
-            ->groupBy('provider_id');
-
-        $galleryAgg = DB::table('media')
-            ->selectRaw('
-                model_id as provider_id,
-                COUNT(*) as gallery_count
-            ')
-            ->where('collection_name', 'gallery')
-            ->where('model_type', $serviceProviderMorphType)
-            ->groupBy('model_id');
-
-        $query = DB::table('service_providers as sp')
-            ->leftJoinSub($analyticsAgg, 'a', 'sp.id', '=', 'a.provider_id')
-            ->leftJoinSub($galleryAgg, 'g', 'sp.id', '=', 'g.provider_id')
-            ->selectRaw('
-                sp.id,
-                sp.company_name,
-                sp.profile_completion_percent,
-                sp.profile_image,
-                sp.created_at,
-                COALESCE(a.profile_views, 0) as profile_views,
-                COALESCE(a.whatsapp_clicks, 0) as whatsapp_clicks,
-                a.last_activity_at,
-                a.last_action_type,
-                COALESCE(g.gallery_count, 0) as gallery_count,
-                CASE WHEN sp.profile_image IS NOT NULL AND sp.profile_image <> "" THEN 1 ELSE 0 END as has_profile_photo
-            ');
+        $query = $this->baseProviderActivityQuery();
 
         // Apply search filter
         if ($request && $search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('sp.id', 'LIKE', "%{$search}%")
-                  ->orWhere('sp.company_name', 'LIKE', "%{$search}%");
+                    ->orWhere('sp.company_name', 'LIKE', "%{$search}%")
+                    ->orWhere('u.name', 'LIKE', "%{$search}%")
+                    ->orWhere('u.email', 'LIKE', "%{$search}%");
             });
         }
 
@@ -70,6 +35,32 @@ class AdminProviderActivityMonitorService
                     break;
                 case 'incomplete':
                     $query->where('sp.profile_completion_percent', '<=', 0);
+                    break;
+            }
+        }
+
+        // Apply issue filter
+        if ($request && $issue = $request->input('issue')) {
+            switch ($issue) {
+                case 'missing_photo':
+                    $query->where(function ($q) {
+                        $q->whereNull('sp.profile_image')->orWhere('sp.profile_image', '');
+                    });
+                    break;
+                case 'missing_gallery':
+                    $query->whereRaw('COALESCE(g.gallery_count, 0) < 4');
+                    break;
+                case 'missing_services':
+                    $query->where(function ($q) {
+                        $q->whereNull('sp.services_offered')
+                            ->orWhere('sp.services_offered', '')
+                            ->orWhere('sp.services_offered', '[]');
+                    });
+                    break;
+                case 'missing_address':
+                    $query->where(function ($q) {
+                        $q->whereNull('sp.address')->orWhere('sp.address', '');
+                    });
                     break;
             }
         }
@@ -92,9 +83,41 @@ class AdminProviderActivityMonitorService
             }
         }
 
-        $query->orderByRaw('COALESCE(a.last_activity_at, sp.created_at) DESC');
+        $sort = $request?->input('sort', 'attention') ?: 'attention';
+        match ($sort) {
+            'views' => $query->orderByDesc('profile_views')->orderByDesc('whatsapp_clicks'),
+            'clicks' => $query->orderByDesc('whatsapp_clicks')->orderByDesc('profile_views'),
+            'completion_low' => $query->orderBy('sp.profile_completion_percent')->orderByDesc('sp.created_at'),
+            'newest' => $query->orderByDesc('sp.created_at'),
+            default => $query
+                ->orderByRaw('CASE WHEN sp.profile_completion_percent < 100 THEN 0 ELSE 1 END')
+                ->orderByRaw('CASE WHEN a.last_activity_at IS NULL THEN 0 ELSE 1 END')
+                ->orderBy('sp.profile_completion_percent')
+                ->orderByRaw('COALESCE(a.last_activity_at, sp.created_at) DESC'),
+        };
 
         return $query->paginate($perPage)->withQueryString();
+    }
+
+    public function getIndexSummary(): array
+    {
+        $rows = $this->baseProviderActivityQuery()->get();
+
+        $total = $rows->count();
+        $totalViews = (int) $rows->sum('profile_views');
+        $totalClicks = (int) $rows->sum('whatsapp_clicks');
+
+        return [
+            'total' => $total,
+            'complete' => $rows->where('profile_completion_percent', '>=', 100)->count(),
+            'needs_work' => $rows->where('profile_completion_percent', '<', 100)->count(),
+            'no_activity' => $rows->whereNull('last_activity_at')->count(),
+            'missing_photo' => $rows->where('has_profile_photo', 0)->count(),
+            'missing_gallery' => $rows->filter(fn ($row) => (int) $row->gallery_count < 4)->count(),
+            'total_views' => $totalViews,
+            'total_clicks' => $totalClicks,
+            'conversion_rate' => $totalViews > 0 ? round(($totalClicks / $totalViews) * 100, 1) : 0,
+        ];
     }
 
     public function getProviderDetails(ServiceProvider $serviceProvider, int $perPage = 30): array
@@ -119,5 +142,69 @@ class AdminProviderActivityMonitorService
             'events' => $events,
             'summary' => $summary,
         ];
+    }
+
+    private function baseProviderActivityQuery()
+    {
+        $serviceProviderMorphType = (new ServiceProvider())->getMorphClass();
+
+        $analyticsAgg = DB::table('analytics')
+            ->selectRaw('
+                provider_id,
+                SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as profile_views,
+                SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as whatsapp_clicks,
+                MAX(created_at) as last_activity_at,
+                SUBSTRING_INDEX(GROUP_CONCAT(action_type ORDER BY created_at DESC, id DESC), ",", 1) as last_action_type
+            ')
+            ->tap(fn($q) => AdminAnalyticsExclusion::apply($q))
+            ->groupBy('provider_id');
+
+        $galleryAgg = DB::table('media')
+            ->selectRaw('
+                model_id as provider_id,
+                COUNT(*) as gallery_count
+            ')
+            ->where('collection_name', 'gallery')
+            ->where('model_type', $serviceProviderMorphType)
+            ->groupBy('model_id');
+
+        return DB::table('service_providers as sp')
+            ->leftJoin('users as u', 'sp.user_id', '=', 'u.id')
+            ->leftJoin('categories as c', 'sp.category_id', '=', 'c.id')
+            ->leftJoin('locations as l', 'sp.location_id', '=', 'l.id')
+            ->leftJoinSub($analyticsAgg, 'a', 'sp.id', '=', 'a.provider_id')
+            ->leftJoinSub($galleryAgg, 'g', 'sp.id', '=', 'g.provider_id')
+            ->selectRaw('
+                sp.id,
+                sp.user_id,
+                sp.company_name,
+                sp.profile_completion_percent,
+                sp.profile_image,
+                sp.created_at,
+                sp.bio,
+                sp.address,
+                sp.experience_years,
+                sp.phone,
+                sp.whatsapp_number,
+                sp.services_offered,
+                sp.is_verified,
+                sp.is_certified,
+                u.name as owner_name,
+                u.email as owner_email,
+                u.is_active as owner_is_active,
+                c.name as category_name,
+                c.name_en as category_name_en,
+                l.city as location_city,
+                COALESCE(a.profile_views, 0) as profile_views,
+                COALESCE(a.whatsapp_clicks, 0) as whatsapp_clicks,
+                a.last_activity_at,
+                a.last_action_type,
+                COALESCE(g.gallery_count, 0) as gallery_count,
+                CASE WHEN sp.profile_image IS NOT NULL AND sp.profile_image <> "" THEN 1 ELSE 0 END as has_profile_photo,
+                CASE WHEN sp.bio IS NOT NULL AND sp.bio <> "" THEN 1 ELSE 0 END as has_description,
+                CASE WHEN sp.address IS NOT NULL AND sp.address <> "" THEN 1 ELSE 0 END as has_address,
+                CASE WHEN sp.experience_years IS NOT NULL AND sp.experience_years > 0 THEN 1 ELSE 0 END as has_experience,
+                CASE WHEN sp.services_offered IS NOT NULL AND sp.services_offered <> "" AND sp.services_offered <> "[]" THEN 1 ELSE 0 END as has_services
+            ');
     }
 }

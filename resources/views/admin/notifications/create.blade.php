@@ -3,22 +3,94 @@
 @section('content')
     <div class="admin-cms-page" dir="ltr">
         <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
-            <section class="admin-page-header">
-                <div>
-                    <p class="admin-section-eyebrow">Notifications</p>
-                    <h1>Create Notification</h1>
-                    <p>Broadcast a multilingual message to all active service providers.</p>
-                </div>
-                <a href="{{ route('admin.notifications.index') }}" class="admin-btn admin-btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Back to List</span>
-                </a>
-            </section>
+            <x-admin.header
+                eyebrow="Notifications"
+                title="Create Notification"
+                subtitle="Send a multilingual message to all active service providers or only selected providers."
+            >
+                <x-slot:actions>
+                    <x-ui.button
+                        :href="route('admin.notifications.index')"
+                        variant="secondary"
+                        icon="fas fa-arrow-left"
+                        class="admin-btn admin-btn-secondary"
+                    >
+                        Back to List
+                    </x-ui.button>
+                </x-slot:actions>
+            </x-admin.header>
 
             <div class="admin-form-layout">
                 <div class="admin-form-main">
                     <form action="{{ route('admin.notifications.store') }}" method="POST" id="notificationForm">
                         @csrf
+
+                        {{-- Targeting Section --}}
+                        <div class="admin-form-section">
+                            <div class="section-header">
+                                <span class="target-icon"><i class="fas fa-bullseye"></i></span>
+                                <h3>Recipients</h3>
+                            </div>
+
+                            @if($targetingEnabled)
+                                <div class="target-mode-grid" role="radiogroup" aria-label="Notification recipients">
+                                    <label class="target-mode-card">
+                                        <input type="radio" name="target_mode" value="all" {{ old('target_mode', 'all') === 'all' ? 'checked' : '' }}>
+                                        <span class="target-mode-content">
+                                            <strong>All Service Providers</strong>
+                                            <small>Every active service provider can see this notification.</small>
+                                        </span>
+                                    </label>
+
+                                    <label class="target-mode-card">
+                                        <input type="radio" name="target_mode" value="selected" {{ old('target_mode') === 'selected' ? 'checked' : '' }}>
+                                        <span class="target-mode-content">
+                                            <strong>Selected Service Providers</strong>
+                                            <small>Only the providers selected below can see this notification.</small>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                @error('target_mode')
+                                    <span class="admin-error">{{ $message }}</span>
+                                @enderror
+
+                                <div class="provider-target-panel" id="providerTargetPanel">
+                                    <label for="service_provider_ids">Choose providers <span class="required">*</span></label>
+                                    <select
+                                        name="service_provider_ids[]"
+                                        id="service_provider_ids"
+                                        multiple
+                                        size="10"
+                                        class="provider-target-select"
+                                    >
+                                        @foreach($serviceProviders as $provider)
+                                            @php($providerLabel = $provider->company_name ?: ($provider->user->name ?? 'Provider #' . $provider->id))
+                                            <option
+                                                value="{{ $provider->id }}"
+                                                @selected(in_array($provider->id, old('service_provider_ids', [])))
+                                            >
+                                                {{ $providerLabel }} - {{ $provider->user->email ?? 'no email' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <div class="target-help">
+                                        Hold Ctrl/Cmd to select more than one provider. {{ $serviceProviders->count() }} active provider(s) available.
+                                    </div>
+                                    @error('service_provider_ids')
+                                        <span class="admin-error">{{ $message }}</span>
+                                    @enderror
+                                    @error('service_provider_ids.*')
+                                        <span class="admin-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @else
+                                <input type="hidden" name="target_mode" value="all">
+                                <x-ui.alert variant="warning" icon="fas fa-triangle-exclamation">
+                                    Targeted provider delivery will become available after running the new notification targeting migration. This notification will be sent to all service providers.
+                                </x-ui.alert>
+                            @endif
+                        </div>
 
                         {{-- Arabic Section --}}
                         <div class="admin-form-section" dir="rtl">
@@ -108,7 +180,7 @@
                         <ul class="info-list">
                             <li>
                                 <i class="fas fa-users"></i>
-                                <span><strong>Target:</strong> Service Providers Only</span>
+                                <span><strong>Target:</strong> All or selected service providers</span>
                             </li>
                             <li>
                                 <i class="fas fa-clock"></i>
@@ -224,6 +296,77 @@
         margin: 0;
         font-size: 1.125rem;
         font-weight: 600;
+    }
+
+    .target-icon {
+        color: var(--sp-color-primary, #2563eb);
+    }
+
+    .target-mode-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .target-mode-card {
+        display: flex;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: 1px solid var(--sp-color-border-strong, #cbd5e1);
+        border-radius: var(--sp-radius-lg, 0.75rem);
+        cursor: pointer;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .target-mode-card:has(input:checked) {
+        border-color: var(--sp-color-primary, #2563eb);
+        box-shadow: var(--sp-shadow-focus, 0 0 0 0.2rem rgba(37, 99, 235, 0.18));
+    }
+
+    .target-mode-card input {
+        width: auto;
+        margin-top: 0.25rem;
+    }
+
+    .target-mode-content {
+        display: grid;
+        gap: 0.25rem;
+    }
+
+    .target-mode-content small {
+        color: var(--sp-color-text-muted, #64748b);
+        line-height: 1.4;
+    }
+
+    .provider-target-panel {
+        display: none;
+        margin-top: 1rem;
+    }
+
+    .provider-target-panel.is-visible {
+        display: block;
+    }
+
+    .provider-target-panel label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .provider-target-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--sp-color-border-strong, #cbd5e1);
+        border-radius: var(--sp-radius-lg, 0.75rem);
+        color: var(--sp-color-text, #0f172a);
+        background: var(--sp-color-surface, #ffffff);
+    }
+
+    .target-help {
+        margin-top: 0.5rem;
+        color: var(--sp-color-text-muted, #64748b);
+        font-size: 0.875rem;
     }
 
     .form-group {
@@ -460,6 +603,10 @@
         .preview-tabs {
             flex-wrap: wrap;
         }
+
+        .target-mode-grid {
+            grid-template-columns: 1fr;
+        }
     }
     </style>
 
@@ -470,8 +617,27 @@
         const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
         const confirmSendBtn = document.getElementById('confirmSend');
         const previewTabs = document.querySelectorAll('.preview-tab');
+        const targetModeInputs = document.querySelectorAll('input[name="target_mode"]');
+        const providerTargetPanel = document.getElementById('providerTargetPanel');
+        const providerTargetSelect = document.getElementById('service_provider_ids');
         
         let currentLang = 'ar';
+
+        function updateTargetPanel() {
+            if (!providerTargetPanel || !providerTargetSelect) return;
+
+            const selectedMode = document.querySelector('input[name="target_mode"]:checked')?.value || 'all';
+            const requiresSelection = selectedMode === 'selected';
+
+            providerTargetPanel.classList.toggle('is-visible', requiresSelection);
+            providerTargetSelect.toggleAttribute('required', requiresSelection);
+        }
+
+        targetModeInputs.forEach(input => {
+            input.addEventListener('change', updateTargetPanel);
+        });
+
+        updateTargetPanel();
 
         // Update preview content
         function updatePreview(lang) {

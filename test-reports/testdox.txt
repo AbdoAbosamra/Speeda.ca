@@ -1,11 +1,17 @@
-Password Reset (Tests\Feature\Auth\PasswordReset)
- [x] Reset password link screen can be rendered
- [x] Reset password link can be requested
- [x] Reset password screen can be rendered
- [x] Password can be reset with valid token
- [x] Unknown email gets generic response without notification
- [x] Password reset requests are rate limited
- [x] Password reset email uses speeda support sender
- [x] Resetting password removes existing database sessions
- [x] Password reset requires a strong new password
+Admin Legal Pages (Tests\Feature\AdminLegalPages)
+ [x] Admin can view legal pages dashboard
+ [x] Admin can publish privacy policy override
+ [x] Admin can publish custom legal page
+ [x] Draft custom legal page is hidden from public site
+ [x] Deleting privacy override restores static fallback
+
+Admin Notification Targeting (Tests\Feature\AdminNotificationTargeting)
+ [x] Admin can view provider targeting controls
+ [x] Admin can create broadcast notification for all service providers
+ [x] Admin can create notification for selected service providers only
+ [x] Admin cannot target inactive service provider
+ [x] Selected notification is visible only to selected provider
+ [x] Unread count only counts notifications visible to current provider
+ [x] Provider cannot mark invisible targeted notification as read
+ [x] Targeted notification clears only selected provider nav cache
 

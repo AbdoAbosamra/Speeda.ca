@@ -22,8 +22,9 @@ class ProviderActivityMonitorController extends Controller
         $perPage = max(5, min(50, $perPage));
 
         $providers = $this->activityService->paginateProviders($perPage, $request);
+        $summary = $this->activityService->getIndexSummary();
 
-        return view('admin.provider_activity_monitor.index', compact('providers'));
+        return view('admin.provider_activity_monitor.index', compact('providers', 'summary'));
     }
 
     public function show(ServiceProvider $serviceProvider, Request $request)

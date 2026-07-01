@@ -3,23 +3,27 @@
 @section('content')
     <div class="admin-cms-page" dir="ltr">
         <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
-            <section class="admin-page-header">
-                <div>
-                    <p class="admin-section-eyebrow">Blog CMS</p>
-                    <h1>Blog Management</h1>
-                    <p>Create, search, edit, publish, and safely delete public blog articles.</p>
-                </div>
-                <a href="{{ route('admin.blog.posts.create') }}" class="admin-btn admin-btn-primary text-white">
-                    <i class="fas fa-plus"></i>
-                    <span>Create Blog</span>
-                </a>
-            </section>
+            <x-admin.header
+                eyebrow="Blog CMS"
+                title="Blog Management"
+                subtitle="Create, search, edit, publish, and safely delete public blog articles."
+            >
+                <x-slot:actions>
+                    <x-ui.button
+                        :href="route('admin.blog.posts.create')"
+                        icon="fas fa-plus"
+                        class="admin-btn admin-btn-primary text-white"
+                    >
+                        Create Blog
+                    </x-ui.button>
+                </x-slot:actions>
+            </x-admin.header>
 
-            <div class="admin-mini-stat-grid">
-                <article><span>Total</span><strong>{{ $counts['total'] }}</strong></article>
-                <article><span>Published</span><strong>{{ $counts['published'] }}</strong></article>
-                <article><span>Drafts</span><strong>{{ $counts['draft'] }}</strong></article>
-            </div>
+            <x-admin.metric-grid>
+                <x-admin.metric label="Total" :value="$counts['total']" />
+                <x-admin.metric label="Published" :value="$counts['published']" />
+                <x-admin.metric label="Drafts" :value="$counts['draft']" />
+            </x-admin.metric-grid>
 
             <section class="admin-section-block">
                 <form action="{{ route('admin.blog.posts.index') }}" method="GET" class="admin-filter-bar">
@@ -36,17 +40,17 @@
                         </select>
                     </label>
                     <div class="admin-filter-actions">
-                        <button type="submit" class="admin-btn admin-btn-primary text-white">
-                            <i class="fas fa-magnifying-glass"></i>
-                            <span>Apply</span>
-                        </button>
-                        <a href="{{ route('admin.blog.posts.index') }}" class="admin-btn admin-btn-secondary">Reset</a>
+                        <x-ui.button type="submit" icon="fas fa-magnifying-glass" class="admin-btn admin-btn-primary text-white">
+                            Apply
+                        </x-ui.button>
+                        <x-ui.button :href="route('admin.blog.posts.index')" variant="secondary" class="admin-btn admin-btn-secondary">
+                            Reset
+                        </x-ui.button>
                     </div>
                 </form>
             </section>
 
-            <section class="admin-table-card">
-                <div class="table-responsive">
+            <x-admin.table-card>
                     <table class="admin-data-table">
                         <thead>
                                 <tr>
@@ -70,9 +74,12 @@
                                         <div class="admin-table-subtitle">{{ $post->slug }}</div>
                                     </td>
                                     <td>
-                                        <span class="admin-badge admin-badge-{{ $postStatus === 'published' ? 'published' : 'draft' }}">
+                                        <x-ui.badge
+                                            :variant="$postStatus === 'published' ? 'success' : 'warning'"
+                                            class="admin-badge admin-badge-{{ $postStatus === 'published' ? 'published' : 'draft' }}"
+                                        >
                                             {{ ucfirst($postStatus) }}
-                                        </span>
+                                        </x-ui.badge>
                                     </td>
                                     <td>{{ optional($post->published_at)->format('M d, Y') ?: '-' }}</td>
                                     <td>{{ optional($post->created_at)->format('M d, Y') }}</td>
@@ -102,19 +109,23 @@
                             @empty
                                 <tr>
                                     <td colspan="6">
-                                        <div class="admin-empty-state">
-                                            <i class="fas fa-newspaper"></i>
-                                            <h2>No blog posts found</h2>
-                                            <p>Create a blog post or adjust the current filters.</p>
-                                            <a href="{{ route('admin.blog.posts.create') }}" class="admin-btn admin-btn-primary text-white">Create Blog</a>
-                                        </div>
+                                        <x-admin.empty-state
+                                            icon="fas fa-newspaper"
+                                            title="No blog posts found"
+                                            description="Create a blog post or adjust the current filters."
+                                        >
+                                            <x-slot:actions>
+                                                <x-ui.button :href="route('admin.blog.posts.create')" class="admin-btn admin-btn-primary text-white">
+                                                    Create Blog
+                                                </x-ui.button>
+                                            </x-slot:actions>
+                                        </x-admin.empty-state>
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
-                </div>
-            </section>
+            </x-admin.table-card>
 
             @if($posts->hasPages())
                 <div class="admin-pagination-wrap">

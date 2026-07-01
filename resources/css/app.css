@@ -1,3 +1,6 @@
+@import "./foundation/design-tokens.css";
+@import "./components/ui-primitives.css";
+
 /* ============================================
    SPEEDA — UNIFIED DESIGN SYSTEM v4.0
    Bootstrap 5 + Custom CSS

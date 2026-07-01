@@ -204,6 +204,15 @@ class ServiceProvider extends Model implements HasMedia
     }
 
     /**
+     * Targeted admin notifications for this provider.
+     */
+    public function targetedAdminNotifications()
+    {
+        return $this->belongsToMany(AdminNotification::class, 'admin_notification_service_provider')
+            ->withTimestamps();
+    }
+
+    /**
      * Get the service areas for the service provider.
      */
     public function serviceAreas(): HasMany

@@ -72,12 +72,12 @@
         <!-- شبكة البطاقات المحسّنة -->
         <div class="providers-grid">
             @forelse($serviceProviders as $provider)
-                <div class="provider-card fade-in">
+                <div class="provider-card fade-in" data-provider-id="{{ $provider->id }}">
                     <div class="card-header">
                         @if($provider->featured)
-                            <div class="provider-badge">
+                            <x-ui.badge variant="warning" class="provider-badge">
                                 <i class="fas fa-crown me-1"></i> {{ __('service_provider.featured') }}
-                            </div>
+                            </x-ui.badge>
                         @endif
 
                         <div class="provider-header">
@@ -120,10 +120,9 @@
                             <i class="fas fa-map-marker-alt location-icon"></i>
                             <div class="address-text">
                                 @if(($provider->is_available_area ?? false) && !in_array($provider->location_id, $activeLocationIds ?? []))
-                                    <span class="badge rounded-pill mb-1"
-                                          style="background-color:#d1fae5;color:#065f46;border:1px solid #6ee7b7;font-weight:600;">
+                                    <x-ui.badge variant="success" class="badge rounded-pill mb-1">
                                         <i class="fas fa-circle-check me-1"></i>{{ __('service_provider.available_in_area') }}
-                                    </span>
+                                    </x-ui.badge>
                                 @endif
                                 @if($provider->location)
                                     <div class="mb-1 fw-bold text-primary">{{ $provider->location->localized_name }}</div>
@@ -218,24 +217,19 @@
                 </div>
             @empty
                 <!-- حالة عدم وجود نتائج محسّنة -->
-                <div class="empty-state">
-                    <div class="empty-illustration">
-                        <i class="fas fa-users"></i>
-                    </div>
-
-                    <h2 class="empty-title">{{ __('service_provider.no_providers_found') }}</h2>
-                    <p class="empty-description">{{ __('service_provider.no_providers_description') }}</p>
-
-                    <div class="empty-actions">
-                        <button class="btn-primary" onclick="resetFilters()">
-                            <i class="fas fa-redo me-2"></i>
+                <x-public.empty-state
+                    icon="fas fa-users"
+                    title="{{ __('service_provider.no_providers_found') }}"
+                    description="{{ __('service_provider.no_providers_description') }}"
+                >
+                    <x-slot:actions>
+                        <x-ui.button type="button" icon="fas fa-redo" class="btn-primary" onclick="resetFilters()">
                             {{ __('service_provider.reset_filters') }}
-                        </button>
-                        <a href="{{ route('home') }}" class="btn-back">
-                            <i class="fas fa-home me-2"></i>
+                        </x-ui.button>
+                        <x-ui.button :href="route('home')" variant="secondary" icon="fas fa-home" class="btn-back">
                             Return Home
-                        </a>
-                    </div>
+                        </x-ui.button>
+                    </x-slot:actions>
 
                     <div class="suggestions-section">
                         <h3 class="suggestions-title">{{ __('service_provider.or_try_browsing') }}</h3>
@@ -260,7 +254,7 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                </x-public.empty-state>
             @endforelse
         </div>
 
@@ -328,7 +322,6 @@
     </div>
 
     <!-- سكريبتات JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // عناصر الفلاتر

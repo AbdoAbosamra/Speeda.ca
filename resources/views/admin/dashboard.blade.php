@@ -314,10 +314,6 @@
                                 <span class="dash-health-val">{{ number_format($health['incomplete'] ?? 0) }}</span>
                             </div>
                         </div>
-                        <div class="dash-health-foot">
-                            <i class="fas fa-triangle-exclamation"></i>
-                            <strong>{{ number_format($health['missing_whatsapp'] ?? 0) }}</strong> providers have no WhatsApp number — direct lead leakage.
-                        </div>
                     </div>
 
                     {{-- WhatsApp quick snapshot --}}
@@ -452,6 +448,11 @@
                     <a href="{{ route('admin.blog.posts.index') }}" class="admin-command-card">
                         <span class="admin-command-icon admin-command-violet"><i class="fas fa-newspaper"></i></span>
                         <div class="admin-command-content"><h3>Manage Blogs</h3><p>Drafts, publishing, images, SEO.</p></div>
+                        <i class="fas fa-arrow-right admin-command-arrow"></i>
+                    </a>
+                    <a href="{{ route('admin.legal-pages.index') }}" class="admin-command-card">
+                        <span class="admin-command-icon admin-command-indigo"><i class="fas fa-scale-balanced"></i></span>
+                        <div class="admin-command-content"><h3>Policies & Privacy</h3><p>Edit legal pages, terms, and privacy content.</p></div>
                         <i class="fas fa-arrow-right admin-command-arrow"></i>
                     </a>
                     <a href="{{ route('admin.visitors') }}" class="admin-command-card">

@@ -1,3 +1,5 @@
+@import "./foundation/design-tokens.css";
+
 /* ============================================
    PROVIDERS INDEX PAGE
    Extracted from index.blade.php inline styles

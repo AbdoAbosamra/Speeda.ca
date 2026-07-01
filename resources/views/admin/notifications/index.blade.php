@@ -3,17 +3,21 @@
 @section('content')
     <div class="admin-cms-page" dir="ltr">
         <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
-            <section class="admin-page-header">
-                <div>
-                    <p class="admin-section-eyebrow">Notifications</p>
-                    <h1>Manage Notifications</h1>
-                    <p>Broadcast multilingual messages to active service providers.</p>
-                </div>
-                <a href="{{ route('admin.notifications.create') }}" class="admin-btn admin-btn-primary text-white">
-                    <i class="fas fa-plus"></i>
-                    <span>Create Notification</span>
-                </a>
-            </section>
+            <x-admin.header
+                eyebrow="Notifications"
+                title="Manage Notifications"
+                subtitle="Broadcast multilingual messages or target selected service providers."
+            >
+                <x-slot:actions>
+                    <x-ui.button
+                        :href="route('admin.notifications.create')"
+                        icon="fas fa-plus"
+                        class="admin-btn admin-btn-primary text-white"
+                    >
+                        Create Notification
+                    </x-ui.button>
+                </x-slot:actions>
+            </x-admin.header>
 
             {{-- Stats Cards --}}
             <section class="admin-stats-row">
@@ -44,6 +48,15 @@
                         <span class="admin-stat-label">Expired</span>
                     </div>
                 </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon admin-stat-icon-targeted">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="admin-stat-content">
+                        <span class="admin-stat-value">{{ $stats['targeted'] }}</span>
+                        <span class="admin-stat-label">Targeted</span>
+                    </div>
+                </div>
             </section>
 
             {{-- Search & Filters --}}
@@ -60,26 +73,29 @@
                             <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>Expired</option>
                         </select>
                     </div>
-                    <button type="submit" class="admin-btn admin-btn-secondary">
-                        <i class="fas fa-filter"></i>
-                        <span>Filter</span>
-                    </button>
+                    <x-ui.button type="submit" variant="secondary" icon="fas fa-filter" class="admin-btn admin-btn-secondary">
+                        Filter
+                    </x-ui.button>
                     @if(request()->hasAny(['search', 'status']))
-                        <a href="{{ route('admin.notifications.index') }}" class="admin-btn admin-btn-ghost">
-                            <i class="fas fa-times"></i>
-                            <span>Clear</span>
-                        </a>
+                        <x-ui.button
+                            :href="route('admin.notifications.index')"
+                            variant="ghost"
+                            icon="fas fa-times"
+                            class="admin-btn admin-btn-ghost"
+                        >
+                            Clear
+                        </x-ui.button>
                     @endif
                 </form>
             </section>
 
-            <section class="admin-table-card">
-                <div class="table-responsive">
+            <x-admin.table-card>
                     <table class="admin-data-table">
                         <thead>
                             <tr>
                                 <th>Title</th>
                                 <th>Status</th>
+                                <th>Target</th>
                                 <th>Created By</th>
                                 <th>Created</th>
                                 <th>Expires</th>
@@ -95,9 +111,23 @@
                                         <div class="admin-table-subtitle">{{ Str::limit($notification->message_en, 110) }}</div>
                                     </td>
                                     <td>
-                                        <span class="admin-badge {{ $isActive ? 'admin-badge-published' : 'admin-badge-draft' }}">
+                                        <x-ui.badge
+                                            :variant="$isActive ? 'success' : 'warning'"
+                                            class="admin-badge {{ $isActive ? 'admin-badge-published' : 'admin-badge-draft' }}"
+                                        >
                                             {{ $isActive ? 'Active' : 'Expired' }}
-                                        </span>
+                                        </x-ui.badge>
+                                    </td>
+                                    <td>
+                                        @if($notification->target_service_providers_count > 0)
+                                            <x-ui.badge variant="primary" icon="fas fa-user-check">
+                                                {{ $notification->target_service_providers_count }} selected
+                                            </x-ui.badge>
+                                        @else
+                                            <x-ui.badge variant="neutral" icon="fas fa-bullhorn">
+                                                All providers
+                                            </x-ui.badge>
+                                        @endif
                                     </td>
                                     <td>{{ $notification->admin->name ?? 'System' }}</td>
                                     <td>{{ optional($notification->created_at)->format('M d, Y H:i') }}</td>
@@ -143,7 +173,30 @@
                                                                 <i class="fas fa-user"></i>
                                                                 <span>By: {{ $notification->admin->name ?? 'System' }}</span>
                                                             </div>
+                                                            <div class="meta-item">
+                                                                <i class="fas fa-bullseye"></i>
+                                                                <span>
+                                                                    Target:
+                                                                    @if($notification->target_service_providers_count > 0)
+                                                                        {{ $notification->target_service_providers_count }} selected provider(s)
+                                                                    @else
+                                                                        All service providers
+                                                                    @endif
+                                                                </span>
+                                                            </div>
                                                         </div>
+                                                        @if($notification->target_service_providers_count > 0)
+                                                            <div class="admin-target-preview mb-4">
+                                                                <strong>Selected Providers</strong>
+                                                                <div class="admin-target-list">
+                                                                    @foreach($notification->targetServiceProviders as $provider)
+                                                                        <span class="admin-target-pill">
+                                                                            {{ $provider->company_name ?? $provider->user?->name ?? 'Provider #' . $provider->id }}
+                                                                        </span>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                        @endif
                                                         <div class="admin-language-preview" dir="rtl">
                                                             <div class="language-label">
                                                                 <span class="flag-icon">🇸🇦</span>
@@ -176,19 +229,19 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6">
-                                        <div class="admin-empty-state">
-                                            <i class="fas fa-bell-slash"></i>
-                                            <h2>No notifications found</h2>
-                                            <p>Create a notification to reach active service providers.</p>
-                                        </div>
+                                    <td colspan="7">
+                                        <x-ui.empty-state
+                                            icon="fas fa-bell-slash"
+                                            title="No notifications found"
+                                            description="Create a notification to reach active service providers."
+                                            class="admin-empty-state"
+                                        />
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
-                </div>
-            </section>
+            </x-admin.table-card>
 
             @if($notifications->hasPages())
                 <div class="admin-pagination-wrap">{{ $notifications->links('components.global-pagination') }}</div>
@@ -209,15 +262,15 @@
         align-items: center;
         gap: 1rem;
         padding: 1.25rem;
-        background: white;
-        border: 1px solid var(--border-default, #e2e8f0);
-        border-radius: 16px;
-        transition: all 0.2s ease;
+        background: var(--sp-color-surface);
+        border: 1px solid var(--sp-color-border-strong);
+        border-radius: var(--sp-radius-xl);
+        transition: all var(--sp-duration-base) var(--sp-ease-standard);
     }
 
     .admin-stat-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        box-shadow: var(--sp-shadow-sm);
     }
 
     .admin-stat-icon {
@@ -226,23 +279,28 @@
         justify-content: center;
         width: 48px;
         height: 48px;
-        border-radius: 12px;
+        border-radius: var(--sp-radius-lg);
         font-size: 1.25rem;
     }
 
     .admin-stat-icon-total {
         background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.15));
-        color: #6366f1;
+        color: var(--sp-color-primary);
     }
 
     .admin-stat-icon-active {
         background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.15));
-        color: #10b981;
+        color: var(--sp-color-success);
     }
 
     .admin-stat-icon-expired {
         background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.15));
-        color: #f59e0b;
+        color: var(--sp-color-warning);
+    }
+
+    .admin-stat-icon-targeted {
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(37, 99, 235, 0.15));
+        color: var(--sp-color-info);
     }
 
     .admin-stat-content {
@@ -253,12 +311,12 @@
     .admin-stat-value {
         font-size: 1.5rem;
         font-weight: 700;
-        color: var(--text-primary, #0f172a);
+        color: var(--sp-color-text);
     }
 
     .admin-stat-label {
         font-size: 0.875rem;
-        color: var(--text-muted, #94a3b8);
+        color: var(--sp-color-text-subtle);
     }
 
     .admin-filters-bar {
@@ -276,14 +334,14 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        background: white;
-        border: 1px solid var(--border-default, #e2e8f0);
-        border-radius: 12px;
+        background: var(--sp-color-surface);
+        border: 1px solid var(--sp-color-border-strong);
+        border-radius: var(--sp-radius-lg);
         min-width: 280px;
     }
 
     .admin-search-box i {
-        color: var(--text-muted, #94a3b8);
+        color: var(--sp-color-text-subtle);
     }
 
     .admin-search-box input {
@@ -291,20 +349,20 @@
         outline: none;
         flex: 1;
         font-size: 0.9375rem;
-        color: var(--text-primary, #0f172a);
+        color: var(--sp-color-text);
     }
 
     .admin-search-box input::placeholder {
-        color: var(--text-muted, #94a3b8);
+        color: var(--sp-color-text-subtle);
     }
 
     .admin-filter-select select {
         padding: 0.625rem 2rem 0.625rem 1rem;
-        background: white;
-        border: 1px solid var(--border-default, #e2e8f0);
-        border-radius: 12px;
+        background: var(--sp-color-surface);
+        border: 1px solid var(--sp-color-border-strong);
+        border-radius: var(--sp-radius-lg);
         font-size: 0.9375rem;
-        color: var(--text-primary, #0f172a);
+        color: var(--sp-color-text);
         cursor: pointer;
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
@@ -314,12 +372,12 @@
 
     .admin-btn-ghost {
         background: transparent;
-        border: 1px solid var(--border-default, #e2e8f0);
-        color: var(--text-secondary, #475569);
+        border: 1px solid var(--sp-color-border-strong);
+        color: var(--sp-color-text-muted);
     }
 
     .admin-btn-ghost:hover {
-        background: var(--surface-subtle, #f8fafc);
+        background: var(--sp-color-surface-muted);
     }
 
     .admin-notification-meta {
@@ -327,8 +385,8 @@
         flex-wrap: wrap;
         gap: 1.5rem;
         padding: 1rem;
-        background: var(--surface-subtle, #f8fafc);
-        border-radius: 12px;
+        background: var(--sp-color-surface-muted);
+        border-radius: var(--sp-radius-lg);
     }
 
     .meta-item {
@@ -336,11 +394,11 @@
         align-items: center;
         gap: 0.5rem;
         font-size: 0.875rem;
-        color: var(--text-secondary, #475569);
+        color: var(--sp-color-text-muted);
     }
 
     .meta-item i {
-        color: var(--primary-500, #3b82f6);
+        color: var(--sp-color-primary);
     }
 
     .language-label {
@@ -357,22 +415,49 @@
     .admin-language-preview {
         padding: 1.25rem;
         margin-bottom: 1rem;
-        background: white;
-        border: 1px solid var(--border-default, #e2e8f0);
-        border-radius: 12px;
+        background: var(--sp-color-surface);
+        border: 1px solid var(--sp-color-border-strong);
+        border-radius: var(--sp-radius-lg);
     }
 
     .admin-language-preview h3 {
         font-size: 1.125rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
-        color: var(--text-primary, #0f172a);
+        color: var(--sp-color-text);
     }
 
     .admin-language-preview p {
-        color: var(--text-secondary, #475569);
+        color: var(--sp-color-text-muted);
         line-height: 1.6;
         margin: 0;
+    }
+
+    .admin-target-preview {
+        padding: 1rem;
+        background: var(--sp-color-surface-muted);
+        border: 1px solid var(--sp-color-border);
+        border-radius: var(--sp-radius-lg);
+    }
+
+    .admin-target-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+
+    .admin-target-pill {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        padding: 0.35rem 0.65rem;
+        border: 1px solid var(--sp-color-primary-border);
+        border-radius: var(--sp-radius-pill);
+        background: var(--sp-color-surface);
+        color: var(--sp-color-text-body);
+        font-size: 0.8125rem;
+        font-weight: 700;
     }
 
     @media (max-width: 768px) {

@@ -109,6 +109,7 @@ class AppServiceProvider extends ServiceProvider
                 $notificationData = \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function () use ($user) {
                     // Get active notifications with limit for dropdown (max 10 for preview)
                     $notifications = \App\Models\AdminNotification::active()
+                        ->visibleToUser($user)
                         ->orderBy('created_at', 'desc')
                         ->take(10)
                         ->get();

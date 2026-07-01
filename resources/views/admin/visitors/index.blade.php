@@ -14,17 +14,22 @@
 
     <div class="admin-cms-page" dir="ltr">
         <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
-            <section class="admin-page-header">
-                <div>
-                    <p class="admin-section-eyebrow">Analytics</p>
-                    <h1>Visitor Analytics</h1>
-                    <p>Review privacy-safe traffic trends and top public pages.</p>
-                </div>
-                <a href="{{ route('admin.visitors.export', ['period' => $period]) }}" class="admin-btn admin-btn-secondary">
-                    <i class="fas fa-download"></i>
-                    <span>Export CSV</span>
-                </a>
-            </section>
+            <x-admin.header
+                eyebrow="Analytics"
+                title="Visitor Analytics"
+                subtitle="Review privacy-safe traffic trends and top public pages."
+            >
+                <x-slot:actions>
+                    <x-ui.button
+                        :href="route('admin.visitors.export', ['period' => $period])"
+                        variant="secondary"
+                        icon="fas fa-download"
+                        class="admin-btn admin-btn-secondary"
+                    >
+                        Export CSV
+                    </x-ui.button>
+                </x-slot:actions>
+            </x-admin.header>
 
             <div class="admin-stat-grid">
                 <article class="admin-stat-card">
@@ -98,11 +103,11 @@
                             <strong>{{ number_format($data->count) }}</strong>
                         </div>
                     @empty
-                        <div class="admin-empty-state">
-                            <i class="fas fa-chart-simple"></i>
-                            <h2>No visitor data</h2>
-                            <p>Traffic will appear here after visits are tracked.</p>
-                        </div>
+                        <x-admin.empty-state
+                            icon="fas fa-chart-simple"
+                            title="No visitor data"
+                            description="Traffic will appear here after visits are tracked."
+                        />
                     @endforelse
                 </section>
 
@@ -135,11 +140,11 @@
                                 @empty
                                     <tr>
                                         <td colspan="3">
-                                            <div class="admin-empty-state">
-                                                <i class="fas fa-file-lines"></i>
-                                                <h2>No page data</h2>
-                                                <p>Top pages will appear after traffic is recorded.</p>
-                                            </div>
+                                            <x-admin.empty-state
+                                                icon="fas fa-file-lines"
+                                                title="No page data"
+                                                description="Top pages will appear after traffic is recorded."
+                                            />
                                         </td>
                                     </tr>
                                 @endforelse

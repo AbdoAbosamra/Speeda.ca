@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
+use App\Models\ServiceProvider;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ErrorHelper;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AdminNotificationController extends Controller
 {
@@ -21,8 +25,15 @@ class AdminNotificationController extends Controller
      */
     public function index(Request $request)
     {
+        $targetingEnabled = AdminNotification::supportsProviderTargeting();
+
         $query = AdminNotification::with('admin')
             ->orderBy('created_at', 'desc');
+
+        if ($targetingEnabled) {
+            $query->with(['targetServiceProviders.user'])
+                ->withCount('targetServiceProviders');
+        }
         
         // Search filter
         if ($request->filled('search')) {
@@ -53,9 +64,10 @@ class AdminNotificationController extends Controller
             'total' => AdminNotification::count(),
             'active' => AdminNotification::active()->count(),
             'expired' => AdminNotification::where('expires_at', '<=', now())->count(),
+            'targeted' => $targetingEnabled ? AdminNotification::has('targetServiceProviders')->count() : 0,
         ];
 
-        return view('admin.notifications.index', compact('notifications', 'stats'));
+        return view('admin.notifications.index', compact('notifications', 'stats', 'targetingEnabled'));
     }
 
     /**
@@ -63,7 +75,18 @@ class AdminNotificationController extends Controller
      */
     public function create()
     {
-        return view('admin.notifications.create');
+        $serviceProviders = ServiceProvider::query()
+            ->with('user')
+            ->whereHas('user', function ($query) {
+                $query->where('role', 'service_provider')
+                    ->where('is_active', true);
+            })
+            ->orderBy('company_name')
+            ->get();
+
+        $targetingEnabled = AdminNotification::supportsProviderTargeting();
+
+        return view('admin.notifications.create', compact('serviceProviders', 'targetingEnabled'));
     }
 
     /**
@@ -78,23 +101,62 @@ class AdminNotificationController extends Controller
             'message_ar' => 'required|string',
             'message_en' => 'required|string',
             'message_fr' => 'required|string',
+            'target_mode' => 'required|in:all,selected',
+            'service_provider_ids' => 'required_if:target_mode,selected|array',
+            'service_provider_ids.*' => 'integer|exists:service_providers,id',
         ]);
 
-        try {
-            AdminNotification::create([
-                'title_ar' => $validated['title_ar'],
-                'title_en' => $validated['title_en'],
-                'title_fr' => $validated['title_fr'],
-                'message_ar' => $validated['message_ar'],
-                'message_en' => $validated['message_en'],
-                'message_fr' => $validated['message_fr'],
-                'target_type' => 'provider_only',
-                'created_by' => Auth::id(),
-                'expires_at' => now()->addDays(30),
+        if ($validated['target_mode'] === 'selected' && !AdminNotification::supportsProviderTargeting()) {
+            throw ValidationException::withMessages([
+                'target_mode' => 'Targeted notifications are not available until the notification targeting migration has run.',
             ]);
+        }
+
+        $targetProviderIds = collect($validated['service_provider_ids'] ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($validated['target_mode'] === 'selected') {
+            $activeTargetProviderIds = ServiceProvider::query()
+                ->whereIn('id', $targetProviderIds->all())
+                ->whereHas('user', function ($query) {
+                    $query->where('role', 'service_provider')
+                        ->where('is_active', true);
+                })
+                ->pluck('id');
+
+            if ($activeTargetProviderIds->count() !== $targetProviderIds->count()) {
+                throw ValidationException::withMessages([
+                    'service_provider_ids' => 'Selected recipients must be active service providers.',
+                ]);
+            }
+
+            $targetProviderIds = $activeTargetProviderIds->values();
+        }
+
+        try {
+            $notification = DB::transaction(function () use ($validated, $targetProviderIds) {
+                $notification = AdminNotification::create([
+                    'title_ar' => $validated['title_ar'],
+                    'title_en' => $validated['title_en'],
+                    'title_fr' => $validated['title_fr'],
+                    'message_ar' => $validated['message_ar'],
+                    'message_en' => $validated['message_en'],
+                    'message_fr' => $validated['message_fr'],
+                    'target_type' => 'provider_only',
+                    'created_by' => Auth::id(),
+                    'expires_at' => now()->addDays(30),
+                ]);
+
+                if ($validated['target_mode'] === 'selected') {
+                    $notification->targetServiceProviders()->sync($targetProviderIds->all());
+                }
+
+                return $notification;
+            });
             
-            // Clear all notification caches since a new notification was added
-            $this->clearAllNotificationCaches();
+            $this->clearNotificationCachesForNotification($notification);
 
             ErrorHelper::flashNotification('Notification sent successfully.', 'success');
             return redirect()->route('admin.notifications.index');
@@ -111,10 +173,13 @@ class AdminNotificationController extends Controller
     public function destroy(AdminNotification $notification)
     {
         try {
+            $targetProviderIds = AdminNotification::supportsProviderTargeting()
+                ? $notification->targetServiceProviders()->pluck('service_providers.id')
+                : collect();
+
             $notification->delete();
             
-            // Clear all notification caches
-            $this->clearAllNotificationCaches();
+            $this->clearNotificationCaches($targetProviderIds->all());
             
             ErrorHelper::flashNotification('Notification deleted successfully.', 'success');
             return redirect()->route('admin.notifications.index');
@@ -132,9 +197,44 @@ class AdminNotificationController extends Controller
     {
         // Get all service provider user IDs and clear their caches
         // This ensures the dropdown shows updated notifications
-        $providerIds = \App\Models\User::whereHas('serviceProvider')->pluck('id');
+        $providerIds = User::whereHas('serviceProvider')->pluck('id');
         
         foreach ($providerIds as $userId) {
+            Cache::forget("nav_notifications_{$userId}");
+        }
+    }
+
+    /**
+     * Clear notification caches for a broadcast or targeted notification.
+     */
+    private function clearNotificationCachesForNotification(AdminNotification $notification): void
+    {
+        if (!AdminNotification::supportsProviderTargeting()) {
+            $this->clearAllNotificationCaches();
+            return;
+        }
+
+        $targetProviderIds = $notification->targetServiceProviders()
+            ->pluck('service_providers.id')
+            ->all();
+
+        $this->clearNotificationCaches($targetProviderIds);
+    }
+
+    /**
+     * Clear selected provider user caches, or all provider caches for broadcast notifications.
+     */
+    private function clearNotificationCaches(array $serviceProviderIds = []): void
+    {
+        if (empty($serviceProviderIds)) {
+            $this->clearAllNotificationCaches();
+            return;
+        }
+
+        $userIds = ServiceProvider::whereIn('id', $serviceProviderIds)
+            ->pluck('user_id');
+
+        foreach ($userIds as $userId) {
             Cache::forget("nav_notifications_{$userId}");
         }
     }

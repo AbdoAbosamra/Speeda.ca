@@ -1,0 +1,252 @@
+name: Speeda CI/CD
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PHP_VERSION: "8.3"
+  NODE_VERSION: "22"
+  DEFAULT_DEPLOY_BRANCH: "main"
+
+jobs:
+  ci:
+    name: CI checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: bcmath, ctype, dom, fileinfo, gd, intl, mbstring, mysql, pdo_mysql, pdo_sqlite, sqlite3, tokenizer, xml, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate Composer manifest
+        run: composer validate --no-check-publish
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --ansi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Prepare isolated Laravel environment
+        run: |
+          cp .env.example .env
+          touch database/ci.sqlite
+          php artisan key:generate --ansi
+          php artisan config:clear --ansi
+          php artisan migrate --force --ansi
+        env:
+          APP_ENV: testing
+          APP_DEBUG: "true"
+          AUTO_CREATE_ADMIN: "false"
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ github.workspace }}/database/ci.sqlite
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          MAIL_MAILER: array
+
+      - name: Validate Laravel config, routes, and views
+        run: |
+          php artisan config:cache --ansi
+          php artisan route:list --ansi
+          php artisan view:cache --ansi
+          php artisan optimize:clear --ansi
+        env:
+          APP_ENV: testing
+          APP_DEBUG: "true"
+          AUTO_CREATE_ADMIN: "false"
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ github.workspace }}/database/ci.sqlite
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          MAIL_MAILER: array
+
+      - name: Build Vite assets
+        run: npm run build
+
+      - name: Run Laravel tests
+        run: |
+          if find tests -name '*Test.php' -print -quit | grep -q .; then
+            php artisan test --testsuite=All --ansi
+          else
+            echo "No Laravel tests found; skipping."
+          fi
+        env:
+          APP_ENV: testing
+          APP_DEBUG: "true"
+          AUTO_CREATE_ADMIN: "false"
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ github.workspace }}/database/ci.sqlite
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          MAIL_MAILER: array
+
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: ci
+    if: ${{ github.event_name == 'push' && github.ref_name == (vars.DEPLOY_BRANCH || 'main') }}
+    environment: production
+    concurrency:
+      group: speeda-production-deploy
+      cancel-in-progress: false
+
+    env:
+      DEPLOY_BRANCH: ${{ vars.DEPLOY_BRANCH || 'main' }}
+      KEEP_RELEASES: ${{ vars.KEEP_RELEASES || '5' }}
+      RUN_MIGRATIONS: ${{ vars.RUN_MIGRATIONS || 'false' }}
+      PHP_BIN: ${{ vars.PHP_BIN || 'php' }}
+      PRODUCTION_HEALTH_URL: ${{ vars.PRODUCTION_HEALTH_URL || '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Confirm production branch
+        run: |
+          echo "Deploy branch: ${DEPLOY_BRANCH}"
+          echo "Current branch: ${GITHUB_REF_NAME}"
+          test "${GITHUB_REF_NAME}" = "${DEPLOY_BRANCH}"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: bcmath, ctype, dom, fileinfo, gd, intl, mbstring, mysql, pdo_mysql, pdo_sqlite, sqlite3, tokenizer, xml, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Install production PHP dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --ansi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build production assets
+        run: npm run build
+
+      - name: Prepare release package
+        run: |
+          set -euo pipefail
+          RELEASE_NAME="${GITHUB_SHA::12}-$(date -u +%Y%m%d%H%M%S)"
+          RELEASE_DIR=".deploy-release"
+
+          echo "RELEASE_NAME=${RELEASE_NAME}" >> "$GITHUB_ENV"
+          rm -rf "$RELEASE_DIR"
+          mkdir -p "$RELEASE_DIR"
+
+          rsync -a --delete ./ "$RELEASE_DIR"/ \
+            --exclude ".deploy-release" \
+            --exclude ".git" \
+            --exclude ".github" \
+            --exclude ".env" \
+            --exclude ".env.*" \
+            --exclude "node_modules" \
+            --exclude "storage" \
+            --exclude "public/hot" \
+            --exclude "public/storage" \
+            --exclude ".phpunit.cache" \
+            --exclude ".phpunit.result.cache" \
+            --exclude "coverage" \
+            --exclude "test-reports"
+
+          echo "Prepared release ${RELEASE_NAME}"
+
+      - name: Configure SSH
+        run: |
+          set -euo pipefail
+          : "${SSH_HOST:?Missing SSH_HOST secret}"
+          : "${SSH_USER:?Missing SSH_USER secret}"
+          : "${SSH_PORT:?Missing SSH_PORT secret}"
+          : "${SSH_PRIVATE_KEY:?Missing SSH_PRIVATE_KEY secret}"
+          : "${PROJECT_PATH:?Missing PROJECT_PATH secret}"
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/speeda_deploy_key
+          chmod 600 ~/.ssh/speeda_deploy_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+
+      - name: Create remote release directory
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/speeda_deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "PROJECT_PATH='$PROJECT_PATH' RELEASE_NAME='$RELEASE_NAME' bash -s" <<'REMOTE'
+          set -euo pipefail
+          mkdir -p "$PROJECT_PATH/releases/$RELEASE_NAME" "$PROJECT_PATH/shared"
+          REMOTE
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+
+      - name: Upload release over SSH
+        run: |
+          set -euo pipefail
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/speeda_deploy_key -p ${SSH_PORT}" \
+            .deploy-release/ \
+            "${SSH_USER}@${SSH_HOST}:${PROJECT_PATH}/releases/${RELEASE_NAME}/"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+
+      - name: Activate release
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/speeda_deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "PROJECT_PATH='$PROJECT_PATH' RELEASE_NAME='$RELEASE_NAME' KEEP_RELEASES='$KEEP_RELEASES' RUN_MIGRATIONS='$RUN_MIGRATIONS' PHP_BIN='$PHP_BIN' PRODUCTION_HEALTH_URL='$PRODUCTION_HEALTH_URL' GITHUB_SHA='$GITHUB_SHA' GITHUB_RUN_ID='$GITHUB_RUN_ID' bash -s" \
+            < deploy/remote-release-activate.sh
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}

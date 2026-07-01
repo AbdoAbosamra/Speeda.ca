@@ -1,16 +1,20 @@
-Comprehensive Registration (Tests\Feature\Auth\ComprehensiveRegistration)
- [x] Registration page is displayed
- [x] Client registers successfully with minimal data
- [x] Service provider registers successfully with complete data
- [x] Service provider registration requires all fields
- [x] Email validation works correctly
- [x] Email uniqueness is enforced
- [x] Password validation enforces security rules
- [x] Mobile phone validation works
- [x] Whatsapp number is optional but validated if provided
- [x] Unicode names are supported
- [x] Registration handles duplicate email
- [x] Role based redirects work correctly
- [x] Csrf protection can be bypassed in tests
- [x] Malicious names are rejected by validation
+Security (Tests\Feature\Security\Security)
+ [x] Unauthorized users cannot access protected routes
+ [x] Clients cannot access service provider routes
+ [x] Users can only access their own data
+ [x] Password reset tokens are secure
+ [x] Sql injection protection works
+ [x] Xss protection works
+ [x] Csrf protection prevents forged requests
+ [x] File upload security works
+ [x] Rate limiting prevents abuse
+ [x] Session security is enforced
+ [x] Sensitive data is not exposed in api
+ [x] Password hashing is secure
+ [x] Email verification prevents unauthorized access
+ [ ] Two factor authentication works
+ [ ] Admin routes require admin role
+ [x] Api authentication works with tokens
+ [x] Input validation prevents malicious data
+ [x] Database queries use parameter binding
 

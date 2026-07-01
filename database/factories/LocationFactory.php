@@ -29,7 +29,10 @@ class LocationFactory extends Factory
         $cityData = fake()->randomElement(self::CANADIAN_CITIES);
 
         return [
-            'city' => $cityData['city'],
+            // Keep the city name unique so multiple factory-made locations never
+            // collide on the unique `city` column. Explicit states (montreal(),
+            // toronto(), withCity()) still set a fixed name when a test needs one.
+            'city' => $cityData['city'] . ' ' . fake()->unique()->numberBetween(1, 999999),
             'is_active' => true,
             'country' => 'Canada',
             'latitude' => $cityData['lat'],

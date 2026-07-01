@@ -92,7 +92,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect(route('service-providers.show', $this->serviceProvider));
 
@@ -114,7 +114,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertSessionHasErrors('whatsapp_number');
     }
@@ -132,7 +132,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect();
         $this->serviceProvider->refresh();
@@ -153,7 +153,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect();
         $this->serviceProvider->refresh();
@@ -175,7 +175,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect();
         $this->serviceProvider->refresh();
@@ -198,7 +198,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect();
         $this->serviceProvider->refresh();
@@ -214,7 +214,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect();
         $this->serviceProvider->refresh();
@@ -232,7 +232,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertSessionHasErrors('business_name');
     }
@@ -249,7 +249,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         // Should redirect back with error
         $response->assertRedirect();
@@ -292,7 +292,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->otherUser)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertForbidden();
 

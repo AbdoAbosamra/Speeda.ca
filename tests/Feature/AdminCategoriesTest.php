@@ -139,7 +139,7 @@ class AdminCategoriesTest extends TestCase
         $category = Category::factory()->create();
 
         $this->actingAs($this->admin)
-            ->delete(route('admin.categories.delete', $category))
+            ->delete(route('admin.categories.destroy', $category))
             ->assertRedirect(route('admin.categories'));
 
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);
@@ -154,7 +154,7 @@ class AdminCategoriesTest extends TestCase
         $child = Category::factory()->create(['parent_id' => $parent->id]);
 
         $this->actingAs($this->admin)
-            ->delete(route('admin.categories.delete', $parent))
+            ->delete(route('admin.categories.destroy', $parent))
             ->assertSessionHasErrors();
 
         $this->assertDatabaseHas('categories', ['id' => $parent->id]);

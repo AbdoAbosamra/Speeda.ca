@@ -1,9 +1,33 @@
+Admin Categories (Tests\Feature\AdminCategories)
+ [x] Admin can view categories list
+ [ ] Non admin cannot view categories list
+ [ ] Admin can create category
+ [ ] Category slug is auto generated
+ [ ] Admin can update category
+ [ ] Admin cannot set category parent to itself
+ [ ] Admin can delete category with no children
+ [ ] Admin cannot delete category with children
+ [ ] Category name is required
+ [ ] Category slug validation
+
 Admin Legal Pages (Tests\Feature\AdminLegalPages)
  [x] Admin can view legal pages dashboard
  [x] Admin can publish privacy policy override
  [x] Admin can publish custom legal page
  [x] Draft custom legal page is hidden from public site
  [x] Deleting privacy override restores static fallback
+
+Admin Locations (Tests\Feature\AdminLocations)
+ [x] Admin can view locations list
+ [ ] Non admin cannot view locations list
+ [x] Admin can create location
+ [x] Location city must be unique
+ [x] Admin can update location
+ [ ] Admin can delete location with no providers
+ [ ] Admin cannot delete location with providers
+ [x] Location city is required
+ [x] Location latitude validation
+ [x] Location longitude validation
 
 Admin Notification Targeting (Tests\Feature\AdminNotificationTargeting)
  [x] Admin can view provider targeting controls
@@ -14,4 +38,323 @@ Admin Notification Targeting (Tests\Feature\AdminNotificationTargeting)
  [x] Unread count only counts notifications visible to current provider
  [x] Provider cannot mark invisible targeted notification as read
  [x] Targeted notification clears only selected provider nav cache
+
+Authentication (Tests\Feature\Auth\Authentication)
+ [x] Login screen can be rendered
+ [ ] Users can authenticate using the login screen
+ [x] Users can not authenticate with invalid password
+ [x] Users can logout
+
+Business Hours Validation (Tests\Unit\Rules\BusinessHoursValidation)
+ [x] It validates correct business hours format
+ [x] It rejects invalid business hours format
+ [x] It validates weekly schedule array
+ [x] It handles closed days properly
+
+Canadian Phone Number (Tests\Unit\Rules\CanadianPhoneNumber)
+ [x] It accepts valid 10 digit phone numbers
+ [x] It accepts valid formatted phone numbers
+ [x] It accepts 11 digit numbers starting with 1
+ [x] It rejects numbers starting with 0
+ [x] It rejects numbers starting with 1
+ [x] It rejects numbers with wrong length
+ [x] It accepts empty values
+ [x] It strips non digit characters
+ [x] It handles edge case area codes
+ [x] It handles international format
+ [x] It rejects obviously fake numbers
+ [x] It handles special characters gracefully
+ [x] Performance test with many validations
+
+Category (Tests\Unit\Models\Category)
+ [x] It can be created with valid data
+ [ ] It has required attributes
+ [x] It can have parent child relationships
+ [x] It can have many service providers
+ [x] It uses soft deletes
+ [x] It can be restored after soft delete
+ [x] Factory creates valid categories
+ [x] It requires name field
+ [x] It can be marked as section
+
+Category Model (Tests\Unit\Models\CategoryModel)
+ [x] Slug is auto generated on create
+ [x] Is section method
+ [x] Is subcategory method
+
+Comprehensive Login (Tests\Feature\Auth\ComprehensiveLogin)
+ [ ] Login page displays correctly
+ [ ] User can login with correct credentials
+ [ ] Client redirects to dashboard after login
+ [ ] Service provider redirects to profile after login
+ [x] Login fails with incorrect email
+ [x] Login fails with incorrect password
+ [x] Login validation requires email and password
+ [x] Login validates email format
+ [ ] Remember me functionality works
+ [ ] Login without remember me works
+ [ ] Rate limiting prevents brute force attacks
+ [ ] Rate limiting is per email address
+ [x] Already authenticated user redirects to intended page
+ [ ] Login redirects to intended url after authentication
+ [ ] Email is case insensitive
+ [ ] Password is case sensitive
+ [ ] Login handles unicode passwords
+ [x] Login protects against timing attacks
+ [ ] Csrf protection is enforced on login
+ [ ] Login logs authentication attempts
+
+Comprehensive Registration (Tests\Feature\Auth\ComprehensiveRegistration)
+ [ ] Registration page displays all required elements
+ [ ] Client registers successfully with minimal data
+ [ ] Service provider registers successfully with complete data
+ [ ] Service provider registration requires all fields
+ [ ] Email validation works correctly
+ [ ] Email uniqueness is enforced
+ [ ] Password validation enforces security rules
+ [ ] Mobile phone validation works
+ [ ] Whatsapp number is optional but validated if provided
+ [ ] Unicode names are supported
+ [ ] Registration handles concurrent requests
+ [ ] Role based redirects work correctly
+ [ ] Csrf protection is enforced
+ [ ] Registration data is properly sanitized
+
+Email Validation (Tests\Unit\Rules\EmailValidation)
+ [x] It validates correct email formats
+ [x] It rejects invalid email formats
+ [x] It validates unique email addresses
+
+Email Verification (Tests\Feature\Auth\EmailVerification)
+ [x] Email verification screen can be rendered
+ [x] Email can be verified
+ [x] Email is not verified with invalid hash
+
+Endorsement (Tests\Feature\Endorsement)
+ [ ] Client can endorse service provider
+ [ ] Client can remove endorsement
+ [ ] Service provider cannot endorse
+ [ ] Unauthenticated user cannot endorse
+ [ ] Endorsement creates only one record
+ [ ] User cannot endorse themselves
+ [ ] Endorsement count updates correctly
+
+Error Helper (Tests\Unit\Helpers\ErrorHelper)
+ [x] It handles validation exceptions
+ [x] It handles http exceptions
+ [x] It handles general exceptions
+ [x] It accepts custom error messages
+
+Example (Tests\Feature\Example)
+ [x] The application returns a successful response
+
+Example (Tests\Unit\Example)
+ [x] That true is true
+
+Flash Helper (Tests\Unit\Helpers\FlashHelper)
+ [x] It flashes success messages
+ [x] It flashes success toast messages
+ [x] It flashes error messages
+ [x] It flashes error toast messages
+ [x] It flashes info messages
+ [x] It flashes warning messages
+
+Locale Controller (Tests\Feature\LocaleController)
+ [x] Post locale updates session and redirects
+ [x] Get locale route switches language
+ [x] Invalid locale returns error
+
+Location (Tests\Unit\Models\Location)
+ [ ] It validates canadian cities enum
+ [ ] It has all canadian cities seeded
+ [ ] It has correct city province mapping
+ [ ] It can have many service providers
+ [x] Locations are active by default
+ [ ] It has proper timestamps
+
+Location Validation (Tests\Unit\Rules\LocationValidation)
+ [x] It validates canadian cities
+ [x] It rejects non canadian cities
+ [x] It validates canadian provinces
+
+Password Confirmation (Tests\Feature\Auth\PasswordConfirmation)
+ [x] Confirm password screen can be rendered
+ [x] Password can be confirmed
+ [x] Password is not confirmed with invalid password
+
+Password Reset (Tests\Feature\Auth\PasswordReset)
+ [x] Reset password link screen can be rendered
+ [x] Reset password link can be requested
+ [x] Reset password screen can be rendered
+ [x] Password can be reset with valid token
+ [x] Unknown email gets generic response without notification
+ [x] Password reset requests are rate limited
+ [x] Password reset email uses speeda support sender
+ [x] Resetting password removes existing database sessions
+ [x] Password reset requires a strong new password
+
+Password Update (Tests\Feature\Auth\PasswordUpdate)
+ [x] Password can be updated
+ [x] Correct password must be provided to update password
+
+Profile (Tests\Feature\Profile)
+ [ ] Profile page is displayed
+ [x] Profile information can be updated
+ [x] Email verification status is unchanged when the email address is unchanged
+ [ ] User can delete their account
+ [x] Correct password must be provided to delete account
+
+Provider Registration (Tests\Feature\Auth\ProviderRegistration)
+ [ ] Provider registration creates profile
+ [ ] Client registration does not create profile
+
+Registration (Tests\Feature\Auth\Registration)
+ [x] Registration screen can be rendered
+ [ ] New users can register
+
+Security (Tests\Feature\Security\Security)
+ [x] Unauthorized users cannot access protected routes
+ [x] Clients cannot access service provider routes
+ [x] Users can only access their own data
+ [ ] Password reset tokens are secure
+ [x] Sql injection protection works
+ [ ] Xss protection works
+ [ ] Csrf protection prevents forged requests
+ [ ] File upload security works
+ [x] Rate limiting prevents abuse
+ [ ] Session security is enforced
+ [x] Sensitive data is not exposed in api
+ [x] Password hashing is secure
+ [x] Email verification prevents unauthorized access
+ [ ] Two factor authentication works
+ [ ] Admin routes require admin role
+ [x] Api authentication works with tokens
+ [ ] Input validation prevents malicious data
+ [x] Database queries use parameter binding
+
+Service Area (Tests\Feature\ServiceProvider\ServiceArea)
+ [x] Owner can save multiple service areas
+ [x] Primary location is excluded from service areas
+ [x] Unchecking all areas clears existing ones
+ [x] Missing marker leaves service areas untouched
+ [x] Invalid location id is rejected and nothing saved
+ [x] Non filterable location is rejected
+ [x] Non owner cannot modify service areas
+ [x] Scope matches primary location
+ [x] Scope matches active service area
+ [x] Scope ignores inactive service area
+ [x] Service area location ids helper returns active ids
+ [x] Listing filter includes provider available via service area
+ [x] Available badge shows only for service area match
+ [x] Unfiltered listing has no available badge
+
+Service Provider (Tests\Unit\Models\ServiceProvider)
+ [ ] It can be created with valid data
+ [x] It belongs to user
+ [x] It belongs to category
+ [x] It belongs to location
+ [ ] It has many bookings
+ [x] It has many reviews
+ [ ] It can have multiple bookings
+ [x] It can have multiple reviews
+ [x] Hourly rate is cast to decimal
+ [x] Boolean fields are cast correctly
+ [x] Views count defaults to zero
+ [x] It can increment views
+ [x] It calculates average rating from reviews
+ [x] It can scope available providers
+ [ ] It can scope verified providers
+ [x] Phone number is stored correctly
+ [x] Whatsapp number can be different from phone
+ [x] Whatsapp number can be null
+ [x] It can have long services description
+ [x] Experience years must be non negative
+
+Service Provider Profile (Tests\Feature\ServiceProviderProfile)
+ [x] Owner can view own profile
+ [ ] Non owner cannot view profile
+ [ ] Guest redirected to login
+ [ ] Owner can update profile
+ [x] Whatsapp number validation
+ [ ] Profile image upload
+ [ ] Certification upload pdf
+ [x] Certification upload image
+ [ ] Category update
+ [ ] Services offered persists as json
+ [x] Validation errors show notification
+ [x] Database transaction rollback on error
+ [ ] Parent categories only shown in dropdown
+ [x] Unauthorized user cannot update profile
+
+System Audit (Tests\Feature\SystemAudit)
+ [ ] Service provider views own profile counter does not increase
+ [ ] Client views provider profile counter increases
+ [ ] Service provider can update profile except profession
+ [ ] Image upload with resizing and instant preview
+ [ ] Multiple locations selection and saving
+ [ ] Error handling with card notifications
+ [ ] Registration with role based mobile validation
+ [ ] Login with email or mobile
+ [ ] Navigation consistency and profile links
+ [ ] Complete system validation
+
+Translation (Tests\Feature\Translation)
+ [ ] Language switching works
+ [x] Translations load correctly
+ [x] Language files exist
+
+User (Tests\Unit\Models\User)
+ [x] It can be created with valid data
+ [x] Password is automatically hashed
+ [ ] It has service provider profile relationship
+ [x] It has service provider relationship
+ [x] It has bookings relationship
+ [ ] Client can have multiple bookings
+ [ ] Service provider user can create profile
+ [x] It hidden sensitive attributes
+ [x] Email verified at is cast to datetime
+ [x] It requires name
+ [x] It requires unique email
+ [x] It can check if user is service provider
+ [ ] It can access fillable attributes
+
+Visitor Analytics (Tests\Feature\VisitorAnalytics)
+ [ ] Admin can view visitor analytics
+ [ ] Non admin cannot view visitor analytics
+ [x] Visitor tracking captures visits
+ [x] Visitor statistics are calculated
+ [ ] Visitor analytics can be exported
+ [x] Live visitor count endpoint
+ [x] Unique visitors are tracked
+
+Whats App Helper (Tests\Unit\Helpers\WhatsAppHelper)
+ [x] It formats canadian phone numbers for whatsapp
+ [x] It generates whatsapp urls
+ [x] It validates whatsapp number format
+ [x] It rejects invalid whatsapp numbers
+
+Whats App Message (Tests\Feature\WhatsAppMessage)
+ [x] Service provider page loads with whatsapp button
+ [x] Whatsapp message contains business name
+ [x] Whatsapp number formats correctly canadian
+ [x] Whatsapp number falls back to phone if null
+ [x] Whatsapp url format is correct
+ [x] Company name not business name is used
+ [ ] Whatsapp message falls back to user name if no company name
+ [x] Whatsapp number cleaning removes special characters
+ [x] Whatsapp message in english
+ [x] Whatsapp message in arabic
+ [x] Whatsapp message in french
+ [x] Multiple service providers all have valid whatsapp data
+ [ ] Whatsapp button reveals contact info
+ [x] Whatsapp number with egyptian format
+ [x] Whatsapp error handling when translations missing
+ [x] Whatsapp url encoding handles special characters
+
+Whatsapp Analytics (Tests\Feature\Admin\WhatsappAnalytics)
+ [x] Guest cannot access whatsapp analytics
+ [x] Non admin cannot access whatsapp analytics
+ [ ] Admin can view whatsapp analytics
+ [ ] Click tracking enriches context
+ [ ] Guest clicks are counted null safe
 

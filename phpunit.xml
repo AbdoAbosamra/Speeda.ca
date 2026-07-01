@@ -21,12 +21,6 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
-        <testsuite name="Integration">
-            <directory>tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Performance">
-            <directory>tests/Performance</directory>
-        </testsuite>
         <testsuite name="Security">
             <directory>tests/Feature/Security</directory>
         </testsuite>

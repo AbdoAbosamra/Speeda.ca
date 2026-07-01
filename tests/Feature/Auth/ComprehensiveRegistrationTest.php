@@ -27,7 +27,7 @@ class ComprehensiveRegistrationTest extends TestCase
 
         // Create necessary test data
         Category::factory()->create(['id' => 1, 'name' => 'Car Mechanics']);
-        Location::factory()->create(['id' => 1, 'name' => 'Toronto']);
+        Location::factory()->create(['id' => 1, 'city' => 'Toronto']);
 
         // Seed categories for profession selection
         $this->artisan('db:seed', ['--class' => 'CategorySeeder']);

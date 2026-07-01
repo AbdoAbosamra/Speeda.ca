@@ -1,12 +1,16 @@
-Admin Locations (Tests\Feature\AdminLocations)
- [x] Admin can view locations list
- [x] Non admin cannot view locations list
- [x] Admin can create location
- [x] Location city must be unique
- [x] Admin can update location
- [x] Admin can delete location with no providers
- [x] Admin cannot delete location with providers
- [x] Location city is required
- [x] Location latitude validation
- [x] Location longitude validation
+Comprehensive Registration (Tests\Feature\Auth\ComprehensiveRegistration)
+ [x] Registration page is displayed
+ [x] Client registers successfully with minimal data
+ [x] Service provider registers successfully with complete data
+ [x] Service provider registration requires all fields
+ [x] Email validation works correctly
+ [x] Email uniqueness is enforced
+ [x] Password validation enforces security rules
+ [x] Mobile phone validation works
+ [x] Whatsapp number is optional but validated if provided
+ [x] Unicode names are supported
+ [x] Registration handles duplicate email
+ [x] Role based redirects work correctly
+ [x] Csrf protection can be bypassed in tests
+ [x] Malicious names are rejected by validation
 

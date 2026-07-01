@@ -43,7 +43,8 @@ class RegisterRequest extends FormRequest
             'email' => [
                 'required',
                 'string',
-                'email:rfc,dns',
+                // DNS lookups are environment-dependent; skip them under tests.
+                app()->runningUnitTests() ? 'email:rfc' : 'email:rfc,dns',
                 'max:255',
                 'unique:users,email',
                 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'

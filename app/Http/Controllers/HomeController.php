@@ -58,6 +58,33 @@ class HomeController extends Controller
             ->take(12)
             ->get();
 
+        // Fallback: if there are no rated providers yet, still populate the homepage
+        // marquee with the strongest available profiles so the section never
+        // disappears (photo + stars, then photo + experience, then most viewed).
+        if ($featuredProviders->isEmpty()) {
+            $featuredProviders = ServiceProvider::query()
+                ->with(['user', 'category', 'location', 'media'])
+                ->withCount([
+                    'endorsements',
+                    'reviews' => function ($query) {
+                        $query->where('is_active', 1);
+                    },
+                ])
+                ->whereHas('user', function ($query) {
+                    $query->where('is_active', true);
+                })
+                ->orderByRaw("CASE
+                    WHEN profile_image IS NOT NULL AND profile_image != '' AND calculated_rating > 0 THEN 3
+                    WHEN profile_image IS NOT NULL AND profile_image != '' AND experience_years > 0 THEN 2
+                    WHEN profile_image IS NOT NULL AND profile_image != '' THEN 1
+                    ELSE 0
+                END DESC")
+                ->orderByDesc('views')
+                ->orderBy('created_at')
+                ->take(12)
+                ->get();
+        }
+
         // Latest Blogs (Cache for 1 hour)
         $latestBlogPosts = Cache::remember('home_latest_blog_posts', 3600, function () {
             return Post::published()

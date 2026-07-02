@@ -18,6 +18,7 @@ use App\Services\CategoryCacheService;
 use App\Services\FacebookConversionService;
 use App\Services\LocationCacheService;
 use App\Services\LocationClusterService;
+use App\Support\MergedCategoryFilters;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ServiceProviderController extends Controller
@@ -74,14 +75,20 @@ class ServiceProviderController extends Controller
             });
         }
 
-        // Category filter
+        // Category filter (supports merged filter options that span several categories)
         if ($request->filled('category')) {
-            $selectedCategory = Category::resolveFilterValue($request->input('category'));
+            $categoryValue = (string) $request->input('category');
 
-            if ($selectedCategory) {
-                $query->whereIn('category_id', $selectedCategory->providerCategoryIds());
+            if (MergedCategoryFilters::isMergedKey($categoryValue)) {
+                $query->whereIn('category_id', MergedCategoryFilters::providerCategoryIds($categoryValue));
             } else {
-                $query->whereNull('id');
+                $selectedCategory = Category::resolveFilterValue($categoryValue);
+
+                if ($selectedCategory) {
+                    $query->whereIn('category_id', $selectedCategory->providerCategoryIds());
+                } else {
+                    $query->whereNull('id');
+                }
             }
         }
 
@@ -146,7 +153,8 @@ class ServiceProviderController extends Controller
             ->withQueryString();
 
         // PERFORMANCE: Use cached categories from Redis (24h TTL)
-        $categories = app(CategoryCacheService::class)->getFilterGroups();
+        // Merge the configured categories (e.g. renovation/construction) into a single option.
+        $categories = MergedCategoryFilters::apply(app(CategoryCacheService::class)->getFilterGroups());
 
         // Get list of revealed contacts from session
         $revealedContacts = session('revealed_contacts', []);

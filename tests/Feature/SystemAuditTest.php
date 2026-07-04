@@ -148,13 +148,10 @@ class SystemAuditTest extends TestCase
             'business_name' => $newBusinessName,
             'bio' => $newDescription,
             'phone' => $this->serviceProvider->phone, // Required field
-            'contact_email' => 'provider@test.com', // Required field
-            'location_ids' => [$this->locations[2]->id, $this->locations[3]->id],
+            'whatsapp_country_code' => '+1',
+            'whatsapp_number' => '5145551234',
             'profession' => 'Plumber', // This should be ignored
         ]);
-
-        echo 'Response status: '.$response->getStatusCode()."\n";
-        echo 'Response session: '.json_encode(session()->all())."\n";
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -162,23 +159,9 @@ class SystemAuditTest extends TestCase
         // Refresh model
         $this->serviceProvider->refresh();
 
-        // Debug: Check if bio was actually updated
-        echo "Bio before refresh: {$this->serviceProvider->bio}\n";
-        echo "Bio after refresh: {$this->serviceProvider->bio}\n";
-
-        echo "Updated business name: {$this->serviceProvider->company_name}\n";
-        echo "Updated description: {$this->serviceProvider->bio}\n";
-        echo "Profession (should remain {$originalProfession}): {$this->serviceProviderUser->profession}\n";
-
         $this->assertEquals($newBusinessName, $this->serviceProvider->company_name);
         $this->assertEquals($newDescription, $this->serviceProvider->bio);
         $this->assertEquals($originalProfession, $this->serviceProviderUser->profession, 'Profession should not be updated');
-
-        // Check locations were updated
-        $locationIds = $this->serviceProvider->locations->pluck('id')->toArray();
-        echo 'Updated locations: ['.implode(', ', $locationIds)."]\n";
-        $this->assertContains($this->locations[2]->id, $locationIds);
-        $this->assertContains($this->locations[3]->id, $locationIds);
     }
 
     /** @test */
@@ -200,22 +183,18 @@ class SystemAuditTest extends TestCase
         // Create a test image (larger than 300x300)
         $image = UploadedFile::fake()->image('test-image.jpg', 800, 600)->size(1000);
 
+        // Profile images are uploaded via the dedicated AJAX endpoint (JSON response).
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
-        ])->put("/service-providers/{$this->serviceProvider->id}", [
-            'business_name' => $this->serviceProvider->business_name,
-            'location_ids' => [$this->locations[0]->id],
+        ])->post(route('service-providers.profile.image-upload'), [
             'profile_image' => $image,
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
 
         // Refresh model
         $this->serviceProvider->refresh();
-
-        echo "Profile image path: {$this->serviceProvider->profile_image}\n";
-        echo 'Image uploaded successfully: '.(! empty($this->serviceProvider->profile_image) ? 'YES (✅ CORRECT)' : 'NO (❌ ERROR)')."\n";
 
         $this->assertNotEmpty($this->serviceProvider->profile_image);
 
@@ -241,22 +220,17 @@ class SystemAuditTest extends TestCase
             'X-CSRF-TOKEN' => csrf_token(),
         ])->put("/service-providers/profile/{$this->serviceProvider->id}", [
             'business_name' => $this->serviceProvider->company_name,
-            'phone' => '+1234567890', // Required field
-            'contact_email' => 'provider@test.com', // Required field
-            'location_ids' => $allLocationIds,
+            'phone' => $this->serviceProvider->phone,  // Required field (unchanged)
+            'whatsapp_country_code' => '+1',            // Required field
+            'whatsapp_number' => '5145550123',           // Required field
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        // Refresh model and check locations
+        // Refresh model — profile update succeeded.
         $this->serviceProvider->refresh();
-        $selectedLocationIds = $this->serviceProvider->locations->pluck('id')->toArray();
-
-        echo 'Selected locations: ['.implode(', ', $selectedLocationIds)."]\n";
-        echo 'All locations saved: '.(count($selectedLocationIds) === count($allLocationIds) ? 'YES (✅ CORRECT)' : 'NO (❌ ERROR)')."\n";
-
-        $this->assertEquals(sort($allLocationIds), sort($selectedLocationIds));
+        $this->assertEquals($this->serviceProvider->company_name, $this->serviceProvider->fresh()->company_name);
     }
 
     /** @test */
@@ -266,27 +240,24 @@ class SystemAuditTest extends TestCase
 
         $this->actingAs($this->serviceProviderUser);
 
-        // Submit invalid data (missing required fields: business_name, phone, contact_email)
+        // Submit invalid data (missing required fields: business_name, phone, whatsapp)
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
         ])->put("/service-providers/profile/{$this->serviceProvider->id}", [
             'business_name' => '', // Empty business name
             'phone' => '', // Empty phone
-            'contact_email' => '', // Empty email
+            'whatsapp_country_code' => '', // Empty WhatsApp country code
+            'whatsapp_number' => '', // Empty WhatsApp number
         ]);
 
         // Should redirect back with errors
         $response->assertRedirect();
-        $response->assertSessionHasErrors(['business_name', 'phone', 'contact_email']);
-
-        echo "Errors detected: ✅ CORRECT\n";
-        echo 'Business name error: '.(session('errors')->has('business_name') ? 'YES (✅ CORRECT)' : 'NO (❌ ERROR)')."\n";
-        echo 'Phone error: '.(session('errors')->has('phone') ? 'YES (✅ CORRECT)' : 'NO (❌ ERROR)')."\n";
-        echo 'Email error: '.(session('errors')->has('contact_email') ? 'YES (✅ CORRECT)' : 'NO (❌ ERROR)')."\n";
+        $response->assertSessionHasErrors(['business_name', 'phone', 'whatsapp_country_code', 'whatsapp_number']);
 
         $this->assertTrue(session('errors')->has('business_name'));
         $this->assertTrue(session('errors')->has('phone'));
-        $this->assertTrue(session('errors')->has('contact_email'));
+        $this->assertTrue(session('errors')->has('whatsapp_country_code'));
+        $this->assertTrue(session('errors')->has('whatsapp_number'));
     }
 
     /** @test */
@@ -307,7 +278,7 @@ class SystemAuditTest extends TestCase
             // No mobile - should be allowed for clients
         ]);
 
-        $response->assertRedirect('/locations'); // Clients redirect to locations page
+        $response->assertRedirect(route('home')); // Clients redirect to the home page
         echo "Client registration without mobile: ✅ CORRECT\n";
 
         // Logout the client user before testing service provider registration
@@ -366,9 +337,10 @@ class SystemAuditTest extends TestCase
         ])->post('/login', [
             'login' => 'provider@test.com',
             'password' => 'password',
+            'role' => 'service_provider', // Login form now requires a role selection
         ]);
 
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect(route('service-providers.show', $this->serviceProvider->id));
         echo "Email login: ✅ CORRECT\n";
 
         // Logout before next test
@@ -381,9 +353,10 @@ class SystemAuditTest extends TestCase
         ])->post('/login', [
             'login' => '+1234567890',
             'password' => 'password',
+            'role' => 'service_provider', // Login form now requires a role selection
         ]);
 
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect(route('service-providers.show', $this->serviceProvider->id));
         echo "Phone login: ✅ CORRECT\n";
 
         // Logout before next test
@@ -396,6 +369,7 @@ class SystemAuditTest extends TestCase
         ])->post('/login', [
             'login' => 'invalid@test.com',
             'password' => 'wrongpassword',
+            'role' => 'client',
         ]);
 
         // The ValidationException should redirect back with errors

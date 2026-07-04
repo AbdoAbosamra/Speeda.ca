@@ -67,21 +67,8 @@
                             @endforeach
                         </select>
                     </label>
-                    <label>Source page
-                        <select name="source_page">
-                            <option value="">All sources</option>
-                            @foreach($options['source_pages'] as $sp)
-                                <option value="{{ $sp }}" @selected($filters['source_page'] === $sp)>{{ ucfirst(str_replace('_', ' ', $sp)) }}</option>
-                            @endforeach
-                        </select>
-                    </label>
-                    <label>Locale
-                        <select name="locale">
-                            <option value="">All locales</option>
-                            @foreach($options['locales'] as $lc)
-                                <option value="{{ $lc }}" @selected($filters['locale'] === $lc)>{{ strtoupper($lc) }}</option>
-                            @endforeach
-                        </select>
+                    <label>Mobile / WhatsApp number
+                        <input type="text" name="phone_search" value="{{ $filters['phone_search'] }}" placeholder="e.g. 0501234567" inputmode="tel">
                     </label>
                     <label>Device
                         <select name="device_type">

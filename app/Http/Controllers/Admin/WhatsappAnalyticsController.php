@@ -77,8 +77,7 @@ class WhatsappAnalyticsController extends Controller
             'provider_id' => $request->input('provider_id') ?: null,
             'category_id' => $request->input('category_id') ?: null,
             'location_id' => $request->input('location_id') ?: null,
-            'source_page' => $request->input('source_page') ?: null,
-            'locale' => $request->input('locale') ?: null,
+            'phone_search' => trim((string) $request->input('phone_search')) ?: null,
             'device_type' => $request->input('device_type') ?: null,
         ];
     }

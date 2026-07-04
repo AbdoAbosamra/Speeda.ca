@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
  * Every query here:
  *   - excludes admin activity in a NULL-safe way (guests are kept),
  *   - applies the admin's dimension filters (provider/category/location/
- *     source/locale/device),
+ *     mobile-or-whatsapp/device),
  *   - handles division-by-zero in conversion rates (returns 0.0),
  *   - reads only privacy-safe columns (no IP, no raw User-Agent).
  *
@@ -392,8 +392,6 @@ class WhatsappAnalyticsService
             return [
                 'categories' => DB::table('categories')->select('id', 'name_en')->orderBy('name_en')->get(),
                 'locations' => DB::table('locations')->select('id', 'city')->orderBy('city')->get(),
-                'source_pages' => DB::table('analytics')->whereNotNull('source_page')->distinct()->pluck('source_page'),
-                'locales' => DB::table('analytics')->whereNotNull('locale')->distinct()->pluck('locale'),
                 'devices' => DB::table('analytics')->whereNotNull('device_type')->distinct()->pluck('device_type'),
             ];
         });
@@ -431,11 +429,36 @@ class WhatsappAnalyticsService
 
     private function applyDimensionFilters($q, array $filters, string $prefix = ''): void
     {
-        foreach (['provider_id', 'category_id', 'location_id', 'source_page', 'locale', 'device_type'] as $field) {
+        foreach (['provider_id', 'category_id', 'location_id', 'device_type'] as $field) {
             if (! empty($filters[$field])) {
                 $q->where($prefix . $field, $filters[$field]);
             }
         }
+
+        // Single-field search matching either the provider's mobile (phone) or
+        // WhatsApp number. Resolved to provider IDs so it applies uniformly to
+        // every query, including those that don't join service_providers.
+        if (! empty($filters['phone_search'])) {
+            $ids = $this->providerIdsMatchingPhone($filters['phone_search']);
+            // Empty result set → force a no-match rather than ignoring the filter.
+            $q->whereIn($prefix . 'provider_id', $ids ?: [0]);
+        }
+    }
+
+    /**
+     * Provider IDs whose mobile (phone) or WhatsApp number contains the term.
+     */
+    private function providerIdsMatchingPhone(string $term): array
+    {
+        $like = '%' . str_replace(['%', '_'], ['\%', '\_'], trim($term)) . '%';
+
+        return DB::table('service_providers')
+            ->where(function ($w) use ($like) {
+                $w->where('phone', 'like', $like)
+                    ->orWhere('whatsapp_number', 'like', $like);
+            })
+            ->pluck('id')
+            ->all();
     }
 
     /**
@@ -484,7 +507,7 @@ class WhatsappAnalyticsService
     /** Stable cache key for a filter set. */
     private function filtersKey(array $filters, bool $withDate = true): string
     {
-        $keys = ['provider_id', 'category_id', 'location_id', 'source_page', 'locale', 'device_type'];
+        $keys = ['provider_id', 'category_id', 'location_id', 'phone_search', 'device_type'];
         if ($withDate) {
             $keys[] = 'date_from';
             $keys[] = 'date_to';

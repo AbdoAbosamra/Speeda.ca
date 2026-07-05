@@ -80,15 +80,15 @@ class ProductionCategorySeeder extends Seeder
             ['id' => 25, 'name' => 'Plumbing', 'slug' => 'plumbing', 'parent_id' => 20, 'sort_order' => 5],
             ['id' => 26, 'name' => 'Electrical Services', 'slug' => 'electrical-services', 'parent_id' => 20, 'sort_order' => 6],
             ['id' => 27, 'name' => 'Locksmith Services', 'slug' => 'locksmith-services', 'parent_id' => 20, 'sort_order' => 7],
-            
+
             ['id' => 31, 'name' => 'House Cleaning', 'slug' => 'house-cleaning', 'parent_id' => 30, 'sort_order' => 1],
             ['id' => 32, 'name' => 'Snow Removal', 'slug' => 'snow-removal', 'parent_id' => 30, 'sort_order' => 2],
-            
+
             ['id' => 35, 'name' => 'Moving Services', 'slug' => 'moving-services', 'parent_id' => 2, 'sort_order' => 3],
-            
+
             ['id' => 41, 'name' => 'Home Renovation', 'slug' => 'home-renovation', 'parent_id' => 40, 'sort_order' => 1],
             ['id' => 42, 'name' => 'General Construction', 'slug' => 'general-construction', 'parent_id' => 40, 'sort_order' => 2],
-            
+
             ['id' => 51, 'name' => 'HVAC Services', 'slug' => 'hvac-services', 'parent_id' => 50, 'sort_order' => 1],
             ['id' => 52, 'name' => 'Appliance Repair', 'slug' => 'appliance-repair', 'parent_id' => 50, 'sort_order' => 2],
         ];
@@ -110,7 +110,7 @@ class ProductionCategorySeeder extends Seeder
             ['id' => 62, 'name' => 'Insurance Brokers', 'slug' => 'insurance-brokers', 'parent_id' => 3, 'sort_order' => 2],
             ['id' => 63, 'name' => 'Real Estate Services', 'slug' => 'real-estate-services', 'parent_id' => 3, 'sort_order' => 4],
             ['id' => 64, 'name' => 'Marketing & Advertising', 'slug' => 'marketing-advertising', 'parent_id' => 3, 'sort_order' => 5],
-            
+
             ['id' => 71, 'name' => 'SEO & Digital Marketing', 'slug' => 'seo-digital-marketing', 'parent_id' => 70, 'sort_order' => 1],
             ['id' => 72, 'name' => 'Web Development', 'slug' => 'web-development', 'parent_id' => 70, 'sort_order' => 2],
             ['id' => 73, 'name' => 'Graphic Design', 'slug' => 'graphic-design', 'parent_id' => 70, 'sort_order' => 3],
@@ -154,13 +154,29 @@ class ProductionCategorySeeder extends Seeder
 
         // 8. Grocery
         DB::table('categories')->insert([
-            'id' => 110, 'name' => 'Grocery & Supermarkets', 'slug' => 'grocery-supermarkets-cat', 'parent_id' => 7, 'is_section' => 0, 'is_active' => 1, 'sort_order' => 1, 'created_at' => $timestamp, 'updated_at' => $timestamp
+            'id' => 110, 'name' => 'Grocery & Supermarkets', 'slug' => 'grocery-supermarkets-cat', 'parent_id' => 7, 'is_section' => 0, 'is_active' => 1, 'sort_order' => 1, 'created_at' => $timestamp, 'updated_at' => $timestamp,
         ]);
 
         // 9. Others
         DB::table('categories')->insert([
-            'id' => 120, 'name' => 'Others', 'slug' => 'others-cat', 'parent_id' => 8, 'is_section' => 0, 'is_active' => 1, 'sort_order' => 1, 'created_at' => $timestamp, 'updated_at' => $timestamp
+            'id' => 120, 'name' => 'Others', 'slug' => 'others-cat', 'parent_id' => 8, 'is_section' => 0, 'is_active' => 1, 'sort_order' => 1, 'created_at' => $timestamp, 'updated_at' => $timestamp,
         ]);
+
+        // Rebuilding the taxonomy above changes category IDs, which would orphan
+        // any provider still pointing at an old ID (rendered as "Uncategorized").
+        // Reassign every provider whose category_id no longer exists to the
+        // "Others" catch-all so no provider is ever left uncategorized.
+        $validCategoryIds = DB::table('categories')->pluck('id')->all();
+        $orphaned = DB::table('service_providers')
+            ->where(function ($q) use ($validCategoryIds) {
+                $q->whereNull('category_id')
+                    ->orWhereNotIn('category_id', $validCategoryIds);
+            })
+            ->update(['category_id' => 120, 'updated_at' => $timestamp]);
+
+        if ($orphaned > 0) {
+            $this->command->warn("🔧 Reassigned {$orphaned} orphaned provider(s) to 'Others'.");
+        }
 
         $this->command->info('✅ Categories synced with production structure!');
     }

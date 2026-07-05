@@ -53,12 +53,12 @@
                                 $othersCategory = ($categories ?? collect([]))->first(fn($cat) => strtolower($cat->translated_name) === 'others' || $cat->slug === 'others');
                             @endphp
                             @foreach($regularCategories as $category)
-                                <option value="{{ $category->slug }}" {{ request('category') == $category->slug || request('category') == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->slug }}" {{ request()->filled('category') && (request('category') == $category->slug || request('category') == $category->id) ? 'selected' : '' }}>
                                     {{ $category->translated_name }}
                                 </option>
                             @endforeach
                             @if($othersCategory)
-                                <option value="{{ $othersCategory->slug }}" {{ request('category') == $othersCategory->slug || request('category') == $othersCategory->id ? 'selected' : '' }}>
+                                <option value="{{ $othersCategory->slug }}" {{ request()->filled('category') && (request('category') == $othersCategory->slug || request('category') == $othersCategory->id) ? 'selected' : '' }}>
                                     {{ $othersCategory->translated_name }}
                                 </option>
                             @endif

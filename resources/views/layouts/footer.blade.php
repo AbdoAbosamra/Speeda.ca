@@ -4,7 +4,7 @@
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <h5>Speeda</h5>
-                <p>{{ __('home.disclaimer') }}</p>
+                <p style="font-size: 13px;">Speeda is a connection-only platform; all agreements and payments occur directly between clients and providers. We do not verify qualifications or guarantee service performance.</p>
             </div>
             <div class="col-lg-2 col-md-6 mb-4">
                 <ul class="footer-links">
@@ -42,50 +42,9 @@
             </div>
         </div>
         <div class="copyright">
-            <p class="mb-2">&copy; 2025 Speeda. {{ __('home.all_rights_reserved') }}</p>
-            <p class="small text-muted">{{ __('home.disclaimer') }}</p>
+            <p class="mb-2" style="font-size: 13px;">&copy; 2025 Speeda. {{ __('home.all_rights_reserved') }}</p>
+            <p class="small text-muted" style="font-size: 11px;">Speeda is a connection-only platform; all agreements and payments occur directly between clients and providers. We do not verify qualifications or guarantee service performance.</p>
         </div>
     </div>
 </footer>
-
-<style>
-    /* Footer */
-    footer {
-        background: linear-gradient(135deg, #212529 0%, #343a40 100%);
-        color: #ccc;
-        padding: 3rem 0 1.5rem;
-    }
-
-    footer h5, footer h6 {
-        color: white;
-        margin-bottom: 1rem;
-    }
-
-    footer a {
-        color: #ccc;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    footer a:hover {
-        color: #03a9f4;
-    }
-
-    .footer-links {
-        list-style: none;
-        padding: 0;
-    }
-
-    .footer-links li {
-        margin-bottom: 0.5rem;
-    }
-
-    .copyright {
-        border-top: 1px solid #444;
-        padding-top: 1.5rem;
-        margin-top: 2rem;
-        text-align: center;
-        font-size: 0.9rem;
-        color: #999;
-    }
-</style>
+{{-- Footer styles are in resources/css/app.css --}}

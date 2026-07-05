@@ -34,8 +34,9 @@ class CommentController extends Controller
                 ->where('commentable_id', $commentable_id)
                 ->where('is_active', true)
                 ->with(['user'])
-                ->orderByDesc('created_at')
-                ->paginate(10);
+->orderByDesc('created_at')
+                 ->paginate(10)
+                 ->withQueryString();
 
             return view('comments.index', compact('comments', 'commentable_type', 'commentable_id'));
         } catch (\Exception $e) {

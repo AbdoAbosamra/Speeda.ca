@@ -20,26 +20,27 @@ class SetLocale
         // Get supported locales from config
         $supportedLocales = array_keys(config('app.supported_locales', ['en', 'ar', 'fr']));
 
-        // STEP 1: Try to get locale from session (user's saved preference), guard when no session
-        $locale = null;
-        if ($request->hasSession()) {
+        // STEP 0: Check for explicit 'lang' query parameter (Priority 1 for SEO/Sitemaps)
+        $locale = $request->query('lang');
+
+        // STEP 1: Try to get locale from session (user's saved preference) if not provided in URL
+        if (!$locale && $request->hasSession()) {
             $locale = $request->session()->get('locale');
         }
 
-        // STEP 2: If not in session, detect from browser Accept-Language header
+        // STEP 2: If still not set, detect from browser Accept-Language header
         if (!$locale) {
             $locale = $this->detectLocaleFromBrowser($request, $supportedLocales);
-            if ($request->hasSession()) {
-                $request->session()->put('locale', $locale);
-            }
         }
 
         // STEP 3: Validate locale is supported, fallback to configured fallback if invalid
-        if (!in_array($locale, $supportedLocales)) {
+        if (!$locale || !in_array($locale, $supportedLocales)) {
             $locale = config('app.fallback_locale', 'en');
-            if ($request->hasSession()) {
-                $request->session()->put('locale', $locale);
-            }
+        }
+
+        // Persist to session for subsequent requests if session exists
+        if ($request->hasSession()) {
+            $request->session()->put('locale', $locale);
         }
 
         // STEP 4: Set application locale for this request

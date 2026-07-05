@@ -225,12 +225,19 @@ foreach ($categoriesToDelete as $id) {
         continue;
     }
 
-    // تحقق فقط من service_providers
     $userCount = DB::table('service_providers')->where('category_id', $id)->count();
+    $profileCount = DB::table('service_provider_profiles')->where('category_id', $id)->count();
+    $pivotCount = DB::table('service_provider_categories')->where('category_id', $id)->count();
+    $locationCount = DB::table('location_category')->where('category_id', $id)->count();
 
-    if ($userCount > 0) {
-        $this->command->error("  ❌ CANNOT DELETE ID {$id} ({$category->name}) - {$userCount} service providers!");
-        $this->command->info("     → Run: php artisan db:seed --class=MigrateUsersSeeder");
+    if ($userCount > 0 || $profileCount > 0 || $pivotCount > 0 || $locationCount > 0) {
+        $this->command->error("  ❌ CANNOT DELETE ID {$id} ({$category->name}) - Data exists!");
+        if ($userCount > 0) $this->command->error("     → {$userCount} in service_providers");
+        if ($profileCount > 0) $this->command->error("     → {$profileCount} in service_provider_profiles");
+        if ($pivotCount > 0) $this->command->error("     → {$pivotCount} in service_provider_categories");
+        if ($locationCount > 0) $this->command->error("     → {$locationCount} in location_category");
+        
+        $this->command->info("     💡 Fix: Run 'php artisan db:seed --class=MigrateUsersSeeder' first.");
         $skippedCount++;
         continue;
     }

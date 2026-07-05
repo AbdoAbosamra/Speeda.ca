@@ -24,7 +24,9 @@ return new class extends Migration
             $table->index('is_active');
             $table->index('country');
             $table->index('area');
-            $table->fullText(['city', 'country', 'area']);
+            if (in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb'])) {
+                $table->fullText(['city', 'country', 'area']);
+            }
         });
     }
 
@@ -37,7 +39,9 @@ return new class extends Migration
             $table->dropIndex(['is_active']);
             $table->dropIndex(['country']);
             $table->dropIndex(['area']);
-            $table->dropFullText(['city', 'country', 'area']);
+            if (in_array(Schema::getConnection()->getDriverName(), ['mysql', 'mariadb'])) {
+                $table->dropFullText(['city', 'country', 'area']);
+            }
 
             $table->dropColumn([
                 'country',

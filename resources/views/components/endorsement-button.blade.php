@@ -10,8 +10,12 @@ Usage: <x-endorsement-button :service-provider="$serviceProvider" />
 @php
     $isLoggedIn = auth()->check();
     $isClient = $isLoggedIn && auth()->user()->isClient();
-    $isEndorsed = $isLoggedIn ? $serviceProvider->isEndorsedBy(auth()->id()) : false;
-    $endorsementCount = $serviceProvider->endorsement_count ?? 0;
+    // PERFORMANCE: Use preloaded is_endorsed attribute if available (from withExists in controller)
+    // Fall back to isEndorsedBy() for backward compatibility with single-provider views
+    $isEndorsed = $isLoggedIn
+        ? ($serviceProvider->is_endorsed ?? $serviceProvider->isEndorsedBy(auth()->id()))
+        : false;
+    $endorsementCount = $serviceProvider->endorsements_count ?? $serviceProvider->endorsement_count ?? 0;
 @endphp
 
 <div x-data="{

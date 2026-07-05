@@ -55,7 +55,7 @@
             @endforeach
         </div>
 
-        {{ $reviews->links() }}
+        {{ $reviews->links('components.global-pagination') }}
     @else
         <p class="text-center text-gray-500">{{ __('reviews.no_reviews') }}</p>
     @endif

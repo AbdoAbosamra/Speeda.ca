@@ -14,9 +14,18 @@ return new class extends Migration
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
             $table->boolean('is_active')->default(true);
-            $table->enum('city', self::CITIES)->unique();
+            if (DB::getDriverName() === 'sqlite') {
+                $table->string('city')->unique();
+            } else {
+                $table->enum('city', self::CITIES)->unique();
+            }
             $table->timestamps();
         });
+
+        // Skip reference-data seeding under tests; the suite manages its own locations.
+        if (app()->runningUnitTests()) {
+            return;
+        }
 
         // إدخال الـ 4 مدن تلقائيًا (idempotent)
         foreach (self::CITIES as $city) {

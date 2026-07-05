@@ -1,1078 +1,10 @@
-{{-- resources/views/service-providers/show.blade.php --}}
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
-    x-data="{ saved: @json(auth()->check() && auth()->user()->savedProviders->contains($serviceProvider->id)) }">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@push('styles')
+    @vite(['resources/css/provider-profile.css'])
+@endpush
 
-    <title>{{ $serviceProvider->company_name ?? $serviceProvider->user->name }} - Speeda</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
-
-    <!-- Preconnect to CDNs for faster loading -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
-
-    <!-- Bootstrap 5 + Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
-    <!-- Custom CSS -->
-    {{-- Meta (Facebook) Pixel --}}
-    @include('partials.meta-pixel')
-    <style>
-        :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #f72585;
-            --light-bg: #f8f9fa;
-            --dark-text: #212529;
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --card-hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        body {
-            font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: var(--dark-text);
-            line-height: 1.6;
-            background-color: #f5f7ff;
-            overflow-x: hidden;
-        }
-
-        /* Animated Background */
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(135deg, #f5f7ff 0%, #e9ecef 100%);
-            overflow: hidden;
-        }
-
-        .animated-bg::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(67, 97, 238, 0.1) 0%, rgba(247, 37, 133, 0.05) 100%);
-            animation: rotate 30s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Navbar Styles */
-        .navbar {
-            backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .navbar-brand img {
-            width: 120px;
-            height: auto;
-            transition: var(--transition);
-        }
-
-        .navbar-brand img:hover {
-            transform: scale(1.05);
-        }
-
-        .nav-link {
-            font-weight: 500;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: var(--primary-color) !important;
-        }
-
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--primary-color);
-        }
-
-        /* Button Styles */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: 50px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
-        }
-
-        .btn-outline-primary {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            border-radius: 50px;
-            padding: 0.5rem 1.5rem;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-save {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-            z-index: 10;
-        }
-
-        .btn-save:hover {
-            transform: scale(1.1);
-        }
-
-        .btn-save.saved {
-            color: var(--accent-color);
-        }
-
-        /* Card Styles */
-        .profile-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .profile-header {
-            height: 200px;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('{{ asset('images/pattern.svg') }}') repeat;
-            opacity: 0.1;
-        }
-
-        .profile-image-container {
-            position: absolute;
-            bottom: -60px;
-            left: 30px;
-            top: 110px;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: white;
-            padding: 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 2;
-        }
-
-        .profile-image {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .profile-content {
-            padding: 80px 30px 30px;
-        }
-
-        .rating-display {
-            background: rgba(255, 193, 7, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 193, 7, 0.5);
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .verification-badge {
-            background: rgba(76, 175, 80, 0.2);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Contact Card Styles */
-        .contact-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .contact-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--card-hover-shadow);
-        }
-
-        .contact-item {
-            padding: 1.5rem;
-            border-bottom: 1px solid #f0f0f0;
-            transition: var(--transition);
-        }
-
-        .contact-item:hover {
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .contact-item:last-child {
-            border-bottom: none;
-        }
-
-        .contact-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 1.2rem;
-            color: white;
-        }
-
-        .phone-icon {
-            background: linear-gradient(135deg, #4361ee, #3f37c9);
-        }
-
-        .email-icon {
-            background: linear-gradient(135deg, #f72585, #b5179e);
-        }
-
-        .location-icon {
-            background: linear-gradient(135deg, #7209b7, #560bad);
-        }
-
-        .hours-icon {
-            background: linear-gradient(135deg, #3a0ca3, #3f37c9);
-        }
-
-        .website-icon {
-            background: linear-gradient(135deg, #4cc9f0, #4361ee);
-        }
-
-        /* Premium WhatsApp Country Badge */
-        .whatsapp-country-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, #dc2626, #b91c1c, #991b1b);
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow:
-                0 4px 6px rgba(220, 38, 38, 0.2),
-                0 8px 16px rgba(220, 38, 38, 0.15),
-                inset 0 1px 2px rgba(255, 255, 255, 0.2),
-                inset 0 -1px 2px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            position: relative;
-            overflow: hidden;
-            height: 46px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: default;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .whatsapp-country-badge::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg,
-                    transparent 30%,
-                    rgba(255, 255, 255, 0.15) 50%,
-                    transparent 70%);
-            animation: badgeShine 3s ease-in-out infinite;
-        }
-
-        @keyframes badgeShine {
-
-            0%,
-            100% {
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            }
-
-            50% {
-                transform: translateX(100%) translateY(100%) rotate(45deg);
-            }
-        }
-
-        .whatsapp-country-badge:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 6px 12px rgba(220, 38, 38, 0.3),
-                0 12px 24px rgba(220, 38, 38, 0.2),
-                inset 0 1px 2px rgba(255, 255, 255, 0.25),
-                inset 0 -1px 2px rgba(0, 0, 0, 0.25);
-        }
-
-        .whatsapp-country-badge .flag-emoji {
-            font-size: 1.5rem;
-            line-height: 1;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-            animation: flagWave 2.5s ease-in-out infinite;
-            display: inline-block;
-        }
-
-        @keyframes flagWave {
-
-            0%,
-            100% {
-                transform: rotate(-5deg);
-            }
-
-            50% {
-                transform: rotate(5deg);
-            }
-        }
-
-        .whatsapp-country-badge .country-code {
-            font-weight: 700;
-            font-size: 1rem;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            letter-spacing: 0.5px;
-        }
-
-        .whatsapp-country-badge .country-name {
-            background: rgba(255, 255, 255, 0.25);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            color: white;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            letter-spacing: 1px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow:
-                0 2px 4px rgba(0, 0, 0, 0.1),
-                inset 0 1px 1px rgba(255, 255, 255, 0.2);
-        }
-
-        /* Responsive Design for Badge */
-        @media (max-width: 768px) {
-            .whatsapp-country-badge {
-                padding: 10px 16px;
-                height: 42px;
-                gap: 6px;
-            }
-
-            .whatsapp-country-badge .flag-emoji {
-                font-size: 1.3rem;
-            }
-
-            .whatsapp-country-badge .country-code {
-                font-size: 0.9rem;
-            }
-
-            .whatsapp-country-badge .country-name {
-                font-size: 0.7rem;
-                padding: 3px 8px;
-            }
-        }
-
-        /* Enhanced Form Styles */
-        .form-control-lg,
-        .form-select-lg {
-            font-size: 1.05rem;
-            font-weight: 500;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: #ffffff;
-        }
-
-        .form-control-lg:focus,
-        .form-select-lg:focus {
-            border-color: #4361ee;
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
-            transform: translateY(-1px);
-            background-color: #ffffff;
-        }
-
-        .form-control-lg:hover,
-        .form-select-lg:hover {
-            border-color: #cbd5e1;
-        }
-
-        textarea.form-control-lg {
-            font-family: 'Figtree', sans-serif;
-            line-height: 1.6;
-        }
-
-        /* Input Group Styling */
-        .input-group {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .input-group:focus-within {
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
-            transform: translateY(-1px);
-        }
-
-        .input-group-text {
-            border: 2px solid #e2e8f0;
-            padding: 12px 14px;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-
-        .input-group:focus-within .input-group-text {
-            border-color: #4361ee;
-            background-color: rgba(67, 97, 238, 0.05) !important;
-        }
-
-        .input-group .form-control-lg {
-            box-shadow: none;
-        }
-
-        /* Card Header Enhancements */
-        .card-header {
-            font-weight: 600;
-            border-bottom: 3px solid rgba(255, 255, 255, 0.2);
-            letter-spacing: 0.5px;
-            padding: 1rem 1.5rem;
-        }
-
-        .card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        /* Labels Enhancement */
-        .form-label {
-            font-size: 0.95rem;
-            margin-bottom: 0.75rem;
-            color: #334155;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Small Text Improvements */
-        small.text-muted {
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            margin-top: 0.5rem;
-        }
-
-        /* Badge in Input Group */
-        .input-group-text .badge {
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            font-weight: 600;
-        }
-
-        /* Service Badge Styles */
-        .service-badge {
-            background: rgba(67, 97, 238, 0.1);
-            color: var(--primary-color);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            margin: 0.25rem;
-            transition: var(--transition);
-        }
-
-        .service-badge:hover {
-            background: rgba(67, 97, 238, 0.2);
-            transform: translateY(-2px);
-
-        }
-
-        /* Gallery Styles */
-        .gallery-container {
-            margin-top: 2rem;
-        }
-
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 15px;
-            height: 200px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .gallery-item:hover img {
-            transform: scale(1.1);
-        }
-
-        .gallery-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
-        }
-
-        .modal {
-            z-index: 2000 !important;
-        }
-
-        .modal-backdrop {
-            z-index: 1990 !important;
-        }
-
-        /* @change 2026-04-12 TASK-1 | Added public gallery grid and Alpine lightbox styles | Show provider gallery to visitors without edit controls | risk:LOW */
-        .public-gallery-grid {
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .public-gallery-card {
-            aspect-ratio: 1 / 1;
-            border: 0;
-            border-radius: 16px;
-            cursor: pointer;
-            overflow: hidden;
-            padding: 0;
-            position: relative;
-            transition: var(--transition);
-        }
-
-        .public-gallery-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
-        }
-
-        .public-gallery-card img {
-            block-size: 100%;
-            inline-size: 100%;
-            object-fit: cover;
-        }
-
-        .public-gallery-card::after {
-            align-items: center;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.45));
-            color: #fff;
-            content: '\f00e';
-            display: flex;
-            font-family: 'Font Awesome 6 Free';
-            font-size: 1.1rem;
-            font-weight: 900;
-            inset: 0;
-            justify-content: center;
-            opacity: 0;
-            position: absolute;
-            transition: var(--transition);
-        }
-
-        .public-gallery-card:hover::after {
-            opacity: 1;
-        }
-
-        .public-gallery-lightbox {
-            align-items: center;
-            background: rgba(15, 23, 42, 0.92);
-            display: flex;
-            inset: 0;
-            justify-content: center;
-            padding: 1.5rem;
-            position: fixed;
-            z-index: 1065;
-        }
-
-        .public-gallery-lightbox img {
-            border-radius: 20px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-            max-block-size: calc(100vh - 6rem);
-            max-inline-size: min(92vw, 960px);
-            object-fit: contain;
-        }
-
-        .public-gallery-close,
-        .public-gallery-nav {
-            align-items: center;
-            background: rgba(255, 255, 255, 0.14);
-            border: 0;
-            border-radius: 999px;
-            color: #fff;
-            display: inline-flex;
-            justify-content: center;
-            position: fixed;
-            transition: var(--transition);
-        }
-
-        .public-gallery-close:hover,
-        .public-gallery-nav:hover {
-            background: rgba(255, 255, 255, 0.24);
-            transform: scale(1.05);
-        }
-
-        .public-gallery-close {
-            block-size: 3rem;
-            inline-size: 3rem;
-            inset-block-start: 1.5rem;
-            inset-inline-end: 1.5rem;
-        }
-
-        .public-gallery-nav {
-            block-size: 3.25rem;
-            inline-size: 3.25rem;
-            inset-block-start: 50%;
-            transform: translateY(-50%);
-        }
-
-        .public-gallery-nav.prev {
-            inset-inline-start: 1.5rem;
-        }
-
-        .public-gallery-nav.next {
-            inset-inline-end: 1.5rem;
-        }
-
-        .public-gallery-counter {
-            background: rgba(255, 255, 255, 0.14);
-            border-radius: 999px;
-            color: #fff;
-            inset-block-end: 1.5rem;
-            inset-inline-start: 50%;
-            padding: 0.5rem 1rem;
-            position: fixed;
-            transform: translateX(-50%);
-        }
-
-        @media (min-width: 992px) {
-            .public-gallery-grid {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 767.98px) {
-            .public-gallery-lightbox {
-                padding: 1rem;
-            }
-
-            .public-gallery-nav {
-                inset-block-end: 1.25rem;
-                inset-block-start: auto;
-                transform: none;
-            }
-
-            .public-gallery-nav.prev {
-                inset-inline-start: 1rem;
-            }
-
-            .public-gallery-nav.next {
-                inset-inline-end: 1rem;
-            }
-
-            .public-gallery-close {
-                inset-block-start: 1rem;
-                inset-inline-end: 1rem;
-            }
-        }
-
-        /* Reviews Section */
-        .review-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: var(--transition);
-        }
-
-        .review-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .review-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .review-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 1rem;
-            object-fit: cover;
-        }
-
-        .review-rating {
-            color: #ffc107;
-        }
-
-        /* Similar Providers */
-        .similar-provider-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: var(--transition);
-            height: 100%;
-        }
-
-        .similar-provider-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .similar-provider-image {
-            height: 150px;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            position: relative;
-            overflow: hidden;
-        }
-
-        .similar-provider-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .similar-provider-content {
-            padding: 1.5rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .profile-header {
-                height: 150px;
-            }
-
-            .profile-image-container {
-                width: 100px;
-                height: 100px;
-                bottom: -50px;
-                left: 20px;
-            }
-
-            .profile-content {
-                padding: 70px 20px 20px;
-            }
-
-            .action-buttons .btn {
-                display: block;
-                width: 100%;
-                margin-bottom: 0.5rem;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Toast Notification */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
-        }
-
-        .custom-toast {
-            background: white;
-            border-radius: 10px;
-            padding: 1rem 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            min-width: 300px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .toast-success {
-            border-left: 4px solid #4CAF50;
-        }
-
-        .toast-error {
-            border-left: 4px solid #f44336;
-        }
-
-        .toast-icon {
-            margin-right: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .toast-success .toast-icon {
-            color: #4CAF50;
-        }
-
-        .toast-error .toast-icon {
-            color: #f44336;
-        }
-
-        /* ===== RTL Support ===== */
-        [dir="rtl"] .toast-container {
-            right: auto;
-            left: 20px;
-        }
-
-        [dir="rtl"] .toast-icon {
-            margin-right: 0;
-            margin-left: 1rem;
-        }
-
-        [dir="rtl"] .toast-success {
-            border-left: none;
-            border-right: 4px solid #4CAF50;
-        }
-
-        [dir="rtl"] .toast-error {
-            border-left: none;
-            border-right: 4px solid #f44336;
-        }
-
-        [dir="rtl"] .nav-link.active::after {
-            left: auto;
-            right: 0;
-        }
-
-        [dir="rtl"] .action-buttons {
-            flex-direction: row-reverse;
-        }
-
-        [dir="rtl"] .btn {
-            flex-direction: row-reverse;
-        }
-
-        [dir="rtl"] .me-1,
-        [dir="rtl"] .me-2,
-        [dir="rtl"] .me-3 {
-            margin-right: 0 !important;
-            margin-left: 0.25rem !important;
-        }
-
-        [dir="rtl"] .ms-1,
-        [dir="rtl"] .ms-2,
-        [dir="rtl"] .ms-3 {
-            margin-left: 0 !important;
-            margin-right: 0.25rem !important;
-        }
-
-        [dir="rtl"] .text-start {
-            text-align: right !important;
-        }
-
-        [dir="rtl"] .text-end {
-            text-align: left !important;
-        }
-
-        /* Custom Checkbox Cards */
-        .custom-checkbox-card {
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            background: #f8fafc;
-        }
-
-        .custom-checkbox-card:hover {
-            border-color: var(--primary-color);
-            background: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .custom-checkbox-card.checked {
-            border-color: var(--primary-color);
-            background: #eef2ff;
-        }
-
-        .custom-checkbox-card .check-icon {
-            color: #cbd5e1;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-
-        .custom-checkbox-card.checked .check-icon {
-            color: var(--primary-color);
-        }
-
-        .language-badge {
-            background: #eef2ff;
-            color: #4f46e5;
-            border: 1px solid #c7d2fe;
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-    </style>
-</head>
-
-<body>
-    {{-- Meta Pixel: ViewContent Event --}}
-    @if(config('facebook.enabled') && !request()->routeIs('admin.*'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                if (typeof fbq === 'function') {
-                    var spViewEventId = 'vc_{{ $serviceProvider->id }}_' + Date.now();
-                    fbq('track', 'ViewContent', {
-                        content_name: {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},
-                        content_ids: ['{!! $serviceProvider->id !!}'],
-                        content_category: {!! json_encode($serviceProvider->category->translated_name ?? 'Uncategorized') !!},
-                        content_type: 'service_provider',
-                        language: '{{ app()->getLocale() }}'
-                    }, { eventID: spViewEventId });
-                    // Store event_id for CAPI deduplication
-                    window.__spViewEventId = spViewEventId;
-                }
-            });
-        </script>
-    @endif
-
-    <!-- Animated Background -->
-    <div class="animated-bg"></div>
-
-    <!-- Toast Container -->
-    <div class="toast-container" x-data="{ showToast: false, message: '', type: 'success' }" x-show="showToast"
-        x-transition>
-        <div class="custom-toast" :class="`toast-${type}`">
-            <div class="toast-icon">
-                <i class="fas" :class="type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'"></i>
-            </div>
-            <div class="toast-message" x-text="message"></div>
-        </div>
-    </div>
-
-    @include('components.main-nav')
-
+@section('content')
     {{-- Notification Card --}}
     @include('components.notification-card')
 
@@ -1085,21 +17,10 @@
                 <li class="breadcrumb-item"><a href="{{ route('service-providers.index') }}"><i
                             class="fas fa-list me-1"></i>{{ __('service_provider.providers_label') }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                    {{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}
                 </li>
             </ol>
         </nav>
-
-        <!-- Flash Messages -->
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        {{-- Unified Error Handler --}}
-        <x-error-handler />
 
         <div class="row">
             <!-- Main Provider Information -->
@@ -1111,7 +32,7 @@
                     <!-- Profile Image -->
                     <div class="profile-image-container" @if(auth()->check() && auth()->id() === $serviceProvider->user_id) id="profileImageClickable" style="cursor: pointer;" title="{{ __('service_provider.click_to_change_image') }}" @endif>
                         <img src="{{ $serviceProvider->display_image_url }}"
-                            alt="{{ $serviceProvider->company_name ?? $serviceProvider->user->name }}"
+                            alt="{{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}"
                             class="profile-image" loading="lazy" id="profileImagePreview"
                             onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
                         {{-- Camera overlay for owner --}}
@@ -1132,7 +53,7 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <h1 class="fw-bold mb-2">
-                                    {{ $serviceProvider->company_name ?? $serviceProvider->user->name }}
+                                    {{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}
                                 </h1>
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-briefcase me-1"></i>
@@ -1143,12 +64,12 @@
                                 @if($serviceProvider->languages && count($serviceProvider->languages) > 0)
                                     <div class="d-flex flex-wrap gap-2 mb-3">
                                         @foreach($serviceProvider->languages as $langCode)
-                                            @php 
+                                            @php
                                                 // Map language codes and full names to translation keys
                                                 $langMap = [
                                                     // Language codes
                                                     'ar' => 'arabic',
-                                                    'en' => 'english', 
+                                                    'en' => 'english',
                                                     'fr' => 'french',
                                                     // Full names (from old data)
                                                     'English' => 'english',
@@ -1171,22 +92,12 @@
                                     <x-endorsement-button :service-provider="$serviceProvider" />
                                 @endif
 
-                                <!-- Certified Badge (only visible to owner) -->
-                                @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->certification)
-                                    <div class="verification-badge"
-                                        style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                                        <i class="fas fa-certificate"></i>
-                                        <span>{{ __('service_provider.certified') }}</span>
-                                    </div>
-                                @endif
+
                             </div>
                         </div>
 
                         @if(auth()->id() === $serviceProvider->user_id)
                             <!-- Owner-only Edit Section -->
-
-                            {{-- Engagement Popup / Banner --}}
-                            <x-profile-completion-popup :serviceProvider="$serviceProvider" />
 
                             {{-- Profile Completion Progress Bar --}}
                             @php $pct = $serviceProvider->profile_completion_percent ?? 0; @endphp
@@ -1207,7 +118,9 @@
                                         class="fas fa-edit me-2"></i>{{ __('service_provider.edit_profile') }}</h4>
 
                                 <form action="{{ route('service-providers.profile.update', $serviceProvider->id) }}"
-                                    method="POST" enctype="multipart/form-data" id="profileUpdateForm">
+                                    method="POST" enctype="multipart/form-data" id="profileUpdateForm"
+                                    x-data="{ loading: false }"
+                                    @submit="loading = true; $el.submit()">
                                     @csrf
                                     @method('PUT')
 
@@ -1291,9 +204,9 @@
                                                     @foreach(['ar' => 'arabic', 'en' => 'english', 'fr' => 'french'] as $code => $label)
                                                         @php $isChecked = in_array($code, old('languages', $serviceProvider->languages ?? [])); @endphp
                                                         <div class="col-md-4">
-                                                            <div class="custom-checkbox-card {{ $isChecked ? 'checked' : '' }}" 
+                                                            <div class="custom-checkbox-card {{ $isChecked ? 'checked' : '' }}"
                                                                  onclick="const cb = this.querySelector('input'); cb.checked = !cb.checked; this.classList.toggle('checked', cb.checked);">
-                                                                <input class="d-none" type="checkbox" name="languages[]" 
+                                                                <input class="d-none" type="checkbox" name="languages[]"
                                                                     value="{{ $code }}" {{ $isChecked ? 'checked' : '' }}>
                                                                 <div class="d-flex align-items-center justify-content-between p-3" style="cursor: pointer;">
                                                                     <span class="fw-semibold">{{ __('service_provider.' . $label) }}</span>
@@ -1481,6 +394,81 @@
                                         </div>
                                     </div>
 
+                                    {{-- Available Service Areas (additional locations) --}}
+                                    <div class="card mb-3 border-0 shadow-sm">
+                                        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-map-location-dot me-2"></i>{{ __('service_provider.service_areas_section') }}
+                                            </h6>
+                                            <span class="badge bg-light text-primary" id="serviceAreasCount">0</span>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-3">
+                                                <i class="fas fa-info-circle text-info me-1"></i>{{ __('service_provider.service_areas_hint') }}
+                                            </p>
+
+                                            {{-- Marker so the controller can distinguish "no change" from "cleared all" --}}
+                                            <input type="hidden" name="has_service_areas" value="1">
+
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text bg-light border-end-0">
+                                                    <i class="fas fa-search text-primary"></i>
+                                                </span>
+                                                <input type="text" id="serviceAreaSearch"
+                                                    class="form-control form-control-lg border-start-0"
+                                                    placeholder="{{ __('service_provider.service_areas_search_placeholder') }}">
+                                            </div>
+
+                                            @php
+                                                $selectedAreas = collect(old('service_areas', $serviceAreaLocationIds ?? []))
+                                                    ->map(fn ($i) => (int) $i)->all();
+                                            @endphp
+
+                                            <div class="row g-2 px-1" id="serviceAreasGrid"
+                                                 style="max-height: 280px; overflow-y: auto;">
+                                                @forelse(($serviceAreaLocations ?? []) as $loc)
+                                                    @continue($serviceProvider->location_id && (int) $loc->id === (int) $serviceProvider->location_id)
+                                                    @php $isChecked = in_array((int) $loc->id, $selectedAreas, true); @endphp
+                                                    <div class="col-md-6 service-area-item"
+                                                         data-name="{{ \Illuminate\Support\Str::lower($loc->localized_name ?? $loc->city ?? $loc->name ?? '') }}">
+                                                        <div class="custom-checkbox-card {{ $isChecked ? 'checked' : '' }}"
+                                                             onclick="const cb=this.querySelector('input'); cb.checked=!cb.checked; this.classList.toggle('checked', cb.checked); window.updateServiceAreasCount && window.updateServiceAreasCount();">
+                                                            <input class="d-none service-area-checkbox" type="checkbox"
+                                                                name="service_areas[]" value="{{ $loc->id }}" {{ $isChecked ? 'checked' : '' }}>
+                                                            <div class="d-flex align-items-center justify-content-between p-3" style="cursor: pointer;">
+                                                                <span class="fw-semibold">
+                                                                    <i class="fas fa-map-marker-alt text-primary me-2"></i>{{ $loc->localized_name ?? $loc->city ?? $loc->name }}
+                                                                </span>
+                                                                <i class="fas fa-check-circle check-icon"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @empty
+                                                    <div class="col-12">
+                                                        <p class="text-muted small mb-0">{{ __('service_provider.no_locations_available') }}</p>
+                                                    </div>
+                                                @endforelse
+                                            </div>
+
+                                            @if($serviceProvider->location)
+                                                <small class="text-muted d-block mt-2">
+                                                    <i class="fas fa-star text-warning me-1"></i>
+                                                    {{ __('service_provider.primary_location_badge') }}:
+                                                    <strong>{{ $serviceProvider->location->localized_name }}</strong>
+                                                </small>
+                                            @endif
+
+                                            @error('service_areas')
+                                                <small class="text-danger d-block mt-1"><i
+                                                        class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                            @enderror
+                                            @error('service_areas.*')
+                                                <small class="text-danger d-block mt-1"><i
+                                                        class="fas fa-exclamation-circle me-1"></i>{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+
                                     {{-- Services & Files --}}
                                     <div class="card mb-3 border-0 shadow-sm">
                                         <div class="card-header bg-warning text-dark">
@@ -1498,7 +486,7 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-tools text-warning"></i>
                                                     </span>
-                                                    <input type="text" name="services_offered"
+                                                    <input type="text" name="services_offered" id="servicesInput"
                                                         class="form-control form-control-lg border-start-0"
                                                         value="{{ old('services_offered', is_array($serviceProvider->services_offered) ? implode(', ', $serviceProvider->services_offered) : $serviceProvider->services_offered) }}"
                                                         placeholder="{{ __('general.example') }}: {{ __('service_provider.services_offered_input_hint') }}">
@@ -1534,7 +522,7 @@
                                                      storeUrl: '{{ route('provider.gallery.store', $serviceProvider->id) }}',
                                                      csrfToken: '{{ csrf_token() }}'
                                                  })">
-                                                
+
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <label class="form-label fw-bold mb-0">
                                                         <i class="fas fa-images text-primary me-1"></i>
@@ -1560,13 +548,13 @@
                                                     {{-- Existing Images --}}
                                                     <template x-for="(img, index) in images" :key="img.id">
                                                         <div class="col">
-                                                            <div class="gallery-cell position-relative overflow-hidden" 
+                                                            <div class="gallery-cell position-relative overflow-hidden"
                                                                  style="aspect-ratio: 1/1; border-radius: 12px; border: 1px solid #e1e5eb; background: #f8f9fa;"
                                                                  @mouseenter="if(isOwner && confirmId !== img.id) hoverId = img.id"
                                                                  @mouseleave="hoverId = null">
-                                                                
+
                                                                 {{-- Delete Confirmation State --}}
-                                                                <div x-show="confirmId === img.id" 
+                                                                <div x-show="confirmId === img.id"
                                                                      class="position-absolute top-0 start-0 w-100 h-100"
                                                                      style="background: rgba(220,53,69,0.15); z-index: 5; display: none;">
                                                                     <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
@@ -1589,7 +577,7 @@
                                                                 </div>
 
                                                                 {{-- Hover Actions (Owner Only) --}}
-                                                                <div x-show="isOwner && hoverId === img.id && confirmId !== img.id && uploadingId !== img.id" 
+                                                                <div x-show="isOwner && hoverId === img.id && confirmId !== img.id && uploadingId !== img.id"
                                                                      x-transition.opacity.duration.200ms
                                                                      class="position-absolute top-0 start-0 w-100 h-100"
                                                                      style="background: rgba(0,0,0,0.55); z-index: 2; display: none;">
@@ -1622,8 +610,8 @@
                                                     <template x-if="isOwner && (images.length + addPreviews.length) < max">
                                                         <template x-for="i in (max - images.length - addPreviews.length)" :key="'placeholder-'+i">
                                                             <div class="col">
-                                                                <div @click="$refs.galleryAddInput.click()" 
-                                                                     class="gallery-cell position-relative d-flex bg-light align-items-center justify-content-center" 
+                                                                <div @click="$refs.galleryAddInput.click()"
+                                                                     class="gallery-cell position-relative d-flex bg-light align-items-center justify-content-center"
                                                                      style="aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed #cbd5e1; cursor: pointer; transition: all 0.2s;">
                                                                     <i class="fas fa-plus text-secondary fa-2x opacity-50"></i>
                                                                 </div>
@@ -1722,7 +710,7 @@
                                                             if (!file || !this.pendingReplaceImg) return;
                                                             if (!this.validateFile(file)) return;
                                                             this.errorMessage = '';
-                                                            
+
                                                             this.uploadingId = this.pendingReplaceImg.id;
 
                                                             // Preview immediately
@@ -1802,31 +790,7 @@
                                             @endif
                                             {{-- End Gallery Inline Widget --}}
 
-                                            <div class="mb-3">
-                                                <label
-                                                    class="form-label fw-bold">{{ __('service_provider.certification') }}</label>
-                                                <input type="file" name="certification" id="certificationInput"
-                                                    class="form-control"
-                                                    accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
-                                                    onchange="validateFileSize(this, 2)">
-                                                <small class="text-muted d-block">
-                                                    <i class="fas fa-info-circle me-1"></i>
-                                                    {{ __('service_provider.certificate_or_license') }} -
-                                                    {{ __('service_provider.max_size_2mb') }}
-                                                </small>
-                                                @if($serviceProvider->certification)
-                                                    <div class="mt-2">
-                                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i>
-                                                            {{ __('service_provider.certificate_uploaded') }}</span>
-                                                        <a href="{{ Storage::url($serviceProvider->certification) }}"
-                                                            target="_blank" class="badge bg-primary"><i class="fas fa-eye"></i>
-                                                            {{ __('service_provider.view') }}</a>
-                                                    </div>
-                                                @endif
-                                                @error('certification')
-                                                    <small class="text-danger d-block">{{ $message }}</small>
-                                                @enderror
-                                            </div>
+
                                         </div>
                                     </div>
 
@@ -1851,9 +815,10 @@
                                                         <i class="fas fa-times-circle me-2"></i>{{ __('general.cancel') }}
                                                     </a>
                                                     <button type="submit" class="btn btn-primary btn-lg px-5"
-                                                        style="border-radius: 12px; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);">
-                                                        <i class="fas fa-save me-2"></i>{{ __('general.save_changes') }}
-                                                        <i class="fas fa-arrow-left ms-2"></i>
+                                                        style="border-radius: 12px; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);"
+                                                        :disabled="loading">
+                                                        <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-save'" class="me-2"></i>
+                                                        <span x-text="loading ? '{{ __('general.saving') }}...' : '{{ __('general.save_changes') }}'"></span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -1870,7 +835,7 @@
                             <h4 class="fw-bold text-primary mb-3">
                                 <i class="fas fa-info-circle me-2"></i>{{ __('service_provider.about_us') }}
                             </h4>
-                            <p class="fs-6">{{ $serviceProvider->bio ?? __('service_provider.no_description') }}</p>
+                            <p class="fs-6">{{ $serviceProvider->localized_bio ?? __('service_provider.no_description') }}</p>
                         </div>
 
                         @if($galleryImages->count() > 0)
@@ -1935,6 +900,13 @@
                                         </div>
                                     </div>
                                 </template>
+                            </div>
+                        @else
+                            {{-- Empty state for gallery --}}
+                            <div class="mb-4 text-center py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 16px;">
+                                <i class="fas fa-images fa-3x text-muted mb-3 opacity-50"></i>
+                                <h5 class="text-muted mb-2">{{ __('service_provider.no_gallery_images') }}</h5>
+                                <p class="text-muted small mb-0">{{ __('service_provider.no_gallery_hint') }}</p>
                             </div>
                         @endif
 
@@ -2071,7 +1043,7 @@
                                 <!-- Pagination -->
                                 @if($reviews->hasPages())
                                     <div class="d-flex justify-content-center mt-4">
-                                        {{ $reviews->links() }}
+                                        {{ $reviews->links('components.global-pagination') }}
                                     </div>
                                 @endif
                             @else
@@ -2142,7 +1114,7 @@
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1 fw-bold">{{ __('general.location') }}</h6>
                                     <p class="mb-0">
-                                        {{ $serviceProvider->location->city ?? __('service_provider.location_not_specified') }}
+                                        {{ $serviceProvider->location->localized_name ?? __('service_provider.location_not_specified') }}
                                     </p>
                                 </div>
                             </div>
@@ -2191,37 +1163,10 @@
                                             class="text-decoration-none">
                                             {{ $serviceProvider->user->email }}
                                         </a>
+                                    </h6>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Certification (Only visible to owner) -->
-                        @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->is_certified && $serviceProvider->certification)
-                            <div class="contact-item">
-                                <div class="d-flex align-items-center">
-                                    <div class="contact-icon"
-                                        style="background: linear-gradient(135deg, #10b981, #059669);">
-                                        <i class="fas fa-certificate"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-bold">{{ __('service_provider.certification') }}</h6>
-                                        @if(Str::endsWith($serviceProvider->certification, '.pdf'))
-                                            <a href="{{ Storage::url($serviceProvider->certification) }}" target="_blank"
-                                                class="text-decoration-none">
-                                                <i class="fas fa-file-pdf text-danger"></i>
-                                                {{ __('service_provider.view_certificate_pdf') }}
-                                            </a>
-                                        @else
-                                            <a href="{{ Storage::url($serviceProvider->certification) }}" target="_blank"
-                                                class="text-decoration-none">
-                                                <i class="fas fa-image text-primary"></i>
-                                                {{ __('service_provider.view_certificate') }}
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
 
                         {{-- Business Views: keep public, hide from the provider owner --}}
                         @if(!auth()->check() || auth()->id() !== $serviceProvider->user_id)
@@ -2278,8 +1223,7 @@
                         @endif
 
                         <a href="mailto:{{ $serviceProvider->user->email }}" class="btn btn-outline-primary w-100"
-                            id="emailContactBtn"
-                            onclick="if(typeof fbq==='function'){fbq('track','Lead',{content_name:{!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},content_ids:['{!! $serviceProvider->id !!}'],contact_type:'email',language:'{{ app()->getLocale() }}'});}">
+                            id="emailContactBtn">
                             <i class="fas fa-envelope me-2"></i> {{ __('service_provider.send_email') }}
                         </a>
                     </div>
@@ -2378,7 +1322,9 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <form id="reviewForm" action="{{ route('reviews.store') }}" method="POST">
+                <form id="reviewForm" action="{{ route('reviews.store') }}" method="POST"
+                    x-data="{ loading: false }"
+                    @submit="loading = true; $el.submit()">
                     @csrf
                     <input type="hidden" name="service_provider_id" value="{{ $serviceProvider->id }}">
                     <div class="modal-body p-4">
@@ -2409,8 +1355,10 @@
                             {{ __('general.cancel') }}
                         </button>
                         <button type="submit" class="btn btn-primary"
-                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                            <i class="fas fa-paper-plane me-2"></i>{{ __('reviews.submit_review') }}
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;"
+                            :disabled="loading">
+                            <i class="fas" :class="loading ? 'fa-spinner fa-spin' : 'fa-paper-plane'" class="me-2"></i>
+                            <span x-text="loading ? '{{ __('general.saving') }}...' : '{{ __('reviews.submit_review') }}'"></span>
                         </button>
                     </div>
                 </form>
@@ -2419,7 +1367,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
         // Review Modal Functions
         function openReviewModal() {
@@ -2682,17 +1629,6 @@
 
         // Track WhatsApp click (internal analytics) + reveal contact (privacy) + open WhatsApp
         async function revealContactInfo(whatsappClean, whatsappDisplay, address) {
-            // Meta Pixel: Track Lead event (WhatsApp contact)
-            if (typeof fbq === 'function') {
-                var leadEventId = 'lead_{{ $serviceProvider->id }}_' + Date.now();
-                fbq('track', 'Lead', {
-                    content_name: {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!},
-                    content_ids: ['{!! $serviceProvider->id !!}'],
-                    content_category: {!! json_encode($serviceProvider->category->translated_name ?? 'Uncategorized') !!},
-                    contact_type: 'whatsapp',
-                    language: '{{ app()->getLocale() }}'
-                }, { eventID: leadEventId });
-            }
 
             // Store reveal in SESSION (server-side) instead of localStorage
             // This ensures only the user who clicked can see the info
@@ -2708,7 +1644,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify({ action_type: 'click_whatsapp' }),
+                    body: JSON.stringify({ action_type: 'click_whatsapp', source_page: 'provider_profile' }),
                     keepalive: true,
                 }).catch(() => {});
             }
@@ -3027,48 +1963,31 @@
         @endif
     </script>
 
+    {{-- Service areas: live counter + instant client-side search --}}
+    <script>
+        (function () {
+            const grid = document.getElementById('serviceAreasGrid');
+            const search = document.getElementById('serviceAreaSearch');
+            const countBadge = document.getElementById('serviceAreasCount');
+            if (!grid) return;
+
+            window.updateServiceAreasCount = function () {
+                const n = grid.querySelectorAll('.service-area-checkbox:checked').length;
+                if (countBadge) countBadge.textContent = n;
+            };
+            window.updateServiceAreasCount();
+
+            if (search) {
+                search.addEventListener('input', function () {
+                    const term = this.value.trim().toLowerCase();
+                    grid.querySelectorAll('.service-area-item').forEach(function (item) {
+                        const name = item.getAttribute('data-name') || '';
+                        item.style.display = name.indexOf(term) !== -1 ? '' : 'none';
+                    });
+                });
+            }
+        })();
+    </script>
+
     <style>
-        .char-counter {
-            font-size: 0.85rem;
-        }
-
-        .file-info {
-            font-size: 0.9rem;
-        }
-
-        .animate-shake {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            10%,
-            30%,
-            50%,
-            70%,
-            90% {
-                transform: translateX(-5px);
-            }
-
-            20%,
-            40%,
-            60%,
-            80% {
-                transform: translateX(5px);
-            }
-        }
-
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
-            border-width: 0.15em;
-        }
-    </style>
-</body>
-
-</html>
+@endsection

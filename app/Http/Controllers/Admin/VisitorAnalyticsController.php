@@ -39,7 +39,7 @@ class VisitorAnalyticsController extends Controller
                 'error' => $e->getMessage(),
             ]);
             return redirect()->route('admin.dashboard')
-                ->with('error', __('admin.error_loading_analytics'));
+                ->with('error', 'Unable to load visitor analytics.');
         }
     }
 
@@ -57,7 +57,7 @@ class VisitorAnalyticsController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => __('admin.error_loading_live_visitors'),
+                'error' => 'Unable to load live visitors.',
             ], 500);
         }
     }
@@ -94,7 +94,7 @@ class VisitorAnalyticsController extends Controller
 
                 foreach ($analytics['top_pages'] as $page) {
                     fputcsv($file, [
-                        $page->path,
+                        $page->page_name ?? $page->path,
                         $page->visits,
                         $page->unique_visitors,
                     ]);
@@ -109,7 +109,7 @@ class VisitorAnalyticsController extends Controller
                 'error' => $e->getMessage(),
             ]);
             return redirect()->back()
-                ->with('error', __('admin.error_exporting_analytics'));
+                ->with('error', 'Unable to export visitor analytics.');
         }
     }
 }

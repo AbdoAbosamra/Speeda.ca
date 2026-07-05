@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Notifications\Auth\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -93,6 +95,14 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class, 'user_id');
     }
 
+    /**
+     * Send a branded password reset notification.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
     // Role management
     public function assignRole(string $role): void
     {
@@ -116,12 +126,12 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        // Consider user admin if role is 'admin' OR email is in ADMINS env list (comma separated)
+        // Consider user admin if role is 'admin' OR email is in admins config list
         if ($this->role === 'admin') {
             return true;
         }
 
-        $admins = array_filter(array_map('trim', explode(',', env('ADMINS', env('ADMIN_EMAIL', '')))));
+        $admins = config('auth.admins', []);
         if ($this->email && in_array($this->email, $admins, true)) {
             return true;
         }

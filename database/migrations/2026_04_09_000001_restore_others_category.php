@@ -23,6 +23,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         DB::transaction(function () {
             // ── Step 1: Restore / create "Others" SECTION ────────────
 

@@ -36,6 +36,7 @@ class CategoryTest extends TestCase
     {
         $category = Category::factory()->create([
             'name' => 'Cleaning Services',
+            'slug' => 'cleaning-services',
             'description' => 'Professional cleaning services',
             'icon' => '🧹',
             'color' => '#28a745'

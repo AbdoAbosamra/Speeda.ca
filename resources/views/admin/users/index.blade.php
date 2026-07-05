@@ -1,75 +1,83 @@
 @extends('layouts.app')
 
-@section('title', __('admin.users_management'))
+@section('title', 'Users Management')
 
 @section('content')
-<!-- Admin Users Management with Tailwind + Alpine.js -->
-<div class="admin-content-wrapper" style="margin-left: 0 !important;" x-data="{ showInactive: true, searchQuery: '', get visibleUsers() { return this.$refs.usersTable ? [...this.$refs.usersTable.querySelectorAll('tbody tr[data-user-id]')].filter(row => { const isActive = row.dataset.active === 'true'; const matchesSearch = this.searchQuery === '' || row.textContent.toLowerCase().includes(this.searchQuery.toLowerCase()); return (this.showInactive || isActive) && matchesSearch; }) : []; } }">
 <div class="container py-4">
-    <!-- Header with Stats -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
-        <div>
-            <h1 class="h3 fw-bold mb-1">{{ __('admin.manage_users') }}</h1>
-            <p class="text-muted mb-0">{{ __('admin.manage_all_users_status') }}</p>
+    @if (session('message'))
+        <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ session('message') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+    @endif
+
+    {{-- Header --}}
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Users Management</h1>
+            <p class="text-muted mb-0">Manage all users, their roles, and account status</p>
+        </div>
+        <a href="{{ route('admin.users.trash') }}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-trash-alt me-2"></i>Trash Bin
+        </a>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card bg-primary text-white" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);">
-                <div class="card-body">
+    {{-- Stats Cards --}}
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 1.25rem;">
+                <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="mb-0 fw-bold">{{ $stats['total'] ?? $users->total() }}</h3>
-                            <small class="opacity-75">{{ __('admin.total_users') }}</small>
+                            <div class="small text-muted text-uppercase fw-semibold tracking-wide">Total Users</div>
+                            <div class="h2 fw-bold mt-1 mb-0">{{ $stats['total'] }}</div>
                         </div>
-                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <div class="rounded-3 p-3" style="background: #eef2ff; color: #4f46e5;">
                             <i class="fas fa-users fa-lg"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-success text-white" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);">
-                <div class="card-body">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 1.25rem;">
+                <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="mb-0 fw-bold">{{ $stats['active'] ?? 0 }}</h3>
-                            <small class="opacity-75">{{ __('admin.active_users') }}</small>
+                            <div class="small text-muted text-uppercase fw-semibold tracking-wide">Active</div>
+                            <div class="h2 fw-bold mt-1 mb-0 text-success">{{ $stats['active'] }}</div>
                         </div>
-                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <div class="rounded-3 p-3" style="background: #ecfdf5; color: #059669;">
                             <i class="fas fa-user-check fa-lg"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-secondary text-white" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(108, 117, 125, 0.3);">
-                <div class="card-body">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 1.25rem;">
+                <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="mb-0 fw-bold">{{ $stats['inactive'] ?? 0 }}</h3>
-                            <small class="opacity-75">{{ __('admin.inactive_users') }}</small>
+                            <div class="small text-muted text-uppercase fw-semibold tracking-wide">Inactive</div>
+                            <div class="h2 fw-bold mt-1 mb-0 text-warning">{{ $stats['inactive'] }}</div>
                         </div>
-                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <div class="rounded-3 p-3" style="background: #fefce8; color: #d97706;">
                             <i class="fas fa-user-slash fa-lg"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card bg-info text-white" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);">
-                <div class="card-body">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 1.25rem;">
+                <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="mb-0 fw-bold">{{ $stats['providers'] ?? 0 }}</h3>
-                            <small class="opacity-75">{{ __('admin.service_providers') }}</small>
+                            <div class="small text-muted text-uppercase fw-semibold tracking-wide">Providers</div>
+                            <div class="h2 fw-bold mt-1 mb-0 text-primary">{{ $stats['providers'] }}</div>
                         </div>
-                        <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <div class="rounded-3 p-3" style="background: #eff6ff; color: #2563eb;">
                             <i class="fas fa-briefcase fa-lg"></i>
                         </div>
                     </div>
@@ -78,181 +86,170 @@
         </div>
     </div>
 
-    <!-- Search and Filter - Enhanced with Alpine.js -->
-    <div class="card border-0 shadow-lg mb-4" style="border-radius: 16px; background: white;">
-        <div class="card-header bg-white" style="border-bottom: 2px solid #f1f5f9; border-radius: 16px 16px 0 0;">
-            <h5 class="mb-0 fw-bold">
-                <i class="fas fa-filter me-2 text-primary"></i>{{ __('admin.search_and_filter') }}
-            </h5>
-        </div>
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.users') }}" class="row g-3">
-                <div class="col-md-5">
-                    <label class="form-label fw-semibold">{{ __('admin.search_users') }}</label>
+    {{-- Filters --}}
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 1.25rem;">
+        <div class="card-body p-3">
+            <form method="GET" action="{{ route('admin.users') }}" class="row g-3 align-items-center">
+                <div class="col-md-4">
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" name="search" class="form-control border-0 bg-light" 
-                               placeholder="{{ __('admin.search_users_placeholder') }}" 
-                               value="{{ request('search') }}">
+                        <span class="input-group-text bg-light border-0 rounded-start-pill"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control bg-light border-0 rounded-end-pill ps-0" 
+                               placeholder="Search by name or email..." value="{{ request('search') }}">
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">{{ __('admin.filter_by_role') }}</label>
-                    <select name="role" class="form-select border-0 bg-light">
-                        <option value="">{{ __('admin.all_roles') }}</option>
-                        <option value="client" {{ request('role') === 'client' ? 'selected' : '' }}>{{ __('admin.role_client') }}</option>
-                        <option value="service_provider" {{ request('role') === 'service_provider' ? 'selected' : '' }}>{{ __('admin.role_service_provider') }}</option>
-                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>{{ __('admin.role_admin') }}</option>
+                <div class="col-md-2">
+                    <select name="role" class="form-select bg-light border-0 rounded-pill">
+                        <option value="">All Roles</option>
+                        <option value="client" {{ request('role') === 'client' ? 'selected' : '' }}>Client</option>
+                        <option value="service_provider" {{ request('role') === 'service_provider' ? 'selected' : '' }}>Provider</option>
+                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label fw-semibold">{{ __('admin.show_status') }}</label>
-                    <div class="form-check form-switch mt-2">
-                        <input class="form-check-input" type="checkbox" id="showInactive" x-model="showInactive" style="transform: scale(1.2);">
-                        <label class="form-check-label" for="showInactive" x-text="showInactive ? '{{ __('admin.showing_all') }}' : '{{ __('admin.active_only') }}'"></label>
-                    </div>
+                    <select name="status" class="form-select bg-light border-0 rounded-pill">
+                        <option value="">All Status</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100" style="border-radius: 12px; padding: 0.75rem; font-weight: 600;">
-                        <i class="fas fa-search me-2"></i>{{ __('admin.search') }}
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 w-100">
+                        <i class="fas fa-filter me-1"></i> Filter
                     </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ route('admin.users') }}" class="btn btn-outline-secondary rounded-pill px-4 w-100">
+                        <i class="fas fa-undo me-1"></i> Reset
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Users Table - Enhanced -->
-    <div class="card border-0 shadow-lg" style="border-radius: 16px; background: white;" x-ref="usersTable">
-        <div class="card-header bg-white" style="border-bottom: 2px solid #f1f5f9; border-radius: 16px 16px 0 0;">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-users me-2 text-primary"></i>{{ __('admin.users_list') }}
-                </h5>
-                <div class="d-flex gap-2">
-                    <span class="badge bg-success rounded-pill px-3 py-2">{{ $stats['active'] ?? 0 }} {{ __('admin.active') }}</span>
-                    <span class="badge bg-secondary rounded-pill px-3 py-2">{{ $stats['inactive'] ?? 0 }} {{ __('admin.inactive') }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead style="background: linear-gradient(135deg, #f8fafc, #f1f5f9);">
-                        <tr>
-                            <th class="fw-bold py-3">{{ __('admin.name') }}</th>
-                            <th class="fw-bold py-3">{{ __('admin.email') }}</th>
-                            <th class="fw-bold py-3">{{ __('admin.role') }}</th>
-                            <th class="fw-bold py-3">{{ __('admin.status') }}</th>
-                            <th class="fw-bold py-3">{{ __('admin.created_at') }}</th>
-                            <th class="fw-bold py-3 text-center">{{ __('admin.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($users as $user)
-                        <tr 
-                            data-user-id="{{ $user->id }}"
-                            data-active="{{ $user->is_active ? 'true' : 'false' }}"
-                            style="border-bottom: 1px solid #f1f5f9; transition: all 0.3s; {{ !$user->is_active ? 'background: #f8f9fa; opacity: 0.75;' : '' }}" 
-                            onmouseover="this.style.background='{{ $user->is_active ? '#f8fafc' : '#e9ecef' }}'" 
-                            onmouseout="this.style.background='{{ $user->is_active ? 'white' : '#f8f9fa' }}'">
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div 
-                                        class="rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                        style="width: 40px; height: 40px; background: {{ $user->is_active ? 'linear-gradient(135deg, #667eea, #764ba2)' : '#6c757d' }}; color: white; font-weight: bold;">
-                                        {{ substr($user->name, 0, 1) }}
+    {{-- Users Table --}}
+    <div class="card border-0 shadow-sm" style="border-radius: 1.25rem;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4 py-3">
+                            <a href="{{ request()->fullUrlWithQuery(['sortField' => 'name', 'sortDirection' => request('sortField') === 'name' && request('sortDirection') === 'asc' ? 'desc' : 'asc']) }}" 
+                               class="text-decoration-none text-muted small fw-semibold text-uppercase tracking-wide">
+                                User <i class="fas fa-sort ms-1"></i>
+                            </a>
+                        </th>
+                        <th class="py-3">
+                            <a href="{{ request()->fullUrlWithQuery(['sortField' => 'role', 'sortDirection' => request('sortField') === 'role' && request('sortDirection') === 'asc' ? 'desc' : 'asc']) }}"
+                               class="text-decoration-none text-muted small fw-semibold text-uppercase tracking-wide">
+                                Role <i class="fas fa-sort ms-1"></i>
+                            </a>
+                        </th>
+                        <th class="py-3 text-muted small fw-semibold text-uppercase tracking-wide">Activity</th>
+                        <th class="py-3">
+                            <a href="{{ request()->fullUrlWithQuery(['sortField' => 'is_active', 'sortDirection' => request('sortField') === 'is_active' && request('sortDirection') === 'asc' ? 'desc' : 'asc']) }}"
+                               class="text-decoration-none text-muted small fw-semibold text-uppercase tracking-wide">
+                                Status <i class="fas fa-sort ms-1"></i>
+                            </a>
+                        </th>
+                        <th class="py-3">
+                            <a href="{{ request()->fullUrlWithQuery(['sortField' => 'created_at', 'sortDirection' => request('sortField') === 'created_at' && request('sortDirection') === 'asc' ? 'desc' : 'asc']) }}"
+                               class="text-decoration-none text-muted small fw-semibold text-uppercase tracking-wide">
+                                Created <i class="fas fa-sort ms-1"></i>
+                            </a>
+                        </th>
+                        <th class="pe-4 py-3 text-end text-muted small fw-semibold text-uppercase tracking-wide">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($users as $user)
+                        <tr class="{{ !$user->is_active ? 'opacity-50' : '' }}">
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                                         style="width: 40px; height: 40px; background: {{ $user->is_active ? 'linear-gradient(135deg, #4f46e5, #6366f1)' : '#cbd5e1' }};">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
                                     </div>
                                     <div>
-                                        <strong class="{{ $user->is_active ? '' : 'text-muted' }}">{{ $user->name }}</strong>
-                                        @if(!$user->is_active)
-                                            <span class="badge bg-secondary ms-2">{{ __('admin.inactive') }}</span>
-                                        @endif
+                                        <div class="fw-semibold">{{ $user->name }}</div>
+                                        <div class="small text-muted">{{ $user->email }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="{{ $user->is_active ? '' : 'text-muted' }}">{{ $user->email }}</td>
                             <td>
-                                <span class="badge rounded-pill px-3 py-2 fw-semibold" 
-                                      style="background: {{ $user->role === 'admin' ? '#ef4444' : ($user->role === 'service_provider' ? '#10b981' : '#3b82f6') }};">
-                                    {{ __('admin.role_' . $user->role) }}
+                                <span class="badge rounded-pill px-3 py-2 fw-semibold
+                                    @if($user->role === 'admin') bg-danger bg-opacity-10 text-danger
+                                    @elseif($user->role === 'service_provider') bg-success bg-opacity-10 text-success
+                                    @else bg-primary bg-opacity-10 text-primary @endif">
+                                    {{ $user->role === 'service_provider' ? 'Provider' : ucfirst($user->role) }}
                                 </span>
                             </td>
                             <td>
-                                @if($user->is_active)
-                                    <span class="badge bg-success rounded-pill px-3 py-2">
-                                        <i class="fas fa-check-circle me-1"></i>{{ __('admin.active') }}
-                                    </span>
-                                @else
-                                    <span class="badge bg-secondary rounded-pill px-3 py-2">
-                                        <i class="fas fa-ban me-1"></i>{{ __('admin.inactive') }}
-                                    </span>
-                                @endif
+                                <div class="d-flex gap-3 small text-muted">
+                                    <span title="Reviews"><i class="fas fa-star text-warning me-1"></i>{{ $user->reviews_count ?? 0 }}</span>
+                                    <span title="Comments"><i class="fas fa-comment text-primary me-1"></i>{{ $user->comments_count ?? 0 }}</span>
+                                </div>
                             </td>
-                            <td class="text-muted">{{ $user->created_at->format('Y-m-d H:i') }}</td>
-                            <td class="text-center">
-                                @if($user->id !== auth()->id())
-                                    <!-- Toggle Status Button -->
-                                    <form action="{{ route('admin.users.toggle', $user) }}" method="POST" 
-                                          onsubmit="return confirm('{{ $user->is_active ? __('admin.confirm_deactivate_user') : __('admin.confirm_activate_user') }}');" 
-                                          class="d-inline me-1">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" 
-                                                class="btn btn-sm {{ $user->is_active ? 'btn-warning' : 'btn-success' }} rounded-pill px-3" 
-                                                style="transition: all 0.3s;"
-                                                onmouseover="this.style.transform='scale(1.05)'"
-                                                onmouseout="this.style.transform='scale(1)'">
-                                            @if($user->is_active)
-                                                <i class="fas fa-ban me-1"></i>{{ __('admin.deactivate') }}
-                                            @else
-                                                <i class="fas fa-check me-1"></i>{{ __('admin.activate') }}
-                                            @endif
-                                        </button>
-                                    </form>
-                                    
-                                    <!-- Delete Button -->
-                                    <form action="{{ route('admin.users.delete', $user) }}" method="POST" 
-                                          onsubmit="return confirm('{{ __('admin.confirm_hard_delete_user') }}');" 
-                                          class="d-inline"
-                                          title="{{ __('admin.delete') }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" 
-                                                style="transition: all 0.3s;"
-                                                onmouseover="this.style.background='#dc3545'; this.style.color='white'; this.style.transform='scale(1.05)'"
-                                                onmouseout="this.style.background='transparent'; this.style.color='#dc3545'; this.style.transform='scale(1)'">
-                                            <i class="fas fa-user-times me-1"></i>{{ __('admin.delete') }}
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="badge bg-secondary rounded-pill px-3 py-2">
-                                        <i class="fas fa-lock me-1"></i>{{ __('admin.current_user') }}
-                                    </span>
-                                @endif
+                            <td>
+                                <form action="{{ route('admin.users.toggle', $user) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" role="switch"
+                                               onchange="this.form.submit()"
+                                               {{ $user->is_active ? 'checked' : '' }}
+                                               {{ $user->id === auth()->id() ? 'disabled' : '' }}>
+                                        <span class="small ms-1 {{ $user->is_active ? 'text-success' : 'text-muted' }}">
+                                            {{ $user->is_active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </div>
+                                </form>
                             </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                                    <p class="mb-0">{{ __('admin.no_users_found') }}</p>
+                            <td class="text-nowrap">
+                                <span>{{ $user->created_at->format('M d, Y') }}</span>
+                                <span class="d-block small text-muted">{{ $user->created_at->format('H:i') }}</span>
+                            </td>
+                            <td class="pe-4 text-end">
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-light rounded-pill px-3" title="Edit">
+                                        <i class="fas fa-pen me-1"></i>Edit
+                                    </a>
+                                    @if($user->id !== auth()->id() && $user->role !== 'admin')
+                                        <form action="{{ route('admin.users.delete', $user) }}" method="POST" 
+                                              onsubmit="return confirm('Move this user to trash?')" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Delete">
+                                                <i class="fas fa-trash-alt me-1"></i>Delete
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="mt-4 d-flex justify-content-center">
-                {{ $users->links() }}
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fas fa-search fa-3x text-muted opacity-25 mb-3 d-block"></i>
+                                <h5 class="fw-bold">No users found</h5>
+                                <p class="text-muted mb-0">No users match your current search or filter criteria.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+
+        {{-- Pagination --}}
+        @if($users->hasPages())
+            <div class="card-footer bg-white border-0 px-4 py-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="small text-muted">
+                        Showing <strong>{{ $users->firstItem() }}</strong> to <strong>{{ $users->lastItem() }}</strong> of <strong>{{ $users->total() }}</strong> users
+                    </div>
+                    {{ $users->links('components.global-pagination') }}
+                </div>
+            </div>
+        @endif
     </div>
-</div>
 </div>
 @endsection

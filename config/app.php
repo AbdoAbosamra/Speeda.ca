@@ -122,6 +122,8 @@ return [
 
     'key' => env('APP_KEY'),
 
+    'analytics_salt' => env('ANALYTICS_SALT', 'default-salt-change-in-production'),
+
     'previous_keys' => [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))

@@ -8,7 +8,7 @@
 
     <title>{{ __('service_provider.analytics_dashboard') }} - Speeda</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/New_logo.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
 

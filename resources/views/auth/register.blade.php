@@ -6,13 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/New_logo.png') }}">
     <title>{{ __('auth.authentication') }} | {{ config('app.name', 'Speeda') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    {{-- Meta (Facebook) Pixel --}}
-    @include('partials.meta-pixel')
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -1904,11 +1903,50 @@
                         </div>
                         <div class="select-options" id="city-options">
                             <div class="select-option" data-value="">{{ __('auth.select_city') }}</div>
-                            <div class="select-option" data-value="Laval">Laval</div>
-                            <div class="select-option" data-value="Montreal">Montreal</div>
-                            <div class="select-option" data-value="Ottawa">Ottawa</div>
-                            <div class="select-option" data-value="Gatineau">Gatineau</div>
+                            <?php
+                                /* @change 2026-06-07 | Signup city groups by province; cities still resolve from DB rows. */
+                                $regionGroups = [
+                                    'Quebec'  => ['montreal', 'laval', 'gatineau'],
+                                    'Ontario' => [
+                                        'ottawa',
+                                        'mississauga',
+                                        'brampton',
+                                        'oakville',
+                                        'burlington',
+                                        'milton',
+                                        'markham',
+                                        'vaughan',
+                                        'richmond hill',
+                                        'oshawa',
+                                        'whitby',
+                                        'ajax',
+                                        'city of toronto',
+                                    ],
+                                ];
+                                /* Index all active locations by lowercase city name for fast lookup */
+                                $locationIndex = ($locations ?? collect())->keyBy(fn($loc) => mb_strtolower(trim($loc->city)));
+                            ?>
+                            @foreach($regionGroups as $regionLabel => $regionCities)
+                                <?php
+                                    /* Filter to only cities that exist in DB (safe — ignores missing rows) */
+                                    $regionLocations = collect($regionCities)
+                                        ->map(fn($slug) => $locationIndex->get($slug))
+                                        ->filter();
+                                ?>
+                                @if($regionLocations->isNotEmpty())
+                                    {{-- Group header — matches profession dropdown visual style --}}
+                                    <div class="select-group-header" style="padding: 0.5rem 1rem; font-weight: 700; color: #667eea; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; background: #f8faff; border-top: 1px solid #e5e7eb; cursor: default; pointer-events: none;">
+                                        {{ $regionLabel }}
+                                    </div>
+                                    @foreach($regionLocations as $loc)
+                                        <div class="select-option" data-value="{{ $loc->city }}" style="padding-inline-start: 1.5rem;">
+                                            {{ $loc->city }}
+                                        </div>
+                                    @endforeach
+                                @endif
+                            @endforeach
                         </div>
+
                         <input type="hidden" name="city" id="city-input" value="{{ old('city') }}">
                     </div>
                     <div class="input-error" id="city-error">

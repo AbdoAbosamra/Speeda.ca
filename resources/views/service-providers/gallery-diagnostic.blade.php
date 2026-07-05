@@ -16,7 +16,7 @@
                         <li><strong>Company:</strong> {{ $serviceProvider->company_name }}</li>
                         <li><strong>Profile Image:</strong> {{ $serviceProvider->profile_image ? '✅ موجود' : '❌ فاضي' }}<br>
                             URL: <code>{{ $serviceProvider->profile_image_url }}</code></li>
-                        <li><strong>Gallery Count:</strong> <span class="badge bg-{{ $serviceProvider->getMedia('provider_gallery')->count() > 0 ? 'success' : 'danger' }}">{{ $serviceProvider->getMedia('provider_gallery')->count() }}</span></li>
+                        <li><strong>Gallery Count:</strong> <span class="badge bg-{{ $serviceProvider->getMedia('gallery')->count() > 0 ? 'success' : 'danger' }}">{{ $serviceProvider->getMedia('gallery')->count() }}</span></li>
                         <li><strong>Media Table Total:</strong> {{ $totalMedia }}</li>
                     </ul>
                 </div>

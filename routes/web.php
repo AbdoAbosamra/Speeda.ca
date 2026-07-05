@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
@@ -15,6 +18,8 @@ use App\Http\Controllers\ServiceProviderAnalyticsController;
 use App\Http\Controllers\ServiceProviderController;
 use App\Http\Controllers\Admin\AdminCommentController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\LegalPageController as AdminLegalPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\VisitorAnalyticsController;
 use App\Http\Controllers\DebugController;
@@ -30,7 +35,7 @@ Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('local
 Route::get('/current-locale', [LocaleController::class, 'getCurrentLocale'])->name('locale.current');
 
 // ==================== PUBLIC ROUTES ====================
-Route::view('/', 'home')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Test translation route (internal diagnostics only)
 Route::middleware(['auth', 'admin'])->get('/test-translations', function () {
@@ -72,8 +77,13 @@ Route::middleware(['auth', 'admin'])->get('/diagnostic', function () {
 Route::get('/locations', [LocationController::class, 'index'])->name('location');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
-Route::view('/privacy-policy', 'Static.PrivacyPolicy')->name('privacy-policy');
-Route::view('/terms-of-service', 'Static.terms-of-service')->name('terms-of-service');
+Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+Route::get('/blogs/{post:slug}', [BlogController::class, 'show'])->name('blogs.show');
+Route::get('/privacy-policy', [LegalPageController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-of-service', [LegalPageController::class, 'termsOfService'])->name('terms-of-service');
+Route::get('/legal/{slug}', [LegalPageController::class, 'show'])
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('legal-pages.show');
 Route::view('/help-center', 'Static.help-center')->name('help-center');
 Route::view('/legal-affairs', 'Static.legal-affairs')->name('legal-affairs');
 Route::view('/about-us', 'about-us')->name('about-us');
@@ -172,6 +182,10 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
     // Dismiss engagement popup
     Route::post('/profile/popup-dismissed', [ServiceProviderController::class, 'dismissEngagementPopup'])
         ->name('service-providers.popup-dismissed');
+
+    // Dismiss completion popup (session-based)
+    Route::post('/profile/completion-popup-dismiss', [ServiceProviderController::class, 'dismissCompletionPopup'])
+        ->name('service-providers.dismiss-completion-popup');
 });
 
 // ==================== REVIEWS ROUTES (Client) ====================
@@ -221,6 +235,11 @@ Route::middleware(['auth'])->prefix('comments')->name('comments.')->group(functi
 
 // ==================== ADMIN ROUTES ====================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Redirect /admin to /admin/dashboard
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
+
     // Activity Logs
     Route::get('/activity-logs', [App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity_logs');
 
@@ -230,6 +249,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+    // Blog CMS
+    Route::resource('blog/posts', BlogPostController::class)
+        ->except(['show'])
+        ->names('blog.posts')
+        ->parameters(['posts' => 'post']);
+
+    // Legal Pages CMS
+    Route::resource('legal-pages', AdminLegalPageController::class)
+        ->except(['show'])
+        ->names('legal-pages');
+
     // Categories Management (using IDs, no slugs)
     Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
@@ -238,10 +268,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('categories.destroy');
     Route::patch('/categories/{category}/toggle', [AdminController::class, 'toggleCategoryStatus'])->name('categories.toggle');
 
-    // Users Management (using IDs, no slugs)
+    // Users Management
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/trash', [AdminController::class, 'usersTrash'])->name('users.trash');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
     Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleUserStatus'])->name('users.toggle');
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
+    Route::post('/users/{id}/restore', [AdminController::class, 'restoreUser'])->name('users.restore');
+    Route::delete('/users/{id}/force', [AdminController::class, 'forceDeleteUser'])->name('users.force_delete');
 
     // Locations
     Route::get('/locations', [AdminController::class, 'locations'])->name('locations');
@@ -255,6 +290,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/visitors', [VisitorAnalyticsController::class, 'index'])->name('visitors');
     Route::get('/visitors/live-count', [VisitorAnalyticsController::class, 'getLiveCount'])->name('visitors.live-count');
     Route::get('/visitors/export', [VisitorAnalyticsController::class, 'export'])->name('visitors.export');
+
+    // Provider Activity Monitor (WhatsApp Clicks & Views)
+    Route::get('/provider-activity-monitor', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'index'])->name('provider_activity_monitor.index');
+    Route::get('/provider-activity-monitor/{serviceProvider}', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'show'])->name('provider_activity_monitor.show');
+
+    // WhatsApp Click Intelligence (read-only analytics)
+    Route::get('/whatsapp-analytics', [App\Http\Controllers\Admin\WhatsappAnalyticsController::class, 'index'])->name('whatsapp_analytics.index');
 
     // Utility - Clear caches to ensure admin changes reflect immediately
     Route::post('/clear-cache', [AdminController::class, 'clearCache'])->name('clear-cache');
@@ -287,7 +329,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 // Service Provider Notification Routes
 Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
 });
 
 

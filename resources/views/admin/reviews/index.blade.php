@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- Admin Reviews Management -->
-    <div class="admin-content-wrapper" style="margin-left: 0 !important;">
+    <div class="admin-content-wrapper" style="margin-inline-start: 0 !important;">
         <div class="container py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -151,6 +151,9 @@
                                         </td>
                                         <td class="py-3 text-center">
                                             <div class="btn-group">
+                                                <a href="{{ route('admin.reviews.show', $review) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1" title="View details">
+                                                    <i class="fas fa-eye me-1"></i>View
+                                                </a>
                                                 @if(!$review->is_active && !$review->admin_approved_at)
                                                     <!-- Pending Review Actions -->
                                                     <form action="{{ route('admin.reviews.approve', $review) }}" method="POST"
@@ -221,7 +224,7 @@
                 </div>
                 @if($reviews->hasPages())
                     <div class="card-footer bg-white" style="border-top: 2px solid #f1f5f9; border-radius: 0 0 16px 16px;">
-                        {{ $reviews->appends(request()->query())->links() }}
+                        {{ $reviews->links('components.global-pagination') }}
                     </div>
                 @endif
             </div>

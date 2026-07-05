@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class MigrateUsersSeeder extends Seeder
 {
@@ -13,7 +14,7 @@ class MigrateUsersSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('🔄 Starting user migration...');
+        $this->command->info('🔄 Starting comprehensive category migration...');
         
         // خريطة النقل: [من الفئة القديمة => إلى الفئة الجديدة]
         $migrationMap = [
@@ -59,55 +60,97 @@ class MigrateUsersSeeder extends Seeder
             60 => 63,  // Entertainers → Others
         ];
 
-        $migratedCount = 0;
-        $totalUsers = 0;
+        $tablesToMigrate = [
+            'service_providers' => 'category_id',
+            'service_provider_profiles' => 'category_id',
+            'service_provider_categories' => 'category_id',
+            'location_category' => 'category_id',
+        ];
 
-        foreach ($migrationMap as $oldCategoryId => $newCategoryId) {
-            // عد المستخدمين في الفئة القديمة
-            $users = DB::table('service_providers')
-                ->where('category_id', $oldCategoryId)
-                ->get(['id', 'user_id']);
-            
-            $userCount = $users->count();
-            
-            if ($userCount > 0) {
-                $totalUsers += $userCount;
+        foreach ($migrationMap as $oldId => $newId) {
+            $oldName = DB::table('categories')->where('id', $oldId)->value('name') ?? "Unknown (ID: $oldId)";
+            $newName = DB::table('categories')->where('id', $newId)->value('name') ?? "Unknown (ID: $newId)";
+
+            $this->command->warn("📦 Processing Migration: {$oldName} → {$newName}");
+
+            foreach ($tablesToMigrate as $table => $column) {
+                if (!Schema::hasTable($table)) continue;
+
+                $count = DB::table($table)->where($column, $oldId)->count();
                 
-                // الحصول على أسماء الفئات
-                $oldCategory = DB::table('categories')->where('id', $oldCategoryId)->value('name');
-                $newCategory = DB::table('categories')->where('id', $newCategoryId)->value('name');
-                
-                $this->command->warn("📦 Found {$userCount} users in: {$oldCategory} (ID: {$oldCategoryId})");
-                $this->command->info("   → Moving to: {$newCategory} (ID: {$newCategoryId})");
-                
-                // نقل المستخدمين
-                DB::table('service_providers')
-                    ->where('category_id', $oldCategoryId)
-                    ->update([
-                        'category_id' => $newCategoryId,
-                        'updated_at' => now()
-                    ]);
-                
-                $migratedCount += $userCount;
-                
-                // عرض تفاصيل المستخدمين المنقولين
-                foreach ($users as $user) {
-                    $userName = DB::table('users')->where('id', $user->user_id)->value('name');
-                    $this->command->line("      ✓ User: {$userName} (ID: {$user->user_id})");
+                if ($count > 0) {
+                    $this->command->info("   - Table '{$table}': Found {$count} records");
+
+                    // Special handling for pivot/unique tables to avoid duplicate key errors
+                    if ($table === 'service_provider_categories') {
+                        // Get all provider IDs in the old category
+                        $providers = DB::table($table)->where($column, $oldId)->pluck('service_provider_profile_id');
+                        
+                        foreach ($providers as $profileId) {
+                            // Check if they already exist in the new category
+                            $exists = DB::table($table)
+                                ->where('service_provider_profile_id', $profileId)
+                                ->where($column, $newId)
+                                ->exists();
+
+                            if ($exists) {
+                                // Just delete the old one
+                                DB::table($table)
+                                    ->where('service_provider_profile_id', $profileId)
+                                    ->where($column, $oldId)
+                                    ->delete();
+                                $this->command->line("      ✓ Removed duplicate pivot for profile #{$profileId}");
+                            } else {
+                                // Update to new ID
+                                DB::table($table)
+                                    ->where('service_provider_profile_id', $profileId)
+                                    ->where($column, $oldId)
+                                    ->update([$column => $newId, 'updated_at' => now()]);
+                            }
+                        }
+                    } 
+                    elseif ($table === 'location_category') {
+                        // Get all location IDs in the old category
+                        $locations = DB::table($table)->where($column, $oldId)->pluck('location_id');
+                        
+                        foreach ($locations as $locationId) {
+                            $exists = DB::table($table)
+                                ->where('location_id', $locationId)
+                                ->where($column, $newId)
+                                ->exists();
+
+                            if ($exists) {
+                                DB::table($table)
+                                    ->where('location_id', $locationId)
+                                    ->where($column, $oldId)
+                                    ->delete();
+                            } else {
+                                DB::table($table)
+                                    ->where('location_id', $locationId)
+                                    ->where($column, $oldId)
+                                    ->update([$column => $newId, 'updated_at' => now()]);
+                            }
+                        }
+                    }
+                    else {
+                        // Direct update for non-pivot tables
+                        DB::table($table)->where($column, $oldId)->update([
+                            $column => $newId,
+                            'updated_at' => now()
+                        ]);
+                    }
+                    
+                    $this->command->line("      ✓ Migrated {$count} records in '{$table}'");
                 }
             }
         }
 
         $this->command->newLine();
         $this->command->info('════════════════════════════════════════');
-        $this->command->info("✅ Migration Complete!");
-        $this->command->info("   • Total users found: {$totalUsers}");
-        $this->command->info("   • Successfully migrated: {$migratedCount}");
+        $this->command->info("✅ Comprehensive Migration Complete!");
         $this->command->info('════════════════════════════════════════');
-        
-        if ($migratedCount > 0) {
-            $this->command->newLine();
-            $this->command->warn('⚠️  IMPORTANT: Now run SafeCategoryUpdateSeeder to complete the update.');
-        }
+        $this->command->newLine();
+        $this->command->warn('⚠️  Now run SafeCategoryUpdateSeeder to complete the update.');
     }
+
 }

@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            AdminUserSeeder::class, // permanent admin (login `admin`), safe on prod
             CategorySeeder::class,  // MUST run first (categories before locations)
             SafeCategoryUpdateSeeder::class,
             LocationSeeder::class,

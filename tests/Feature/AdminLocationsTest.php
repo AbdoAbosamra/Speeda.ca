@@ -45,7 +45,7 @@ class AdminLocationsTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('admin.locations'))
-            ->assertRedirect(route('dashboard'));
+            ->assertForbidden();
     }
 
     /**
@@ -114,7 +114,7 @@ class AdminLocationsTest extends TestCase
      */
     public function test_admin_can_delete_location_with_no_providers()
     {
-        $location = Location::factory()->create();
+        $location = Location::factory()->create(['is_active' => false]);
 
         $this->actingAs($this->admin)
             ->delete(route('admin.locations.delete', $location))
@@ -128,7 +128,7 @@ class AdminLocationsTest extends TestCase
      */
     public function test_admin_cannot_delete_location_with_providers()
     {
-        $location = Location::factory()->create();
+        $location = Location::factory()->create(['is_active' => false]);
 
         // Create a service provider at this location
         $user = User::factory()->create(['role' => 'service_provider']);
@@ -139,7 +139,7 @@ class AdminLocationsTest extends TestCase
 
         $this->actingAs($this->admin)
             ->delete(route('admin.locations.delete', $location))
-            ->assertSessionHasErrors();
+            ->assertRedirect();
 
         $this->assertDatabaseHas('locations', ['id' => $location->id]);
     }

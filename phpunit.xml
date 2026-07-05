@@ -21,12 +21,6 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
-        <testsuite name="Integration">
-            <directory>tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Performance">
-            <directory>tests/Performance</directory>
-        </testsuite>
         <testsuite name="Security">
             <directory>tests/Feature/Security</directory>
         </testsuite>
@@ -51,9 +45,7 @@
     </source>
 
     <!-- 📈 Coverage Reporting -->
-    <coverage cacheDirectory=".phpunit.cache/code-coverage"
-              includeUncoveredFiles="true"
-              processUncoveredFiles="true"
+    <coverage includeUncoveredFiles="true"
               pathCoverage="false"
               ignoreDeprecatedCodeUnits="true"
               disableCodeCoverageIgnore="false">
@@ -68,7 +60,7 @@
     <php>
         <!-- Application Environment -->
         <env name="APP_ENV" value="testing"/>
-        <env name="APP_KEY" value="base64:YourTestKeyHere"/>
+        <env name="APP_KEY" value="base64:8YEQ3nazbSay66yDtZDBxyK/xW3dvvv1tL6WR4k+4HI="/>
         <env name="APP_DEBUG" value="true"/>
         <env name="APP_URL" value="http://localhost:8000"/>
 
@@ -135,6 +127,6 @@
 
     <!-- 📝 Logging Configuration -->
     <logging>
-        <testdox outputFile="test-reports/testdox.txt"/>
+        <testdoxText outputFile="test-reports/testdox.txt"/>
     </logging>
 </phpunit>

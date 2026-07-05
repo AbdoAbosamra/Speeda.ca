@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ServiceProvider;
 use App\Models\Category;
 use App\Models\Location;
+use App\Services\CategoryCacheService;
+use App\Services\LocationCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +27,9 @@ class ServiceProviderProfileController extends Controller
                 ->with('info', 'You already have a service provider profile.');
         }
 
-        $categories = Category::with('parent.parent')->terminal()->get();
-        $locations = Location::active()->get();
+        // PERFORMANCE: Use cached categories and locations from Redis (24h TTL)
+        $categories = app(CategoryCacheService::class)->getTerminalCategories();
+        $locations = app(LocationCacheService::class)->getActiveLocations();
 
         // The dedicated create view is not present in the repository. Redirect to
         // the provider listing to avoid returning a missing view (per constraints
@@ -70,7 +73,7 @@ class ServiceProviderProfileController extends Controller
             DB::transaction(function () use ($validated, $request) {
                 $validated['user_id'] = auth()->id();
                 $validated['business_slug'] = $this->generateUniqueSlug($validated['business_name']);
-                $validated['is_verified'] = false; // يحتاج إلى موافقة المسؤول
+                $validated['is_verified'] = true; // Auto-verified
 
                 // تعيين القيم الافتراضية
                 $validated['views'] = 0;
@@ -93,7 +96,7 @@ class ServiceProviderProfileController extends Controller
             });
 
             return redirect()->route('service-providers.manage')
-                ->with('success', 'Service provider profile created successfully! It will be visible after verification.');
+                ->with('success', 'Service provider profile created successfully!');
 
         } catch (\Exception $e) {
             return redirect()->back()
@@ -187,7 +190,7 @@ class ServiceProviderProfileController extends Controller
                 foreach ($request->file('gallery_images') as $image) {
                     $serviceProvider
                         ->addMedia($image)
-                        ->toMediaCollection('provider_gallery');
+                        ->toMediaCollection('gallery');
                 }
             }
 

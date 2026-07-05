@@ -71,4 +71,9 @@ return [
 
     // Category
     'sp_category_invalid' => 'Selected category/profession is invalid',
+
+    // Service areas
+    'sp_service_areas_invalid' => 'Invalid service areas selection.',
+    'sp_service_areas_distinct' => 'Duplicate locations are not allowed in service areas.',
+    'sp_service_areas_exists' => 'One or more selected locations are invalid.',
 ];

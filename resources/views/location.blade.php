@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('location.choose_location') }} - {{ config('app.name', 'Speeda') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/main-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/New_logo.png') }}">
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -254,7 +254,7 @@ use Illuminate\Support\Facades\Storage;
                    class="city-card"
                    style="background-image: url('{{ $bg }}'); background-size: cover; background-position: center;">
                     <div style="position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);"></div>
-                    <h2 style="position:absolute; left:1rem; bottom:1rem; color:#fff; margin:0;">{{ $loc->city }}</h2>
+                    <h2 style="position:absolute; left:1rem; bottom:1rem; color:#fff; margin:0;">{{ $loc->localized_name }}</h2>
                 </a>
             </div>
         @empty

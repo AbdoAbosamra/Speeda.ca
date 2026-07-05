@@ -71,4 +71,9 @@ return [
 
     // Category
     'sp_category_invalid' => 'الفئة/الوظيفة المختارة غير صالحة',
+
+    // أماكن الخدمة
+    'sp_service_areas_invalid' => 'اختيار أماكن الخدمة غير صالح.',
+    'sp_service_areas_distinct' => 'لا يمكن تكرار نفس المكان في أماكن الخدمة.',
+    'sp_service_areas_exists' => 'واحد أو أكثر من الأماكن المختارة غير صالح.',
 ];

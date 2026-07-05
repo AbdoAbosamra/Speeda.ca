@@ -15,9 +15,11 @@ return new class extends Migration
     {
         // Use raw statement to change column type safely across MySQL versions
         // Keep existing values intact.
-        DB::statement("ALTER TABLE `locations` MODIFY `city` VARCHAR(255) NOT NULL;");
-        // Keep unique index on city
-        DB::statement("ALTER TABLE `locations` ADD UNIQUE (`city`);");
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            DB::statement("ALTER TABLE `locations` MODIFY `city` VARCHAR(255) NOT NULL;");
+            // Keep unique index on city
+            DB::statement("ALTER TABLE `locations` ADD UNIQUE (`city`);");
+        }
     }
 
     /**
@@ -28,6 +30,8 @@ return new class extends Migration
     {
         // Drop unique constraint if exists (name may vary across DB engines)
         // Attempt by column alteration to enum
-        DB::statement("ALTER TABLE `locations` MODIFY `city` ENUM('Laval','Montreal','Ottawa','Gatineau') NOT NULL;");
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            DB::statement("ALTER TABLE `locations` MODIFY `city` ENUM('Laval','Montreal','Ottawa','Gatineau') NOT NULL;");
+        }
     }
 };

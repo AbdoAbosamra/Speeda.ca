@@ -21,8 +21,9 @@ class ActivityLogController extends Controller
     {
         $logs = AdminLog::with('admin')
             ->where('is_undone', false)
-            ->orderByDesc('created_at')
-            ->paginate(20);
+->orderByDesc('created_at')
+             ->paginate(20)
+             ->withQueryString();
 
         return view('admin.activity_logs.index', compact('logs'));
     }

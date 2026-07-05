@@ -7,7 +7,7 @@
             </h1>
 
             <p class="hero-subtitle">
-                Connect with verified professionals in your area.
+                Connect with professionals in your area.
                 Get quality services at competitive prices, or grow your business
                 by connecting with clients who need your expertise.
             </p>

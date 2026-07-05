@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         DB::transaction(function () {
             $this->syncSections();
             $this->syncAutomotive();

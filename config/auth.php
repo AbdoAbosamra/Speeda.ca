@@ -99,6 +99,12 @@ return [
         ],
     ],
 
+    'password_reset' => [
+        'support_email' => env('SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS', 'support@speeda.ca')),
+        'rate_limit_per_minute' => env('PASSWORD_RESET_RATE_LIMIT_PER_MINUTE', 5),
+        'rate_limit_per_hour' => env('PASSWORD_RESET_RATE_LIMIT_PER_HOUR', 20),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout
@@ -111,5 +117,52 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Users Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This option defines the admin users who have full access to the admin
+    | panel. These email addresses are loaded from the ADMINS and ADMIN_EMAIL
+    | environment variables and cached when config:cache is run.
+    |
+    | IMPORTANT: Always use config('auth.admins') instead of env() directly
+    | to prevent admin access issues when configuration is cached.
+    |
+    */
+
+    'admins' => array_filter(
+        array_map('trim', explode(',', env('ADMINS', env('ADMIN_EMAIL', ''))))
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Login Email
+    |--------------------------------------------------------------------------
+    |
+    | The email used when an admin types 'admin' as the login shortcut.
+    | Override via ADMIN_EMAIL in .env for security.
+    |
+    */
+
+    'admin_email' => env('ADMIN_EMAIL', 'admin@speeda.com'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-Create Admin Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These options control the automatic creation of an admin user during
+    | application boot. This is typically used during initial deployment.
+    |
+    */
+
+    'auto_create_admin' => [
+        'enabled' => env('AUTO_CREATE_ADMIN', false),
+        'email' => env('ADMIN_EMAIL'),
+        'password' => env('ADMIN_PASSWORD'),
+        'name' => env('ADMIN_NAME', 'Administrator'),
+    ],
 
 ];

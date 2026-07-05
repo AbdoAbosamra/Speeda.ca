@@ -71,4 +71,12 @@ class ServiceProviderPolicy
     {
         return $user->role === 'admin';
     }
+
+    /**
+     * Determine whether the user can manage the gallery (upload/replace/delete images).
+     */
+    public function manageGallery(User $user, ServiceProvider $serviceProvider): bool
+    {
+        return $user->id === $serviceProvider->user_id;
+    }
 }

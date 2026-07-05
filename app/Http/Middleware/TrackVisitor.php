@@ -37,6 +37,11 @@ class TrackVisitor
      */
     protected function recordVisitor(Request $request): void
     {
+        // Skip tracking for admin users to keep visitor numbers credible
+        if (Auth::check() && Auth::user()->isAdmin()) {
+            return;
+        }
+
         // GDPR-compliant hashing with salt using app key
         $ipHash = hash_hmac('sha256', $request->ip(), config('app.key'));
         $userAgentHash = hash_hmac('sha256', $request->userAgent(), config('app.key'));

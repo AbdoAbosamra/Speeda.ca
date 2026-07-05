@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class CategorySeeder extends Seeder
 {
@@ -12,10 +13,10 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing categories
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // Clear existing categories (cross-database safe)
+        Schema::disableForeignKeyConstraints();
         DB::table('categories')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        Schema::enableForeignKeyConstraints();
 
         $timestamp = '2025-11-25 16:17:30';
 
@@ -137,8 +138,10 @@ class CategorySeeder extends Seeder
             ]));
         }
 
-        // Reset AUTO_INCREMENT
-        DB::statement('ALTER TABLE categories AUTO_INCREMENT = 89');
+        // Reset AUTO_INCREMENT (MySQL/MariaDB only)
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            DB::statement('ALTER TABLE categories AUTO_INCREMENT = 89');
+        }
 
         $this->command->info('✅ Categories seeded successfully!');
         $this->command->info('   7 Sections + 65 Categories = 72 Total');

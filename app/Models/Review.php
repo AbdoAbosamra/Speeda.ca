@@ -163,26 +163,9 @@ class Review extends Model
      */
     public static function recalculateProviderRating(int $serviceProviderId): void
     {
-        $stats = self::where('service_provider_id', $serviceProviderId)
-            ->where('is_active', true)
-            ->selectRaw('
-                COUNT(*) as total_reviews,
-                AVG(rating) as average_rating,
-                SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as five_star,
-                SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as four_star,
-                SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as three_star,
-                SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as two_star,
-                SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as one_star
-            ')
-            ->first();
-
-        $averageRating = $stats->total_reviews > 0
-            ? round($stats->average_rating, 1)
-            : null;
-
-        // Update the service provider record
-        ServiceProvider::where('id', $serviceProviderId)->update([
-            'rating' => $averageRating,
-        ]);
+        $provider = ServiceProvider::find($serviceProviderId);
+        if ($provider) {
+            $provider->recalculateRating();
+        }
     }
 }

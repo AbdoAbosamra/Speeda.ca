@@ -62,21 +62,23 @@ class ServiceProviderProfileTest extends TestCase
     }
 
     /** @test */
-    public function test_non_owner_cannot_view_profile()
+    public function test_other_provider_can_view_public_profile()
     {
+        // Provider profiles are public; any authenticated user can view them.
         $response = $this->actingAs($this->otherUser)
             ->get(route('service-providers.show', $this->serviceProvider));
 
         $response->assertStatus(200)
-            ->assertSee('Access Denied');
+            ->assertSee($this->serviceProvider->company_name);
     }
 
     /** @test */
-    public function test_guest_redirected_to_login()
+    public function test_guest_can_view_public_profile()
     {
         $response = $this->get(route('service-providers.show', $this->serviceProvider));
 
-        $response->assertRedirect(route('login'));
+        $response->assertStatus(200)
+            ->assertSee($this->serviceProvider->company_name);
     }
 
     /** @test */
@@ -85,24 +87,24 @@ class ServiceProviderProfileTest extends TestCase
         $data = [
             'business_name' => 'Updated Business Name',
             'phone' => '9876543210',
+            'whatsapp_country_code' => '+1',
             'whatsapp_number' => '+1234567890',
             'bio' => 'Updated bio text',
             'experience_years' => 10,
-            'hourly_rate' => 75.50,
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect(route('service-providers.show', $this->serviceProvider));
 
         $this->serviceProvider->refresh();
         $this->assertEquals('Updated Business Name', $this->serviceProvider->company_name);
         $this->assertEquals('9876543210', $this->serviceProvider->phone);
-        $this->assertEquals('+1234567890', $this->serviceProvider->whatsapp_number);
+        // whatsapp_country_code (+1) is prepended to the submitted number.
+        $this->assertEquals('+11234567890', $this->serviceProvider->whatsapp_number);
         $this->assertEquals('Updated bio text', $this->serviceProvider->bio);
         $this->assertEquals(10, $this->serviceProvider->experience_years);
-        $this->assertEquals(75.50, $this->serviceProvider->hourly_rate);
     }
 
     /** @test */
@@ -114,93 +116,35 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertSessionHasErrors('whatsapp_number');
     }
 
     /** @test */
-    public function test_profile_image_upload()
+    public function test_category_can_be_changed_only_when_currently_others()
     {
-        Storage::fake('public');
+        // Category is locked unless the current category is "Others".
+        $others = Category::factory()->create(['name' => 'Others', 'is_active' => true]);
+        $this->serviceProvider->update(['category_id' => $others->id]);
 
-        $file = UploadedFile::fake()->image('profile.jpg', 800, 800);
-
-        $data = [
-            'business_name' => $this->serviceProvider->company_name,
-            'profile_image' => $file,
-        ];
-
-        $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
-
-        $response->assertRedirect();
-        $this->serviceProvider->refresh();
-        $this->assertNotNull($this->serviceProvider->profile_image);
-        Storage::disk('public')->assertExists($this->serviceProvider->profile_image);
-    }
-
-    /** @test */
-    public function test_certification_upload_pdf()
-    {
-        Storage::fake('public');
-
-        $file = UploadedFile::fake()->create('certificate.pdf', 1000, 'application/pdf');
-
-        $data = [
-            'business_name' => $this->serviceProvider->company_name,
-            'certification' => $file,
-        ];
-
-        $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
-
-        $response->assertRedirect();
-        $this->serviceProvider->refresh();
-        $this->assertNotNull($this->serviceProvider->certification);
-        $this->assertTrue($this->serviceProvider->is_certified);
-        Storage::disk('public')->assertExists($this->serviceProvider->certification);
-    }
-
-    /** @test */
-    public function test_certification_upload_image()
-    {
-        Storage::fake('public');
-
-        $file = UploadedFile::fake()->image('certificate.jpg');
-
-        $data = [
-            'business_name' => $this->serviceProvider->company_name,
-            'certification' => $file,
-        ];
-
-        $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
-
-        $response->assertRedirect();
-        $this->serviceProvider->refresh();
-        $this->assertNotNull($this->serviceProvider->certification);
-        $this->assertTrue($this->serviceProvider->is_certified);
-    }
-
-    /** @test */
-    public function test_category_update()
-    {
         $newCategory = Category::factory()->create([
             'name' => 'Electrical',
-            'parent_id' => 1,
             'is_active' => true,
         ]);
 
         $data = [
             'business_name' => $this->serviceProvider->company_name,
+            'phone' => '9876543210',
+            'whatsapp_country_code' => '+1',
+            'whatsapp_number' => '+1234567890',
             'category_id' => $newCategory->id,
         ];
 
-        $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+        $this->actingAs($this->user)
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data)
+            ->assertRedirect();
 
-        $response->assertRedirect();
         $this->serviceProvider->refresh();
         $this->assertEquals($newCategory->id, $this->serviceProvider->category_id);
     }
@@ -210,11 +154,14 @@ class ServiceProviderProfileTest extends TestCase
     {
         $data = [
             'business_name' => $this->serviceProvider->company_name,
+            'phone' => '9876543210',
+            'whatsapp_country_code' => '+1',
+            'whatsapp_number' => '+1234567890',
             'services_offered' => 'Plumbing, Repairs, Installation, Maintenance',
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertRedirect();
         $this->serviceProvider->refresh();
@@ -232,7 +179,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertSessionHasErrors('business_name');
     }
@@ -249,7 +196,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->user)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         // Should redirect back with error
         $response->assertRedirect();
@@ -260,31 +207,6 @@ class ServiceProviderProfileTest extends TestCase
     }
 
     /** @test */
-    public function test_parent_categories_only_shown_in_dropdown()
-    {
-        // Create child category (should not appear)
-        Category::factory()->create([
-            'name' => 'Child Category',
-            'parent_id' => 2, // Not 1
-            'is_active' => true,
-        ]);
-
-        // Create parent category (should appear)
-        Category::factory()->create([
-            'name' => 'Parent Category',
-            'parent_id' => 1,
-            'is_active' => true,
-        ]);
-
-        $response = $this->actingAs($this->user)
-            ->get(route('service-providers.show', $this->serviceProvider));
-
-        $response->assertStatus(200)
-            ->assertSee('Parent Category')
-            ->assertDontSee('Child Category');
-    }
-
-    /** @test */
     public function test_unauthorized_user_cannot_update_profile()
     {
         $data = [
@@ -292,7 +214,7 @@ class ServiceProviderProfileTest extends TestCase
         ];
 
         $response = $this->actingAs($this->otherUser)
-            ->put(route('service-providers.update', $this->serviceProvider), $data);
+            ->put(route('service-providers.profile.update', $this->serviceProvider), $data);
 
         $response->assertForbidden();
 

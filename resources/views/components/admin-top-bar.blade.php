@@ -7,82 +7,145 @@
     $dashboardRoute = Route::has('admin.dashboard') ? route('admin.dashboard') : '#';
 
     if ($currentRoute === 'admin.dashboard' && Route::has('admin.dashboard')) {
-        $breadcrumbs = [['label' => __('admin.dashboard'), 'url' => $dashboardRoute]];
+        $breadcrumbs = [['label' => 'Dashboard', 'url' => $dashboardRoute]];
     }
     elseif (str_starts_with($currentRoute ?? '', 'admin.categories') && Route::has('admin.categories')) {
         $breadcrumbs = [
-            ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
-            ['label' => __('admin.categories'), 'url' => route('admin.categories')]
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Categories', 'url' => route('admin.categories')]
         ];
         if (in_array($currentRoute, ['admin.categories.edit'])) {
-            $breadcrumbs[] = ['label' => __('admin.edit'), 'url' => '#'];
+            $breadcrumbs[] = ['label' => 'Edit', 'url' => '#'];
         }
     }
     elseif (str_starts_with($currentRoute ?? '', 'admin.locations') && Route::has('admin.locations')) {
         $breadcrumbs = [
-            ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
-            ['label' => __('admin.locations'), 'url' => route('admin.locations')]
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Locations', 'url' => route('admin.locations')]
         ];
     }
     elseif (str_starts_with($currentRoute ?? '', 'admin.users') && Route::has('admin.users')) {
         $breadcrumbs = [
-            ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
-            ['label' => __('admin.users'), 'url' => route('admin.users')]
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Users', 'url' => route('admin.users')]
         ];
+    }
+    elseif (str_starts_with($currentRoute ?? '', 'admin.blog.posts') && Route::has('admin.blog.posts.index')) {
+        $breadcrumbs = [
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Blogs', 'url' => route('admin.blog.posts.index')]
+        ];
+        if ($currentRoute === 'admin.blog.posts.create') {
+            $breadcrumbs[] = ['label' => 'Create', 'url' => '#'];
+        }
+        if ($currentRoute === 'admin.blog.posts.edit') {
+            $breadcrumbs[] = ['label' => 'Edit', 'url' => '#'];
+        }
     }
     elseif (str_starts_with($currentRoute ?? '', 'admin.reviews') && Route::has('admin.reviews')) {
         $breadcrumbs = [
-            ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
-            ['label' => __('admin.reviews'), 'url' => route('admin.reviews')]
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Reviews', 'url' => route('admin.reviews')]
         ];
         if ($currentRoute === 'admin.reviews.show' && Route::has('admin.reviews.show')) {
-            $breadcrumbs[] = ['label' => __('admin.view'), 'url' => '#'];
+            $breadcrumbs[] = ['label' => 'View', 'url' => '#'];
         }
     }
     elseif (str_starts_with($currentRoute ?? '', 'admin.comments') && Route::has('admin.comments')) {
         $breadcrumbs = [
-            ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
-            ['label' => __('admin.comments'), 'url' => route('admin.comments')]
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Comments', 'url' => route('admin.comments')]
         ];
         if ($currentRoute === 'admin.comments.show' && Route::has('admin.comments.show')) {
-            $breadcrumbs[] = ['label' => __('admin.view'), 'url' => '#'];
+            $breadcrumbs[] = ['label' => 'View', 'url' => '#'];
         }
     }
     elseif (str_starts_with($currentRoute ?? '', 'admin.visitors') && Route::has('admin.visitors')) {
         $breadcrumbs = [
-            ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
-            ['label' => __('admin.visitors'), 'url' => route('admin.visitors')]
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Analytics', 'url' => route('admin.visitors')]
         ];
     }
     elseif (str_starts_with($currentRoute ?? '', 'admin.activity_logs') && Route::has('admin.activity_logs')) {
         $breadcrumbs = [
-            ['label' => __('admin.dashboard'), 'url' => $dashboardRoute],
-            ['label' => __('admin.activity_logs'), 'url' => route('admin.activity_logs')]
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Activity Logs', 'url' => route('admin.activity_logs')]
         ];
     }
-    else {
-        $breadcrumbs = [['label' => __('admin.dashboard'), 'url' => $dashboardRoute]];
+    elseif (str_starts_with($currentRoute ?? '', 'admin.notifications') && Route::has('admin.notifications.index')) {
+        $breadcrumbs = [
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Notifications', 'url' => route('admin.notifications.index')]
+        ];
+        if ($currentRoute === 'admin.notifications.create') {
+            $breadcrumbs[] = ['label' => 'Create', 'url' => '#'];
+        }
     }
+    elseif (str_starts_with($currentRoute ?? '', 'admin.provider_activity_monitor') && Route::has('admin.provider_activity_monitor.index')) {
+        $breadcrumbs = [
+            ['label' => 'Dashboard', 'url' => $dashboardRoute],
+            ['label' => 'Provider Analytics', 'url' => route('admin.provider_activity_monitor.index')]
+        ];
+        if ($currentRoute === 'admin.provider_activity_monitor.show') {
+            $breadcrumbs[] = ['label' => 'Details', 'url' => '#'];
+        }
+    }
+    else {
+        $breadcrumbs = [['label' => 'Dashboard', 'url' => $dashboardRoute]];
+    }
+
+    $adminMenu = [
+        ['label' => 'Dashboard', 'icon' => 'fa-gauge-high', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
+        ['label' => 'Users', 'icon' => 'fa-users', 'route' => 'admin.users', 'active' => 'admin.users*'],
+        ['label' => 'Reviews', 'icon' => 'fa-star', 'route' => 'admin.reviews', 'active' => 'admin.reviews*'],
+        ['label' => 'Blogs', 'icon' => 'fa-newspaper', 'route' => 'admin.blog.posts.index', 'active' => 'admin.blog.posts*'],
+        ['label' => 'Notifications', 'icon' => 'fa-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications*'],
+        ['label' => 'Visitor Analytics', 'icon' => 'fa-chart-line', 'route' => 'admin.visitors', 'active' => 'admin.visitors*'],
+        ['label' => 'Provider Analytics', 'icon' => 'fa-briefcase', 'route' => 'admin.provider_activity_monitor.index', 'active' => 'admin.provider_activity_monitor*'],
+        ['label' => 'Categories', 'icon' => 'fa-folder-tree', 'route' => 'admin.categories', 'active' => 'admin.categories*'],
+        ['label' => 'Locations', 'icon' => 'fa-location-dot', 'route' => 'admin.locations', 'active' => 'admin.locations*'],
+        ['label' => 'Activity Logs', 'icon' => 'fa-clipboard-list', 'route' => 'admin.activity_logs', 'active' => 'admin.activity_logs*'],
+    ];
 @endphp
 
 {{-- @change 2026-04-14 TASK-5 | Removed admin top-bar notification scaffolding | Admin notifications now live on the dedicated page without navbar duplication | risk:LOW --}}
 <nav class="admin-top-bar" x-data="adminTopBar()" x-init="init()">
     <!-- Left Section -->
     <div class="admin-top-bar-left">
-        <!-- Sidebar Toggle -->
-        <button class="admin-toggle-btn" @click="toggleSidebar" aria-label="{{ __('admin.toggle_sidebar') }}">
-            <i class="fas fa-bars"></i>
-        </button>
+        <div class="admin-menu" x-data="{ open: false }">
+            <button class="admin-menu-btn" type="button" @click="open = !open" :class="{ 'active': open }" aria-label="Open admin menu">
+                <i class="fas fa-table-cells-large"></i>
+                <span>Admin Menu</span>
+                <i class="fas fa-chevron-down admin-menu-chevron" :class="{ 'rotate-180': open }"></i>
+            </button>
+            <div x-show="open" @click.away="open = false" @keydown.escape.window="open = false"
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 translate-y-1"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-1"
+                 class="admin-menu-dropdown">
+                @foreach($adminMenu as $item)
+                    @if(Route::has($item['route']))
+                        <a href="{{ route($item['route']) }}" class="admin-menu-item {{ request()->routeIs($item['active']) ? 'active' : '' }}">
+                            <i class="fas {{ $item['icon'] }}"></i>
+                            <span>{{ $item['label'] }}</span>
+                        </a>
+                    @endif
+                @endforeach
+            </div>
+        </div>
 
         <!-- Logo -->
         @if(Route::has('admin.dashboard'))
             <a href="{{ route('admin.dashboard') }}" class="admin-logo">
-                <img src="{{ asset('images/main-logo.png') }}" alt="Speeda" height="36">
+                <img src="{{ asset('images/New_logo.png') }}" alt="Speeda" height="36">
                 <span class="brand-name">Speeda</span>
             </a>
         @else
             <span class="admin-logo">
-                <img src="{{ asset('images/main-logo.png') }}" alt="Speeda" height="36">
+                <img src="{{ asset('images/New_logo.png') }}" alt="Speeda" height="36">
                 <span class="brand-name">Speeda</span>
             </span>
         @endif
@@ -120,7 +183,7 @@
                 </span>
                 <span class="user-info">
                     <span class="user-name">{{ $user->name ?? 'Admin' }}</span>
-                    <span class="user-role">{{ $user && $user->isAdmin() ? (__('admin.administrator') ?: 'Administrator') : (__('admin.moderator') ?: 'Moderator') }}</span>
+                    <span class="user-role">{{ $user && $user->isAdmin() ? 'Administrator' : 'Moderator' }}</span>
                 </span>
                 <i class="fas fa-chevron-down user-chevron" :class="{ 'rotate-180': open }"></i>
             </button>
@@ -149,7 +212,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item text-danger">
-                            <i class="fas fa-sign-out-alt"></i> {{ __('general.logout') ?: 'Logout' }}
+                            <i class="fas fa-sign-out-alt"></i> Logout
                         </button>
                     </form>
                 @endif
@@ -167,7 +230,7 @@
 
 :root {
     --admin-top-bar-height: 68px; /* Slightly slimmer for a more modern look */
-    --admin-sidebar-width: 280px;
+    --admin-sidebar-width: 0px;
     --top-bar-blur: 16px; /* Increased blur for premium glassmorphism */
     --dropdown-shadow: 0 25px 40px -10px rgba(0,0,0,0.08), 0 10px 15px -5px rgba(0,0,0,0.04);
     --accent-indigo-gradient: linear-gradient(135deg, #4f46e5, #6366f1); /* Subtle gradient for depth */
@@ -178,7 +241,7 @@
 /* === Top Bar Container === */
 .admin-top-bar {
     position: fixed;
-    left: var(--admin-sidebar-width);
+    left: 0;
     right: 0;
     top: 0;
     height: var(--admin-top-bar-height);
@@ -197,15 +260,7 @@
 
 [dir="rtl"] .admin-top-bar {
     left: 0;
-    right: var(--admin-sidebar-width);
-}
-
-.sidebar-collapsed .admin-top-bar {
-    left: 80px;
-}
-[dir="rtl"] .sidebar-collapsed .admin-top-bar {
-    right: 80px;
-    left: 0;
+    right: 0;
 }
 
 .admin-top-bar:hover {
@@ -221,7 +276,8 @@
 }
 
 /* Toggle Button */
-.admin-toggle-btn {
+.admin-toggle-btn,
+.admin-menu-btn {
     width: 44px;
     height: 44px;
     display: flex;
@@ -236,7 +292,17 @@
     cursor: pointer;
 }
 
-.admin-toggle-btn:hover {
+.admin-menu-btn {
+    width: auto;
+    gap: 0.55rem;
+    padding: 0 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.admin-toggle-btn:hover,
+.admin-menu-btn:hover,
+.admin-menu-btn.active {
     background: var(--accent-soft-indigo, #eef2ff);
     color: var(--accent-indigo, #4f46e5);
     border-color: var(--accent-indigo);
@@ -696,6 +762,55 @@
     }
 }
 
+.admin-menu {
+    position: relative;
+}
+
+.admin-menu-chevron {
+    font-size: 0.72rem;
+    transition: transform 0.2s ease;
+}
+
+.admin-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    z-index: 1200;
+    width: min(360px, calc(100vw - 2rem));
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: var(--dropdown-shadow);
+}
+
+.admin-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 44px;
+    padding: 0.7rem 0.75rem;
+    border-radius: 14px;
+    color: var(--text-primary);
+    font-size: 0.84rem;
+    font-weight: 800;
+    text-decoration: none !important;
+}
+
+.admin-menu-item i {
+    width: 18px;
+    color: #6366f1;
+}
+
+.admin-menu-item:hover,
+.admin-menu-item.active {
+    background: #eef2ff;
+    color: #4338ca;
+}
+
 @media (max-width: 768px) {
     .admin-top-bar {
         left: 0 !important;
@@ -731,18 +846,10 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('adminTopBar', () => ({
         sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
         init() {
-            window.addEventListener('toggle-sidebar', () => {
-                this.sidebarCollapsed = !this.sidebarCollapsed;
-                localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
-                document.body.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
-            });
-            document.body.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
+            document.body.classList.remove('sidebar-collapsed');
         },
         toggleSidebar() {
-            this.sidebarCollapsed = !this.sidebarCollapsed;
-            localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
-            document.body.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
-            window.dispatchEvent(new CustomEvent('sidebar-toggled', { detail: { collapsed: this.sidebarCollapsed } }));
+            return;
         }
     }));
 

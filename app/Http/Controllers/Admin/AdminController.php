@@ -12,8 +12,14 @@ use App\Models\Location;
 use App\Models\Category;
 use App\Models\Visitor;
 use App\Models\Review;
+use App\Models\Post;
+use App\Models\ServiceProvider;
+use App\Models\AdminNotification;
 use App\Models\User;
+use App\Services\CategoryCacheService;
+use App\Services\LocationCacheService;
 use App\Services\VisitorTrackingService;
+use App\Support\AdminAnalyticsExclusion;
 use App\Traits\LogsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +30,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 use App\Models\AdminLog;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -49,9 +56,100 @@ class AdminController extends Controller
             // Get visitor statistics
             $visitorStats = $this->visitorService->getStatistics();
 
+            // WhatsApp Analytics Calculations
+            $now = Carbon::now();
+            
+            $dailyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereDate('created_at', $now->toDateString())
+                ->count();
+
+            $yesterdayWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereDate('created_at', $now->copy()->subDay()->toDateString())
+                ->count();
+                
+            $dailyWhatsappTrend = $yesterdayWhatsappClicks > 0 
+                ? (($dailyWhatsappClicks - $yesterdayWhatsappClicks) / $yesterdayWhatsappClicks) * 100 
+                : ($dailyWhatsappClicks > 0 ? 100 : 0);
+
+            // Rolling 7-day window vs the previous 7-day window (equal length =
+            // a fair comparison; avoids the "partial current week vs full last
+            // week" distortion that always reads negative early in the period).
+            $weeklyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->where('created_at', '>=', $now->copy()->subDays(7))
+                ->count();
+
+            $lastWeekWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereBetween('created_at', [$now->copy()->subDays(14), $now->copy()->subDays(7)])
+                ->count();
+
+            $weeklyWhatsappTrend = $lastWeekWhatsappClicks > 0
+                ? (($weeklyWhatsappClicks - $lastWeekWhatsappClicks) / $lastWeekWhatsappClicks) * 100
+                : ($weeklyWhatsappClicks > 0 ? 100 : 0);
+
+            // Rolling 30-day window vs the previous 30-day window.
+            $monthlyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->where('created_at', '>=', $now->copy()->subDays(30))
+                ->count();
+
+            $lastMonthWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
+                ->whereBetween('created_at', [$now->copy()->subDays(60), $now->copy()->subDays(30)])
+                ->count();
+
+            $monthlyWhatsappTrend = $lastMonthWhatsappClicks > 0
+                ? (($monthlyWhatsappClicks - $lastMonthWhatsappClicks) / $lastMonthWhatsappClicks) * 100
+                : ($monthlyWhatsappClicks > 0 ? 100 : 0);
+
+            $totalWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')->count();
+
+            $mostClickedCategoryData = DB::table('analytics')
+                ->join('service_providers', 'analytics.provider_id', '=', 'service_providers.id')
+                ->join('categories', 'service_providers.category_id', '=', 'categories.id')
+                ->where('analytics.action_type', 'click_whatsapp')
+                ->tap(fn($q) => AdminAnalyticsExclusion::apply($q, 'analytics.user_id'))
+                ->select('categories.name_en as name', DB::raw('count(analytics.id) as total_clicks'))
+                ->groupBy('categories.id', 'categories.name_en')
+                ->orderByDesc('total_clicks')
+                ->first();
+                
+            $mostClickedCategory = null;
+            if ($mostClickedCategoryData) {
+                $mostClickedCategory = [
+                    'name' => $mostClickedCategoryData->name ?: 'Unknown',
+                    'clicks' => $mostClickedCategoryData->total_clicks,
+                    'percentage' => $totalWhatsappClicks > 0 
+                        ? round(($mostClickedCategoryData->total_clicks / $totalWhatsappClicks) * 100, 1) 
+                        : 0
+                ];
+            }
+
+            // Minimum views so the conversion-rate ranking is statistically
+            // meaningful (a 1-view/1-click provider should not outrank a
+            // 1000-view/400-click one). Falls back gracefully when data is sparse.
+            $minViewsForRanking = 10;
+
+            $topProvidersPerformance = DB::table('service_providers')
+                ->join('analytics', 'service_providers.id', '=', 'analytics.provider_id')
+                ->where('analytics.created_at', '>=', $now->copy()->subDays(30))
+                ->tap(fn($q) => AdminAnalyticsExclusion::apply($q, 'analytics.user_id'))
+                ->select('service_providers.id', 'service_providers.company_name',
+                    DB::raw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) as total_views'),
+                    DB::raw('SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) as total_whatsapp_clicks')
+                )
+                ->groupBy('service_providers.id', 'service_providers.company_name')
+                ->havingRaw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) >= ?', [$minViewsForRanking])
+                ->orderByRaw('(SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) / SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END)) DESC')
+                ->limit(5)
+                ->get()
+                ->map(function($provider) {
+                    $rate = ($provider->total_whatsapp_clicks / $provider->total_views) * 100;
+                    $provider->performance_rate = round($rate, 1);
+                    return $provider;
+                });
+
             $stats = [
                 'liveVisitors' => $visitorStats['live_visitors'] ?? 0,
                 'visitorsToday' => $this->getVisitorsToday(),
+                'visitorsThisMonth' => $this->getVisitorsThisMonth(),
                 'last7Days' => $visitorStats['last_7_days'] ?? 0,
                 'last30Days' => $visitorStats['last_30_days'] ?? 0,
                 'last12Months' => $visitorStats['last_12_months'] ?? 0,
@@ -61,13 +159,32 @@ class AdminController extends Controller
                 'totalLocations' => Location::count(),
                 'totalCategories' => Category::count(),
                 'totalUsers' => User::count(),
+                'totalProviders' => ServiceProvider::count(),
+                'totalClients' => User::where('role', 'client')->count(),
+                'totalBlogs' => Post::count(),
+                'notificationsSent' => AdminNotification::count(),
+                'activeNotifications' => AdminNotification::active()->count(),
                 // Pending moderation counts
                 'pendingReviews' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
                 'totalReviews' => Review::count(),
                 'newUsersToday' => User::whereDate('created_at', today())->count(),
             ];
 
-            return view('admin.dashboard', compact('stats'));
+            // Rich operations data (action center, KPIs+trends, funnel, feeds).
+            $dashboard = app(\App\Services\Admin\AdminDashboardService::class)->build();
+
+            return view('admin.dashboard', compact(
+                'stats',
+                'dashboard',
+                'dailyWhatsappClicks',
+                'dailyWhatsappTrend',
+                'weeklyWhatsappClicks',
+                'weeklyWhatsappTrend',
+                'monthlyWhatsappClicks',
+                'monthlyWhatsappTrend',
+                'mostClickedCategory',
+                'topProvidersPerformance'
+            ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             Log::error('Admin dashboard error: ' . $e->getMessage());
@@ -77,6 +194,7 @@ class AdminController extends Controller
             $stats = [
                 'liveVisitors' => 0,
                 'visitorsToday' => 0,
+                'visitorsThisMonth' => 0,
                 'last7Days' => 0,
                 'last30Days' => 0,
                 'last12Months' => 0,
@@ -86,11 +204,22 @@ class AdminController extends Controller
                 'totalLocations' => 0,
                 'totalCategories' => 0,
                 'totalUsers' => 0,
+                'totalProviders' => 0,
+                'totalClients' => 0,
+                'totalBlogs' => 0,
+                'notificationsSent' => 0,
+                'activeNotifications' => 0,
                 'pendingReviews' => 0,
                 'totalReviews' => 0,
                 'newUsersToday' => 0,
             ];
-            return view('admin.dashboard', compact('stats'));
+            $dashboard = [
+                'action_center' => ['items' => [], 'total' => 0],
+                'kpis' => [], 'funnel' => [], 'visitor_trend' => ['labels' => [], 'values' => []],
+                'profile_health' => [], 'top_providers' => [], 'top_categories' => [],
+                'recent_signups' => [], 'recent_reviews' => [], 'recent_admin_actions' => [],
+            ];
+            return view('admin.dashboard', compact('stats', 'dashboard'));
         }
     }
 
@@ -99,9 +228,48 @@ class AdminController extends Controller
      */
     private function getVisitorsToday(): int
     {
-        return Visitor::whereDate('visited_at', today())
-            ->selectRaw('DISTINCT ip_hash, user_agent_hash')
-            ->count();
+        $canadaNow = Carbon::now(config('app.timezone', 'America/Toronto'));
+
+        return (int) Visitor::whereBetween('visited_at', [
+                $canadaNow->copy()->startOfDay(),
+                $canadaNow->copy()->endOfDay(),
+            ])
+            ->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhereDoesntHave('user', fn ($q) => $q->where('role', 'admin'));
+            })
+            ->selectRaw($this->uniqueVisitorExpression() . ' as aggregate')
+            ->value('aggregate');
+    }
+
+    /**
+     * Get visitors for the current Canadian calendar month.
+     */
+    private function getVisitorsThisMonth(): int
+    {
+        $canadaNow = Carbon::now(config('app.timezone', 'America/Toronto'));
+
+        return (int) Visitor::whereBetween('visited_at', [
+                $canadaNow->copy()->startOfMonth(),
+                $canadaNow->copy()->endOfMonth(),
+            ])
+            ->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhereDoesntHave('user', fn ($q) => $q->where('role', 'admin'));
+            })
+            ->selectRaw($this->uniqueVisitorExpression() . ' as aggregate')
+            ->value('aggregate');
+    }
+
+    /**
+     * Driver-portable "distinct (ip_hash, user_agent_hash)" count expression.
+     * MySQL supports multi-column COUNT(DISTINCT ...); SQLite does not.
+     */
+    private function uniqueVisitorExpression(): string
+    {
+        return DB::connection()->getDriverName() === 'mysql'
+            ? 'COUNT(DISTINCT ip_hash, user_agent_hash)'
+            : "COUNT(DISTINCT ip_hash || '|' || user_agent_hash)";
     }
 
     /**
@@ -111,7 +279,7 @@ class AdminController extends Controller
     {
         try {
             // Show all locations to admin (active + inactive), ordering active ones first
-            $locations = Location::orderByDesc('is_active')->orderBy('city')->paginate(20);
+            $locations = Location::orderByDesc('is_active')->orderBy('city')->paginate(20)->withQueryString();
             return view('admin.locations.index', compact('locations'));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -405,9 +573,7 @@ class AdminController extends Controller
 
                 $log = $this->logAction('create', $category);
                 $this->clearApplicationCaches();
-                Cache::forget('categories:tree');
-                Cache::forget('categories:sections');
-                Cache::forget('categories:active');
+
 
                 $this->flashSuccessWithUndo(__('admin.category_created_successfully'), $log);
 
@@ -432,7 +598,7 @@ class AdminController extends Controller
                 $oldValues = $category->getOriginal();
                 
                 // Prevent setting parent to itself
-                if ($validated['parent_id'] && $validated['parent_id'] == $category->id) {
+                if (($validated['parent_id'] ?? null) && $validated['parent_id'] == $category->id) {
                     throw new \Exception(__('admin.cannot_set_self_as_parent'));
                 }
 
@@ -487,9 +653,7 @@ class AdminController extends Controller
 
                 $log = $this->logUpdate($category, $oldValues);
                 $this->clearApplicationCaches();
-                Cache::forget('categories:tree');
-                Cache::forget('categories:sections');
-                Cache::forget('categories:active');
+
 
                 $this->flashSuccessWithUndo(__('admin.category_updated_successfully'), $log);
 
@@ -603,9 +767,7 @@ class AdminController extends Controller
 
             // Clear category-specific caches
             $this->clearApplicationCaches();
-            Cache::forget('categories:tree');
-            Cache::forget('categories:sections');
-            Cache::forget('categories:active');
+
 
             // Log the action
             Log::info('Category status toggled by admin', [
@@ -665,18 +827,45 @@ class AdminController extends Controller
     }
 
     /**
-     * Display list of all users with status management
+     * Display list of all users with search, role filter, status filter, and sorting
      */
-    public function users()
+    public function users(Request $request)
     {
         try {
-            $users = User::with('serviceProvider')
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
+            $allowedSortFields = ['name', 'email', 'role', 'is_active', 'created_at'];
+            $sortField = in_array($request->get('sortField', 'created_at'), $allowedSortFields)
+                ? $request->get('sortField', 'created_at') : 'created_at';
+            $sortDirection = $request->get('sortDirection', 'desc') === 'asc' ? 'asc' : 'desc';
 
-            // Stats for dashboard - with safe checks for is_active column
+            $query = User::with('serviceProvider');
+
+            // Search filter
+            if ($search = $request->get('search')) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%');
+                });
+            }
+
+            // Role filter
+            if ($role = $request->get('role')) {
+                $query->where('role', $role);
+            }
+
+            // Status filter
+            if ($status = $request->get('status')) {
+                $hasActiveColumn = Schema::hasColumn('users', 'is_active');
+                if ($hasActiveColumn) {
+                    $query->where('is_active', $status === 'active');
+                }
+            }
+
+            $users = $query->orderBy($sortField, $sortDirection)
+                 ->paginate(20)
+                 ->withQueryString();
+
+            // Stats
             $hasActiveColumn = Schema::hasColumn('users', 'is_active');
-            
             $stats = [
                 'total' => User::count(),
                 'active' => $hasActiveColumn ? User::where('is_active', true)->count() : User::count(),
@@ -841,6 +1030,88 @@ class AdminController extends Controller
     }
 
     /**
+     * Display soft deleted users
+     */
+    public function usersTrash()
+    {
+        $users = User::onlyTrashed()->latest()->paginate(20)->withQueryString();
+        return view('admin.users.trash', compact('users'));
+    }
+
+    /**
+     * Edit user data and role
+     */
+    public function editUser(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    /**
+     * Update user data and role
+     */
+    public function updateUser(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'required|in:admin,client,service_provider',
+            'is_active' => 'boolean',
+        ]);
+
+        $user->update($request->only('name', 'email', 'role', 'is_active'));
+
+        ErrorHelper::flashNotification(__('admin.user_updated_successfully'), 'success');
+        return redirect()->route('admin.users');
+    }
+
+    /**
+     * Restore a soft deleted user
+     */
+    public function restoreUser($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+
+        ErrorHelper::flashNotification(__('admin.user_restored_successfully'), 'success');
+        return redirect()->back();
+    }
+
+    /**
+     * Permanently delete a user
+     */
+    public function forceDeleteUser($id)
+    {
+        try {
+            DB::transaction(function () use ($id) {
+                $user = User::withTrashed()->findOrFail($id);
+                
+                if ($user->id === auth()->id()) {
+                    throw new \Exception(__('admin.cannot_delete_yourself'));
+                }
+
+                // Cleanup related data (similar to deleteUser logic but for force delete)
+                if ($user->isServiceProvider()) {
+                    $provider = $user->serviceProvider;
+                    if ($provider) {
+                        $provider->reviews()->delete();
+                        $provider->endorsements()->delete();
+                        $provider->delete();
+                    }
+                }
+
+                $user->forceDelete();
+            });
+
+            ErrorHelper::flashNotification(__('admin.user_permanently_deleted'), 'success');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back();
+        }
+    }
+
+    /**
      * Flash success message with undo link
      */
     protected function flashSuccessWithUndo(string $message, AdminLog $log)
@@ -878,6 +1149,10 @@ class AdminController extends Controller
             Artisan::call('route:clear');
             Artisan::call('config:clear');
             Artisan::call('cache:clear');
+
+            // PERFORMANCE: Invalidate category and location caches
+            app(CategoryCacheService::class)->invalidateCache();
+            app(LocationCacheService::class)->invalidateCache();
         } catch (\Exception $e) {
             Log::warning('Failed to clear application caches', [
                 'error' => $e->getMessage(),

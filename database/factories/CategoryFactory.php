@@ -4,75 +4,79 @@ namespace Database\Factories;
 
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
- */
 class CategoryFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Category::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
+        $name = fake()->unique()->randomElement([
+            'Electrician', 'Plumber', 'Carpenter', 'Painter', 'Roofer',
+            'HVAC Technician', 'Landscaper', 'Cleaner', 'Mechanic',
+        ]);
+
         return [
-            'name' => fake()->randomElement([
-                'Car Mechanics',
-                'House Cleaning',
-                'Electricians',
-                'Plumbing',
-                'HVAC Services',
-                'Landscaping',
-                'Painting',
-                'Carpentry',
-                'IT Support',
-                'Appliance Repair'
-            ]),
+            'name' => $name,
+            'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 999),
             'description' => fake()->sentence(),
-            'icon' => fake()->randomElement(['🔧', '🏠', '⚡', '🔌', '❄️', '🌱', '🎨', '🔨', '💻', '🔧']),
+            'icon' => fake()->randomElement(['fas fa-tools', 'fas fa-home', 'fas fa-bolt']),
+            'color' => fake()->hexColor(),
             'is_active' => true,
+            'is_section' => false,
             'sort_order' => fake()->numberBetween(1, 100),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'parent_id' => null,
         ];
     }
 
-    /**
-     * Create an active category.
-     */
-    public function active(): static
+    public function section(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_active' => true,
+        return $this->state(fn(array $attrs) => [
+            'name' => fake()->unique()->randomElement([
+                'Construction', 'Home Maintenance', 'Professional Services',
+                'Technology', 'Moving & Transport',
+            ]),
+            'is_section' => true,
+            'parent_id' => null,
+            'sort_order' => fake()->numberBetween(1, 10),
         ]);
     }
 
-    /**
-     * Create an inactive category.
-     */
+    public function group(int $sectionId): static
+    {
+        return $this->state(fn(array $attrs) => [
+            'name' => fake()->unique()->randomElement([
+                'Electrical Work', 'Plumbing', 'Carpentry', 'Painting',
+                'HVAC', 'Roofing', 'Landscaping', 'Cleaning',
+            ]),
+            'is_section' => false,
+            'parent_id' => $sectionId,
+            'sort_order' => fake()->numberBetween(1, 50),
+        ]);
+    }
+
+    public function profession(int $groupId): static
+    {
+        return $this->state(fn(array $attrs) => [
+            'name' => fake()->unique()->randomElement([
+                'Electrician', 'Plumber', 'Carpenter', 'Painter', 'Roofer',
+                'HVAC Tech', 'Landscaper', 'House Cleaner',
+                'Solar Installer', 'Smart Home Tech', 'Interior Painter',
+            ]),
+            'is_section' => false,
+            'parent_id' => $groupId,
+            'sort_order' => fake()->numberBetween(1, 100),
+        ]);
+    }
+
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_active' => false,
-        ]);
+        return $this->state(fn() => ['is_active' => false]);
     }
 
-    /**
-     * Create with specific name.
-     */
-    public function withName(string $name): static
+    public function named(string $name): static
     {
-        return $this->state(fn (array $attributes) => [
-            'name' => $name,
-        ]);
+        return $this->state(fn() => ['name' => $name, 'slug' => Str::slug($name)]);
     }
 }

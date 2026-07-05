@@ -629,6 +629,36 @@
         .sp-notif__empty-text { font-weight: 600; font-size: 0.9375rem; color: var(--text-secondary); }
         .sp-notif__empty-sub { font-size: 0.8125rem; margin-top: var(--space-1); }
 
+        .sp-notif__footer {
+            display: flex;
+            justify-content: center;
+            padding: var(--space-4) var(--space-5);
+            border-top: 1px solid var(--border-default);
+            background: var(--surface-subtle);
+        }
+
+        .sp-notif__view-all {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--primary-600);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+
+        .sp-notif__view-all:hover {
+            background: var(--primary-50);
+            color: var(--primary-700);
+        }
+
+        .sp-notif__view-all i {
+            font-size: 0.8125rem;
+        }
+
         .sp-scroll-progress { position: fixed; top: 0; left: 0; z-index: 9999; width: 0%; height: 3px; background: var(--gradient-primary); box-shadow: 0 0 12px rgba(99, 102, 241, 0.5); transition: width 0.1s linear; }
 
         .sp-theme-toggle { position: relative; width: 56px; height: 32px; padding: 3px; background: var(--surface-subtle); border: 2px solid var(--border-default); border-radius: var(--radius-full); cursor: pointer; transition: all var(--transition-base); }
@@ -948,7 +978,7 @@
                 const originalHTML = btnElement?.innerHTML;
                 try {
                     if (btnElement) {
-                        btnElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> جارٍ...';
+                        btnElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> {{ __('general.loading') }}';
                         btnElement.disabled = true;
                     }
                     const res = await fetch('{{ route("notifications.mark-as-read") }}', {
@@ -1101,7 +1131,6 @@
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     if (nav.classList.contains('is-open')) { toggleMenu(); toggle?.focus(); }
-                    if (notifDropdown?.getAttribute('aria-hidden') === 'false') notifTrigger?.focus();
                 }
             });
         });
@@ -1113,37 +1142,50 @@
 <nav class="sp-nav" role="navigation" aria-label="{{ __('general.main_navigation') }}">
     <div class="sp-nav__inner">
         <a class="sp-brand" href="{{ route('home') }}" aria-label="{{ config('app.name', 'Speeda') }} - {{ __('general.home') }}">
-            <img class="sp-brand__img" src="{{ asset('images/main-logo.png') }}" alt="{{ config('app.name', 'Speeda') }}" loading="eager">
+            <img class="sp-brand__img" src="{{ asset('images/New_logo.png') }}" alt="{{ config('app.name', 'Speeda') }}" loading="eager">
         </a>
 
-        @if($isServiceProvider && isset($activeNotifications))
+        @if($isServiceProvider)
             <div class="sp-notif sp-notif--mobile {{ $hasUnread ? 'sp-notif--unread' : '' }}">
-                <button class="sp-notif__trigger js-notif-trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false">
+                <button class="sp-notif__trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false" aria-haspopup="true">
                     <i class="fas fa-bell" aria-hidden="true"></i>
-                    <span class="sp-notif__badge js-notif-badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
+                    <span class="sp-notif__badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
                 </button>
-
-                <div class="sp-notif__dropdown js-notif-dropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
+                <div class="sp-notif__dropdown" aria-hidden="true">
                     <div class="sp-notif__header">
                         <div class="sp-notif__header-left">
-                            <i class="fas fa-bell" aria-hidden="true"></i> {{ __('admin.notifications') }}
+                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            <span>{{ __('admin.notifications') }}</span>
+                            @if($unreadCount > 0)
+                                <span class="sp-notif__header-count">{{ $unreadCount }}</span>
+                            @endif
                         </div>
-                        @if($hasUnread)
-                            <span class="sp-notif__header-count js-notif-header-count">{{ $unreadCount }} {{ __('general.new') }}</span>
-                            <button class="sp-notif__footer-btn js-mark-read-btn" type="button">
-                                <i class="fas fa-check-double" aria-hidden="true"></i> {{ __('general.mark_all_read') }}
+                        @if($unreadCount > 0)
+                            <button type="button" class="sp-notif__footer-btn mark-all-read-btn">
+                                <i class="fas fa-check-double" aria-hidden="true"></i>
+                                {{ __('general.mark_all_read') }}
                             </button>
                         @endif
                     </div>
-                    <div class="sp-notif__list js-notif-list">
+                    <div class="sp-notif__list">
                         @forelse($activeNotifications as $notif)
-                            <div class="sp-notif__item {{ (!in_array($notif->id, $readIds)) ? 'sp-notif__item--unread' : '' }}" data-notif-title="{{ $notif->title }}" data-notif-message="{{ $notif->message }}" data-notif-time="{{ $notif->created_at->diffForHumans() }}">
+                            @php $isRead = in_array($notif->id, $readNotificationIds); @endphp
+                            <div class="sp-notif__item {{ $isRead ? '' : 'sp-notif__item--unread' }}" 
+                                 role="button"
+                                 tabindex="0"
+                                 data-notif-id="{{ $notif->id }}"
+                                 data-notif-title="{{ $notif->title }}"
+                                 data-notif-message="{{ $notif->message }}"
+                                 data-notif-time="{{ $notif->created_at->diffForHumans() }}">
                                 <div class="sp-notif__title">
-                                    @if(!in_array($notif->id, $readIds))<span class="sp-notif__dot" aria-hidden="true"></span>@endif
-                                    {{ $notif->title }}
+                                    @if(!$isRead)<span class="sp-notif__dot" aria-hidden="true"></span>@endif
+                                    <span>{{ Str::limit($notif->title, 50) }}</span>
                                 </div>
-                                <div class="sp-notif__message">{{ Str::limit($notif->message, 120) }}</div>
-                                <div class="sp-notif__time"><i class="fas fa-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</div>
+                                <div class="sp-notif__message">{{ Str::limit($notif->message, 80) }}</div>
+                                <div class="sp-notif__time">
+                                    <i class="fas fa-clock" aria-hidden="true"></i>
+                                    {{ $notif->created_at->diffForHumans() }}
+                                </div>
                             </div>
                         @empty
                             <div class="sp-notif__empty">
@@ -1152,6 +1194,12 @@
                                 <div class="sp-notif__empty-sub">{{ __('general.all_caught_up') }}</div>
                             </div>
                         @endforelse
+                    </div>
+                    <div class="sp-notif__footer">
+                        <a href="{{ route('notifications.index') }}" class="sp-notif__view-all">
+                            <i class="fas fa-list" aria-hidden="true"></i>
+                            {{ __('general.view_all_notifications') }}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1179,34 +1227,47 @@
             <div class="sp-actions">
                 @include('components.language-switcher')
 
-                @if($isServiceProvider && isset($activeNotifications))
+                @if($isServiceProvider)
                     <div class="sp-notif sp-notif--desktop {{ $hasUnread ? 'sp-notif--unread' : '' }}">
-                        <button class="sp-notif__trigger js-notif-trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false">
+                        <button class="sp-notif__trigger" type="button" aria-label="{{ __('admin.notifications') }}{{ $hasUnread ? ' (' . $unreadCount . ' ' . __('general.new') . ')' : '' }}" aria-expanded="false" aria-haspopup="true">
                             <i class="fas fa-bell" aria-hidden="true"></i>
-                            <span class="sp-notif__badge js-notif-badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
+                            <span class="sp-notif__badge" @if(!$hasUnread) hidden @endif>{{ $unreadCount }}</span>
                         </button>
-
-                        <div class="sp-notif__dropdown js-notif-dropdown" role="region" aria-label="{{ __('admin.notifications') }}" aria-hidden="true">
+                        <div class="sp-notif__dropdown" aria-hidden="true">
                             <div class="sp-notif__header">
                                 <div class="sp-notif__header-left">
-                                    <i class="fas fa-bell" aria-hidden="true"></i> {{ __('admin.notifications') }}
+                                    <i class="fas fa-bell" aria-hidden="true"></i>
+                                    <span>{{ __('admin.notifications') }}</span>
+                                    @if($unreadCount > 0)
+                                        <span class="sp-notif__header-count">{{ $unreadCount }}</span>
+                                    @endif
                                 </div>
-                                @if($hasUnread)
-                                    <span class="sp-notif__header-count js-notif-header-count">{{ $unreadCount }} {{ __('general.new') }}</span>
-                                    <button class="sp-notif__footer-btn js-mark-read-btn" type="button">
-                                        <i class="fas fa-check-double" aria-hidden="true"></i> {{ __('general.mark_all_read') }}
+                                @if($unreadCount > 0)
+                                    <button type="button" class="sp-notif__footer-btn mark-all-read-btn">
+                                        <i class="fas fa-check-double" aria-hidden="true"></i>
+                                        {{ __('general.mark_all_read') }}
                                     </button>
                                 @endif
                             </div>
-                            <div class="sp-notif__list js-notif-list">
+                            <div class="sp-notif__list">
                                 @forelse($activeNotifications as $notif)
-                                    <div class="sp-notif__item {{ (!in_array($notif->id, $readIds)) ? 'sp-notif__item--unread' : '' }}" data-notif-title="{{ $notif->title }}" data-notif-message="{{ $notif->message }}" data-notif-time="{{ $notif->created_at->diffForHumans() }}">
+                                    @php $isRead = in_array($notif->id, $readNotificationIds); @endphp
+                                    <div class="sp-notif__item {{ $isRead ? '' : 'sp-notif__item--unread' }}" 
+                                         role="button"
+                                         tabindex="0"
+                                         data-notif-id="{{ $notif->id }}"
+                                         data-notif-title="{{ $notif->title }}"
+                                         data-notif-message="{{ $notif->message }}"
+                                         data-notif-time="{{ $notif->created_at->diffForHumans() }}">
                                         <div class="sp-notif__title">
-                                            @if(!in_array($notif->id, $readIds))<span class="sp-notif__dot" aria-hidden="true"></span>@endif
-                                            {{ $notif->title }}
+                                            @if(!$isRead)<span class="sp-notif__dot" aria-hidden="true"></span>@endif
+                                            <span>{{ Str::limit($notif->title, 50) }}</span>
                                         </div>
-                                        <div class="sp-notif__message">{{ Str::limit($notif->message, 120) }}</div>
-                                        <div class="sp-notif__time"><i class="fas fa-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</div>
+                                        <div class="sp-notif__message">{{ Str::limit($notif->message, 80) }}</div>
+                                        <div class="sp-notif__time">
+                                            <i class="fas fa-clock" aria-hidden="true"></i>
+                                            {{ $notif->created_at->diffForHumans() }}
+                                        </div>
                                     </div>
                                 @empty
                                     <div class="sp-notif__empty">
@@ -1215,6 +1276,12 @@
                                         <div class="sp-notif__empty-sub">{{ __('general.all_caught_up') }}</div>
                                     </div>
                                 @endforelse
+                            </div>
+                            <div class="sp-notif__footer">
+                                <a href="{{ route('notifications.index') }}" class="sp-notif__view-all">
+                                    <i class="fas fa-list" aria-hidden="true"></i>
+                                    {{ __('general.view_all_notifications') }}
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -1230,15 +1297,15 @@
                     </div>
 
                     @if($provider)
-                        <a href="{{ route('service-providers.show', $provider) }}" class="sp-btn sp-btn--primary" @if(request()->url() === route('service-providers.show', $provider)) aria-current="page" @endif>
+                        <a href="{{ route('service-providers.show', $provider) }}" class="sp-btn sp-btn--primary text-white" @if(request()->url() === route('service-providers.show', $provider)) aria-current="page" @endif>
                             <i class="fas fa-id-card" aria-hidden="true"></i> {{ __('general.my_profile') }}
                         </a>
                     @elseif($user->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="sp-btn sp-btn--primary">
+                        <a href="{{ route('admin.dashboard') }}" class="sp-btn sp-btn--primary text-white">
                             <i class="fas fa-tachometer-alt" aria-hidden="true"></i> {{ __('admin.dashboard') }}
                         </a>
                     @else
-                        <a href="{{ route('dashboard') }}" class="sp-btn sp-btn--primary">
+                        <a href="{{ route('dashboard') }}" class="sp-btn sp-btn--primary text-white">
                             <i class="fas fa-tachometer-alt" aria-hidden="true"></i> {{ __('general.dashboard') }}
                         </a>
                     @endif
@@ -1250,11 +1317,11 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}?tab=login" class="sp-btn sp-btn--primary">
+                    <a href="{{ route('login') }}?tab=login" class="sp-btn sp-btn--primary text-white">
                         <i class="fas fa-sign-in-alt" aria-hidden="true"></i> {{ __('general.login') }}
                     </a>
                     @guest
-                        <a href="{{ route('login') }}?tab=register" class="sp-btn sp-btn--primary">
+                        <a href="{{ route('login') }}?tab=register" class="sp-btn sp-btn--primary text-white">
                             <i class="fas fa-user-plus" aria-hidden="true"></i> {{ __('general.register') }}
                         </a>
                     @endguest
@@ -1263,7 +1330,6 @@
         </div>
     </div>
 </nav>
-
 <!-- Notification Detail Modal -->
 <div class="modal fade" id="notifDetailModal" tabindex="-1" aria-labelledby="notifDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1285,3 +1351,4 @@
         </div>
     </div>
 </div>
+

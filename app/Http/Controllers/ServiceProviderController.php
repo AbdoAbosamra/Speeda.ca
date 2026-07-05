@@ -14,8 +14,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Actions\CalculateProfileCompletionAction;
 use App\Actions\TrackProviderViewAction;
+use App\Services\CategoryCacheService;
 use App\Services\FacebookConversionService;
+use App\Services\LocationCacheService;
 use App\Services\LocationClusterService;
+use App\Support\MergedCategoryFilters;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ServiceProviderController extends Controller
@@ -23,7 +26,7 @@ class ServiceProviderController extends Controller
     /**
      * Display a listing of service providers (public index page)
      */
-    public function index(Request $request)
+    public function index(Request $request, \App\Domain\SEO\Services\SeoMetaService $seoService)
     {
         if ($request->input('category') === 'construction-services') {
             $redirectParams = $request->query();
@@ -32,18 +35,27 @@ class ServiceProviderController extends Controller
             return redirect()->route('service-providers.index', $redirectParams)->setStatusCode(301);
         }
 
+        // Apply SEO
+        if ($request->filled('search') || $request->filled('city')) {
+            $seoService->apply('search');
+        } elseif ($request->filled('category')) {
+            $cat = Category::resolveFilterValue($request->input('category'));
+            $seoService->apply('category', $cat);
+        } else {
+            $seoService->apply('category');
+        }
+
         // Eager-load Spatie media to avoid N+1 queries in provider cards.
+        // PERFORMANCE: Use withExists for endorsement check to avoid N+1 in view loop
+        // PERFORMANCE: Use cached calculated_rating column instead of live subquery
         $query = ServiceProvider::with(['user', 'category.parent.parent', 'location', 'media'])
             ->withCount(['activeReviews as reviews_count', 'endorsements as endorsements_count'])
-            // Calculate live average rating from active reviews (SINGLE QUERY PER PROVIDER)
-            ->selectRaw(
-                'service_providers.*,
-                COALESCE(
-                    (SELECT AVG(rating) FROM service_provider_reviews
-                     WHERE service_provider_id = service_providers.id AND is_active = true),
-                    0
-                ) as live_rating'
-            );
+            ->when(auth()->check() && auth()->user()->isClient(), function ($q) {
+                // PERFORMANCE: Preload whether current user has endorsed each provider (avoids N+1)
+                $q->withExists(['endorsements as is_endorsed' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                }]);
+            });
 
         // Only show providers whose users are active
         $query->whereHas('user', function ($userQuery) {
@@ -63,32 +75,44 @@ class ServiceProviderController extends Controller
             });
         }
 
-        // Category filter
+        // Category filter (supports merged filter options that span several categories)
         if ($request->filled('category')) {
-            $selectedCategory = Category::resolveFilterValue($request->input('category'));
+            $categoryValue = (string) $request->input('category');
 
-            if ($selectedCategory) {
-                $query->whereIn('category_id', $selectedCategory->providerCategoryIds());
+            if (MergedCategoryFilters::isMergedKey($categoryValue)) {
+                $query->whereIn('category_id', MergedCategoryFilters::providerCategoryIds($categoryValue));
             } else {
-                $query->whereNull('id');
+                $selectedCategory = Category::resolveFilterValue($categoryValue);
+
+                if ($selectedCategory) {
+                    $query->whereIn('category_id', $selectedCategory->providerCategoryIds());
+                } else {
+                    $query->whereNull('id');
+                }
             }
         }
 
         // Location filter — with cluster mapping
         // @change 2026-04-12 TASK-3 | Switched public location filter to two named clusters with legacy ID fallback | Restrict dropdown choices without breaking existing cluster resolution | risk:LOW
-        $locationClusters = [
-            'cluster_montreal' => 'Laval – Montréal',
-            'cluster_ottawa' => 'Ottawa – Gatineau',
-        ];
+        // @change 2026-06-07 | Added 6 Ontario GTA clusters to public listing filter | risk:LOW
+        $clusterService = app(LocationClusterService::class);
+        $locationClusters = $clusterService->getPublicFilterClusters();
 
+
+        // @change 2026-06-28 | Location filter now also matches providers' added service areas | risk:LOW
+        $activeLocationIds = [];
         if ($request->filled('location')) {
             $selectedLocation = (string) $request->input('location');
-            $clusterService = app(LocationClusterService::class);
 
             if (array_key_exists($selectedLocation, $locationClusters)) {
                 $clusterIds = $clusterService->getClusterIdsByKey($selectedLocation);
             } elseif (ctype_digit($selectedLocation)) {
-                $clusterIds = $clusterService->getClusterIds((int) $selectedLocation);
+                // @change 2026-05-04 | Added exact_location bypass to support individual city selection from homepage without clustering | risk:LOW
+                if ($request->filled('exact_location')) {
+                    $clusterIds = [(int) $selectedLocation];
+                } else {
+                    $clusterIds = $clusterService->getClusterIds((int) $selectedLocation);
+                }
             } else {
                 $clusterIds = [];
             }
@@ -96,26 +120,46 @@ class ServiceProviderController extends Controller
             if (empty($clusterIds)) {
                 $query->whereNull('id');
             } else {
-                $query->whereIn('location_id', $clusterIds);
+                $activeLocationIds = array_values(array_unique(array_map('intval', $clusterIds)));
+                // Match providers based here OR available here through an added service area.
+                $query->availableInLocations($activeLocationIds);
             }
         }
 
-        // Order by LIVE rating (from subquery) instead of stored rating
-        $serviceProviders = $query->orderByRaw('live_rating DESC')
-            ->orderBy('views', 'desc')
+        // Flag providers that match ONLY through an added service area, so the card
+        // can show an "available in this area" badge (avoids N+1 with a single subquery).
+        if (!empty($activeLocationIds)) {
+            $query->withExists(['serviceAreas as is_available_area' => function ($q) use ($activeLocationIds) {
+                $q->whereIn('location_id', $activeLocationIds)->where('is_active', true);
+            }]);
+        }
+
+        // Display priority (applies to the default listing AND every filtered result,
+        // since all filters are applied to $query before this ordering):
+        //   1. Has a photo AND stars (rating)      → highest priority
+        //   2. Has a photo AND years of experience
+        //   3. Has a photo (only)                  → still above photo-less providers
+        //   Ties are broken by most views, then by registration seniority (oldest first).
+        $serviceProviders = $query
+            ->orderByRaw("CASE
+                WHEN profile_image IS NOT NULL AND profile_image != '' AND calculated_rating > 0 THEN 3
+                WHEN profile_image IS NOT NULL AND profile_image != '' AND experience_years > 0 THEN 2
+                WHEN profile_image IS NOT NULL AND profile_image != '' THEN 1
+                ELSE 0
+            END DESC")
+            ->orderByDesc('views')
+            ->orderBy('created_at')
             ->paginate(12)
             ->withQueryString();
 
-        $categories = Category::with('children')
-            ->filterGroups()
-            ->get()
-            ->sortBy('translated_name')
-            ->values();
+        // PERFORMANCE: Use cached categories from Redis (24h TTL)
+        // Merge the configured categories (e.g. renovation/construction) into a single option.
+        $categories = MergedCategoryFilters::apply(app(CategoryCacheService::class)->getFilterGroups());
 
         // Get list of revealed contacts from session
         $revealedContacts = session('revealed_contacts', []);
 
-        return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts'));
+        return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts', 'activeLocationIds'));
     }
 
     /**
@@ -135,14 +179,9 @@ class ServiceProviderController extends Controller
             // Eager load relationships
             $serviceProvider->loadMissing(['user', 'category.parent.parent', 'location']);
 
-            // Get all locations for dropdown
-            $locations = Location::orderBy('city')->get();
-
-            // Get all child categories (all 55 professions)
-            $categories = Category::with('parent.parent')
-                ->terminal()
-                ->orderBy('name')
-                ->get();
+            // PERFORMANCE: Use cached locations and categories from Redis (24h TTL)
+            $locations = app(LocationCacheService::class)->getAllLocations();
+            $categories = app(CategoryCacheService::class)->getTerminalCategories();
 
             // Check if user is owner (always true for this route)
             $isOwner = true;
@@ -181,14 +220,12 @@ class ServiceProviderController extends Controller
         }
     }
 
-    /**
-     * Display the specified service provider's profile (public view)
-     * Anyone can view but only owner can edit
-     */
-    // @change 2026-04-12 TASK-1 | Added public gallery eager loading and view variables | Allow non-providers to view the gallery | risk:LOW
-    public function show(Request $request, ServiceProvider $serviceProvider)
+    public function show(Request $request, ServiceProvider $serviceProvider, \App\Domain\SEO\Services\SeoMetaService $seoService)
     {
         try {
+            // Apply SEO
+            $seoService->apply('provider', $serviceProvider);
+
             // Check if the service provider's user is active
             $user = $serviceProvider->user;
             if ($user && !$user->is_active) {
@@ -196,8 +233,11 @@ class ServiceProviderController extends Controller
                 abort(404, __('service_provider.account_disabled'));
             }
 
-            // Increment views only if not the owner
-            if (!auth()->check() || auth()->id() !== $serviceProvider->user_id) {
+            // Increment views only for real visitors, not owners or admins monitoring the site.
+            $isAdmin = auth()->check() && auth()->user()->isAdmin();
+            $isOwner = auth()->check() && auth()->id() === $serviceProvider->user_id;
+
+            if (!$isAdmin && !$isOwner) {
                 DB::table('service_providers')
                     ->where('id', $serviceProvider->id)
                     ->increment('views');
@@ -267,8 +307,15 @@ class ServiceProviderController extends Controller
                 'activeReviews.client',
                 'activeReviews.approvedBy',
                 'endorsements',
+                'serviceAreas',
                 'media' => function($q) { $q->where('collection_name', 'gallery'); }
             ]);
+
+            // Location IDs the owner has marked as available (for the edit form pre-selection).
+            $serviceAreaLocationIds = $serviceProvider->serviceAreaLocationIds();
+
+            // Only offer regions that are reachable through the public location filter.
+            $serviceAreaLocations = app(LocationClusterService::class)->getFilterableLocations();
 
             // Prepare public gallery images payload
             $galleryImages = collect($serviceProvider->getMedia('gallery'))->map(function ($media) use ($serviceProvider) {
@@ -290,17 +337,21 @@ class ServiceProviderController extends Controller
                 ->paginate(5, ['*'], 'reviews_page')
                 ->withQueryString();
 
-            // Get all locations for dropdown (not needed for public view, only for owner edit)
-            $locations = Location::orderBy('city')->get();
+            // PERFORMANCE: Use cached locations from Redis (24h TTL)
+            $locations = app(LocationCacheService::class)->getAllLocations();
 
             // Get similar providers in same category (excluding self)
-            // Eager-load Spatie media to render gallery thumbnails in similar-provider cards.
+            // Eager-load relationships and counts to avoid N+1 in similar-provider cards
             $similarProviders = ServiceProvider::with(['category', 'location', 'user', 'media'])
+                ->withCount(['activeReviews', 'endorsements'])
                 ->where('category_id', $serviceProvider->category_id)
                 ->where('id', '!=', $serviceProvider->id)
                 ->orderBy('rating', 'desc')
                 ->limit(4)
                 ->get();
+
+            // PERFORMANCE: Use cached categories from Redis (24h TTL)
+            $categories = app(CategoryCacheService::class)->getTerminalCategories();
 
             // Format phone number for WhatsApp
             $formattedNumber = preg_replace('/[^0-9]/', '', $serviceProvider->whatsapp_number ?? $serviceProvider->phone ?? '');
@@ -311,10 +362,7 @@ class ServiceProviderController extends Controller
 
             // Get all child categories (all professions) for category dropdown in edit form
             // Must match the categories loaded in profile() method to ensure consistency
-            $categories = Category::with('parent.parent')
-                ->terminal()
-                ->orderBy('name')
-                ->get();
+            $categories = app(CategoryCacheService::class)->getTerminalCategories();
 
             // Check if current user has already reviewed this provider
             $hasReviewed = auth()->check() && auth()->user()->isClient()
@@ -353,7 +401,9 @@ class ServiceProviderController extends Controller
                 'isContactRevealed',
                 'hasReviewed',
                 'userRating',
-                'galleryImages'
+                'galleryImages',
+                'serviceAreaLocationIds',
+                'serviceAreaLocations'
             ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -435,94 +485,7 @@ class ServiceProviderController extends Controller
             // Profile image is now handled via AJAX auto-save (uploadProfileImage method)
             // so we no longer process it in the main update form.
 
-            // CRITICAL FIX: Handle certification upload (image or PDF) with enhanced validation
-            if ($request->hasFile('certification')) {
-                try {
-                    $certFile = $request->file('certification');
 
-                    // Validate file was uploaded successfully
-                    if (!$certFile->isValid()) {
-                        throw new \Exception(__('service_provider.upload_error'));
-                    }
-
-                    $extension = strtolower($certFile->getClientOriginalExtension());
-
-                    // Validate file based on type
-                    if ($extension === 'pdf') {
-                        // Enhanced PDF validation
-                        $mime = $certFile->getMimeType();
-                        if (!in_array($mime, ['application/pdf', 'application/x-pdf'])) {
-                            throw new \Exception(__('service_provider.invalid_pdf_file'));
-                        }
-
-                        // Check if PDF is corrupted by reading first few bytes
-                        $handle = @fopen($certFile->getRealPath(), 'r');
-                        if ($handle === false) {
-                            throw new \Exception(__('service_provider.cannot_read_file'));
-                        }
-
-                        $header = fread($handle, 5);
-                        fclose($handle);
-
-                        if ($header !== '%PDF-') {
-                            throw new \Exception(__('service_provider.corrupted_pdf_file'));
-                        }
-
-                    } else {
-                        // Validate certification image
-                        $imageSize = @getimagesize($certFile->getRealPath());
-                        if ($imageSize === false) {
-                            throw new \Exception(__('service_provider.invalid_certification_image'));
-                        }
-
-                        // Validate certification image dimensions
-                        if ($imageSize[0] < 300 || $imageSize[1] < 300) {
-                            throw new \Exception(__('service_provider.certification_too_small'));
-                        }
-
-                        if ($imageSize[0] > 10000 || $imageSize[1] > 10000) {
-                            throw new \Exception(__('service_provider.certification_too_large'));
-                        }
-                    }
-
-                    // Generate secure filename
-                    $certFilename = 'certification_' . $serviceProvider->id . '_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $extension;
-                    $certPath = $certFile->storeAs('certifications', $certFilename, 'public');
-
-                    if (!$certPath) {
-                        throw new \Exception(__('service_provider.failed_upload_certification'));
-                    }
-
-                    $uploadedFiles[] = $certPath;
-
-                    // Delete old certification only after new one uploaded successfully
-                    if ($serviceProvider->certification && Storage::disk('public')->exists($serviceProvider->certification)) {
-                        Storage::disk('public')->delete($serviceProvider->certification);
-                    }
-
-                    $validated['certification'] = $certPath;
-                    $validated['is_certified'] = true;
-
-                    // Log certification upload
-                    Log::info('Certification uploaded successfully', [
-                        'user_id' => auth()->id(),
-                        'sp_id' => $serviceProvider->id,
-                        'file_type' => $extension,
-                        'file_size' => $certFile->getSize(),
-                        'file_name' => $certFilename,
-                        'stored_path' => $certPath
-                    ]);
-
-                } catch (\Exception $certError) {
-                    Log::error('Certification upload failed', [
-                        'user_id' => auth()->id(),
-                        'sp_id' => $serviceProvider->id,
-                        'error' => $certError->getMessage(),
-                        'file_size' => $certFile->getSize() ?? 0
-                    ]);
-                    throw new \Exception(__('service_provider.failed_upload_certification') . ': ' . $certError->getMessage());
-                }
-            }
 
             // Prepare update data with proper field mapping (NO 'description' field!)
             $updateData = [
@@ -572,11 +535,7 @@ class ServiceProviderController extends Controller
                 $updateData['profile_image'] = $validated['profile_image'];
             }
 
-            // Add certification if uploaded
-            if (isset($validated['certification'])) {
-                $updateData['certification'] = $validated['certification'];
-                $updateData['is_certified'] = true;
-            }
+
 
             // Add category if provided and allowed (FormRequest already filters/removes it if not allowed)
             if (isset($validated['category_id'])) {
@@ -588,6 +547,25 @@ class ServiceProviderController extends Controller
 
             if (!$updated) {
                 throw new \Exception(__('service_provider.profile_update_failed'));
+            }
+
+            // === Service Areas: sync the additional locations the provider is available in ===
+            // The hidden `has_service_areas` marker lets us distinguish "no change" from
+            // "cleared all", so unchecking every box correctly removes existing areas.
+            if ($request->has('has_service_areas')) {
+                $primaryLocationId = (int) ($updateData['location_id'] ?? $serviceProvider->location_id);
+                $filterableIds = app(LocationClusterService::class)->getFilterableLocationIds();
+
+                $areaIds = collect($validated['service_areas'] ?? [])
+                    ->map(fn ($id) => (int) $id)
+                    ->filter(fn ($id) => in_array($id, $filterableIds, true)) // only filterable regions
+                    ->reject(fn ($id) => $id === $primaryLocationId) // primary location is implicit
+                    ->unique()
+                    ->values();
+
+                $serviceProvider->locations()->sync(
+                    $areaIds->mapWithKeys(fn ($id) => [$id => ['is_active' => true]])->all()
+                );
             }
 
             // Log successful update
@@ -610,7 +588,7 @@ class ServiceProviderController extends Controller
 
                     if (is_array($files)) {
                         foreach ($files as $file) {
-                            $serviceProvider->addMedia($file)->toMediaCollection('provider_gallery');
+                            $serviceProvider->addMedia($file)->toMediaCollection('gallery');
                         }
                     }
 
@@ -772,7 +750,7 @@ class ServiceProviderController extends Controller
 
             $serviceProvider
                 ->addMedia($request->file('gallery_image'))
-                ->toMediaCollection('provider_gallery');
+                ->toMediaCollection('gallery');
 
             $media->delete();
 
@@ -804,8 +782,21 @@ class ServiceProviderController extends Controller
             ->whereKey($mediaId)
             ->where('model_type', ServiceProvider::class)
             ->where('model_id', $serviceProvider->id)
-            ->where('collection_name', 'provider_gallery')
+            ->where('collection_name', 'gallery')
             ->firstOrFail();
+    }
+
+    /**
+     * Mark the profile completion popup as dismissed in session for the current provider
+     */
+    public function dismissCompletionPopup(Request $request)
+    {
+        session(['profile_completion_popup_dismissed' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Completion popup dismissed for current session'
+        ]);
     }
 
     /**

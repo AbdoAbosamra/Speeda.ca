@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\ErrorHelper;
+use App\Http\Controllers\Controller;
 use App\Services\Admin\WhatsappAnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -59,7 +59,7 @@ class WhatsappAnalyticsController extends Controller
             ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
-            Log::error('WhatsApp analytics error: ' . $e->getMessage());
+            Log::error('WhatsApp analytics error: '.$e->getMessage());
             ErrorHelper::flashNotification($error['message'], $error['type']);
 
             return redirect()->route('admin.dashboard');

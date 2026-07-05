@@ -23,6 +23,7 @@ use Illuminate\Database\Seeder;
 class AdminUserSeeder extends Seeder
 {
     public const LOGIN = 'admin';
+
     public const PASSWORD = 'admin12345678910';
 
     public function run(): void
@@ -39,6 +40,6 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        $this->command?->info('   ✅ Admin ensured — login `' . self::LOGIN . "` / email {$email}");
+        $this->command?->info('   ✅ Admin ensured — login `'.self::LOGIN."` / email {$email}");
     }
 }

@@ -24,9 +24,11 @@ use Illuminate\Support\Facades\DB;
 class WhatsappAnalyticsService
 {
     private const CLICK = 'click_whatsapp';
+
     private const VIEW = 'view';
 
     private const SUMMARY_TTL = 300;   // 5 minutes
+
     private const BREAKDOWN_TTL = 600; // 10 minutes
 
     /* =====================================================================
@@ -36,7 +38,7 @@ class WhatsappAnalyticsService
     public function summary(array $filters): array
     {
         return Cache::remember(
-            'wa_summary_' . $this->filtersKey($filters, false),
+            'wa_summary_'.$this->filtersKey($filters, false),
             self::SUMMARY_TTL,
             function () use ($filters) {
                 $now = Carbon::now();
@@ -183,7 +185,7 @@ class WhatsappAnalyticsService
     public function categoryPerformance(array $filters, int $limit = 15): array
     {
         return Cache::remember(
-            'wa_cat_' . $this->filtersKey($filters),
+            'wa_cat_'.$this->filtersKey($filters),
             self::BREAKDOWN_TTL,
             fn () => $this->dimensionPerformance($filters, 'analytics.category_id', 'categories', 'id', 'name_en', 'category', $limit)
         );
@@ -192,7 +194,7 @@ class WhatsappAnalyticsService
     public function locationPerformance(array $filters, int $limit = 15): array
     {
         return Cache::remember(
-            'wa_loc_' . $this->filtersKey($filters),
+            'wa_loc_'.$this->filtersKey($filters),
             self::BREAKDOWN_TTL,
             fn () => $this->dimensionPerformance($filters, 'analytics.location_id', 'locations', 'id', 'city', 'location', $limit)
         );
@@ -375,7 +377,7 @@ class WhatsappAnalyticsService
             ->limit($limit)
             ->get()
             ->map(fn ($r) => [
-                'session' => substr($r->session_hash, 0, 10) . '…', // truncated, non-reversible
+                'session' => substr($r->session_hash, 0, 10).'…', // truncated, non-reversible
                 'clicks' => (int) $r->clicks,
                 'providers' => (int) $r->providers,
                 'last_seen' => $r->last_seen,
@@ -431,7 +433,7 @@ class WhatsappAnalyticsService
     {
         foreach (['provider_id', 'category_id', 'location_id', 'device_type'] as $field) {
             if (! empty($filters[$field])) {
-                $q->where($prefix . $field, $filters[$field]);
+                $q->where($prefix.$field, $filters[$field]);
             }
         }
 
@@ -441,7 +443,7 @@ class WhatsappAnalyticsService
         if (! empty($filters['phone_search'])) {
             $ids = $this->providerIdsMatchingPhone($filters['phone_search']);
             // Empty result set → force a no-match rather than ignoring the filter.
-            $q->whereIn($prefix . 'provider_id', $ids ?: [0]);
+            $q->whereIn($prefix.'provider_id', $ids ?: [0]);
         }
     }
 
@@ -450,7 +452,7 @@ class WhatsappAnalyticsService
      */
     private function providerIdsMatchingPhone(string $term): array
     {
-        $like = '%' . str_replace(['%', '_'], ['\%', '\_'], trim($term)) . '%';
+        $like = '%'.str_replace(['%', '_'], ['\%', '\_'], trim($term)).'%';
 
         return DB::table('service_providers')
             ->where(function ($w) use ($like) {

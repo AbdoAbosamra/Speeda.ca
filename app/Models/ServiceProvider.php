@@ -161,7 +161,7 @@ class ServiceProvider extends Model implements HasMedia
      * - Convert to WebP
      * - Generate a thumbnail for the responsive gallery grid
      */
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this
             ->addMediaConversion('gallery_thumb')

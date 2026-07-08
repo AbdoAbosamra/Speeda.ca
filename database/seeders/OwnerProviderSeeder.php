@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Location;
 use App\Models\ServiceArea;
 use App\Models\ServiceProvider;
@@ -28,7 +29,8 @@ class OwnerProviderSeeder extends Seeder
     private const OWNER_NAME    = 'Abdelrahman Abosamra';
     private const OWNER_PHONE   = '+201289121218';
     private const OWNER_PASSWORD = 'Ab202020@';
-    private const CATEGORY_ID   = 72; // Web Development
+    // Category is resolved by name at run time (IDs differ between environments).
+    private const CATEGORY_NAME = 'Web Development';
     private const LINKEDIN_URL  = 'https://www.linkedin.com/in/abdelrahman-abo-samra/';
 
     public function run(): void
@@ -66,8 +68,17 @@ class OwnerProviderSeeder extends Seeder
                 . 'and business sites to full custom platforms — with clean UI/UX and SEO '
                 . 'best practices. Available remotely for clients everywhere.';
 
+            // Resolve the category by name — IDs are not stable across environments.
+            $category = Category::where('name', self::CATEGORY_NAME)->first()
+                ?? Category::where('name', 'like', '%Web%')->first()
+                ?? Category::where('name', 'like', '%Design%')->first();
+
+            if (! $category) {
+                $this->command?->warn('OwnerProviderSeeder: no matching category found; leaving category empty.');
+            }
+
             $provider = ServiceProvider::firstOrNew(['user_id' => $user->id]);
-            $provider->category_id       = self::CATEGORY_ID;
+            $provider->category_id       = $category?->id;
             $provider->location_id       = $egypt->id;
             $provider->company_name      = self::OWNER_NAME;
             $provider->bio               = $bioEn;

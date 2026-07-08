@@ -278,4 +278,7 @@ return [
     'no_locations_available' => 'No locations available.',
     'primary_location_badge' => 'Primary location',
     'available_in_area' => 'Available in this area',
+    'available_all_areas' => 'Available in all areas',
+    'site_developer' => 'Site Developer',
+    'site_developer_tooltip' => 'Developer of this website',
 ];

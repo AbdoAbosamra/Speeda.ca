@@ -269,4 +269,7 @@ return [
   'no_locations_available' => 'لا توجد أماكن متاحة.',
   'primary_location_badge' => 'الموقع الأساسي',
   'available_in_area' => 'متاح في هذه المنطقة',
+  'available_all_areas' => 'متاح في جميع المناطق',
+  'site_developer' => 'مطوّر الموقع',
+  'site_developer_tooltip' => 'مطوّر هذا الموقع',
 ];

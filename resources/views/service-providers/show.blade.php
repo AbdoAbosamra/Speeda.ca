@@ -55,6 +55,11 @@
                                 <h1 class="fw-bold mb-2">
                                     {{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}
                                 </h1>
+                                @if($serviceProvider->isSiteDeveloper())
+                                    <div class="mb-2">
+                                        <x-developer-badge size="lg" />
+                                    </div>
+                                @endif
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-briefcase me-1"></i>
                                     {{ $serviceProvider->category->translated_name ?? __('service_provider.uncategorized') }}
@@ -1106,6 +1111,13 @@
                         </div>
 
                         <!-- Location -->
+                        @php
+                            // Private-location providers (inactive primary location) hide their real
+                            // location/address from everyone except the owner; visitors just see that
+                            // the provider is available in all areas.
+                            $locationHidden = $serviceProvider->location && ! $serviceProvider->location->is_active;
+                            $canSeeLocation = ! $locationHidden || (auth()->check() && auth()->id() === $serviceProvider->user_id);
+                        @endphp
                         <div class="contact-item">
                             <div class="d-flex align-items-center">
                                 <div class="contact-icon location-icon">
@@ -1114,14 +1126,18 @@
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1 fw-bold">{{ __('general.location') }}</h6>
                                     <p class="mb-0">
-                                        {{ $serviceProvider->location->localized_name ?? __('service_provider.location_not_specified') }}
+                                        @if($canSeeLocation)
+                                            {{ $serviceProvider->location->localized_name ?? __('service_provider.location_not_specified') }}
+                                        @else
+                                            {{ __('service_provider.available_all_areas') }}
+                                        @endif
                                     </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Address (Hidden numbers until WhatsApp button clicked) -->
-                        @if($serviceProvider->address)
+                        @if($serviceProvider->address && $canSeeLocation)
                             <div class="contact-item">
                                 <div class="d-flex align-items-center">
                                     <div class="contact-icon"

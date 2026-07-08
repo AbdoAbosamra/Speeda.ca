@@ -338,6 +338,16 @@ class ServiceProvider extends Model implements HasMedia
     }
 
     /**
+     * Whether this provider is the site's developer account (gets a special badge).
+     */
+    public function isSiteDeveloper(): bool
+    {
+        $ownerEmail = config('owner.email');
+
+        return !empty($ownerEmail) && optional($this->user)->email === $ownerEmail;
+    }
+
+    /**
      * Get the formatted hourly rate.
      */
     // public function getFormattedHourlyRateAttribute(): string

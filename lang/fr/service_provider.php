@@ -269,4 +269,7 @@ Complétez votre profil maintenant.',
   'no_locations_available' => 'Aucun lieu disponible.',
   'primary_location_badge' => 'Lieu principal',
   'available_in_area' => 'Disponible dans cette zone',
+  'available_all_areas' => 'Disponible dans toutes les zones',
+  'site_developer' => 'Développeur du site',
+  'site_developer_tooltip' => 'Développeur de ce site web',
 ];

@@ -92,6 +92,9 @@
 
                             <div class="provider-info">
                                 <h3>{{ $provider->localized_company_name ?? $provider->user->name }}</h3>
+                                @if($provider->isSiteDeveloper())
+                                    <x-developer-badge size="sm" class="mb-1" />
+                                @endif
                                 <p class="provider-category">
                                     {{ $provider->category->translated_name ?? __('service_provider.uncategorized') }}
                                 </p>
@@ -115,6 +118,13 @@
                     </div>
 
                     <!-- معلومات الموقع -->
+                    @php
+                        // A provider whose primary location is inactive (hidden) is a private-location
+                        // provider: the real location and address are shown only to the owner, everyone
+                        // else just sees that the provider is available in all areas.
+                        $locationHidden = $provider->location && ! $provider->location->is_active;
+                        $canSeeLocation = ! $locationHidden || $provider->isOwner();
+                    @endphp
                     <div class="location-section">
                         <div class="location-info" data-provider-id="{{ $provider->id }}">
                             <i class="fas fa-map-marker-alt location-icon"></i>
@@ -124,19 +134,23 @@
                                         <i class="fas fa-circle-check me-1"></i>{{ __('service_provider.available_in_area') }}
                                     </x-ui.badge>
                                 @endif
-                                @if($provider->location)
-                                    <div class="mb-1 fw-bold text-primary">{{ $provider->location->localized_name }}</div>
-                                @endif
-                                <span class="address-content hidden-address" style="display: block;">
-                                    @if($provider->address)
-                                        {{ preg_replace('/\d/', '*', $provider->address) }}
-                                    @else
-                                        {{ __('service_provider.address_not_provided') }}
+                                @if($locationHidden && ! $canSeeLocation)
+                                    <div class="mb-1 fw-bold text-primary">{{ __('service_provider.available_all_areas') }}</div>
+                                @else
+                                    @if($provider->location)
+                                        <div class="mb-1 fw-bold text-primary">{{ $provider->location->localized_name }}</div>
                                     @endif
-                                </span>
-                                <span class="address-content full-address" style="display: none;">
-                                    {{ $provider->address ?? __('service_provider.address_not_provided') }}
-                                </span>
+                                    <span class="address-content hidden-address" style="display: block;">
+                                        @if($provider->address)
+                                            {{ preg_replace('/\d/', '*', $provider->address) }}
+                                        @else
+                                            {{ __('service_provider.address_not_provided') }}
+                                        @endif
+                                    </span>
+                                    <span class="address-content full-address" style="display: none;">
+                                        {{ $provider->address ?? __('service_provider.address_not_provided') }}
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>

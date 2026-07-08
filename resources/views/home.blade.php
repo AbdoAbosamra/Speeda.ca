@@ -464,10 +464,18 @@
                                                     </div>
                                                 </div>
 
+                                                @php
+                                                    $locationHidden = $provider->location && ! $provider->location->is_active;
+                                                    $canSeeLocation = ! $locationHidden || $provider->isOwner();
+                                                @endphp
                                                 @if($provider->location)
                                                     <p class="small home-text-muted mb-0 provider-location home-provider-location">
                                                         <i class="fas fa-map-marker-alt"></i>
-                                                        {{ $provider->location->localized_name ?? __('home.location') }}
+                                                        @if($canSeeLocation)
+                                                            {{ $provider->location->localized_name ?? __('home.location') }}
+                                                        @else
+                                                            {{ __('service_provider.available_all_areas') }}
+                                                        @endif
                                                     </p>
                                                 @endif
                                             </div>

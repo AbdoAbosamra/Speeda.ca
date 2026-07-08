@@ -22,6 +22,14 @@ class CanadianPhoneNumber implements ValidationRule
             return;
         }
 
+        // Owner whitelist: allow the site owner's non-Canadian (e.g. Egyptian)
+        // number(s) to pass. This is the ONLY way a foreign number is accepted;
+        // every other non-Canadian number is still rejected below.
+        $inputDigits = preg_replace('/\D/', '', $value);
+        if ($inputDigits !== '' && in_array($inputDigits, (array) config('owner.exempt_phones', []), true)) {
+            return;
+        }
+
         // Handle extensions by removing them first
         $cleanValue = preg_replace('/\b(ext|extension|x)\s*\d+$/i', '', $value);
 

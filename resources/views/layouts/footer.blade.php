@@ -44,6 +44,10 @@
         <div class="copyright">
             <p class="mb-2" style="font-size: 13px;">&copy; 2025 Speeda. {{ __('home.all_rights_reserved') }}</p>
             <p class="small text-muted" style="font-size: 11px;">Speeda is a connection-only platform; all agreements and payments occur directly between clients and providers. We do not verify qualifications or guarantee service performance.</p>
+            <p class="mb-0 mt-2" style="font-size: 11px; opacity: 0.85;">
+                Designed &amp; developed by
+                <a href="https://www.linkedin.com/in/abdelrahman-abo-samra/" target="_blank" rel="noopener noreferrer author" style="text-decoration: none; font-weight: 600;">Eng. Abdelrahman Abosamra</a>
+            </p>
         </div>
     </div>
 </footer>

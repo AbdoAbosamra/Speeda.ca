@@ -120,7 +120,7 @@
                             <i class="fas fa-map-marker-alt location-icon"></i>
                             <div class="address-text">
                                 @if(($provider->is_available_area ?? false) && !in_array($provider->location_id, $activeLocationIds ?? []))
-                                    <x-ui.badge variant="success" class="badge rounded-pill mb-1">
+                                    <x-ui.badge variant="success" class="rounded-pill mb-1">
                                         <i class="fas fa-circle-check me-1"></i>{{ __('service_provider.available_in_area') }}
                                     </x-ui.badge>
                                 @endif

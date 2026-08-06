@@ -43,29 +43,49 @@
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-dark">User Role</label>
-                                <select name="role" class="form-select @error('role') is-invalid @enderror" required>
+                                <select name="role" class="form-select @error('role') is-invalid @enderror" required
+                                        {{ $user->id === auth()->id() ? 'disabled' : '' }}>
                                     <option value="client" {{ old('role', $user->role) === 'client' ? 'selected' : '' }}>Client</option>
                                     <option value="service_provider" {{ old('role', $user->role) === 'service_provider' ? 'selected' : '' }}>Service Provider</option>
                                     <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Administrator</option>
                                 </select>
+                                @if($user->id === auth()->id())
+                                    <input type="hidden" name="role" value="{{ $user->role }}">
+                                @endif
                                 @error('role')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                                 <div class="form-text text-warning mt-2 small">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>Changing role may affect visibility and permissions.
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    @if($user->id === auth()->id())
+                                        You cannot change your own role.
+                                    @else
+                                        Changing role may affect visibility and permissions.
+                                    @endif
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-dark">Account Status</label>
                                 <div class="form-check form-switch mt-2">
-                                    <input type="hidden" name="is_active" value="0">
-                                    <input class="form-check-input" type="checkbox" name="is_active" value="1" 
-                                           id="is_active" {{ old('is_active', $user->is_active) ? 'checked' : '' }}
-                                           {{ $user->id === auth()->id() ? 'disabled' : '' }}>
-                                    <label class="form-check-label" for="is_active">
-                                        {{ $user->is_active ? 'Active Account' : 'Inactive Account' }}
-                                    </label>
+                                    @if($user->id === auth()->id())
+                                        {{-- Editing yourself: the status is locked, so mirror the current value
+                                             instead of a hidden "0" that a disabled checkbox can never override. --}}
+                                        <input type="hidden" name="is_active" value="{{ $user->is_active ? 1 : 0 }}">
+                                        <input class="form-check-input" type="checkbox"
+                                               id="is_active" {{ $user->is_active ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="is_active">
+                                            {{ $user->is_active ? 'Active Account' : 'Inactive Account' }}
+                                            <span class="text-muted small d-block">You cannot change your own account status.</span>
+                                        </label>
+                                    @else
+                                        <input type="hidden" name="is_active" value="0">
+                                        <input class="form-check-input" type="checkbox" name="is_active" value="1"
+                                               id="is_active" {{ old('is_active', $user->is_active) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_active">
+                                            {{ $user->is_active ? 'Active Account' : 'Inactive Account' }}
+                                        </label>
+                                    @endif
                                 </div>
                             </div>
 

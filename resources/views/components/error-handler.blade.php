@@ -10,6 +10,36 @@ Features:
 - Multi-language support
 --}}
 
+{{-- ErrorHelper::flashNotification() messages (structured: message/type/icon/undo_log_id) --}}
+@php($spNotification = session('notification'))
+@if(is_array($spNotification) && !empty($spNotification['message']))
+    @php($spVariant = match($spNotification['type'] ?? 'info') {
+        'success' => 'success',
+        'error'   => 'danger',
+        'warning' => 'warning',
+        default   => 'info',
+    })
+    <div class="alert-container mb-4" role="alert">
+        <div class="alert alert-{{ $spVariant }} alert-dismissible fade show shadow-sm" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="{{ $spNotification['icon'] ?? 'fas fa-info-circle' }} me-2 fs-5"></i>
+                <div class="flex-grow-1">
+                    <div>{{ $spNotification['message'] }}</div>
+                </div>
+                @if(!empty($spNotification['undo_log_id']) && Route::has('admin.undo'))
+                    <form action="{{ route('admin.undo', $spNotification['undo_log_id']) }}" method="POST" class="ms-3">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold">
+                            <i class="fas fa-undo me-1"></i>{{ __('admin.undo') }}
+                        </button>
+                    </form>
+                @endif
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+@endif
+
 {{-- Session Flash Messages --}}
 @if(session('success') || session('error') || session('warning') || session('info'))
     <div class="alert-container mb-4" role="alert">
@@ -95,12 +125,13 @@ Features:
     </div>
 @endif
 
-{{-- Auto-dismiss alerts after 5 seconds --}}
-@if(session('success') || session('error') || session('warning') || session('info'))
+{{-- Auto-dismiss alerts after 5 seconds (alerts offering an Undo action stay put) --}}
+@if(session('success') || session('error') || session('warning') || session('info') || is_array($spNotification ?? null))
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             setTimeout(function () {
-                const alerts = document.querySelectorAll('.alert-container .alert');
+                const alerts = Array.from(document.querySelectorAll('.alert-container .alert'))
+                    .filter(function (alert) { return !alert.querySelector('form'); });
                 alerts.forEach(function (alert) {
                     const bsAlert = new bootstrap.Alert(alert);
                     bsAlert.close();

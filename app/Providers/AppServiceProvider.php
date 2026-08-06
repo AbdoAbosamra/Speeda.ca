@@ -15,6 +15,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Observers\ServiceProviderObserver;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,6 +50,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Password::defaults(function () {
+            return Password::min(8);
+        });
+
         RateLimiter::for('password-reset', function (Request $request) {
             $email = Str::lower((string) $request->input('email'));
             $ip = $request->ip() ?: 'unknown-ip';
@@ -67,6 +72,12 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultSimpleView('components.pagination.default');
 
         View::share('supportedLocales', config('app.supported_locales'));
+
+        // Record login metadata (count / timestamp / IP) on every successful login.
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Login::class,
+            \App\Listeners\RecordSuccessfulLogin::class
+        );
 
         // SEO & Business Logic Observers
         \App\Models\Category::observe(\App\Observers\CategoryObserver::class);

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Models;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\ServiceProvider;
 use App\Models\User;
 use App\Models\Category;
@@ -20,7 +22,7 @@ class ServiceProviderTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_be_created_with_valid_data()
     {
         $user = User::factory()->create();
@@ -49,7 +51,7 @@ class ServiceProviderTest extends TestCase
         $this->assertFalse($serviceProvider->is_verified);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_user()
     {
         $serviceProvider = ServiceProvider::factory()->create();
@@ -62,7 +64,7 @@ class ServiceProviderTest extends TestCase
         $this->assertInstanceOf(User::class, $serviceProvider->user);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_category()
     {
         $serviceProvider = ServiceProvider::factory()->create();
@@ -75,7 +77,7 @@ class ServiceProviderTest extends TestCase
         $this->assertInstanceOf(Category::class, $serviceProvider->category);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_location()
     {
         $serviceProvider = ServiceProvider::factory()->create();
@@ -88,7 +90,7 @@ class ServiceProviderTest extends TestCase
         $this->assertInstanceOf(Location::class, $serviceProvider->location);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_reviews()
     {
         $serviceProvider = ServiceProvider::factory()->create();
@@ -99,7 +101,7 @@ class ServiceProviderTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_multiple_reviews()
     {
         $serviceProvider = ServiceProvider::factory()->create();
@@ -111,7 +113,7 @@ class ServiceProviderTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function hourly_rate_is_cast_to_decimal()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -122,7 +124,7 @@ class ServiceProviderTest extends TestCase
         $this->assertIsString($serviceProvider->hourly_rate);
     }
 
-    /** @test */
+    #[Test]
     public function boolean_fields_are_cast_correctly()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -136,7 +138,7 @@ class ServiceProviderTest extends TestCase
         $this->assertTrue($serviceProvider->emergency_available);
     }
 
-    /** @test */
+    #[Test]
     public function views_count_defaults_to_zero()
     {
         $serviceProvider = ServiceProvider::factory()->create(['views' => 0]);
@@ -144,7 +146,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals(0, $serviceProvider->views);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_increment_views()
     {
         $serviceProvider = ServiceProvider::factory()->create(['views' => 5]);
@@ -154,7 +156,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals(6, $serviceProvider->fresh()->views);
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_average_rating_from_reviews()
     {
         $serviceProvider = ServiceProvider::factory()->create(['rating' => 4.5]);
@@ -163,7 +165,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals('4.50', $serviceProvider->rating);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_scope_available_providers()
     {
         ServiceProvider::factory()->create(['emergency_available' => true]);
@@ -174,7 +176,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals(1, $availableCount);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_scope_verified_providers()
     {
         ServiceProvider::factory()->create(['is_verified' => true]);
@@ -185,7 +187,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals(1, $verifiedCount);
     }
 
-    /** @test */
+    #[Test]
     public function phone_number_is_stored_correctly()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -195,7 +197,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals('+15551234567', $serviceProvider->phone);
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_number_can_be_different_from_phone()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -207,7 +209,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals('+15559876543', $serviceProvider->whatsapp_number);
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_number_can_be_null()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -217,7 +219,7 @@ class ServiceProviderTest extends TestCase
         $this->assertNull($serviceProvider->whatsapp_number);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_long_services_description()
     {
         $longDescription = str_repeat('Professional service description. ', 50);
@@ -229,7 +231,7 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals($longDescription, $serviceProvider->services_offered);
     }
 
-    /** @test */
+    #[Test]
     public function experience_years_must_be_non_negative()
     {
         $serviceProvider = ServiceProvider::factory()->create([

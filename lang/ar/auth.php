@@ -62,7 +62,7 @@ return [
   'password_reset_visual_text' => 'حافظ على حسابك محمياً برابط قصير الصلاحية وكلمة مرور أقوى.',
   'secure_account_access' => 'دخول آمن للحساب',
   'remembered_password' => 'تذكرت كلمة المرور؟',
-  'password_rules_hint' => 'استخدم 12 حرفاً على الأقل مع حروف كبيرة وصغيرة وأرقام ورموز.',
+  'password_rules_hint' => 'استخدم 8 أحرف على الأقل.',
   'toggle_password_visibility' => 'إظهار أو إخفاء كلمة المرور',
   'reset_password_button' => 'إعادة تعيين كلمة المرور',
   'reset_password_email_subject' => 'إعادة تعيين كلمة مرور Speeda',

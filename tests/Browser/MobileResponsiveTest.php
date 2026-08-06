@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use App\Models\Category;
@@ -26,7 +28,7 @@ class MobileResponsiveTest extends DuskTestCase
         $this->artisan('migrate:fresh --seed');
     }
 
-    /** @test */
+    #[Test]
     public function mobile_navigation_works_perfectly()
     {
         $this->browse(function (Browser $browser) {
@@ -53,7 +55,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function tablet_layout_adapts_correctly()
     {
         $this->browse(function (Browser $browser) {
@@ -73,7 +75,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function touch_interactions_work_on_mobile()
     {
         $this->browse(function (Browser $browser) {
@@ -99,7 +101,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function forms_are_mobile_optimized()
     {
         $this->browse(function (Browser $browser) {
@@ -128,7 +130,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_search_is_user_friendly()
     {
         $this->browse(function (Browser $browser) {
@@ -156,7 +158,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_service_provider_profile_works()
     {
         $this->browse(function (Browser $browser) {
@@ -189,7 +191,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_loading_performance_is_optimal()
     {
         $this->browse(function (Browser $browser) {
@@ -212,7 +214,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function offline_functionality_works()
     {
         $this->browse(function (Browser $browser) {
@@ -237,7 +239,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function cross_browser_compatibility_works()
     {
         // Test different browser capabilities
@@ -262,7 +264,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_accessibility_is_maintained()
     {
         $this->browse(function (Browser $browser) {
@@ -287,7 +289,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_gestures_work_correctly()
     {
         $this->browse(function (Browser $browser) {
@@ -313,7 +315,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_orientation_changes_work()
     {
         $this->browse(function (Browser $browser) {
@@ -338,7 +340,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_keyboard_behavior_is_correct()
     {
         $this->browse(function (Browser $browser) {
@@ -360,7 +362,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_image_optimization_works()
     {
         $this->browse(function (Browser $browser) {
@@ -382,7 +384,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_notifications_work()
     {
         $this->browse(function (Browser $browser) {
@@ -404,7 +406,7 @@ class MobileResponsiveTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_share_functionality_works()
     {
         $this->browse(function (Browser $browser) {

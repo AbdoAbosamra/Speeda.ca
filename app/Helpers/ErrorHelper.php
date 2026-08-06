@@ -106,12 +106,13 @@ class ErrorHelper
      * @param string $type (success, error, warning, info)
      * @return array
      */
-    public static function createNotification(string $message, string $type = 'error'): array
+    public static function createNotification(string $message, string $type = 'error', ?int $undoLogId = null): array
     {
         return [
             'message' => $message,
             'type' => $type,
             'icon' => self::getIconForType($type),
+            'undo_log_id' => $undoLogId,
         ];
     }
 
@@ -139,9 +140,9 @@ class ErrorHelper
      * @param string $type
      * @return void
      */
-    public static function flashNotification(string $message, string $type = 'error'): void
+    public static function flashNotification(string $message, string $type = 'error', ?int $undoLogId = null): void
     {
-        session()->flash('notification', self::createNotification($message, $type));
+        session()->flash('notification', self::createNotification($message, $type, $undoLogId));
     }
 
     /**

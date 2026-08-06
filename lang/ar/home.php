@@ -125,4 +125,7 @@ return [
     'expansion_bullet1' => 'المزيد من مقدمي الخدمات الموثوقين.',
     'expansion_bullet2' => 'المزيد من المناطق والمواقع.',
     'expansion_bullet3' => 'المزيد من السهولة والراحة للمجتمعات المحلية.',
+    'testimonials_title' => 'ماذا يقول مزودو الخدمة لدينا',
+    'testimonials_subtitle' => 'آراء حقيقية من مزودي الخدمة الذين ينمّون أعمالهم مع Speeda.',
+    'testimonials_out_of_five' => 'من 5 نجوم',
 ];

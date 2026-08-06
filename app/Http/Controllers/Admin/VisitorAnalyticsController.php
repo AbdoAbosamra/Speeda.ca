@@ -80,6 +80,11 @@ class VisitorAnalyticsController extends Controller
 
             $callback = function () use ($analytics) {
                 $file = fopen('php://output', 'w');
+
+                // UTF-8 BOM so Excel renders Arabic/French page names correctly
+                // instead of mojibake.
+                fwrite($file, "\xEF\xBB\xBF");
+
                 fputcsv($file, ['Date', 'Unique Visitors']);
 
                 foreach ($analytics['visitors_by_date'] as $data) {

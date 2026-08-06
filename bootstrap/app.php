@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckUserStatus;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\TrackUserPresence;
 use App\Http\Middleware\TrackVisitor;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
             TrackVisitor::class,
             CheckUserStatus::class, // Check if user account is active
+            TrackUserPresence::class, // Presence heartbeat (last_seen_at)
         ]);
 
         $middleware->alias([
@@ -32,6 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'handle.large.uploads' => \App\Http\Middleware\HandleLargeUploads::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'check.user.status' => \App\Http\Middleware\CheckUserStatus::class,
+            // Pins the admin panel to English regardless of site language.
+            'admin.locale' => \App\Http\Middleware\ForceAdminLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

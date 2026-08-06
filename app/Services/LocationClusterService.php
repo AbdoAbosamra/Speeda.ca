@@ -20,9 +20,9 @@ class LocationClusterService
         // Québec clusters (bidirectional)
         'laval'    => ['laval', 'montreal'],
         'montreal' => ['montreal', 'laval'],
-        // National Capital clusters (bidirectional)
-        'gatineau' => ['gatineau', 'ottawa'],
-        'ottawa'   => ['ottawa', 'gatineau'],
+        // National Capital — split into standalone cities (each returns only itself)
+        'gatineau' => ['gatineau'],
+        'ottawa'   => ['ottawa'],
         // Ontario — each city is its own cluster (no cross-city grouping at row level)
         'mississauga'     => ['mississauga'],
         'brampton'        => ['brampton'],
@@ -45,9 +45,11 @@ class LocationClusterService
      * @change 2026-06-07 | Added 6 Ontario GTA clusters for /service-providers filter | risk:LOW
      */
     private const NAMED_CLUSTERS = [
-        // Original clusters — unchanged
+        // Original clusters
         'cluster_montreal' => ['laval', 'montreal'],
-        'cluster_ottawa'   => ['ottawa', 'gatineau'],
+        // National Capital — split into two standalone filter options
+        'cluster_ottawa'   => ['ottawa'],
+        'cluster_gatineau' => ['gatineau'],
         // Ontario GTA clusters — 6 groups as specified
         'cluster_mississauga'           => ['mississauga'],
         'cluster_brampton'              => ['brampton'],
@@ -59,7 +61,8 @@ class LocationClusterService
 
     private const PUBLIC_FILTER_CLUSTERS = [
         'cluster_montreal'                      => 'Laval – Montréal',
-        'cluster_ottawa'                        => 'Ottawa – Gatineau',
+        'cluster_ottawa'                        => 'Ottawa',
+        'cluster_gatineau'                      => 'Gatineau',
         'cluster_mississauga'                   => 'Mississauga',
         'cluster_brampton'                      => 'Brampton',
         'cluster_oakville_burlington_milton'    => 'Oakville – Burlington – Milton',

@@ -6,17 +6,98 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\Post;
+use App\Traits\HandlesBulkActions;
+use App\Traits\LogsAdminActions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class BlogPostController extends Controller
 {
+    use LogsAdminActions;
+    use HandlesBulkActions;
+
+    public function bulk(Request $request)
+    {
+        return $this->runBulkAction($request, 'posts');
+    }
+
+    protected function bulkActions(string $resource): array
+    {
+        return [
+            'publish' => __('admin.bulk_verb_published'),
+            'draft' => __('admin.bulk_verb_drafted'),
+            'delete' => __('admin.bulk_verb_trashed'),
+            'restore' => __('admin.bulk_verb_restored'),
+        ];
+    }
+
+    protected function bulkQuery(string $resource): \Illuminate\Database\Eloquent\Builder
+    {
+        // withTrashed so the Trash tab can restore in bulk.
+        return Post::withTrashed();
+    }
+
+    /**
+     * @return true|string
+     */
+    protected function applyBulkAction(string $resource, string $action, $post)
+    {
+        if ($post->trashed() && $action !== 'restore') {
+            return __('admin.bulk_reason_already_trashed');
+        }
+
+        switch ($action) {
+            case 'publish':
+                if ($post->status === 'published') {
+                    return __('admin.bulk_reason_already_published');
+                }
+                $old = $post->getOriginal();
+                $post->update([
+                    'status' => 'published',
+                    'is_published' => true,
+                    'published_at' => $post->published_at ?: now(),
+                ]);
+                $this->logUpdate($post, $old);
+                break;
+
+            case 'draft':
+                if ($post->status === 'draft') {
+                    return __('admin.bulk_reason_already_draft');
+                }
+                $old = $post->getOriginal();
+                $post->update(['status' => 'draft', 'is_published' => false]);
+                $this->logUpdate($post, $old);
+                break;
+
+            case 'delete':
+                $this->logAction('delete', $post, ['deleted' => ['title' => $post->title, 'slug' => $post->slug]]);
+                $post->delete();
+                break;
+
+            case 'restore':
+                if (!$post->trashed()) {
+                    return __('admin.bulk_reason_not_trashed');
+                }
+                $post->restore();
+                $this->logAction('restore', $post);
+                break;
+
+            default:
+                return __('admin.bulk_reason_failed');
+        }
+
+        $this->clearBlogCaches();
+
+        return true;
+    }
+
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('search', ''));
@@ -89,12 +170,42 @@ class BlogPostController extends Controller
 
     public function destroy(Post $post): RedirectResponse
     {
+        $this->logAction('delete', $post, ['deleted' => ['title' => $post->title, 'slug' => $post->slug]]);
+
+        // Soft delete only, so the cover image is deliberately left on disk —
+        // restoring from Trash needs it.
         $post->delete();
         $this->clearBlogCaches();
 
         return redirect()
             ->route('admin.blog.posts.index')
-            ->with('success', 'Blog post deleted safely.');
+            ->with('success', 'Blog post deleted safely. You can restore it from the Trash tab.');
+    }
+
+    /**
+     * Soft-deleted posts, so a mistaken delete is recoverable.
+     */
+    public function trash(): View
+    {
+        $posts = Post::onlyTrashed()
+            ->with(['author', 'category'])
+            ->latest('deleted_at')
+            ->paginate(15);
+
+        return view('admin.blog.posts.trash', compact('posts'));
+    }
+
+    public function restore(int $postId): RedirectResponse
+    {
+        $post = Post::withTrashed()->findOrFail($postId);
+        $post->restore();
+
+        $this->logAction('restore', $post);
+        $this->clearBlogCaches();
+
+        return redirect()
+            ->route('admin.blog.posts.index')
+            ->with('success', 'Blog post restored.');
     }
 
     protected function validatePost(Request $request, ?Post $post = null): array
@@ -177,12 +288,29 @@ class BlogPostController extends Controller
         ];
 
         if ($request->hasFile('featured_image')) {
+            $previousImage = $post->featured_image;
+
             $data['featured_image'] = $request->file('featured_image')->store('blog-images', 'public');
             $data['image'] = $data['featured_image'];
+
+            // Remove the superseded file so replacing a cover image repeatedly
+            // does not leave orphans piling up on disk.
+            if ($previousImage
+                && $previousImage !== $data['featured_image']
+                && Storage::disk('public')->exists($previousImage)) {
+                Storage::disk('public')->delete($previousImage);
+            }
         }
+
+        $isNew = !$post->exists;
+        $oldValues = $post->getOriginal();
 
         $post->fill($this->onlyExistingColumns($data));
         $post->save();
+
+        // Blog edits now land in the admin activity log like every other module.
+        $isNew ? $this->logCreate($post) : $this->logUpdate($post, $oldValues);
+
         $this->clearBlogCaches();
     }
 
@@ -204,11 +332,22 @@ class BlogPostController extends Controller
         return $slug;
     }
 
+    /**
+     * Drop keys that have no matching column on the posts table.
+     *
+     * The column list is fetched once and cached: the previous implementation
+     * called Schema::hasColumn() per key, firing ~23 metadata queries on every
+     * single save.
+     */
     protected function onlyExistingColumns(array $data): array
     {
-        return collect($data)
-            ->filter(fn ($value, $column) => Schema::hasColumn('posts', $column))
-            ->all();
+        $columns = Cache::remember(
+            'schema.posts.columns',
+            now()->addDay(),
+            fn () => Schema::getColumnListing('posts')
+        );
+
+        return array_intersect_key($data, array_flip($columns));
     }
 
     protected function categories()

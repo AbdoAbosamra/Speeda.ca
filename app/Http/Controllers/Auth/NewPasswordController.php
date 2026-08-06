@@ -35,14 +35,17 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', Rules\Password::min(12)->mixedCase()->numbers()->symbols()],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        $credentials = $request->only('email', 'password', 'password_confirmation', 'token');
+        $credentials['email'] = Str::lower($credentials['email']);
 
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
         $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
+            $credentials,
             function (User $user) use ($request) {
                 $user->forceFill([
                     'password' => Hash::make($request->password),

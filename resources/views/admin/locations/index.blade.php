@@ -36,6 +36,44 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
+                                <label class="form-label fw-semibold">{{ __('admin.country') }}</label>
+                                <input type="text" name="country" class="form-control @error('country') is-invalid @enderror"
+                                    value="{{ old('country') }}"
+                                    style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.75rem;">
+                                @error('country')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">{{ __('admin.area') }}</label>
+                                <input type="text" name="area" class="form-control @error('area') is-invalid @enderror"
+                                    value="{{ old('area') }}"
+                                    style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.75rem;">
+                                @error('area')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            {{-- Coordinates and SEO meta are accepted by StoreLocationRequest but
+                                 previously had no inputs, so they could never be set from admin. --}}
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">{{ __('admin.latitude') }}</label>
+                                <input type="number" step="any" min="-90" max="90" name="latitude"
+                                    class="form-control @error('latitude') is-invalid @enderror" value="{{ old('latitude') }}"
+                                    style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.75rem;">
+                                @error('latitude')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">{{ __('admin.longitude') }}</label>
+                                <input type="number" step="any" min="-180" max="180" name="longitude"
+                                    class="form-control @error('longitude') is-invalid @enderror" value="{{ old('longitude') }}"
+                                    style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.75rem;">
+                                @error('longitude')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">{{ __('admin.image') }}</label>
                                 <input type="file" name="image" class="form-control @error('image') is-invalid @enderror"
                                     accept="image/*"
@@ -51,8 +89,26 @@
                                         style="width: 3rem; height: 1.5rem; cursor: pointer;">
                                 </div>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100"
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ __('admin.meta_title') }}</label>
+                                <input type="text" name="meta_title" maxlength="255"
+                                    class="form-control @error('meta_title') is-invalid @enderror" value="{{ old('meta_title') }}"
+                                    style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.75rem;">
+                                @error('meta_title')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">{{ __('admin.meta_description') }}</label>
+                                <textarea name="meta_description" rows="2" maxlength="500"
+                                    class="form-control @error('meta_description') is-invalid @enderror"
+                                    style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.75rem;">{{ old('meta_description') }}</textarea>
+                                @error('meta_description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary px-5"
                                     style="border-radius: 12px; padding: 0.75rem; font-weight: 600; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border: none;">
                                     <i class="fas fa-plus me-2"></i>{{ __('admin.add') }}
                                 </button>
@@ -69,15 +125,26 @@
                         <h5 class="mb-0 fw-bold">
                             <i class="fas fa-map-marker-alt me-2 text-primary"></i>{{ __('admin.locations_list') }}
                         </h5>
+                        {{-- total() counts active + inactive, so label it accurately. --}}
                         <span class="badge bg-success rounded-pill px-3 py-2">{{ $locations->total() }}
-                            {{ __('admin.active_locations') }}</span>
+                            {{ __('admin.locations') }}</span>
                     </div>
                 </div>
                 <div class="card-body">
+                    <x-admin.bulk-form
+                        :action="route('admin.locations.bulk')"
+                        label="locations"
+                        :actions="[
+                            'activate'   => ['label' => __('admin.activate_bulk'), 'icon' => 'fa-check', 'variant' => 'success'],
+                            'deactivate' => ['label' => __('admin.deactivate_bulk'), 'icon' => 'fa-ban', 'variant' => 'warning'],
+                            'delete'     => ['label' => __('admin.delete'), 'icon' => 'fa-trash', 'variant' => 'danger', 'confirm' => __('admin.bulk_confirm_delete')],
+                        ]"
+                    >
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead style="background: linear-gradient(135deg, #f8fafc, #f1f5f9);">
                                 <tr>
+                                    <th class="py-3" style="width:1%;"><x-admin.bulk-checkbox master /></th>
                                     <th class="fw-bold py-3">{{ __('admin.image') }}</th>
                                     <th class="fw-bold py-3">{{ __('admin.city') }}</th>
                                     <th class="fw-bold py-3">{{ __('admin.status') }}</th>
@@ -90,6 +157,7 @@
                                     <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.3s;"
                                         onmouseover="this.style.background='#f8fafc'"
                                         onmouseout="this.style.background='white'">
+                                        <td><x-admin.bulk-checkbox :value="$location->id" /></td>
                                         <td>
                                             @if($location->image)
                                                 <img src="{{ Storage::url($location->image) }}" alt="{{ $location->city }}"
@@ -111,7 +179,7 @@
                                                 {{ $location->is_active ? __('admin.active') : __('admin.inactive') }}
                                             </span>
                                         </td>
-                                        <td class="text-muted">{{ $location->created_at->format('Y-m-d') }}</td>
+                                        <td class="text-muted">{{ optional($location->created_at)->format('Y-m-d') ?: '—' }}</td>
                                         <td class="text-center">
                                             @if($location->is_active)
                                                 <form action="{{ route('admin.locations.deactivate', $location) }}" method="POST"
@@ -182,6 +250,43 @@
                                                                         value="{{ $location->city }}" required
                                                                         style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.75rem;">
                                                                 </div>
+                                                                <div class="row g-2 mb-3">
+                                                                    <div class="col-6">
+                                                                        <label class="form-label fw-semibold">{{ __('admin.country') }}</label>
+                                                                        <input type="text" name="country" class="form-control"
+                                                                            value="{{ $location->country }}"
+                                                                            style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.6rem;">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="form-label fw-semibold">{{ __('admin.area') }}</label>
+                                                                        <input type="text" name="area" class="form-control"
+                                                                            value="{{ $location->area }}"
+                                                                            style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.6rem;">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="form-label fw-semibold">{{ __('admin.latitude') }}</label>
+                                                                        <input type="number" step="any" min="-90" max="90" name="latitude"
+                                                                            class="form-control" value="{{ $location->latitude }}"
+                                                                            style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.6rem;">
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="form-label fw-semibold">{{ __('admin.longitude') }}</label>
+                                                                        <input type="number" step="any" min="-180" max="180" name="longitude"
+                                                                            class="form-control" value="{{ $location->longitude }}"
+                                                                            style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.6rem;">
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <label class="form-label fw-semibold">{{ __('admin.meta_title') }}</label>
+                                                                        <input type="text" name="meta_title" maxlength="255"
+                                                                            class="form-control" value="{{ $location->meta_title }}"
+                                                                            style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.6rem;">
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <label class="form-label fw-semibold">{{ __('admin.meta_description') }}</label>
+                                                                        <textarea name="meta_description" rows="2" maxlength="500" class="form-control"
+                                                                            style="border-radius: 12px; border: 2px solid #e2e8f0; padding: 0.6rem;">{{ $location->meta_description }}</textarea>
+                                                                    </div>
+                                                                </div>
                                                                 <div class="mb-3">
                                                                     <label
                                                                         class="form-label fw-semibold">{{ __('admin.image') }}</label>
@@ -224,7 +329,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center py-5">
+                                        <td colspan="6" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
                                                 <p class="mb-0">{{ __('admin.no_locations') }}</p>
@@ -235,6 +340,7 @@
                             </tbody>
                         </table>
                     </div>
+                    </x-admin.bulk-form>
 
                     <!-- Pagination -->
                     <div class="mt-4 d-flex justify-content-center">

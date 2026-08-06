@@ -94,7 +94,8 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'string',
                 'min:3',
                 'max:255',
-                'regex:/^[a-zA-Z0-9\s\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{08A0}-\x{08FF}\x{FB50}-\x{FDFF}\x{FE70}-\x{FEFF}\-_&.،]+$/u'
+                // \pL covers Arabic, French and English letters; \pM combining marks (accents); \pN numbers.
+                'regex:/^[\pL\pM\pN\s\-_&.,،\'«»]+$/u'
             ],
 
             'profession' => ['nullable', 'string', 'max:255'], // Read-only field, ignore if sent
@@ -157,7 +158,8 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:1000',
-                'regex:/^[a-zA-Z0-9\s\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{08A0}-\x{08FF}\x{FB50}-\x{FDFF}\x{FE70}-\x{FEFF}\-_،,]+$/u'
+                // \pL covers Arabic, French and English letters; \pM combining marks (accents); \pN numbers.
+                'regex:/^[\pL\pM\pN\s\-_.,،&\'«»]+$/u'
             ],
 
             // profile_image validation removed (handled by AJAX)

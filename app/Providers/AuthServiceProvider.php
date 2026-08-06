@@ -3,14 +3,26 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\Location;
-use App\Models\ServiceProvider;
+use App\Models\Review;
+use App\Models\ServiceProvider as ServiceProviderModel;
 use App\Policies\CategoryPolicy;
+use App\Policies\CommentPolicy;
 use App\Policies\LocationPolicy;
+use App\Policies\ReviewPolicy;
 use App\Policies\ServiceProviderPolicy;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
+/**
+ * Registers authorization policies and admin gates.
+ *
+ * NOTE: this file previously aliased the framework's legacy AuthServiceProvider
+ * to `ServiceProvider`, which collided with the `App\Models\ServiceProvider`
+ * import above it and made the file impossible to parse. It was also missing
+ * from bootstrap/providers.php, so none of these gates existed at runtime.
+ */
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -18,10 +30,12 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @var array<class-string, class-string>
      */
-    protected $policies = [
+    protected array $policies = [
         Category::class => CategoryPolicy::class,
+        Comment::class => CommentPolicy::class,
         Location::class => LocationPolicy::class,
-        ServiceProvider::class => ServiceProviderPolicy::class,
+        Review::class => ReviewPolicy::class,
+        ServiceProviderModel::class => ServiceProviderPolicy::class,
     ];
 
     /**
@@ -29,22 +43,15 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Define a gate for admin access (strict scope)
-        Gate::define('admin-only', function ($user) {
-            return $user && $user->isAdmin();
-        });
+        foreach ($this->policies as $model => $policy) {
+            Gate::policy($model, $policy);
+        }
 
-        // Define gates for specific admin resources
-        Gate::define('manage-categories', function ($user) {
-            return $user && $user->isAdmin();
-        });
-
-        Gate::define('manage-locations', function ($user) {
-            return $user && $user->isAdmin();
-        });
-
-        Gate::define('view-visitor-analytics', function ($user) {
-            return $user && $user->isAdmin();
-        });
+        // Admin access gates.
+        Gate::define('admin-only', fn ($user) => (bool) ($user && $user->isAdmin()));
+        Gate::define('manage-categories', fn ($user) => (bool) ($user && $user->isAdmin()));
+        Gate::define('manage-locations', fn ($user) => (bool) ($user && $user->isAdmin()));
+        Gate::define('manage-providers', fn ($user) => (bool) ($user && $user->isAdmin()));
+        Gate::define('view-visitor-analytics', fn ($user) => (bool) ($user && $user->isAdmin()));
     }
 }

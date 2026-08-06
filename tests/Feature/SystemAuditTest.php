@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\ServiceProvider;
@@ -14,6 +16,24 @@ use Tests\TestCase;
 class SystemAuditTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Human-readable progress output for this audit suite.
+     *
+     * These were bare `echo` calls, which PHPUnit flags as risky under
+     * beStrictAboutOutputDuringTests. The commentary is still useful when
+     * running the audit by hand, so it is kept behind an opt-in env flag:
+     *
+     *     SYSTEM_AUDIT_VERBOSE=1 php artisan test --filter=SystemAuditTest
+     */
+    private function report(string $message): void
+    {
+        if (! filter_var(getenv('SYSTEM_AUDIT_VERBOSE') ?: '0', FILTER_VALIDATE_BOOLEAN)) {
+            return;
+        }
+
+        fwrite(STDERR, $message);
+    }
 
     private $serviceProviderUser;
 
@@ -76,14 +96,12 @@ class SystemAuditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function test_service_provider_views_own_profile_counter_does_not_increase()
     {
-        echo "\n=== TEST 1: Service Provider Views Own Profile ===\n";
-
+        $this->report("\n=== TEST 1: Service Provider Views Own Profile ===\n");
         $initialViews = $this->serviceProvider->views;
-        echo "Initial views: $initialViews\n";
-
+        $this->report("Initial views: $initialViews\n");
         // Login as service provider
         $this->actingAs($this->serviceProviderUser);
 
@@ -96,20 +114,17 @@ class SystemAuditTest extends TestCase
         $this->serviceProvider->refresh();
         $finalViews = $this->serviceProvider->views;
 
-        echo "Final views: $finalViews\n";
-        echo 'Views increased: '.($finalViews > $initialViews ? 'YES (❌ ERROR)' : 'NO (✅ CORRECT)')."\n";
-
+        $this->report("Final views: $finalViews\n");
+        $this->report('Views increased: '.($finalViews > $initialViews ? 'YES (❌ ERROR)' : 'NO (✅ CORRECT)')."\n");
         $this->assertEquals($initialViews, $finalViews, 'Views should not increase when provider views own profile');
     }
 
-    /** @test */
+    #[Test]
     public function test_client_views_provider_profile_counter_increases()
     {
-        echo "\n=== TEST 2: Client Views Provider Profile ===\n";
-
+        $this->report("\n=== TEST 2: Client Views Provider Profile ===\n");
         $initialViews = $this->serviceProvider->views;
-        echo "Initial views: $initialViews\n";
-
+        $this->report("Initial views: $initialViews\n");
         // Login as client
         $this->actingAs($this->clientUser);
 
@@ -122,23 +137,20 @@ class SystemAuditTest extends TestCase
         $this->serviceProvider->refresh();
         $finalViews = $this->serviceProvider->views;
 
-        echo "Final views: $finalViews\n";
-        echo 'Views increased: '.($finalViews > $initialViews ? 'YES (✅ CORRECT)' : 'NO (❌ ERROR)')."\n";
-
+        $this->report("Final views: $finalViews\n");
+        $this->report('Views increased: '.($finalViews > $initialViews ? 'YES (✅ CORRECT)' : 'NO (❌ ERROR)')."\n");
         $this->assertGreaterThan($initialViews, $finalViews, 'Views should increase when client views provider profile');
     }
 
-    /** @test */
+    #[Test]
     public function test_service_provider_can_update_profile_except_profession()
     {
-        echo "\n=== TEST 3: Provider Updates Profile Data ===\n";
-
+        $this->report("\n=== TEST 3: Provider Updates Profile Data ===\n");
         $this->actingAs($this->serviceProviderUser);
 
         // Store original profession to verify it doesn't change
         $originalProfession = $this->serviceProviderUser->profession;
-        echo "Original profession: {$originalProfession}\n";
-
+        $this->report("Original profession: {$originalProfession}\n");
         $newBusinessName = 'Updated Business Name';
         $newDescription = 'This is an updated description';
 
@@ -164,14 +176,13 @@ class SystemAuditTest extends TestCase
         $this->assertEquals($originalProfession, $this->serviceProviderUser->profession, 'Profession should not be updated');
     }
 
-    /** @test */
+    #[Test]
     public function test_image_upload_with_resizing_and_instant_preview()
     {
-        echo "\n=== TEST 4: Image Upload with Resizing ===\n";
-
+        $this->report("\n=== TEST 4: Image Upload with Resizing ===\n");
         // Skip this test if GD extension is not available
         if (! extension_loaded('gd')) {
-            echo "GD extension not available - skipping image upload test\n";
+            $this->report("GD extension not available - skipping image upload test\n");
             $this->assertTrue(true); // Mark as passed
 
             return;
@@ -201,20 +212,18 @@ class SystemAuditTest extends TestCase
         // Verify image was stored
         Storage::disk('public')->assertExists($this->serviceProvider->profile_image);
 
-        echo "Image storage verified: ✅ CORRECT\n";
+        $this->report("Image storage verified: ✅ CORRECT\n");
     }
 
-    /** @test */
+    #[Test]
     public function test_multiple_locations_selection_and_saving()
     {
-        echo "\n=== TEST 5: Multiple Locations Selection ===\n";
-
+        $this->report("\n=== TEST 5: Multiple Locations Selection ===\n");
         $this->actingAs($this->serviceProviderUser);
 
         // Get all locations
         $allLocationIds = $this->locations->pluck('id')->toArray();
-        echo 'Available locations: ['.implode(', ', $allLocationIds)."]\n";
-
+        $this->report('Available locations: ['.implode(', ', $allLocationIds)."]\n");
         // Select all locations
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
@@ -233,11 +242,10 @@ class SystemAuditTest extends TestCase
         $this->assertEquals($this->serviceProvider->company_name, $this->serviceProvider->fresh()->company_name);
     }
 
-    /** @test */
+    #[Test]
     public function test_error_handling_with_card_notifications()
     {
-        echo "\n=== TEST 6: Error Handling with Card Notifications ===\n";
-
+        $this->report("\n=== TEST 6: Error Handling with Card Notifications ===\n");
         $this->actingAs($this->serviceProviderUser);
 
         // Submit invalid data (missing required fields: business_name, phone, whatsapp)
@@ -260,13 +268,12 @@ class SystemAuditTest extends TestCase
         $this->assertTrue(session('errors')->has('whatsapp_number'));
     }
 
-    /** @test */
+    #[Test]
     public function test_registration_with_role_based_mobile_validation()
     {
-        echo "\n=== TEST 7: Registration with Role-Based Mobile Validation ===\n";
-
+        $this->report("\n=== TEST 7: Registration with Role-Based Mobile Validation ===\n");
         // Test client registration without mobile
-        echo "Testing client registration without mobile...\n";
+        $this->report("Testing client registration without mobile...\n");
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
         ])->post('/register', [
@@ -279,13 +286,12 @@ class SystemAuditTest extends TestCase
         ]);
 
         $response->assertRedirect(route('home')); // Clients redirect to the home page
-        echo "Client registration without mobile: ✅ CORRECT\n";
-
+        $this->report("Client registration without mobile: ✅ CORRECT\n");
         // Logout the client user before testing service provider registration
         $this->post('/logout');
 
         // Test service provider registration without phone
-        echo "Testing service provider registration without phone...\n";
+        $this->report("Testing service provider registration without phone...\n");
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
         ])->post('/register', [
@@ -299,14 +305,12 @@ class SystemAuditTest extends TestCase
             'mobile' => '', // Empty mobile - should fail for providers
         ]);
 
-        echo 'Response status: '.$response->getStatusCode()."\n";
-        echo 'Response session: '.json_encode(session()->all())."\n";
-
+        $this->report('Response status: '.$response->getStatusCode()."\n");
+        $this->report('Response session: '.json_encode(session()->all())."\n");
         $response->assertSessionHasErrors('mobile');
-        echo "Service provider registration without mobile: ❌ BLOCKED (✅ CORRECT)\n";
-
+        $this->report("Service provider registration without mobile: ❌ BLOCKED (✅ CORRECT)\n");
         // Test service provider registration with phone
-        echo "Testing service provider registration with phone...\n";
+        $this->report("Testing service provider registration with phone...\n");
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
         ])->post('/register', [
@@ -322,16 +326,15 @@ class SystemAuditTest extends TestCase
 
         // Service providers redirect to their profile page
         $response->assertStatus(302); // Accept any redirect for new provider
-        echo "Service provider registration with phone: ✅ CORRECT\n";
+        $this->report("Service provider registration with phone: ✅ CORRECT\n");
     }
 
-    /** @test */
+    #[Test]
     public function test_login_with_email_or_mobile()
     {
-        echo "\n=== TEST 8: Login with Email or Mobile ===\n";
-
+        $this->report("\n=== TEST 8: Login with Email or Mobile ===\n");
         // Test login with email
-        echo "Testing login with email...\n";
+        $this->report("Testing login with email...\n");
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
         ])->post('/login', [
@@ -341,13 +344,12 @@ class SystemAuditTest extends TestCase
         ]);
 
         $response->assertRedirect(route('service-providers.show', $this->serviceProvider->id));
-        echo "Email login: ✅ CORRECT\n";
-
+        $this->report("Email login: ✅ CORRECT\n");
         // Logout before next test
         $this->post('/logout');
 
         // Test login with phone
-        echo "Testing login with phone...\n";
+        $this->report("Testing login with phone...\n");
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
         ])->post('/login', [
@@ -357,13 +359,12 @@ class SystemAuditTest extends TestCase
         ]);
 
         $response->assertRedirect(route('service-providers.show', $this->serviceProvider->id));
-        echo "Phone login: ✅ CORRECT\n";
-
+        $this->report("Phone login: ✅ CORRECT\n");
         // Logout before next test
         $this->post('/logout');
 
         // Test login with invalid credentials
-        echo "Testing login with invalid credentials...\n";
+        $this->report("Testing login with invalid credentials...\n");
         $response = $this->withHeaders([
             'X-CSRF-TOKEN' => csrf_token(),
         ])->post('/login', [
@@ -374,14 +375,13 @@ class SystemAuditTest extends TestCase
 
         // The ValidationException should redirect back with errors
         $response->assertSessionHasErrors('login');
-        echo "Invalid login: ❌ BLOCKED (✅ CORRECT)\n";
+        $this->report("Invalid login: ❌ BLOCKED (✅ CORRECT)\n");
     }
 
-    /** @test */
+    #[Test]
     public function test_navigation_consistency_and_profile_links()
     {
-        echo "\n=== TEST 9: Navigation and Profile Links ===\n";
-
+        $this->report("\n=== TEST 9: Navigation and Profile Links ===\n");
         $this->actingAs($this->serviceProviderUser);
 
         // Visit dashboard (should redirect to service-providers.index)
@@ -394,8 +394,7 @@ class SystemAuditTest extends TestCase
 
         // Check if profile link exists in navigation
         $response->assertSee('Profile');
-        echo "Profile link in navigation: ✅ CORRECT\n";
-
+        $this->report("Profile link in navigation: ✅ CORRECT\n");
         // Click profile link
         $response = $this->get('/service-providers/'.$this->serviceProvider->id);
         $response->assertStatus(200);
@@ -404,20 +403,18 @@ class SystemAuditTest extends TestCase
         $response->assertSee($this->serviceProvider->company_name);
         // Check if category/profession is shown (use the actual category name from the model)
         $response->assertSee($this->category->name_en); // Check English category name
-        echo "Profile page loads correctly: ✅ CORRECT\n";
-
+        $this->report("Profile page loads correctly: ✅ CORRECT\n");
         // Test edit link (edit is on the show page for service providers, so it redirects)
         $response = $this->get("/service-providers/{$this->serviceProvider->id}/edit");
         // Edit redirects to show page where edit form is displayed
         $response->assertStatus(302);
-        echo "Edit profile redirects to show page: ✅ CORRECT\n";
+        $this->report("Edit profile redirects to show page: ✅ CORRECT\n");
     }
 
-    /** @test */
+    #[Test]
     public function test_complete_system_validation()
     {
-        echo "\n=== TEST 10: Complete System Validation ===\n";
-
+        $this->report("\n=== TEST 10: Complete System Validation ===\n");
         // Test all routes are accessible
         $routes = [
             '/login' => 302, // Redirects to /register (tabbed UI)
@@ -430,9 +427,9 @@ class SystemAuditTest extends TestCase
         foreach ($routes as $route => $expectedStatus) {
             $response = $this->get($route);
             if ($response->status() === $expectedStatus) {
-                echo "Route $route: ✅ ACCESSIBLE\n";
+                $this->report("Route $route: ✅ ACCESSIBLE\n");
             } else {
-                echo "Route $route: ❌ UNEXPECTED STATUS ({$response->status()})\n";
+                $this->report("Route $route: ❌ UNEXPECTED STATUS ({$response->status()})\n");
             }
             // Add assertion to make test pass
             $this->assertEquals($expectedStatus, $response->status(), "Route $route should return $expectedStatus");
@@ -449,13 +446,13 @@ class SystemAuditTest extends TestCase
         foreach ($authRoutes as $route => $expectedStatus) {
             $response = $this->get($route);
             if ($response->status() === $expectedStatus) {
-                echo "Authenticated route $route: ✅ ACCESSIBLE\n";
+                $this->report("Authenticated route $route: ✅ ACCESSIBLE\n");
             } else {
-                echo "Authenticated route $route: ❌ UNEXPECTED STATUS ({$response->status()})\n";
+                $this->report("Authenticated route $route: ❌ UNEXPECTED STATUS ({$response->status()})\n");
             }
         }
 
-        echo "\n=== SYSTEM AUDIT COMPLETE ===\n";
-        echo "All critical systems have been tested and verified.\n";
+        $this->report("\n=== SYSTEM AUDIT COMPLETE ===\n");
+        $this->report("All critical systems have been tested and verified.\n");
     }
 }

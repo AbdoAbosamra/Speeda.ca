@@ -20,6 +20,8 @@
 /storage/pail
 /storage/app/public/*
 !/storage/app/public/.gitkeep
+/storage/media-library/
+/test-reports/
 /vendor
 Homestead.json
 Homestead.yaml

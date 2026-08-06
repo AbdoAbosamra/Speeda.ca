@@ -2,11 +2,13 @@
 
 namespace Tests\Unit\Helpers;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Tests\TestCase;
 
 class WhatsAppHelperTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_formats_canadian_phone_numbers_for_whatsapp()
     {
         $phoneNumbers = [
@@ -22,7 +24,7 @@ class WhatsAppHelperTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_whatsapp_urls()
     {
         $phone = '15145550123';
@@ -35,7 +37,7 @@ class WhatsAppHelperTest extends TestCase
         $this->assertStringContainsString(urlencode($message), $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_whatsapp_number_format()
     {
         $validNumbers = [
@@ -49,7 +51,7 @@ class WhatsAppHelperTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_invalid_whatsapp_numbers()
     {
         $invalidNumbers = [

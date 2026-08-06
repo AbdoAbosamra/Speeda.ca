@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Models;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,7 +18,7 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_be_created_with_valid_data()
     {
         $userData = [
@@ -35,7 +37,7 @@ class UserTest extends TestCase
         $this->assertTrue(\Hash::check('password123', $user->password));
     }
 
-    /** @test */
+    #[Test]
     public function password_is_automatically_hashed()
     {
         $user = User::create([
@@ -49,7 +51,7 @@ class UserTest extends TestCase
         $this->assertTrue(\Hash::check('plaintext', $user->password));
     }
 
-    /** @test */
+    #[Test]
     public function it_has_service_provider_relationship()
     {
         $user = User::factory()->create(['role' => 'service_provider']);
@@ -60,7 +62,7 @@ class UserTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_has_bookings_relationship()
     {
         $user = User::factory()->create(['role' => 'client']);
@@ -71,7 +73,7 @@ class UserTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_hidden_sensitive_attributes()
     {
         $user = User::factory()->create();
@@ -81,7 +83,7 @@ class UserTest extends TestCase
         $this->assertArrayNotHasKey('remember_token', $userArray);
     }
 
-    /** @test */
+    #[Test]
     public function email_verified_at_is_cast_to_datetime()
     {
         $user = User::factory()->create([
@@ -91,7 +93,7 @@ class UserTest extends TestCase
         $this->assertInstanceOf(\Carbon\Carbon::class, $user->email_verified_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_name()
     {
         $this->expectException(\Illuminate\Database\QueryException::class);
@@ -102,7 +104,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_unique_email()
     {
         User::factory()->create(['email' => 'test@example.com']);
@@ -116,7 +118,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_user_is_service_provider()
     {
         $serviceProvider = User::factory()->create(['role' => 'service_provider']);
@@ -126,20 +128,22 @@ class UserTest extends TestCase
         $this->assertEquals('client', $client->role);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_access_fillable_attributes()
     {
         $user = new User();
+        $fillable = $user->getFillable();
 
-        $expectedFillable = [
-            'name',
-            'email',
-            'password',
-            'profession',
-            'role',
-            'is_active',
-        ];
+        // Assert the core attributes are mass-assignable rather than pinning the
+        // exact array: later migrations legitimately add columns (login_count,
+        // last_seen_at, ...) and an equality assertion breaks on every one.
+        foreach (['name', 'email', 'password', 'profession', 'role', 'is_active'] as $attribute) {
+            $this->assertContains($attribute, $fillable);
+        }
 
-        $this->assertEquals($expectedFillable, $user->getFillable());
+        // Attributes that must never be mass-assignable.
+        foreach (['id', 'remember_token', 'email_verified_at'] as $guarded) {
+            $this->assertNotContains($guarded, $fillable);
+        }
     }
 }

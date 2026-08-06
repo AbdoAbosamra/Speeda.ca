@@ -89,10 +89,18 @@
                 </form>
             </section>
 
+            <x-admin.bulk-form
+                :action="route('admin.notifications.bulk')"
+                label="notifications"
+                :actions="[
+                    'delete' => ['label' => __('admin.delete'), 'icon' => 'fa-trash', 'variant' => 'danger', 'confirm' => __('admin.bulk_confirm_delete')],
+                ]"
+            >
             <x-admin.table-card>
                     <table class="admin-data-table">
                         <thead>
                             <tr>
+                                <th style="width:1%;"><x-admin.bulk-checkbox master /></th>
                                 <th>Title</th>
                                 <th>Status</th>
                                 <th>Target</th>
@@ -106,6 +114,7 @@
                             @forelse($notifications as $notification)
                                 @php($isActive = $notification->expires_at && $notification->expires_at->isFuture())
                                 <tr>
+                                    <td><x-admin.bulk-checkbox :value="$notification->id" /></td>
                                     <td>
                                         <div class="admin-table-title">{{ $notification->title_en }}</div>
                                         <div class="admin-table-subtitle">{{ Str::limit($notification->message_en, 110) }}</div>
@@ -142,6 +151,10 @@
                                                 <i class="fas fa-eye"></i>
                                                 <span>View</span>
                                             </button>
+                                            <a href="{{ route('admin.notifications.show', $notification) }}" class="admin-icon-action">
+                                                <i class="fas fa-check-double"></i>
+                                                <span>Read Receipts</span>
+                                            </a>
                                             <form action="{{ route('admin.notifications.destroy', $notification) }}" method="POST" onsubmit="return confirm('Delete this notification?');">
                                                 @csrf
                                                 @method('DELETE')
@@ -163,11 +176,11 @@
                                                         <div class="admin-notification-meta mb-4">
                                                             <div class="meta-item">
                                                                 <i class="fas fa-calendar"></i>
-                                                                <span>Created: {{ $notification->created_at->format('M d, Y H:i') }}</span>
+                                                                <span>Created: {{ optional($notification->created_at)->format('M d, Y H:i') ?: '—' }}</span>
                                                             </div>
                                                             <div class="meta-item">
                                                                 <i class="fas fa-hourglass-half"></i>
-                                                                <span>Expires: {{ $notification->expires_at->format('M d, Y H:i') }}</span>
+                                                                <span>Expires: {{ optional($notification->expires_at)->format('M d, Y H:i') ?: '—' }}</span>
                                                             </div>
                                                             <div class="meta-item">
                                                                 <i class="fas fa-user"></i>
@@ -242,6 +255,7 @@
                         </tbody>
                     </table>
             </x-admin.table-card>
+            </x-admin.bulk-form>
 
             @if($notifications->hasPages())
                 <div class="admin-pagination-wrap">{{ $notifications->links('components.global-pagination') }}</div>

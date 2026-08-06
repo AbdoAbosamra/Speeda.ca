@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\User;
 use App\Helpers\ErrorHelper;
+use App\Traits\HandlesBulkActions;
+use App\Traits\LogsAdminActions;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +16,125 @@ use Illuminate\Support\Facades\Log;
 
 class AdminCommentController extends Controller
 {
+    use LogsAdminActions;
+    use HandlesBulkActions;
+
+    public function bulk(Request $request)
+    {
+        return $this->runBulkAction($request, 'comments');
+    }
+
+    protected function bulkActions(string $resource): array
+    {
+        return [
+            'approve' => __('admin.bulk_verb_approved'),
+            'reject' => __('admin.bulk_verb_rejected'),
+            'flag' => __('admin.bulk_verb_flagged'),
+            'unflag' => __('admin.bulk_verb_unflagged'),
+            'delete' => __('admin.bulk_verb_deleted'),
+            'restore' => __('admin.bulk_verb_restored'),
+        ];
+    }
+
+    protected function bulkQuery(string $resource): Builder
+    {
+        // withTrashed so the Trash tab can restore in bulk; `user` is eager
+        // loaded because approve()/reject() and the audit log touch it.
+        return Comment::withTrashed()->with('user');
+    }
+
+    /**
+     * @return true|string
+     */
+    protected function applyBulkAction(string $resource, string $action, $comment)
+    {
+        /** @var \App\Models\User $admin */
+        $admin = Auth::user();
+
+        // Moderation actions do not apply to trashed rows — restore first.
+        if ($comment->trashed() && $action !== 'restore') {
+            return __('admin.bulk_reason_already_trashed');
+        }
+
+        return match ($action) {
+            'approve' => $this->bulkApprove($comment, $admin),
+            'reject' => $this->bulkReject($comment, $admin),
+            'flag' => $this->bulkFlag($comment),
+            'unflag' => $this->bulkUnflag($comment),
+            'delete' => $this->bulkDelete($comment),
+            'restore' => $this->bulkRestore($comment),
+            default => __('admin.bulk_reason_failed'),
+        };
+    }
+
+    private function bulkApprove(Comment $comment, $admin)
+    {
+        if ($comment->is_active) {
+            return __('admin.bulk_reason_already_approved');
+        }
+
+        $comment->approve($admin);
+        $this->logApprove($comment);
+
+        return true;
+    }
+
+    private function bulkReject(Comment $comment, $admin)
+    {
+        if ($comment->isRejected()) {
+            return __('admin.bulk_reason_already_rejected');
+        }
+
+        $comment->reject($admin);
+        $this->logReject($comment);
+
+        return true;
+    }
+
+    private function bulkFlag(Comment $comment)
+    {
+        if ($comment->is_flagged) {
+            return __('admin.bulk_reason_already_flagged');
+        }
+
+        $comment->flag();
+        $this->logAction('flag', $comment);
+
+        return true;
+    }
+
+    private function bulkUnflag(Comment $comment)
+    {
+        if (!$comment->is_flagged) {
+            return __('admin.bulk_reason_not_flagged');
+        }
+
+        $comment->unflag();
+        $this->logAction('unflag', $comment);
+
+        return true;
+    }
+
+    private function bulkDelete(Comment $comment)
+    {
+        $this->logAction('delete', $comment, ['deleted' => $comment->toArray()]);
+        $comment->delete();
+
+        return true;
+    }
+
+    private function bulkRestore(Comment $comment)
+    {
+        if (!$comment->trashed()) {
+            return __('admin.bulk_reason_not_trashed');
+        }
+
+        $comment->restore();
+        $this->logAction('restore', $comment);
+
+        return true;
+    }
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -25,33 +147,46 @@ class AdminCommentController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Comment::with(['user', 'approvedBy'])
-                ->orderByDesc('created_at');
+            $status = (string) $request->input('status', '');
 
-            // Filter by status
-            if ($request->get('status') === 'active') {
-                $query->where('is_active', true);
-            } elseif ($request->get('status') === 'pending') {
-                $query->pending();
-            } elseif ($request->get('status') === 'flagged') {
-                $query->flagged();
-            } elseif ($request->get('status') === 'rejected') {
-                $query->rejected();
+            // "deleted" is the only view that reaches into the trash; every other
+            // tab keeps the default (non-trashed) scope.
+            $query = $status === 'deleted'
+                ? Comment::onlyTrashed()
+                : Comment::query();
+
+            $query->with(['user', 'approvedBy'])->orderByDesc('created_at');
+
+            match ($status) {
+                'active' => $query->where('is_active', true),
+                'pending' => $query->pending(),
+                'flagged' => $query->flagged(),
+                'rejected' => $query->rejected(),
+                default => null,
+            };
+
+            // filled() (not has()) so an empty select value means "no filter"
+            // rather than matching on an empty string.
+            if ($request->filled('commentable_type')) {
+                $query->where('commentable_type', $request->input('commentable_type'));
             }
 
-            // Filter by commentable type
-            if ($request->has('commentable_type')) {
-                $query->where('commentable_type', $request->get('commentable_type'));
-            }
-
-            // Filter by user
-            if ($request->has('user_id')) {
-                $query->where('user_id', $request->get('user_id'));
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->input('user_id'));
             }
 
             $comments = $query->paginate(20)->withQueryString();
 
-            return view('admin.comments.index', compact('comments'));
+            $stats = [
+                'total' => Comment::count(),
+                'pending' => Comment::pending()->count(),
+                'approved' => Comment::where('is_active', true)->count(),
+                'flagged' => Comment::flagged()->count(),
+                'rejected' => Comment::rejected()->count(),
+                'deleted' => Comment::onlyTrashed()->count(),
+            ];
+
+            return view('admin.comments.index', compact('comments', 'stats', 'status'));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
@@ -62,10 +197,15 @@ class AdminCommentController extends Controller
     /**
      * Show comment details for admin review/approval.
      */
-    public function show(Comment $comment)
+    public function show(int $commentId)
     {
         try {
-            $comment->load(['user', 'approvedBy', 'commentable']);
+            // withTrashed so a soft-deleted comment can still be inspected and
+            // restored from its detail page.
+            $comment = Comment::withTrashed()
+                ->with(['user', 'approvedBy', 'commentable'])
+                ->findOrFail($commentId);
+
             return view('admin.comments.show', compact('comment'));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -89,6 +229,7 @@ class AdminCommentController extends Controller
 
             return DB::transaction(function () use ($comment, $admin) {
                 $comment->approve($admin);
+                $this->logApprove($comment);
 
                 Log::info('Comment approved by admin', [
                     'comment_id' => $comment->id,
@@ -127,6 +268,7 @@ class AdminCommentController extends Controller
 
             return DB::transaction(function () use ($comment, $admin, $reason) {
                 $comment->reject($admin, $reason);
+                $this->logReject($comment, $reason);
 
                 Log::info('Comment rejected by admin', [
                     'comment_id' => $comment->id,
@@ -206,6 +348,7 @@ class AdminCommentController extends Controller
     {
         try {
             $commentId = $comment->id;
+            $this->logAction('delete', $comment, ['deleted' => $comment->toArray()]);
             $comment->delete();
 
             Log::info('Comment deleted by admin', [

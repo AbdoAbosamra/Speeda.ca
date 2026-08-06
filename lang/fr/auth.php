@@ -62,7 +62,7 @@ return [
   'password_reset_visual_text' => 'Protégez votre compte avec un lien de réinitialisation temporaire et un mot de passe plus fort.',
   'secure_account_access' => 'Accès sécurisé au compte',
   'remembered_password' => 'Vous vous souvenez de votre mot de passe ?',
-  'password_rules_hint' => 'Utilisez au moins 12 caractères avec majuscules, minuscules, chiffres et symboles.',
+  'password_rules_hint' => 'Utilisez au moins 8 caractères.',
   'toggle_password_visibility' => 'Afficher ou masquer le mot de passe',
   'reset_password_button' => 'Réinitialiser le mot de passe',
   'reset_password_email_subject' => 'Réinitialisez votre mot de passe Speeda',

@@ -2,12 +2,14 @@
 
 namespace Tests\Unit\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
 
 class LocationValidationTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_validates_canadian_cities()
     {
         $validCities = ['Laval', 'Montreal', 'Ottawa', 'Gatineau'];
@@ -21,7 +23,7 @@ class LocationValidationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_non_canadian_cities()
     {
         $invalidCities = ['Toronto', 'Vancouver', 'New York', 'Paris', 'London'];
@@ -35,7 +37,7 @@ class LocationValidationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_canadian_provinces()
     {
         $validProvinces = ['Quebec', 'Ontario'];

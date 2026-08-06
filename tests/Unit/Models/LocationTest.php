@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Models;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\Location;
 use App\Models\ServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,7 +23,7 @@ class LocationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_canadian_cities_enum()
     {
         // الـ Locations موجودة بالفعل من الـ migration، لذا نقوم بجلبها
@@ -35,7 +37,7 @@ class LocationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_has_all_canadian_cities_seeded()
     {
         $expectedCities = ['Laval', 'Montreal', 'Ottawa', 'Gatineau'];
@@ -51,7 +53,7 @@ class LocationTest extends TestCase
         $this->assertEquals(4, Location::count());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_correct_city_province_mapping()
     {
         // هذا اختبار منطقي للمدن والمقاطعات (حتى لو لم تكن محفوظة في DB)
@@ -72,7 +74,7 @@ class LocationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_many_service_providers()
     {
         $location = Location::where('city', 'Montreal')->first();
@@ -84,7 +86,7 @@ class LocationTest extends TestCase
         $this->assertTrue($location->serviceProviders->contains($serviceProvider2));
     }
 
-    /** @test */
+    #[Test]
     public function locations_are_active_by_default()
     {
         $locations = Location::all();
@@ -94,7 +96,7 @@ class LocationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_has_proper_timestamps()
     {
         $location = Location::first();

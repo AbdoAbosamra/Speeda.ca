@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use App\Models\Category;
@@ -26,7 +28,7 @@ class BasicBrowserTest extends DuskTestCase
         $this->artisan('migrate:fresh --seed');
     }
 
-    /** @test */
+    #[Test]
     public function homepage_navigation_simulation_works()
     {
         $this->browse(function ($browser) {
@@ -44,7 +46,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertSee('Speeda');
     }
 
-    /** @test */
+    #[Test]
     public function user_registration_flow_simulation()
     {
         $this->browse(function ($browser) {
@@ -72,7 +74,7 @@ class BasicBrowserTest extends DuskTestCase
         $this->assertDatabaseHas('users', ['email' => 'jane@example.test']);
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_profile_access_simulation()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -96,7 +98,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertSee('Test Business');
     }
 
-    /** @test */
+    #[Test]
     public function search_functionality_simulation()
     {
         $category = Category::factory()->create(['name_en' => 'Web Development']);
@@ -120,7 +122,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertSee('DevCorp');
     }
 
-    /** @test */
+    #[Test]
     public function mobile_responsive_simulation()
     {
         $this->browse(function ($browser) {
@@ -140,7 +142,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function multilingual_interface_simulation()
     {
         $this->browse(function ($browser) {
@@ -161,7 +163,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function contact_reveal_system_simulation()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -183,7 +185,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function form_validation_simulation()
     {
         $this->browse(function ($browser) {
@@ -203,7 +205,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertSessionHasErrors(['name', 'email', 'password']);
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_dashboard_simulation()
     {
         $user = User::factory()->create(['role' => 'service_provider']);
@@ -222,7 +224,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertRedirect("/service-providers/{$serviceProvider->id}");
     }
 
-    /** @test */
+    #[Test]
     public function error_handling_simulation()
     {
         $this->browse(function ($browser) {
@@ -236,7 +238,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_integration_simulation()
     {
         $serviceProvider = ServiceProvider::factory()->create([
@@ -259,7 +261,7 @@ class BasicBrowserTest extends DuskTestCase
         $this->assertStringContainsString('wa.me/15145551234', $whatsappUrl);
     }
 
-    /** @test */
+    #[Test]
     public function category_filtering_simulation()
     {
         $category1 = Category::factory()->create(['name_en' => 'Auto Services']);
@@ -282,7 +284,7 @@ class BasicBrowserTest extends DuskTestCase
         $response->assertSee('Auto Shop');
     }
 
-    /** @test */
+    #[Test]
     public function authentication_flow_simulation()
     {
         $user = User::factory()->create([

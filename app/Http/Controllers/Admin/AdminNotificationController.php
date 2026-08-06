@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminNotification;
 use App\Models\ServiceProvider;
 use App\Models\User;
+use App\Traits\HandlesBulkActions;
+use App\Traits\LogsAdminActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ErrorHelper;
@@ -15,6 +17,47 @@ use Illuminate\Validation\ValidationException;
 
 class AdminNotificationController extends Controller
 {
+    use LogsAdminActions;
+    use HandlesBulkActions;
+
+    public function bulk(Request $request)
+    {
+        return $this->runBulkAction($request, 'notifications');
+    }
+
+    protected function bulkActions(string $resource): array
+    {
+        return ['delete' => __('admin.bulk_verb_deleted')];
+    }
+
+    protected function bulkQuery(string $resource): \Illuminate\Database\Eloquent\Builder
+    {
+        return AdminNotification::query();
+    }
+
+    /**
+     * @return true|string
+     */
+    protected function applyBulkAction(string $resource, string $action, $notification)
+    {
+        if ($action !== 'delete') {
+            return __('admin.bulk_reason_failed');
+        }
+
+        $targetProviderIds = AdminNotification::supportsProviderTargeting()
+            ? $notification->targetServiceProviders()->pluck('service_providers.id')->all()
+            : [];
+
+        $this->logAction('delete', $notification, [
+            'deleted' => ['title_en' => $notification->title_en],
+        ], $notification->title_en);
+
+        $notification->delete();
+        $this->clearNotificationCaches($targetProviderIds);
+
+        return true;
+    }
+
     public function __construct()
     {
         $this->middleware(['auth', 'admin']);
@@ -104,6 +147,8 @@ class AdminNotificationController extends Controller
             'target_mode' => 'required|in:all,selected',
             'service_provider_ids' => 'required_if:target_mode,selected|array',
             'service_provider_ids.*' => 'integer|exists:service_providers,id',
+            // Expiry is now admin-controlled instead of a hardcoded 30 days.
+            'expires_in_days' => 'nullable|integer|min:1|max:365',
         ]);
 
         if ($validated['target_mode'] === 'selected' && !AdminNotification::supportsProviderTargeting()) {
@@ -146,12 +191,14 @@ class AdminNotificationController extends Controller
                     'message_fr' => $validated['message_fr'],
                     'target_type' => 'provider_only',
                     'created_by' => Auth::id(),
-                    'expires_at' => now()->addDays(30),
+                    'expires_at' => now()->addDays((int) ($validated['expires_in_days'] ?? 30)),
                 ]);
 
                 if ($validated['target_mode'] === 'selected') {
                     $notification->targetServiceProviders()->sync($targetProviderIds->all());
                 }
+
+                $this->logCreate($notification, $notification->title_en);
 
                 return $notification;
             });
@@ -168,6 +215,57 @@ class AdminNotificationController extends Controller
     }
 
     /**
+     * Show a per-recipient read-receipt breakdown for a notification.
+     * Lists which targeted (or, for broadcasts, all active) providers have
+     * read the notification and which have not.
+     */
+    public function show(AdminNotification $notification)
+    {
+        $targetingEnabled = AdminNotification::supportsProviderTargeting();
+
+        // Resolve the recipient user IDs (provider users).
+        if ($targetingEnabled && $notification->targetServiceProviders()->exists()) {
+            $recipientUserIds = $notification->targetServiceProviders()
+                ->with('user')
+                ->get()
+                ->pluck('user.id')
+                ->filter()
+                ->unique()
+                ->values();
+            $isBroadcast = false;
+        } else {
+            // Broadcast: every active service provider is a recipient.
+            $recipientUserIds = User::where('role', 'service_provider')
+                ->where('is_active', true)
+                ->pluck('id');
+            $isBroadcast = true;
+        }
+
+        // Map of user_id => read_at for recipients who have opened it.
+        $readMap = $notification->readByUsers()
+            ->whereIn('users.id', $recipientUserIds)
+            ->get()
+            ->filter(fn ($user) => $user->pivot->read_at !== null)
+            ->mapWithKeys(fn ($user) => [$user->id => $user->pivot->read_at]);
+
+        $recipients = User::whereIn('id', $recipientUserIds)
+            ->with('serviceProvider')
+            ->orderBy('name')
+            ->get();
+
+        $readRecipients = $recipients->filter(fn ($user) => $readMap->has($user->id))->values();
+        $unreadRecipients = $recipients->reject(fn ($user) => $readMap->has($user->id))->values();
+
+        return view('admin.notifications.show', compact(
+            'notification',
+            'readRecipients',
+            'unreadRecipients',
+            'readMap',
+            'isBroadcast'
+        ));
+    }
+
+    /**
      * Remove the specified notification.
      */
     public function destroy(AdminNotification $notification)
@@ -177,8 +275,12 @@ class AdminNotificationController extends Controller
                 ? $notification->targetServiceProviders()->pluck('service_providers.id')
                 : collect();
 
+            $this->logAction('delete', $notification, [
+                'deleted' => ['title_en' => $notification->title_en],
+            ], $notification->title_en);
+
             $notification->delete();
-            
+
             $this->clearNotificationCaches($targetProviderIds->all());
             
             ErrorHelper::flashNotification('Notification deleted successfully.', 'success');

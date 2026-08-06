@@ -2,12 +2,19 @@
 
 namespace Tests\Unit\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
 
 class EmailValidationTest extends TestCase
 {
-    /** @test */
+    // it_validates_unique_email_addresses uses the `unique:users,email` rule,
+    // which needs the users table to exist.
+    use RefreshDatabase;
+
+    #[Test]
     public function it_validates_correct_email_formats()
     {
         $validEmails = [
@@ -26,7 +33,7 @@ class EmailValidationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_invalid_email_formats()
     {
         $invalidEmails = [
@@ -46,7 +53,7 @@ class EmailValidationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_unique_email_addresses()
     {
         // This would typically test against database uniqueness

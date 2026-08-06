@@ -124,6 +124,8 @@ class Review extends Model
             throw new \Exception('Only admins can approve reviews');
         }
 
+        $wasAlreadyApproved = (bool) $this->is_active;
+
         $this->update([
             'is_active' => true,
             'admin_approved_by' => $admin->id,
@@ -132,6 +134,11 @@ class Review extends Model
 
         // Recalculate provider's average rating
         self::recalculateProviderRating($this->service_provider_id);
+
+        if (!$wasAlreadyApproved && $this->is_active) {
+            app(\App\Services\UserEngagementEmailService::class)
+                ->handleReviewApproved($this);
+        }
     }
 
     /**

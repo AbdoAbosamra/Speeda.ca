@@ -35,9 +35,8 @@ class SitemapService
         });
 
         // 3. Service Providers
-        ServiceProvider::whereHas('user', function ($query) {
-            $query->where('is_active', true);
-        })->chunk(100, function ($providers) use ($sitemap, $locales) {
+        // Deactivated profiles must not be advertised in the sitemap.
+        ServiceProvider::publiclyVisible()->chunk(100, function ($providers) use ($sitemap, $locales) {
             foreach ($providers as $provider) {
                 foreach ($locales as $locale) {
                     $sitemap->add($this->createUrl(

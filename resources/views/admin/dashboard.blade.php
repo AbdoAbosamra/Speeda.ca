@@ -50,6 +50,9 @@
                     <a href="{{ route('admin.whatsapp_analytics.index') }}" class="admin-btn admin-btn-primary text-white">
                         <i class="fab fa-whatsapp"></i><span>WhatsApp Analytics</span>
                     </a>
+                    <a href="{{ route('admin.email_journey.index') }}" class="admin-btn admin-btn-secondary">
+                        <i class="fas fa-envelope"></i><span>Email Journey</span>
+                    </a>
                     <a href="{{ route('admin.notifications.index') }}" class="admin-btn admin-btn-secondary">
                         <i class="fas fa-bell"></i><span>Notifications</span>
                     </a>

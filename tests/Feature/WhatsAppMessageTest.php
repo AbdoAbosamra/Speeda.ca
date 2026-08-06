@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\ServiceProvider;
@@ -52,7 +54,7 @@ class WhatsAppMessageTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function test_service_provider_page_loads_with_whatsapp_button()
     {
         $response = $this->get(route('service-providers.show', $this->serviceProvider->id));
@@ -62,7 +64,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee('revealContactInfo');
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_message_contains_business_name()
     {
         $response = $this->get(route('service-providers.show', $this->serviceProvider->id));
@@ -76,7 +78,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee(__('service_provider.whatsapp_message'));
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_number_formats_correctly_canadian()
     {
         // Test Canadian format
@@ -96,7 +98,7 @@ class WhatsAppMessageTest extends TestCase
         $this->assertStringContainsString('613', $response->content());
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_number_falls_back_to_phone_if_null()
     {
         $sp = ServiceProvider::factory()->create([
@@ -115,7 +117,7 @@ class WhatsAppMessageTest extends TestCase
         $this->assertStringContainsString('6138649118', $response->content());
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_url_format_is_correct()
     {
         $response = $this->get(route('service-providers.show', $this->serviceProvider->id));
@@ -126,7 +128,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee('api.whatsapp.com/send', false);
     }
 
-    /** @test */
+    #[Test]
     public function test_company_name_not_business_name_is_used()
     {
         // Ensure we're using company_name (which exists) not business_name (which doesn't)
@@ -147,7 +149,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee('Correct Company Name');
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_message_falls_back_to_user_name_if_no_company_name()
     {
         $sp = ServiceProvider::factory()->create([
@@ -170,7 +172,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee('John Doe Fallback');
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_number_cleaning_removes_special_characters()
     {
         $sp = ServiceProvider::factory()->create([
@@ -189,7 +191,7 @@ class WhatsAppMessageTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_message_in_english()
     {
         app()->setLocale('en');
@@ -201,7 +203,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee('Hello, I am contacting you through the Speeda platform', false);
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_message_in_arabic()
     {
         // Check that Arabic translation exists
@@ -209,13 +211,15 @@ class WhatsAppMessageTest extends TestCase
         $this->assertEquals('مرحبًا، أتواصل معك عبر منصة سبيدا.', $translation);
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_message_in_french()
     {
         // Check that French translation exists
         $translation = __('service_provider.whatsapp_message', [], 'fr');
         $this->assertEquals('Bonjour, je vous contacte via la plateforme Speeda.', $translation);
-    }    /** @test */
+    }
+
+    #[Test]
     public function test_multiple_service_providers_all_have_valid_whatsapp_data()
     {
         // Create multiple service providers
@@ -238,7 +242,7 @@ class WhatsAppMessageTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_button_reveals_contact_info()
     {
         $response = $this->get(route('service-providers.show', $this->serviceProvider->id));
@@ -252,7 +256,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee('whatsappNumber', false);
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_number_with_egyptian_format()
     {
         $sp = ServiceProvider::factory()->create([
@@ -271,7 +275,7 @@ class WhatsAppMessageTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_error_handling_when_translations_missing()
     {
         // Temporarily remove translation
@@ -285,7 +289,7 @@ class WhatsAppMessageTest extends TestCase
         $response->assertSee('console.error');
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_url_encoding_handles_special_characters()
     {
         $sp = ServiceProvider::factory()->create([

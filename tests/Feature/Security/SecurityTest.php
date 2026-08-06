@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use App\Models\Booking;
@@ -20,7 +22,7 @@ class SecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function unauthorized_users_cannot_access_protected_routes()
     {
         $protectedRoutes = [
@@ -39,7 +41,7 @@ class SecurityTest extends TestCase
         $this->assertContains($response->getStatusCode(), [302, 404]); // Redirect or not found
     }
 
-    /** @test */
+    #[Test]
     public function clients_cannot_access_service_provider_routes()
     {
         $client = User::factory()->create(['role' => 'client']);
@@ -72,7 +74,7 @@ class SecurityTest extends TestCase
         $response->assertStatus(403); // Should be forbidden
     }
 
-    /** @test */
+    #[Test]
     public function users_can_only_access_their_own_data()
     {
         $provider1 = User::factory()->create(['role' => 'service_provider']);
@@ -94,7 +96,7 @@ class SecurityTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function password_reset_tokens_are_secure()
     {
         $user = User::factory()->create(['email' => 'test@example.com']);
@@ -123,7 +125,7 @@ class SecurityTest extends TestCase
         $this->assertNotNull($token->created_at);
     }
 
-    /** @test */
+    #[Test]
     public function sql_injection_protection_works()
     {
         $user = User::factory()->create(['role' => 'client']);
@@ -139,7 +141,7 @@ class SecurityTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $user->id]);
     }
 
-    /** @test */
+    #[Test]
     public function xss_protection_works()
     {
         $user = User::factory()->create(['role' => 'service_provider']);
@@ -171,7 +173,7 @@ class SecurityTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function csrf_protection_prevents_forged_requests()
     {
         $user = User::factory()->create(['role' => 'client']);
@@ -188,7 +190,7 @@ class SecurityTest extends TestCase
         $this->assertContains($response->getStatusCode(), [302, 422]);
     }
 
-    /** @test */
+    #[Test]
     public function file_upload_security_works()
     {
         $user = User::factory()->create(['role' => 'service_provider']);
@@ -213,7 +215,7 @@ class SecurityTest extends TestCase
         $this->assertTrue(true);
     }
 
-    /** @test */
+    #[Test]
     public function rate_limiting_prevents_abuse()
     {
         // Test that rate limiting concept exists by testing throttle middleware on service provider updates
@@ -233,7 +235,7 @@ class SecurityTest extends TestCase
         $this->assertTrue(true); // Rate limiting exists in routes
     }
 
-    /** @test */
+    #[Test]
     public function session_security_is_enforced()
     {
         $user = User::factory()->client()->create([
@@ -260,7 +262,7 @@ class SecurityTest extends TestCase
         // Note: In tests, session ID might not change, but in real app it should
     }
 
-    /** @test */
+    #[Test]
     public function sensitive_data_is_not_exposed_in_api()
     {
         $user = User::factory()->create([
@@ -283,7 +285,7 @@ class SecurityTest extends TestCase
         $this->assertArrayHasKey('email', $userData);
     }
 
-    /** @test */
+    #[Test]
     public function password_hashing_is_secure()
     {
         $plainPassword = 'MySecretPassword123!';
@@ -308,7 +310,7 @@ class SecurityTest extends TestCase
         $this->assertTrue(Hash::check($plainPassword, $hash2));
     }
 
-    /** @test */
+    #[Test]
     public function email_verification_prevents_unauthorized_access()
     {
         // Create unverified user
@@ -321,7 +323,7 @@ class SecurityTest extends TestCase
         $response->assertRedirect('/service-providers');
     }
 
-    /** @test */
+    #[Test]
     public function two_factor_authentication_works()
     {
         if (!class_exists('Laravel\Fortify\Features')) {
@@ -348,7 +350,7 @@ class SecurityTest extends TestCase
         $response->assertRedirect('/two-factor-challenge');
     }
 
-    /** @test */
+    #[Test]
     public function admin_routes_require_admin_role()
     {
         if (!class_exists('App\Models\Admin')) {
@@ -370,7 +372,7 @@ class SecurityTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function api_authentication_works_with_tokens()
     {
         if (!trait_exists('Laravel\Sanctum\HasApiTokens')) {
@@ -390,7 +392,7 @@ class SecurityTest extends TestCase
         $this->assertTrue(true); // API authentication architecture is secure by design
     }
 
-    /** @test */
+    #[Test]
     public function input_validation_prevents_malicious_data()
     {
         $user = User::factory()->create(['role' => 'service_provider']);
@@ -422,7 +424,7 @@ class SecurityTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function database_queries_use_parameter_binding()
     {
         // This is more of a code review test

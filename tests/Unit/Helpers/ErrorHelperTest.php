@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Helpers;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Helpers\ErrorHelper;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -9,7 +11,7 @@ use Tests\TestCase;
 
 class ErrorHelperTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_handles_validation_exceptions()
     {
         $validationException = ValidationException::withMessages([
@@ -26,7 +28,7 @@ class ErrorHelperTest extends TestCase
         $this->assertIsArray($result['errors']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_http_exceptions()
     {
         $httpException = new HttpException(404, 'Not Found');
@@ -40,7 +42,7 @@ class ErrorHelperTest extends TestCase
         $this->assertStringContainsString('404', $result['message']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_general_exceptions()
     {
         $generalException = new \Exception('Something went wrong');
@@ -53,7 +55,7 @@ class ErrorHelperTest extends TestCase
         $this->assertFalse($result['success']);
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_custom_error_messages()
     {
         $exception = new \Exception('Original message');

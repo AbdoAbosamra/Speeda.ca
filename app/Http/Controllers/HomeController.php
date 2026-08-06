@@ -8,6 +8,7 @@ use App\Models\ServiceProvider;
 use App\Models\Review;
 use App\Models\Endorsement;
 use App\Models\Post;
+use App\Models\SiteTestimonial;
 use App\Services\CategoryCacheService;
 use App\Services\LocationClusterService;
 use Illuminate\Http\Request;
@@ -70,9 +71,7 @@ class HomeController extends Controller
                         $query->where('is_active', 1);
                     },
                 ])
-                ->whereHas('user', function ($query) {
-                    $query->where('is_active', true);
-                })
+                ->publiclyVisible()
                 ->orderByRaw("CASE
                     WHEN profile_image IS NOT NULL AND profile_image != '' AND calculated_rating > 0 THEN 3
                     WHEN profile_image IS NOT NULL AND profile_image != '' AND experience_years > 0 THEN 2
@@ -94,6 +93,9 @@ class HomeController extends Controller
                 ->get();
         });
 
-        return view('home', compact('categories', 'locationClusters', 'providerStats', 'featuredProviders', 'latestBlogPosts'));
+        // Admin-managed provider testimonials — shown only when exactly 3 are active.
+        $siteTestimonials = SiteTestimonial::forHomePage();
+
+        return view('home', compact('categories', 'locationClusters', 'providerStats', 'featuredProviders', 'latestBlogPosts', 'siteTestimonials'));
     }
 }

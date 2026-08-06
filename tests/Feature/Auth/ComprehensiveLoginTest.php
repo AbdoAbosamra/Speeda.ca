@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Auth;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,14 +24,14 @@ class ComprehensiveLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function login_page_redirects_to_register()
     {
         // The standalone login page was merged into the register page.
         $this->get('/login')->assertRedirect(route('register'));
     }
 
-    /** @test */
+    #[Test]
     public function user_can_login_with_correct_credentials()
     {
         $user = User::factory()->client()->create([
@@ -47,7 +49,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    /** @test */
+    #[Test]
     public function client_redirects_to_home_after_login()
     {
         $client = User::factory()->client()->create([
@@ -65,7 +67,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertAuthenticatedAs($client);
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_redirects_to_profile_after_login()
     {
         $provider = User::factory()->serviceProvider()->create([
@@ -85,7 +87,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertAuthenticatedAs($provider);
     }
 
-    /** @test */
+    #[Test]
     public function login_fails_with_incorrect_email()
     {
         User::factory()->client()->create([
@@ -103,7 +105,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function login_fails_with_incorrect_password()
     {
         User::factory()->client()->create([
@@ -121,7 +123,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function login_validation_requires_login_password_and_role()
     {
         // Missing login field
@@ -147,7 +149,7 @@ class ComprehensiveLoginTest extends TestCase
             ->assertSessionHasErrors(['login', 'password', 'role']);
     }
 
-    /** @test */
+    #[Test]
     public function login_fails_for_unknown_credentials()
     {
         $invalidCredentials = [
@@ -165,7 +167,7 @@ class ComprehensiveLoginTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function remember_me_functionality_works()
     {
         $user = User::factory()->client()->create([
@@ -190,7 +192,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function login_without_remember_me_works()
     {
         $user = User::factory()->client()->create([
@@ -208,7 +210,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    /** @test */
+    #[Test]
     public function rate_limiting_prevents_brute_force_attacks()
     {
         User::factory()->client()->create([
@@ -238,7 +240,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function rate_limiting_is_per_login_identifier()
     {
         User::factory()->client()->create([
@@ -276,7 +278,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertAuthenticatedAs($user2);
     }
 
-    /** @test */
+    #[Test]
     public function already_authenticated_user_is_redirected_from_login()
     {
         $user = User::factory()->client()->create();
@@ -286,7 +288,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->get('/login')->assertRedirect();
     }
 
-    /** @test */
+    #[Test]
     public function password_is_case_sensitive()
     {
         User::factory()->client()->create([
@@ -310,7 +312,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function login_handles_unicode_passwords()
     {
         $unicodePassword = 'كلمة_مرور_عربية_123';
@@ -330,7 +332,7 @@ class ComprehensiveLoginTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    /** @test */
+    #[Test]
     public function csrf_protection_is_enforced_on_login()
     {
         User::factory()->client()->create([
@@ -348,7 +350,7 @@ class ComprehensiveLoginTest extends TestCase
         $response->assertRedirect(route('home'));
     }
 
-    /** @test */
+    #[Test]
     public function login_logs_authentication_attempts()
     {
         $user = User::factory()->client()->create([

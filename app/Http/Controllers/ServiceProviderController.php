@@ -57,10 +57,8 @@ class ServiceProviderController extends Controller
                 }]);
             });
 
-        // Only show providers whose users are active
-        $query->whereHas('user', function ($userQuery) {
-            $userQuery->where('is_active', true);
-        });
+        // Only show providers whose owner account AND profile are both active.
+        $query->publiclyVisible();
 
         // Search filter
         if ($request->filled('search')) {
@@ -226,11 +224,17 @@ class ServiceProviderController extends Controller
             // Apply SEO
             $seoService->apply('provider', $serviceProvider);
 
-            // Check if the service provider's user is active
+            // A profile is only reachable when the owner account is active AND
+            // an admin has not deactivated the listing itself. Admins and the
+            // owner may still open a deactivated profile to review it.
             $user = $serviceProvider->user;
-            if ($user && !$user->is_active) {
-                // User is deactivated - show 404
-                abort(404, __('service_provider.account_disabled'));
+            $isAdminViewer = auth()->check() && auth()->user()->isAdmin();
+            $isOwnerViewer = auth()->check() && auth()->id() === $serviceProvider->user_id;
+
+            if (!$isAdminViewer && !$isOwnerViewer) {
+                if (($user && !$user->is_active) || !$serviceProvider->is_active) {
+                    abort(404, __('service_provider.account_disabled'));
+                }
             }
 
             // Increment views only for real visitors, not owners or admins monitoring the site.
@@ -405,6 +409,11 @@ class ServiceProviderController extends Controller
                 'serviceAreaLocationIds',
                 'serviceAreaLocations'
             ));
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+            // Deliberate aborts (404 for a hidden or deactivated profile) must
+            // reach the client as-is. Swallowing them into a redirect told
+            // crawlers the page had moved instead of that it does not exist.
+            throw $e;
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);

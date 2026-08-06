@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\ServiceProvider;
@@ -51,7 +53,7 @@ class ServiceProviderProfileTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function test_owner_can_view_own_profile()
     {
         $response = $this->actingAs($this->user)
@@ -61,7 +63,7 @@ class ServiceProviderProfileTest extends TestCase
             ->assertSee($this->serviceProvider->company_name);
     }
 
-    /** @test */
+    #[Test]
     public function test_other_provider_can_view_public_profile()
     {
         // Provider profiles are public; any authenticated user can view them.
@@ -72,7 +74,7 @@ class ServiceProviderProfileTest extends TestCase
             ->assertSee($this->serviceProvider->company_name);
     }
 
-    /** @test */
+    #[Test]
     public function test_guest_can_view_public_profile()
     {
         $response = $this->get(route('service-providers.show', $this->serviceProvider));
@@ -81,7 +83,7 @@ class ServiceProviderProfileTest extends TestCase
             ->assertSee($this->serviceProvider->company_name);
     }
 
-    /** @test */
+    #[Test]
     public function test_owner_can_update_profile()
     {
         $data = [
@@ -107,7 +109,7 @@ class ServiceProviderProfileTest extends TestCase
         $this->assertEquals(10, $this->serviceProvider->experience_years);
     }
 
-    /** @test */
+    #[Test]
     public function test_whatsapp_number_validation()
     {
         $data = [
@@ -121,7 +123,7 @@ class ServiceProviderProfileTest extends TestCase
         $response->assertSessionHasErrors('whatsapp_number');
     }
 
-    /** @test */
+    #[Test]
     public function test_category_can_be_changed_only_when_currently_others()
     {
         // Category is locked unless the current category is "Others".
@@ -149,7 +151,7 @@ class ServiceProviderProfileTest extends TestCase
         $this->assertEquals($newCategory->id, $this->serviceProvider->category_id);
     }
 
-    /** @test */
+    #[Test]
     public function test_services_offered_persists_as_json()
     {
         $data = [
@@ -171,7 +173,7 @@ class ServiceProviderProfileTest extends TestCase
         $this->assertContains('Repairs', $services);
     }
 
-    /** @test */
+    #[Test]
     public function test_validation_errors_show_notification()
     {
         $data = [
@@ -184,7 +186,7 @@ class ServiceProviderProfileTest extends TestCase
         $response->assertSessionHasErrors('business_name');
     }
 
-    /** @test */
+    #[Test]
     public function test_database_transaction_rollback_on_error()
     {
         $originalName = $this->serviceProvider->company_name;
@@ -206,7 +208,7 @@ class ServiceProviderProfileTest extends TestCase
         $this->assertEquals($originalName, $this->serviceProvider->company_name);
     }
 
-    /** @test */
+    #[Test]
     public function test_unauthorized_user_cannot_update_profile()
     {
         $data = [

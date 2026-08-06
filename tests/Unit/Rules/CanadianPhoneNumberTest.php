@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Rules\CanadianPhoneNumber;
 use Tests\TestCase;
 
@@ -21,7 +23,7 @@ class CanadianPhoneNumberTest extends TestCase
         $this->rule = new CanadianPhoneNumber();
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_valid_10_digit_phone_numbers()
     {
         $validNumbers = [
@@ -37,7 +39,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_valid_formatted_phone_numbers()
     {
         $validFormats = [
@@ -54,7 +56,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_11_digit_numbers_starting_with_1()
     {
         $validNumbers = [
@@ -68,7 +70,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_numbers_starting_with_0()
     {
         $invalidNumbers = [
@@ -82,7 +84,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_numbers_starting_with_1()
     {
         $invalidNumbers = [
@@ -95,7 +97,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_numbers_with_wrong_length()
     {
         $invalidNumbers = [
@@ -110,7 +112,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_accepts_empty_values()
     {
         $emptyValues = [null, '', ' ', '   '];
@@ -120,7 +122,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_strips_non_digit_characters()
     {
         $messyNumbers = [
@@ -136,7 +138,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_edge_case_area_codes()
     {
         // Test some real Canadian area codes
@@ -177,7 +179,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_international_format()
     {
         $internationalFormats = [
@@ -191,7 +193,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_obviously_fake_numbers()
     {
         $fakeNumbers = [
@@ -206,7 +208,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_special_characters_gracefully()
     {
         $numbersWithSpecialChars = [
@@ -226,7 +228,7 @@ class CanadianPhoneNumberTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function performance_test_with_many_validations()
     {
         $startTime = microtime(true);

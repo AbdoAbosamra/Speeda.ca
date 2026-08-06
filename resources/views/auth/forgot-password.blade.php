@@ -5,7 +5,7 @@
 ])
 
 @section('content')
-    <form class="password-form" method="POST" action="{{ route('password.email') }}">
+    <form class="password-form" method="POST" action="{{ route('password.email') }}" onsubmit="this.querySelector('button[type=submit]').disabled = true; return true;">
         @csrf
 
         <div class="password-field">
@@ -22,11 +22,13 @@
                     autofocus
                     autocomplete="email"
                     placeholder="{{ __('general.email_placeholder') }}"
+                    aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
+                    @if($errors->has('email')) aria-describedby="email-error" @endif
                 >
             </div>
 
             @foreach ($errors->get('email') as $message)
-                <p class="password-error">{{ $message }}</p>
+                <p class="password-error" id="email-error" role="alert">{{ $message }}</p>
             @endforeach
         </div>
 

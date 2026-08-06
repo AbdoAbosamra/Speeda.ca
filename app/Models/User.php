@@ -19,6 +19,13 @@ class User extends Authenticatable
         'profession',
         'role', // allow setting role during registration
         'is_active', // user account status
+        'client_welcome_email_sent_at', // send-once guard: client welcome email
+        'first_review_email_sent_at', // send-once guard: 1st approved review email
+        'fifth_review_email_sent_at', // send-once guard: 5th approved review email
+        'login_count', // number of successful logins
+        'last_login_at', // timestamp of the most recent login
+        'last_login_ip', // IP of the most recent login
+        'last_seen_at', // presence heartbeat (updated on activity)
     ];
 
     protected $hidden = [
@@ -32,6 +39,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'client_welcome_email_sent_at' => 'datetime',
+            'first_review_email_sent_at' => 'datetime',
+            'fifth_review_email_sent_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'last_seen_at' => 'datetime',
+            'login_count' => 'integer',
         ];
     }
 
@@ -145,6 +158,26 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return $this->is_active ?? true; // Default to true if column doesn't exist
+    }
+
+    /** Minutes of inactivity after which a user is considered offline. */
+    public const ONLINE_THRESHOLD_MINUTES = 5;
+
+    /**
+     * Whether the user is currently considered online (recent heartbeat).
+     */
+    public function isOnline(): bool
+    {
+        return $this->last_seen_at !== null
+            && $this->last_seen_at->gt(now()->subMinutes(self::ONLINE_THRESHOLD_MINUTES));
+    }
+
+    /**
+     * Scope to users seen within the online threshold.
+     */
+    public function scopeOnline($query)
+    {
+        return $query->where('last_seen_at', '>', now()->subMinutes(self::ONLINE_THRESHOLD_MINUTES));
     }
 
     // Scopes

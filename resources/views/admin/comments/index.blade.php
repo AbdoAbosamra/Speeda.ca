@@ -37,6 +37,12 @@
                         <a href="{{ route('admin.comments', ['status' => 'rejected']) }}"
                             class="btn {{ request('status') === 'rejected' ? 'btn-dark' : 'btn-outline-secondary' }} rounded-pill px-3">
                             <i class="fas fa-ban me-1"></i>{{ __('admin.rejected') }}
+                            <span class="badge bg-light text-dark ms-1">{{ $stats['rejected'] ?? 0 }}</span>
+                        </a>
+                        <a href="{{ route('admin.comments', ['status' => 'deleted']) }}"
+                            class="btn {{ request('status') === 'deleted' ? 'btn-danger' : 'btn-outline-secondary' }} rounded-pill px-3">
+                            <i class="fas fa-trash me-1"></i>{{ __('admin.trash') }}
+                            <span class="badge bg-light text-dark ms-1">{{ $stats['deleted'] ?? 0 }}</span>
                         </a>
                     </div>
                 </div>
@@ -51,10 +57,23 @@
                     </h5>
                 </div>
                 <div class="card-body p-0">
+                    <x-admin.bulk-form
+                        :action="route('admin.comments.bulk')"
+                        label="comments"
+                        :actions="[
+                            'approve' => ['label' => __('admin.approve'), 'icon' => 'fa-check', 'variant' => 'success'],
+                            'reject'  => ['label' => __('admin.reject'), 'icon' => 'fa-times', 'variant' => 'warning'],
+                            'flag'    => ['label' => __('admin.flag'), 'icon' => 'fa-flag'],
+                            'unflag'  => ['label' => __('admin.unflag'), 'icon' => 'fa-flag'],
+                            'restore' => ['label' => __('admin.restore'), 'icon' => 'fa-undo'],
+                            'delete'  => ['label' => __('admin.delete'), 'icon' => 'fa-trash', 'variant' => 'danger', 'confirm' => __('admin.bulk_confirm_delete')],
+                        ]"
+                    >
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead style="background: #f8fafc;">
                                 <tr>
+                                    <th class="ps-4 py-3" style="width:1%;"><x-admin.bulk-checkbox master /></th>
                                     <th class="fw-bold px-4 py-3">{{ __('admin.user') }}</th>
                                     <th class="fw-bold py-3">{{ __('admin.content') }}</th>
                                     <th class="fw-bold py-3">{{ __('admin.type') }}</th>
@@ -66,6 +85,7 @@
                             <tbody>
                                 @forelse($comments as $comment)
                                     <tr style="border-bottom: 1px solid #e2e8f0;">
+                                        <td class="ps-4 py-3"><x-admin.bulk-checkbox :value="$comment->id" /></td>
                                         <td class="px-4 py-3">
                                             <div class="d-flex align-items-center">
                                                 <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center me-2"
@@ -106,7 +126,7 @@
                                                 <span class="badge rounded-pill px-3 py-2 bg-danger">
                                                     <i class="fas fa-flag me-1"></i>{{ __('admin.flagged') }}
                                                 </span>
-                                            @elseif($comment->rejection_reason)
+                                            @elseif($comment->isRejected())
                                                 <span class="badge rounded-pill px-3 py-2 bg-dark">
                                                     <i class="fas fa-ban me-1"></i>{{ __('admin.rejected') }}
                                                 </span>
@@ -122,8 +142,17 @@
                                         </td>
                                         <td class="py-3 text-center">
                                             <div class="btn-group">
-                                                @if(!$comment->is_active && !$comment->rejection_reason)
-                                                    <!-- Pending Comment Actions -->
+                                                <a href="{{ route('admin.comments.show', $comment) }}"
+                                                   class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1"
+                                                   title="{{ __('admin.view') }}">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
+                                                {{-- Moderation actions resolve the comment via implicit binding,
+                                                     which skips trashed rows — so only offer them while it is live.
+                                                     Approve is offered for anything not currently published, so a
+                                                     rejected comment can be reinstated. --}}
+                                                @if(!$comment->trashed() && !$comment->is_active)
                                                     <form action="{{ route('admin.comments.approve', $comment) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
@@ -132,6 +161,9 @@
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
+                                                @endif
+
+                                                @if(!$comment->trashed() && !$comment->isRejected())
                                                     <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 me-1"
                                                         title="{{ __('admin.reject') }}" data-bs-toggle="modal"
                                                         data-bs-target="#rejectModal{{ $comment->id }}">
@@ -139,7 +171,9 @@
                                                     </button>
                                                 @endif
 
-                                                @if(!$comment->is_flagged && $comment->is_active)
+                                                @if($comment->trashed())
+                                                    {{-- flag/unflag are unavailable while trashed --}}
+                                                @elseif(!$comment->is_flagged && $comment->is_active)
                                                     <form action="{{ route('admin.comments.flag', $comment) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
@@ -153,24 +187,36 @@
                                                     <form action="{{ route('admin.comments.unflag', $comment) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 me-1"
+                                                        <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill px-3 me-1"
                                                             title="{{ __('admin.unflag') }}">
-                                                            <i class="fas fa-check"></i> {{ __('admin.approve') }}
+                                                            <i class="fas fa-flag"></i>
                                                         </button>
                                                     </form>
                                                 @endif
 
-                                                <form action="{{ route('admin.comments.delete', $comment) }}" method="POST"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('{{ __('admin.confirm_delete_comment') }}');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                        class="btn btn-sm btn-outline-danger rounded-pill px-3"
-                                                        title="{{ __('admin.delete') }}">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                @if($comment->trashed())
+                                                    <form action="{{ route('admin.comments.restore', $comment->id) }}" method="POST"
+                                                        class="d-inline">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-outline-success rounded-pill px-3"
+                                                            title="{{ __('admin.restore') }}">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <form action="{{ route('admin.comments.delete', $comment) }}" method="POST"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('{{ __('admin.confirm_delete_comment') }}');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                            title="{{ __('admin.delete') }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
 
                                             <!-- Reject Modal -->
@@ -214,7 +260,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
                                             <p class="text-muted">{{ __('admin.no_comments') }}</p>
                                         </td>
@@ -223,6 +269,7 @@
                             </tbody>
                         </table>
                     </div>
+                    </x-admin.bulk-form>
                 </div>
                 @if($comments->hasPages())
                     <div class="card-footer bg-white" style="border-top: 2px solid #f1f5f9; border-radius: 0 0 16px 16px;">

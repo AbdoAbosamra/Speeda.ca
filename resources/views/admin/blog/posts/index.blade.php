@@ -10,6 +10,14 @@
             >
                 <x-slot:actions>
                     <x-ui.button
+                        :href="route('admin.blog.posts.trash')"
+                        variant="secondary"
+                        icon="fas fa-trash"
+                        class="admin-btn admin-btn-secondary"
+                    >
+                        Trash
+                    </x-ui.button>
+                    <x-ui.button
                         :href="route('admin.blog.posts.create')"
                         icon="fas fa-plus"
                         class="admin-btn admin-btn-primary text-white"
@@ -50,10 +58,20 @@
                 </form>
             </section>
 
+            <x-admin.bulk-form
+                :action="route('admin.blog.posts.bulk')"
+                label="posts"
+                :actions="[
+                    'publish' => ['label' => __('admin.publish'), 'icon' => 'fa-upload', 'variant' => 'success'],
+                    'draft'   => ['label' => __('admin.unpublish'), 'icon' => 'fa-file-pen', 'variant' => 'warning'],
+                    'delete'  => ['label' => __('admin.delete'), 'icon' => 'fa-trash', 'variant' => 'danger', 'confirm' => __('admin.bulk_confirm_delete')],
+                ]"
+            >
             <x-admin.table-card>
                     <table class="admin-data-table">
                         <thead>
                                 <tr>
+                                    <th style="width:1%;"><x-admin.bulk-checkbox master /></th>
                                     <th>Image</th>
                                     <th>Title</th>
                                     <th>Status</th>
@@ -66,6 +84,7 @@
                             @forelse($posts as $post)
                                 @php($postStatus = $post->status ?: ($post->is_published ? 'published' : 'draft'))
                                 <tr>
+                                    <td><x-admin.bulk-checkbox :value="$post->id" /></td>
                                     <td>
                                         <img src="{{ $post->image_url }}" alt="{{ $post->title_en ?: $post->title }}" class="admin-table-thumb" loading="lazy">
                                     </td>
@@ -108,7 +127,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6">
+                                    <td colspan="7">
                                         <x-admin.empty-state
                                             icon="fas fa-newspaper"
                                             title="No blog posts found"
@@ -126,6 +145,7 @@
                         </tbody>
                     </table>
             </x-admin.table-card>
+            </x-admin.bulk-form>
 
             @if($posts->hasPages())
                 <div class="admin-pagination-wrap">

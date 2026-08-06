@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use App\Models\Category;
@@ -25,7 +27,7 @@ class UserJourneyTest extends DuskTestCase
         $this->artisan('db:seed', ['--class' => 'CategorySeeder']);
     }
 
-    /** @test */
+    #[Test]
     public function client_can_complete_full_booking_journey()
     {
         $this->browse(function (Browser $browser) {
@@ -78,7 +80,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_can_manage_bookings()
     {
         $this->browse(function (Browser $browser) {
@@ -116,7 +118,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function registration_form_validation_works_in_browser()
     {
         $this->browse(function (Browser $browser) {
@@ -153,7 +155,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function mobile_responsive_design_works()
     {
         $this->browse(function (Browser $browser) {
@@ -182,7 +184,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function search_functionality_works_in_browser()
     {
         $this->browse(function (Browser $browser) {
@@ -215,7 +217,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function real_time_notifications_work()
     {
         if (!class_exists('Pusher\Pusher')) {
@@ -247,7 +249,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function file_upload_works_in_browser()
     {
         $this->browse(function (Browser $browser) {
@@ -268,7 +270,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function language_switching_works()
     {
         $this->browse(function (Browser $browser) {
@@ -294,7 +296,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_integration_launches_correctly()
     {
         $this->browse(function (Browser $browser) {
@@ -318,7 +320,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function booking_calendar_integration_works()
     {
         $this->browse(function (Browser $browser) {
@@ -349,7 +351,7 @@ class UserJourneyTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function error_handling_displays_user_friendly_messages()
     {
         $this->browse(function (Browser $browser) {

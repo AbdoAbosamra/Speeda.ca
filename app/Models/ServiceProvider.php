@@ -14,6 +14,21 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\MediaCollections\File;
 
+/**
+ * NOTE ON DELETES
+ * ---------------
+ * The service_providers table carries a `deleted_at` column, but this model
+ * deliberately does NOT use SoftDeletes, so delete() is permanent.
+ *
+ * That is intentional: `whatsapp_number` has a UNIQUE constraint, and retaining
+ * soft-deleted rows would block a provider from ever re-registering with the
+ * same number. AdminProviderController::destroy() therefore also cleans the
+ * media/files off disk, and the UI states that the action cannot be undone.
+ *
+ * Do not add the SoftDeletes trait without first making whatsapp_number unique
+ * only across non-trashed rows. The `deleted_at` column is currently unused
+ * (0 rows populated) and is a candidate for removal.
+ */
 class ServiceProvider extends Model implements HasMedia
 {
     use HasFactory;
@@ -45,6 +60,8 @@ class ServiceProvider extends Model implements HasMedia
         'business_license',
         'business_type',
         'is_verified',
+        'is_featured',
+        'is_active',
         'is_certified',
         'certification',
         'phone',
@@ -53,6 +70,8 @@ class ServiceProvider extends Model implements HasMedia
         'rating',
         'calculated_rating',
         'endorsement_count',
+        'first_review_received_email_sent_at',
+        'fifth_review_received_email_sent_at',
     ];
 
     /**
@@ -64,6 +83,7 @@ class ServiceProvider extends Model implements HasMedia
         'available_evenings' => 'boolean',
         'is_verified' => 'boolean',
         'is_featured' => 'boolean',
+        'is_active' => 'boolean',
         'is_certified' => 'boolean',
         'experience_years' => 'integer',
         'hourly_rate' => 'decimal:2',
@@ -71,6 +91,8 @@ class ServiceProvider extends Model implements HasMedia
         'views' => 'integer',
         'profile_completion_percent' => 'integer',
         'profile_completion_popup_shown_at' => 'datetime',
+        'first_review_received_email_sent_at' => 'datetime',
+        'fifth_review_received_email_sent_at' => 'datetime',
         'languages' => 'array',
         'specializations' => 'array',
         'services_offered' => 'array',
@@ -592,10 +614,30 @@ class ServiceProvider extends Model implements HasMedia
     }
 
     /**
+     * Only providers that should appear on the public site.
+     *
+     * A profile is publicly visible when BOTH are true:
+     *  - the owning user account is active (and not trashed), and
+     *  - the profile itself has not been deactivated by an admin.
+     *
+     * Admins toggle the second flag from the provider management screen, which
+     * lets a listing be pulled without disabling the owner's login.
+     */
+    public function scopePubliclyVisible($query)
+    {
+        return $query
+            ->where('service_providers.is_active', true)
+            ->whereHas('user', fn ($userQuery) => $userQuery->where('is_active', true));
+    }
+
+    /**
      * Get all bookings for this service provider.
      */
-    // public function bookings(): HasMany
-    // {
-    //     return $this->hasMany(Booking::class);
-    // }
+    /**
+     * Get all email journey logs for this service provider.
+     */
+    public function providerEmailLogs(): HasMany
+    {
+        return $this->hasMany(ProviderEmailLog::class);
+    }
 }

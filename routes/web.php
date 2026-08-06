@@ -234,7 +234,12 @@ Route::middleware(['auth'])->prefix('comments')->name('comments.')->group(functi
 });
 
 // ==================== ADMIN ROUTES ====================
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+// throttle:120,1 is a safety net against runaway scripts / credential-stuffed
+// sessions hammering the panel; it is well above normal interactive use.
+// admin.locale pins the panel to English; site language stays untouched for the
+// public site. Database content (Arabic category names, bios, reviews) is not
+// affected — only __() UI strings.
+Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('admin')->name('admin.')->group(function () {
     // Redirect /admin to /admin/dashboard
     Route::get('/', function () {
         return redirect()->route('admin.dashboard');
@@ -250,6 +255,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Blog CMS
+    // Trash routes are declared before the resource so blog/posts/trash is not
+    // swallowed by the blog/posts/{post} wildcard.
+    Route::post('blog/posts/bulk', [BlogPostController::class, 'bulk'])->name('blog.posts.bulk');
+    Route::get('blog/posts/trash', [BlogPostController::class, 'trash'])->name('blog.posts.trash');
+    Route::post('blog/posts/{post}/restore', [BlogPostController::class, 'restore'])->name('blog.posts.restore');
     Route::resource('blog/posts', BlogPostController::class)
         ->except(['show'])
         ->names('blog.posts')
@@ -262,6 +272,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Categories Management (using IDs, no slugs)
     Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
+    Route::post('/categories/bulk', [AdminController::class, 'bulkCategories'])->name('categories.bulk');
     Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
     Route::get('/categories/{category}/edit', [AdminController::class, 'editCategory'])->name('categories.edit');
     Route::patch('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
@@ -270,6 +281,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Users Management
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::post('/users/bulk', [AdminController::class, 'bulkUsers'])->name('users.bulk');
     Route::get('/users/trash', [AdminController::class, 'usersTrash'])->name('users.trash');
     Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
     Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
@@ -280,6 +292,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Locations
     Route::get('/locations', [AdminController::class, 'locations'])->name('locations');
+    Route::post('/locations/bulk', [AdminController::class, 'bulkLocations'])->name('locations.bulk');
     Route::post('/locations', [AdminController::class, 'storeLocation'])->name('locations.store');
     Route::put('/locations/{location}', [AdminController::class, 'updateLocation'])->name('locations.update');
     Route::delete('/locations/{location}', [AdminController::class, 'deleteLocation'])->name('locations.delete');
@@ -291,9 +304,21 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/visitors/live-count', [VisitorAnalyticsController::class, 'getLiveCount'])->name('visitors.live-count');
     Route::get('/visitors/export', [VisitorAnalyticsController::class, 'export'])->name('visitors.export');
 
-    // Provider Activity Monitor (WhatsApp Clicks & Views)
+    // Login Activity & Presence (who logs in / who is online)
+    Route::get('/login-activity', [App\Http\Controllers\Admin\LoginActivityController::class, 'index'])->name('login_activity.index');
+
+    // Provider Activity Monitor (WhatsApp Clicks & Views) — read-only analytics
     Route::get('/provider-activity-monitor', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'index'])->name('provider_activity_monitor.index');
     Route::get('/provider-activity-monitor/{serviceProvider}', [App\Http\Controllers\Admin\ProviderActivityMonitorController::class, 'show'])->name('provider_activity_monitor.show');
+
+    // Provider Management (write actions on the listing itself)
+    Route::post('/providers/bulk', [App\Http\Controllers\Admin\AdminProviderController::class, 'bulk'])->name('providers.bulk');
+    Route::get('/providers/{serviceProvider}/edit', [App\Http\Controllers\Admin\AdminProviderController::class, 'edit'])->name('providers.edit');
+    Route::patch('/providers/{serviceProvider}', [App\Http\Controllers\Admin\AdminProviderController::class, 'update'])->name('providers.update');
+    Route::patch('/providers/{serviceProvider}/toggle-active', [App\Http\Controllers\Admin\AdminProviderController::class, 'toggleActive'])->name('providers.toggle_active');
+    Route::patch('/providers/{serviceProvider}/toggle-verified', [App\Http\Controllers\Admin\AdminProviderController::class, 'toggleVerified'])->name('providers.toggle_verified');
+    Route::patch('/providers/{serviceProvider}/toggle-featured', [App\Http\Controllers\Admin\AdminProviderController::class, 'toggleFeatured'])->name('providers.toggle_featured');
+    Route::delete('/providers/{serviceProvider}', [App\Http\Controllers\Admin\AdminProviderController::class, 'destroy'])->name('providers.destroy');
 
     // WhatsApp Click Intelligence (read-only analytics)
     Route::get('/whatsapp-analytics', [App\Http\Controllers\Admin\WhatsappAnalyticsController::class, 'index'])->name('whatsapp_analytics.index');
@@ -303,6 +328,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Reviews Management (Admin approval workflow)
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews');
+    Route::post('/reviews/bulk', [AdminReviewController::class, 'bulk'])->name('reviews.bulk');
     Route::get('/reviews/{review}', [AdminReviewController::class, 'show'])->name('reviews.show');
     Route::post('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
     Route::post('/reviews/{review}/reject', [AdminReviewController::class, 'reject'])->name('reviews.reject');
@@ -312,6 +338,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Comments Management (Admin approval workflow)
     Route::get('/comments', [AdminCommentController::class, 'index'])->name('comments');
+    Route::post('/comments/bulk', [AdminCommentController::class, 'bulk'])->name('comments.bulk');
     Route::get('/comments/{comment}', [AdminCommentController::class, 'show'])->name('comments.show');
     Route::post('/comments/{comment}/approve', [AdminCommentController::class, 'approve'])->name('comments.approve');
     Route::post('/comments/{comment}/reject', [AdminCommentController::class, 'reject'])->name('comments.reject');
@@ -320,11 +347,34 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/comments/{comment}', [AdminCommentController::class, 'delete'])->name('comments.delete');
     Route::post('/comments/{comment}/restore', [AdminCommentController::class, 'restore'])->name('comments.restore');
 
+    // Site Testimonials (admin-authored provider testimonials shown on home)
+    Route::post('/testimonials/bulk', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'bulk'])->name('testimonials.bulk');
+    Route::get('/testimonials', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'index'])->name('testimonials.index');
+    Route::post('/testimonials', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'store'])->name('testimonials.store');
+    Route::patch('/testimonials/{testimonial}', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'update'])->name('testimonials.update');
+    Route::patch('/testimonials/{testimonial}/toggle', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'toggle'])->name('testimonials.toggle');
+    Route::delete('/testimonials/{testimonial}', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'destroy'])->name('testimonials.destroy');
+
     // Notifications Management
+    Route::post('/notifications/bulk', [App\Http\Controllers\Admin\AdminNotificationController::class, 'bulk'])->name('notifications.bulk');
     Route::get('/notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/create', [App\Http\Controllers\Admin\AdminNotificationController::class, 'create'])->name('notifications.create');
+    Route::get('/notifications/{notification}/read-receipts', [App\Http\Controllers\Admin\AdminNotificationController::class, 'show'])->name('notifications.show');
     Route::post('/notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'store'])->name('notifications.store');
     Route::delete('/notifications/{notification}', [App\Http\Controllers\Admin\AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Email Templates (admin-editable copy for the automated emails)
+    Route::get('/email-templates', [App\Http\Controllers\Admin\AdminEmailTemplateController::class, 'index'])->name('email_templates.index');
+    Route::get('/email-templates/{key}/edit', [App\Http\Controllers\Admin\AdminEmailTemplateController::class, 'edit'])->name('email_templates.edit');
+    Route::put('/email-templates/{key}', [App\Http\Controllers\Admin\AdminEmailTemplateController::class, 'update'])->name('email_templates.update');
+    Route::delete('/email-templates/{key}', [App\Http\Controllers\Admin\AdminEmailTemplateController::class, 'reset'])->name('email_templates.reset');
+    Route::get('/email-templates/{key}/preview', [App\Http\Controllers\Admin\AdminEmailTemplateController::class, 'preview'])->name('email_templates.preview');
+
+    // Email Journey Onboarding
+    Route::get('/email-journey', [App\Http\Controllers\Admin\AdminEmailJourneyController::class, 'index'])->name('email_journey.index');
+    Route::get('/email-journey/preview/{type}', [App\Http\Controllers\Admin\AdminEmailJourneyController::class, 'preview'])->name('email_journey.preview');
+    Route::get('/email-journey/{serviceProvider}', [App\Http\Controllers\Admin\AdminEmailJourneyController::class, 'show'])->name('email_journey.show');
+    Route::post('/email-journey/{serviceProvider}/send-test', [App\Http\Controllers\Admin\AdminEmailJourneyController::class, 'sendTest'])->name('email_journey.send_test');
 });
 
 // Service Provider Notification Routes

@@ -129,6 +129,13 @@ class AuthService
             'rating' => 0,
         ]);
 
+        // Send Welcome Email immediately via journey service
+        try {
+            app(\App\Services\ProviderEmailJourneyService::class)->sendWelcomeEmail($serviceProvider);
+        } catch (\Throwable $e) {
+            Log::error('Failed to trigger welcome email during registration: ' . $e->getMessage());
+        }
+
         // Deprecated: ServiceProviderProfile creation removed in favor of single ServiceProvider model
 
         Log::info('Service provider setup completed', [

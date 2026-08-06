@@ -78,6 +78,26 @@
                             @endforeach
                         </select>
                     </label>
+                    <label>Source page
+                        <select name="source_page">
+                            <option value="">All sources</option>
+                            @foreach($options['sources'] ?? [] as $src)
+                                <option value="{{ $src }}" @selected(($filters['source_page'] ?? null) === $src)>
+                                    {{ ucfirst(str_replace('_', ' ', $src)) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label>Language
+                        <select name="locale">
+                            <option value="">All languages</option>
+                            @foreach($options['locales'] ?? [] as $loc)
+                                <option value="{{ $loc }}" @selected(($filters['locale'] ?? null) === $loc)>
+                                    {{ strtoupper($loc) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </label>
                     <label>Provider ID
                         <input type="number" name="provider_id" min="1" value="{{ $filters['provider_id'] }}" placeholder="e.g. 42">
                     </label>

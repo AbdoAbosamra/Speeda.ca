@@ -395,6 +395,13 @@ class WhatsappAnalyticsService
                 'categories' => DB::table('categories')->select('id', 'name_en')->orderBy('name_en')->get(),
                 'locations' => DB::table('locations')->select('id', 'city')->orderBy('city')->get(),
                 'devices' => DB::table('analytics')->whereNotNull('device_type')->distinct()->pluck('device_type'),
+                // Backing lists for the source_page / locale filters.
+                'sources' => DB::table('analytics')
+                    ->whereNotNull('source_page')->where('source_page', '!=', '')
+                    ->distinct()->orderBy('source_page')->pluck('source_page'),
+                'locales' => DB::table('analytics')
+                    ->whereNotNull('locale')->where('locale', '!=', '')
+                    ->distinct()->orderBy('locale')->pluck('locale'),
             ];
         });
     }

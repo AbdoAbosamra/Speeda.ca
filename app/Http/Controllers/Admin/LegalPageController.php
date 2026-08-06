@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\LegalPage;
+use App\Traits\LogsAdminActions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ use Illuminate\View\View;
 
 class LegalPageController extends Controller
 {
+    use LogsAdminActions;
+
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('search', ''));
@@ -110,6 +113,8 @@ class LegalPageController extends Controller
     {
         $slug = $legalPage->slug;
 
+        $this->logAction('delete', $legalPage, ['deleted' => ['slug' => $slug, 'page_type' => $legalPage->page_type]]);
+
         $legalPage->forceFill([
             'slug' => $slug . '-deleted-' . $legalPage->id . '-' . now()->format('YmdHis'),
             'status' => LegalPage::STATUS_DRAFT,
@@ -187,11 +192,17 @@ class LegalPageController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        if (!$page->exists) {
+        $isNew = !$page->exists;
+        $oldValues = $page->getOriginal();
+
+        if ($isNew) {
             $page->created_by = Auth::id();
         }
 
         $page->save();
+
+        // Legal-page edits are now auditable like every other admin change.
+        $isNew ? $this->logCreate($page) : $this->logUpdate($page, $oldValues);
     }
 
     private function cleanHtml(string $html): string

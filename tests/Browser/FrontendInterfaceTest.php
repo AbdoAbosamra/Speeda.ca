@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -15,7 +17,7 @@ class FrontendInterfaceTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function main_navigation_structure_works()
     {
         $response = $this->get('/');
@@ -29,7 +31,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Main navigation structure is present and functional');
     }
 
-    /** @test */
+    #[Test]
     public function search_interface_components_exist()
     {
         $response = $this->get('/service-providers');
@@ -41,7 +43,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Search interface components are present');
     }
 
-    /** @test */
+    #[Test]
     public function language_switcher_interface_works()
     {
         $response = $this->get('/');
@@ -54,7 +56,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Language switcher interface is present');
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_cards_display_correctly()
     {
         $response = $this->get('/service-providers');
@@ -66,7 +68,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Service provider cards display structure is correct');
     }
 
-    /** @test */
+    #[Test]
     public function responsive_grid_layout_structure()
     {
         $response = $this->get('/service-providers');
@@ -78,7 +80,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Responsive grid layout structure is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function modal_dialog_structure_exists()
     {
         $response = $this->get('/');
@@ -89,7 +91,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Modal dialog structure is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function form_validation_feedback_interface()
     {
         $response = $this->get('/register');
@@ -101,7 +103,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Form validation feedback interface is present');
     }
 
-    /** @test */
+    #[Test]
     public function loading_states_interface_components()
     {
         $response = $this->get('/service-providers');
@@ -112,7 +114,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Loading states interface components are implemented');
     }
 
-    /** @test */
+    #[Test]
     public function error_message_display_interface()
     {
         $response = $this->get('/nonexistent-page');
@@ -123,7 +125,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Error message display interface works correctly');
     }
 
-    /** @test */
+    #[Test]
     public function pagination_interface_structure()
     {
         $response = $this->get('/service-providers');
@@ -134,7 +136,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Pagination interface structure is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function filter_sidebar_interface()
     {
         $response = $this->get('/service-providers');
@@ -146,7 +148,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Filter sidebar interface is present');
     }
 
-    /** @test */
+    #[Test]
     public function breadcrumb_navigation_interface()
     {
         $response = $this->get('/service-providers');
@@ -157,7 +159,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Breadcrumb navigation interface is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function social_media_integration_interface()
     {
         $response = $this->get('/');
@@ -167,7 +169,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Social media integration interface is configured');
     }
 
-    /** @test */
+    #[Test]
     public function contact_reveal_interface_components()
     {
         $response = $this->get('/service-providers');
@@ -178,7 +180,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Contact reveal interface components are present');
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_integration_interface()
     {
         $response = $this->get('/service-providers');
@@ -189,7 +191,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'WhatsApp integration interface is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function image_gallery_interface_structure()
     {
         $response = $this->get('/service-providers');
@@ -201,7 +203,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Image gallery interface structure is present');
     }
 
-    /** @test */
+    #[Test]
     public function rating_system_interface_components()
     {
         $response = $this->get('/service-providers');
@@ -213,7 +215,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Rating system interface components are implemented');
     }
 
-    /** @test */
+    #[Test]
     public function category_filtering_interface()
     {
         $response = $this->get('/categories');
@@ -224,7 +226,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Category filtering interface is functional');
     }
 
-    /** @test */
+    #[Test]
     public function location_search_interface()
     {
         $response = $this->get('/locations');
@@ -235,7 +237,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Location search interface is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function advanced_search_interface_components()
     {
         $response = $this->get('/service-providers');
@@ -246,7 +248,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Advanced search interface components are present');
     }
 
-    /** @test */
+    #[Test]
     public function user_dashboard_interface_structure()
     {
         // Test dashboard accessibility (should redirect to auth)
@@ -256,7 +258,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'User dashboard interface structure is protected');
     }
 
-    /** @test */
+    #[Test]
     public function accessibility_aria_labels_present()
     {
         $response = $this->get('/');
@@ -267,7 +269,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Accessibility ARIA labels are present');
     }
 
-    /** @test */
+    #[Test]
     public function keyboard_navigation_support()
     {
         $response = $this->get('/');
@@ -278,7 +280,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Keyboard navigation support is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function mobile_menu_interface_structure()
     {
         $response = $this->withHeaders([
@@ -291,7 +293,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Mobile menu interface structure is present');
     }
 
-    /** @test */
+    #[Test]
     public function notification_system_interface()
     {
         $response = $this->get('/');
@@ -302,7 +304,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Notification system interface is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function tooltip_help_system_interface()
     {
         $response = $this->get('/');
@@ -313,7 +315,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Tooltip help system interface is present');
     }
 
-    /** @test */
+    #[Test]
     public function theme_color_scheme_consistency()
     {
         $response = $this->get('/');
@@ -324,7 +326,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Theme color scheme consistency is maintained');
     }
 
-    /** @test */
+    #[Test]
     public function rtl_language_support_interface()
     {
         $response = $this->withHeaders([
@@ -337,7 +339,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'RTL language support interface is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function progressive_enhancement_features()
     {
         $response = $this->get('/');
@@ -347,7 +349,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Progressive enhancement features are configured');
     }
 
-    /** @test */
+    #[Test]
     public function cross_browser_compatibility_structure()
     {
         $response = $this->withHeaders([
@@ -359,7 +361,7 @@ class FrontendInterfaceTest extends TestCase
         $this->assertTrue(true, 'Cross-browser compatibility structure is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function performance_lazy_loading_interface()
     {
         $response = $this->get('/service-providers');

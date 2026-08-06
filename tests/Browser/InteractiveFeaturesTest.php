@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -15,7 +17,7 @@ class InteractiveFeaturesTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function dynamic_search_filtering_works()
     {
         $response = $this->get('/service-providers?search=test&category=1&location=1');
@@ -27,7 +29,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Dynamic search filtering works correctly');
     }
 
-    /** @test */
+    #[Test]
     public function ajax_search_suggestions_endpoint()
     {
         $response = $this->withHeaders([
@@ -40,7 +42,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'AJAX search suggestions endpoint works');
     }
 
-    /** @test */
+    #[Test]
     public function infinite_scroll_pagination()
     {
         $response = $this->withHeaders([
@@ -52,7 +54,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Infinite scroll pagination works');
     }
 
-    /** @test */
+    #[Test]
     public function real_time_contact_reveal_system()
     {
         $response = $this->withHeaders([
@@ -64,7 +66,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Real-time contact reveal system is functional');
     }
 
-    /** @test */
+    #[Test]
     public function dynamic_category_filtering()
     {
         $response = $this->withHeaders([
@@ -76,7 +78,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Dynamic category filtering works');
     }
 
-    /** @test */
+    #[Test]
     public function location_based_search_functionality()
     {
         $response = $this->withHeaders([
@@ -88,7 +90,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Location-based search functionality works');
     }
 
-    /** @test */
+    #[Test]
     public function modal_dialog_interactions()
     {
         $response = $this->withHeaders([
@@ -100,7 +102,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Modal dialog interactions are functional');
     }
 
-    /** @test */
+    #[Test]
     public function image_gallery_lightbox_functionality()
     {
         $response = $this->withHeaders([
@@ -112,7 +114,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Image gallery lightbox functionality works');
     }
 
-    /** @test */
+    #[Test]
     public function rating_submission_system()
     {
         $response = $this->withHeaders([
@@ -128,7 +130,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Rating submission system is functional');
     }
 
-    /** @test */
+    #[Test]
     public function favorites_toggle_functionality()
     {
         $response = $this->withHeaders([
@@ -141,7 +143,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Favorites toggle functionality works');
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_message_generator()
     {
         $response = $this->withHeaders([
@@ -153,7 +155,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'WhatsApp message generator is functional');
     }
 
-    /** @test */
+    #[Test]
     public function form_auto_validation()
     {
         $response = $this->withHeaders([
@@ -165,7 +167,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Form auto-validation works correctly');
     }
 
-    /** @test */
+    #[Test]
     public function live_search_results_update()
     {
         $response = $this->withHeaders([
@@ -177,7 +179,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Live search results update functionality works');
     }
 
-    /** @test */
+    #[Test]
     public function dynamic_content_loading()
     {
         $response = $this->withHeaders([
@@ -189,7 +191,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Dynamic content loading is functional');
     }
 
-    /** @test */
+    #[Test]
     public function filter_state_persistence()
     {
         // Set filters via session
@@ -202,7 +204,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Filter state persistence works');
     }
 
-    /** @test */
+    #[Test]
     public function breadcrumb_dynamic_updates()
     {
         $response = $this->get('/service-providers/category/1');
@@ -212,7 +214,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Breadcrumb dynamic updates work');
     }
 
-    /** @test */
+    #[Test]
     public function tooltip_hover_interactions()
     {
         $response = $this->withHeaders([
@@ -224,7 +226,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Tooltip hover interactions are functional');
     }
 
-    /** @test */
+    #[Test]
     public function keyboard_shortcuts_support()
     {
         $response = $this->withHeaders([
@@ -236,7 +238,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Keyboard shortcuts support is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function scroll_to_top_functionality()
     {
         $response = $this->get('/service-providers');
@@ -247,7 +249,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Scroll to top functionality is present');
     }
 
-    /** @test */
+    #[Test]
     public function progressive_image_loading()
     {
         $response = $this->get('/service-providers');
@@ -258,7 +260,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Progressive image loading is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function social_sharing_functionality()
     {
         $response = $this->withHeaders([
@@ -270,7 +272,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Social sharing functionality works');
     }
 
-    /** @test */
+    #[Test]
     public function print_friendly_views()
     {
         $response = $this->get('/service-provider/1/print');
@@ -280,7 +282,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Print-friendly views are available');
     }
 
-    /** @test */
+    #[Test]
     public function dark_mode_toggle()
     {
         $response = $this->withHeaders([
@@ -292,7 +294,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Dark mode toggle functionality works');
     }
 
-    /** @test */
+    #[Test]
     public function accessibility_focus_management()
     {
         $response = $this->get('/');
@@ -303,7 +305,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Accessibility focus management is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function error_recovery_mechanisms()
     {
         // Simulate network error recovery
@@ -316,7 +318,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Error recovery mechanisms are in place');
     }
 
-    /** @test */
+    #[Test]
     public function offline_functionality_detection()
     {
         $response = $this->get('/');
@@ -327,7 +329,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Offline functionality detection is implemented');
     }
 
-    /** @test */
+    #[Test]
     public function performance_monitoring_endpoints()
     {
         $response = $this->withHeaders([
@@ -339,7 +341,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Performance monitoring endpoints are functional');
     }
 
-    /** @test */
+    #[Test]
     public function user_preferences_persistence()
     {
         // Set user preferences
@@ -355,7 +357,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'User preferences persistence works');
     }
 
-    /** @test */
+    #[Test]
     public function advanced_filter_combinations()
     {
         $response = $this->get('/service-providers?' . http_build_query([
@@ -370,7 +372,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Advanced filter combinations work correctly');
     }
 
-    /** @test */
+    #[Test]
     public function context_sensitive_help_system()
     {
         $response = $this->withHeaders([
@@ -382,7 +384,7 @@ class InteractiveFeaturesTest extends TestCase
         $this->assertTrue(true, 'Context-sensitive help system is functional');
     }
 
-    /** @test */
+    #[Test]
     public function multi_step_form_navigation()
     {
         $response = $this->get('/register');

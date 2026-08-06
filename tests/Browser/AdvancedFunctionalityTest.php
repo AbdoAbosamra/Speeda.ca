@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use App\Models\Category;
@@ -26,7 +28,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         $this->artisan('migrate:fresh --seed');
     }
 
-    /** @test */
+    #[Test]
     public function file_upload_works_with_validation()
     {
         $this->browse(function (Browser $browser) {
@@ -54,7 +56,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function multiple_file_uploads_work()
     {
         $this->browse(function (Browser $browser) {
@@ -82,7 +84,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function drag_and_drop_file_upload_works()
     {
         $this->browse(function (Browser $browser) {
@@ -104,7 +106,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function real_time_search_suggestions_work()
     {
         $this->browse(function (Browser $browser) {
@@ -130,7 +132,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function infinite_scroll_works_smoothly()
     {
         $this->browse(function (Browser $browser) {
@@ -158,7 +160,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function real_time_notifications_display()
     {
         $this->browse(function (Browser $browser) {
@@ -191,7 +193,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function modal_interactions_work_correctly()
     {
         $this->browse(function (Browser $browser) {
@@ -222,7 +224,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function image_gallery_with_zoom_works()
     {
         $this->browse(function (Browser $browser) {
@@ -258,7 +260,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function advanced_filtering_combinations_work()
     {
         $this->browse(function (Browser $browser) {
@@ -306,7 +308,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function keyboard_navigation_works_throughout_app()
     {
         $this->browse(function (Browser $browser) {
@@ -333,7 +335,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function auto_complete_and_suggestions_work()
     {
         $this->browse(function (Browser $browser) {
@@ -363,7 +365,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function dynamic_form_fields_work()
     {
         $this->browse(function (Browser $browser) {
@@ -390,7 +392,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function error_recovery_works_gracefully()
     {
         $this->browse(function (Browser $browser) {
@@ -419,7 +421,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function progressive_web_app_features_work()
     {
         $this->browse(function (Browser $browser) {
@@ -443,7 +445,7 @@ class AdvancedFunctionalityTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function complex_user_interactions_work()
     {
         $this->browse(function (Browser $browser) {

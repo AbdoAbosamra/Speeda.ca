@@ -66,6 +66,17 @@
     color: var(--pad-accent);
     border-color: rgba(79,70,229,0.2);
 }
+.pad-btn-primary {
+    background: var(--pad-accent);
+    color: #fff;
+    border: 1px solid var(--pad-accent);
+}
+.pad-btn-primary:hover {
+    background: #4338ca;
+    color: #fff;
+}
+.pad-header-actions form { display: inline; }
+.pad-header-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 /* ===== Summary Cards ===== */
 .pad-summary {
@@ -244,8 +255,40 @@
                     </p>
                 </div>
                 <div class="pad-header-actions">
-                    <a href="{{ route('service-providers.show', $provider->id) }}" class="pad-btn pad-btn-ghost">
-                        <i class="fas fa-user"></i> View Profile
+                    {{-- Management actions (this page used to be read-only). --}}
+                    <a href="{{ route('admin.providers.edit', $provider->id) }}" class="pad-btn pad-btn-primary">
+                        <i class="fas fa-pen"></i> Edit Provider
+                    </a>
+
+                    <form action="{{ route('admin.providers.toggle_active', $provider->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="pad-btn pad-btn-ghost">
+                            <i class="fas {{ $provider->is_active ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+                            {{ $provider->is_active ? 'Hide Listing' : 'Show Listing' }}
+                        </button>
+                    </form>
+
+                    <form action="{{ route('admin.providers.toggle_verified', $provider->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="pad-btn pad-btn-ghost">
+                            <i class="fas {{ $provider->is_verified ? 'fa-circle-xmark' : 'fa-circle-check' }}"></i>
+                            {{ $provider->is_verified ? 'Unverify' : 'Verify' }}
+                        </button>
+                    </form>
+
+                    <form action="{{ route('admin.providers.toggle_featured', $provider->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="pad-btn pad-btn-ghost">
+                            <i class="{{ $provider->is_featured ? 'far' : 'fas' }} fa-star"></i>
+                            {{ $provider->is_featured ? 'Unfeature' : 'Feature' }}
+                        </button>
+                    </form>
+
+                    <a href="{{ route('service-providers.show', $provider->id) }}" class="pad-btn pad-btn-ghost" target="_blank" rel="noopener">
+                        <i class="fas fa-arrow-up-right-from-square"></i> Public Profile
                     </a>
                     <a href="{{ route('admin.provider_activity_monitor.index') }}" class="pad-btn pad-btn-ghost">
                         <i class="fas fa-arrow-left"></i> Back

@@ -14,35 +14,66 @@
                 </a>
             </div>
 
+            {{-- Stats (previously computed by the controller but never rendered) --}}
+            <div class="row g-3 mb-4">
+                @php
+                    $statCards = [
+                        ['label' => 'Total', 'value' => $stats['total'], 'icon' => 'fa-star', 'bg' => '#eef2ff', 'fg' => '#4f46e5'],
+                        ['label' => 'Pending', 'value' => $stats['pending'], 'icon' => 'fa-clock', 'bg' => '#fefce8', 'fg' => '#d97706'],
+                        ['label' => 'Approved', 'value' => $stats['approved'], 'icon' => 'fa-check-circle', 'bg' => '#ecfdf5', 'fg' => '#059669'],
+                        ['label' => 'Rejected', 'value' => $stats['rejected'], 'icon' => 'fa-ban', 'bg' => '#f1f5f9', 'fg' => '#334155'],
+                        ['label' => 'Featured', 'value' => $stats['featured'], 'icon' => 'fa-award', 'bg' => '#eff6ff', 'fg' => '#2563eb'],
+                        ['label' => 'Avg. Rating', 'value' => number_format((float) $stats['average_rating'], 2), 'icon' => 'fa-chart-simple', 'bg' => '#fdf4ff', 'fg' => '#a21caf'],
+                    ];
+                @endphp
+                @foreach($statCards as $card)
+                    <div class="col-6 col-lg-2">
+                        <div class="card border-0 shadow-sm h-100" style="border-radius: 1rem;">
+                            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="small text-muted text-uppercase fw-semibold">{{ $card['label'] }}</div>
+                                    <div class="h4 fw-bold mt-1 mb-0">{{ is_numeric($card['value']) && $card['value'] == (int) $card['value'] ? number_format($card['value']) : $card['value'] }}</div>
+                                </div>
+                                <div class="rounded-3 p-2" style="background: {{ $card['bg'] }}; color: {{ $card['fg'] }};">
+                                    <i class="fas {{ $card['icon'] }}"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
             <!-- Filter Tabs and Per Page Selector -->
             <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
                 <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="{{ route('admin.reviews') }}"
-                                class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }} rounded-pill px-3">
-                                <i class="fas fa-list me-1"></i>All
-                            </a>
-                            <a href="{{ route('admin.reviews', ['status' => 'pending']) }}"
-                                class="btn {{ request('status') === 'pending' ? 'btn-warning' : 'btn-outline-secondary' }} rounded-pill px-3">
-                                <i class="fas fa-clock me-1"></i>Pending
-                            </a>
-                            <a href="{{ route('admin.reviews', ['status' => 'active']) }}"
-                                class="btn {{ request('status') === 'active' ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3">
-                                <i class="fas fa-check me-1"></i>Approved
-                            </a>
+                            @php
+                                $tabs = [
+                                    ['status' => null, 'label' => 'All', 'icon' => 'fa-list', 'class' => 'btn-primary'],
+                                    ['status' => 'pending', 'label' => 'Pending', 'icon' => 'fa-clock', 'class' => 'btn-warning'],
+                                    ['status' => 'active', 'label' => 'Approved', 'icon' => 'fa-check', 'class' => 'btn-success'],
+                                    ['status' => 'rejected', 'label' => 'Rejected', 'icon' => 'fa-ban', 'class' => 'btn-dark'],
+                                    ['status' => 'featured', 'label' => 'Featured', 'icon' => 'fa-award', 'class' => 'btn-info'],
+                                ];
+                            @endphp
+                            @foreach($tabs as $tab)
+                                <a href="{{ $tab['status'] ? route('admin.reviews', ['status' => $tab['status']]) : route('admin.reviews') }}"
+                                    class="btn {{ request('status') === $tab['status'] || (!$tab['status'] && !request('status')) ? $tab['class'] : 'btn-outline-secondary' }} rounded-pill px-3">
+                                    <i class="fas {{ $tab['icon'] }} me-1"></i>{{ $tab['label'] }}
+                                </a>
+                            @endforeach
                         </div>
                         <form method="GET" action="{{ route('admin.reviews') }}" class="d-flex align-items-center gap-2">
                             @if(request('status'))
                                 <input type="hidden" name="status" value="{{ request('status') }}">
                             @endif
                             <label for="per_page" class="text-muted small mb-0">Show:</label>
-                            <select name="per_page" id="per_page" class="form-select form-select-sm rounded-pill" 
+                            <select name="per_page" id="per_page" class="form-select form-select-sm rounded-pill"
                                     style="width: auto; min-width: 80px;" onchange="this.form.submit()">
-                                <option value="10" {{ request('per_page', 20) == 10 ? 'selected' : '' }}>10</option>
-                                <option value="25" {{ request('per_page', 20) == 25 ? 'selected' : '' }}>25</option>
-                                <option value="50" {{ request('per_page', 20) == 50 ? 'selected' : '' }}>50</option>
-                                <option value="100" {{ request('per_page', 20) == 100 ? 'selected' : '' }}>100</option>
+                                @foreach([10, 25, 50, 100] as $option)
+                                    <option value="{{ $option }}" @selected(($perPage ?? 25) == $option)>{{ $option }}</option>
+                                @endforeach
                             </select>
                             <span class="text-muted small">per page</span>
                         </form>
@@ -59,10 +90,22 @@
                     </h5>
                 </div>
                 <div class="card-body p-0">
+                    <x-admin.bulk-form
+                        :action="route('admin.reviews.bulk')"
+                        label="reviews"
+                        :actions="[
+                            'approve'   => ['label' => __('admin.approve'), 'icon' => 'fa-check', 'variant' => 'success'],
+                            'reject'    => ['label' => __('admin.reject'), 'icon' => 'fa-times', 'variant' => 'warning'],
+                            'feature'   => ['label' => __('admin.feature'), 'icon' => 'fa-star'],
+                            'unfeature' => ['label' => __('admin.unfeature'), 'icon' => 'fa-star-half-stroke'],
+                            'delete'    => ['label' => __('admin.delete'), 'icon' => 'fa-trash', 'variant' => 'danger', 'confirm' => __('admin.bulk_confirm_delete')],
+                        ]"
+                    >
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead style="background: #f8fafc;">
                                 <tr>
+                                    <th class="ps-4 py-3" style="width:1%;"><x-admin.bulk-checkbox master /></th>
                                     <th class="fw-bold px-4 py-3">Client</th>
                                     <th class="fw-bold py-3">Provider</th>
                                     <th class="fw-bold py-3 text-center">Rating</th>
@@ -75,6 +118,7 @@
                             <tbody>
                                 @forelse($reviews as $review)
                                     <tr style="border-bottom: 1px solid #e2e8f0;">
+                                        <td class="ps-4 py-3"><x-admin.bulk-checkbox :value="$review->id" /></td>
                                         <td class="px-4 py-3">
                                             <div class="d-flex align-items-center">
                                                 <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2"
@@ -154,16 +198,21 @@
                                                 <a href="{{ route('admin.reviews.show', $review) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1" title="View details">
                                                     <i class="fas fa-eye me-1"></i>View
                                                 </a>
-                                                @if(!$review->is_active && !$review->admin_approved_at)
-                                                    <!-- Pending Review Actions -->
+                                                {{-- Approve is offered for anything not currently published, so a
+                                                     previously rejected review can be reinstated (it used to be
+                                                     locked out once admin_approved_at was set). --}}
+                                                @if(!$review->is_active)
                                                     <form action="{{ route('admin.reviews.approve', $review) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
                                                         <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 me-1"
-                                                            title="Approve">
+                                                            title="{{ $review->admin_approved_at ? 'Re-approve' : 'Approve' }}">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
+                                                @endif
+
+                                                @if($review->is_active || !$review->admin_approved_at)
                                                     <form action="{{ route('admin.reviews.reject', $review) }}" method="POST"
                                                         class="d-inline">
                                                         @csrf
@@ -212,7 +261,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">
+                                        <td colspan="8" class="text-center py-5">
                                             <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
                                             <p class="text-muted">No reviews found</p>
                                         </td>
@@ -221,6 +270,7 @@
                             </tbody>
                         </table>
                     </div>
+                    </x-admin.bulk-form>
                 </div>
                 @if($reviews->hasPages())
                     <div class="card-footer bg-white" style="border-top: 2px solid #f1f5f9; border-radius: 0 0 16px 16px;">
@@ -260,7 +310,7 @@
                                     </div>
                                 </div>
                                 <div class="ms-auto text-muted small">
-                                    {{ $review->created_at->format('M d, Y') }}
+                                    {{ optional($review->created_at)->format('M d, Y') ?: '—' }}
                                 </div>
                             </div>
 

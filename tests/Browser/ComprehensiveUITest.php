@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use App\Models\Category;
@@ -27,7 +29,7 @@ class ComprehensiveUITest extends DuskTestCase
         $this->artisan('migrate:fresh --seed');
     }
 
-    /** @test */
+    #[Test]
     public function homepage_loads_correctly_and_is_responsive()
     {
         $this->browse(function (Browser $browser) {
@@ -55,7 +57,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function navigation_works_across_all_pages()
     {
         $this->browse(function (Browser $browser) {
@@ -87,7 +89,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function search_functionality_is_comprehensive()
     {
         $this->browse(function (Browser $browser) {
@@ -135,7 +137,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function user_registration_flow_is_complete()
     {
         $this->browse(function (Browser $browser) {
@@ -170,7 +172,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function login_and_logout_work_correctly()
     {
         $this->browse(function (Browser $browser) {
@@ -195,7 +197,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_profile_is_fully_functional()
     {
         $this->browse(function (Browser $browser) {
@@ -223,7 +225,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function multilingual_interface_works_correctly()
     {
         $this->browse(function (Browser $browser) {
@@ -255,7 +257,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_integration_works_properly()
     {
         $this->browse(function (Browser $browser) {
@@ -274,7 +276,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function form_validation_works_in_real_time()
     {
         $this->browse(function (Browser $browser) {
@@ -305,7 +307,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function accessibility_features_are_present()
     {
         $this->browse(function (Browser $browser) {
@@ -328,7 +330,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function error_pages_display_correctly()
     {
         $this->browse(function (Browser $browser) {
@@ -349,7 +351,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function performance_indicators_work()
     {
         $this->browse(function (Browser $browser) {
@@ -365,7 +367,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function social_media_integration_works()
     {
         $this->browse(function (Browser $browser) {
@@ -381,7 +383,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function contact_reveal_system_works()
     {
         $this->browse(function (Browser $browser) {
@@ -404,7 +406,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function breadcrumb_navigation_works()
     {
         $this->browse(function (Browser $browser) {
@@ -423,7 +425,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function infinite_scroll_or_pagination_works()
     {
         $this->browse(function (Browser $browser) {
@@ -446,7 +448,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function filter_and_sort_combinations_work()
     {
         $this->browse(function (Browser $browser) {
@@ -478,7 +480,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function image_gallery_and_modal_work()
     {
         $this->browse(function (Browser $browser) {
@@ -507,7 +509,7 @@ class ComprehensiveUITest extends DuskTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function rtl_layout_works_for_arabic()
     {
         $this->browse(function (Browser $browser) {

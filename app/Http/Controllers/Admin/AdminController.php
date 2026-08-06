@@ -20,7 +20,9 @@ use App\Services\CategoryCacheService;
 use App\Services\LocationCacheService;
 use App\Services\VisitorTrackingService;
 use App\Support\AdminAnalyticsExclusion;
+use App\Traits\HandlesBulkActions;
 use App\Traits\LogsAdminActions;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -35,6 +37,23 @@ use Carbon\Carbon;
 class AdminController extends Controller
 {
     use LogsAdminActions;
+    use HandlesBulkActions;
+
+    /**
+     * Derived dashboard/analytics caches that must be dropped whenever an admin
+     * changes underlying data. Keys mirror AdminDashboardService + helpers.
+     */
+    private const ADMIN_DASHBOARD_CACHE_KEYS = [
+        'admin_dash_action_center',
+        'admin_dash_kpis',
+        'admin_dash_funnel',
+        'admin_dash_visitor_trend_14',
+        'admin_dash_profile_health',
+        'admin_user_ids',
+        'visitor_stats',
+        'live_visitors_count',
+    ];
+
     protected VisitorTrackingService $visitorService;
 
     /**
@@ -56,50 +75,33 @@ class AdminController extends Controller
             // Get visitor statistics
             $visitorStats = $this->visitorService->getStatistics();
 
-            // WhatsApp Analytics Calculations
+            // WhatsApp Analytics Calculations.
+            // Every count below goes through whatsappClicksBetween() so admin
+            // activity is excluded consistently — the category/provider break-
+            // downs further down already did this, the headline numbers did not.
             $now = Carbon::now();
-            
-            $dailyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereDate('created_at', $now->toDateString())
-                ->count();
 
-            $yesterdayWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereDate('created_at', $now->copy()->subDay()->toDateString())
-                ->count();
-                
-            $dailyWhatsappTrend = $yesterdayWhatsappClicks > 0 
-                ? (($dailyWhatsappClicks - $yesterdayWhatsappClicks) / $yesterdayWhatsappClicks) * 100 
-                : ($dailyWhatsappClicks > 0 ? 100 : 0);
+            $dailyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->startOfDay(), $now);
+            $yesterdayWhatsappClicks = $this->whatsappClicksBetween(
+                $now->copy()->subDay()->startOfDay(),
+                $now->copy()->subDay()->endOfDay()
+            );
+
+            $dailyWhatsappTrend = $this->percentageChange($dailyWhatsappClicks, $yesterdayWhatsappClicks);
 
             // Rolling 7-day window vs the previous 7-day window (equal length =
             // a fair comparison; avoids the "partial current week vs full last
             // week" distortion that always reads negative early in the period).
-            $weeklyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->where('created_at', '>=', $now->copy()->subDays(7))
-                ->count();
-
-            $lastWeekWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereBetween('created_at', [$now->copy()->subDays(14), $now->copy()->subDays(7)])
-                ->count();
-
-            $weeklyWhatsappTrend = $lastWeekWhatsappClicks > 0
-                ? (($weeklyWhatsappClicks - $lastWeekWhatsappClicks) / $lastWeekWhatsappClicks) * 100
-                : ($weeklyWhatsappClicks > 0 ? 100 : 0);
+            $weeklyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(7), $now);
+            $lastWeekWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(14), $now->copy()->subDays(7));
+            $weeklyWhatsappTrend = $this->percentageChange($weeklyWhatsappClicks, $lastWeekWhatsappClicks);
 
             // Rolling 30-day window vs the previous 30-day window.
-            $monthlyWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->where('created_at', '>=', $now->copy()->subDays(30))
-                ->count();
+            $monthlyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(30), $now);
+            $lastMonthWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(60), $now->copy()->subDays(30));
+            $monthlyWhatsappTrend = $this->percentageChange($monthlyWhatsappClicks, $lastMonthWhatsappClicks);
 
-            $lastMonthWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')
-                ->whereBetween('created_at', [$now->copy()->subDays(60), $now->copy()->subDays(30)])
-                ->count();
-
-            $monthlyWhatsappTrend = $lastMonthWhatsappClicks > 0
-                ? (($monthlyWhatsappClicks - $lastMonthWhatsappClicks) / $lastMonthWhatsappClicks) * 100
-                : ($monthlyWhatsappClicks > 0 ? 100 : 0);
-
-            $totalWhatsappClicks = \App\Models\ProviderAnalytics::where('action_type', 'click_whatsapp')->count();
+            $totalWhatsappClicks = $this->whatsappClicksBetween(null, null);
 
             $mostClickedCategoryData = DB::table('analytics')
                 ->join('service_providers', 'analytics.provider_id', '=', 'service_providers.id')
@@ -122,52 +124,26 @@ class AdminController extends Controller
                 ];
             }
 
-            // Minimum views so the conversion-rate ranking is statistically
-            // meaningful (a 1-view/1-click provider should not outrank a
-            // 1000-view/400-click one). Falls back gracefully when data is sparse.
-            $minViewsForRanking = 10;
+            // NOTE: the "Top Providers" table on the dashboard is rendered from
+            // $dashboard['top_providers'] (AdminDashboardService, cached). The
+            // duplicate raw-SQL ranking that used to live here was never read by
+            // the view and has been removed.
 
-            $topProvidersPerformance = DB::table('service_providers')
-                ->join('analytics', 'service_providers.id', '=', 'analytics.provider_id')
-                ->where('analytics.created_at', '>=', $now->copy()->subDays(30))
-                ->tap(fn($q) => AdminAnalyticsExclusion::apply($q, 'analytics.user_id'))
-                ->select('service_providers.id', 'service_providers.company_name',
-                    DB::raw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) as total_views'),
-                    DB::raw('SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) as total_whatsapp_clicks')
-                )
-                ->groupBy('service_providers.id', 'service_providers.company_name')
-                ->havingRaw('SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END) >= ?', [$minViewsForRanking])
-                ->orderByRaw('(SUM(CASE WHEN analytics.action_type = "click_whatsapp" THEN 1 ELSE 0 END) / SUM(CASE WHEN analytics.action_type = "view" THEN 1 ELSE 0 END)) DESC')
-                ->limit(5)
-                ->get()
-                ->map(function($provider) {
-                    $rate = ($provider->total_whatsapp_clicks / $provider->total_views) * 100;
-                    $provider->performance_rate = round($rate, 1);
-                    return $provider;
-                });
-
+            // Only the keys the dashboard view actually reads. The remaining
+            // counters (active/total categories & locations, total users,
+            // active notifications, new users today, 7/30/365-day visitors) were
+            // computed on every page load and never rendered.
             $stats = [
                 'liveVisitors' => $visitorStats['live_visitors'] ?? 0,
                 'visitorsToday' => $this->getVisitorsToday(),
                 'visitorsThisMonth' => $this->getVisitorsThisMonth(),
-                'last7Days' => $visitorStats['last_7_days'] ?? 0,
-                'last30Days' => $visitorStats['last_30_days'] ?? 0,
-                'last12Months' => $visitorStats['last_12_months'] ?? 0,
                 'totalVisitors' => $visitorStats['total_visitors'] ?? 0,
-                'activeLocations' => Location::where('is_active', true)->count(),
-                'activeCategories' => Category::where('is_active', true)->count(),
-                'totalLocations' => Location::count(),
-                'totalCategories' => Category::count(),
-                'totalUsers' => User::count(),
                 'totalProviders' => ServiceProvider::count(),
                 'totalClients' => User::where('role', 'client')->count(),
                 'totalBlogs' => Post::count(),
                 'notificationsSent' => AdminNotification::count(),
-                'activeNotifications' => AdminNotification::active()->count(),
-                // Pending moderation counts
                 'pendingReviews' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
                 'totalReviews' => Review::count(),
-                'newUsersToday' => User::whereDate('created_at', today())->count(),
             ];
 
             // Rich operations data (action center, KPIs+trends, funnel, feeds).
@@ -182,8 +158,7 @@ class AdminController extends Controller
                 'weeklyWhatsappTrend',
                 'monthlyWhatsappClicks',
                 'monthlyWhatsappTrend',
-                'mostClickedCategory',
-                'topProvidersPerformance'
+                'mostClickedCategory'
             ));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -195,23 +170,13 @@ class AdminController extends Controller
                 'liveVisitors' => 0,
                 'visitorsToday' => 0,
                 'visitorsThisMonth' => 0,
-                'last7Days' => 0,
-                'last30Days' => 0,
-                'last12Months' => 0,
                 'totalVisitors' => 0,
-                'activeLocations' => 0,
-                'activeCategories' => 0,
-                'totalLocations' => 0,
-                'totalCategories' => 0,
-                'totalUsers' => 0,
                 'totalProviders' => 0,
                 'totalClients' => 0,
                 'totalBlogs' => 0,
                 'notificationsSent' => 0,
-                'activeNotifications' => 0,
                 'pendingReviews' => 0,
                 'totalReviews' => 0,
-                'newUsersToday' => 0,
             ];
             $dashboard = [
                 'action_center' => ['items' => [], 'total' => 0],
@@ -221,6 +186,35 @@ class AdminController extends Controller
             ];
             return view('admin.dashboard', compact('stats', 'dashboard'));
         }
+    }
+
+    /**
+     * Count WhatsApp clicks in a window, excluding admin activity.
+     * Pass nulls for an all-time count.
+     */
+    private function whatsappClicksBetween(?Carbon $from, ?Carbon $to): int
+    {
+        $query = DB::table('analytics')->where('action_type', 'click_whatsapp');
+
+        if ($from && $to) {
+            $query->whereBetween('created_at', [$from, $to]);
+        }
+
+        AdminAnalyticsExclusion::apply($query);
+
+        return (int) $query->count();
+    }
+
+    /**
+     * Percentage change between two equal-length windows.
+     */
+    private function percentageChange(int $current, int $previous): float
+    {
+        if ($previous > 0) {
+            return round((($current - $previous) / $previous) * 100, 1);
+        }
+
+        return $current > 0 ? 100.0 : 0.0;
     }
 
     /**
@@ -345,16 +339,19 @@ class AdminController extends Controller
             $validated = $request->validated();
 
             return DB::transaction(function () use ($request, $validated, $location) {
+                // Nullable fields are only touched when the form actually sent
+                // them, so a cleared input clears the column and an absent input
+                // leaves the stored value alone.
                 $updateData = [
                     'city' => $validated['city'],
-                    'country' => $validated['country'] ?? $location->country,
-                    'area' => $validated['area'] ?? $location->area,
-                    'latitude' => $validated['latitude'] ?? $location->latitude,
-                    'longitude' => $validated['longitude'] ?? $location->longitude,
                     'is_active' => $validated['is_active'] ?? $location->is_active,
-                    'meta_title' => $validated['meta_title'] ?? $location->meta_title,
-                    'meta_description' => $validated['meta_description'] ?? $location->meta_description,
                 ];
+
+                foreach (['country', 'area', 'latitude', 'longitude', 'meta_title', 'meta_description'] as $nullable) {
+                    if (array_key_exists($nullable, $validated)) {
+                        $updateData[$nullable] = $validated[$nullable];
+                    }
+                }
 
                 // Handle image upload
                 if ($request->hasFile('image')) {
@@ -442,24 +439,51 @@ class AdminController extends Controller
     /**
      * Display list of all categories
      */
-    public function categories()
+    public function categories(Request $request)
     {
         try {
+            // Sections drive the parent dropdowns and the section filter.
             $sections = Category::where('is_section', true)
-                ->with([
-                    'children' => function ($query) {
-                        $query->orderBy('name');
-                    }
-                ])
                 ->orderBy('sort_order')
                 ->get();
 
+            // Search / section / status are applied in SQL. They used to be
+            // Alpine-only bindings that were never wired to the table rows, so
+            // none of the three controls did anything.
+            $search = trim((string) $request->query('search', ''));
+            $sectionId = $request->query('section');
+            $status = (string) $request->query('status', '');
+
             $allCategories = Category::with('parent')
+                ->withCount('serviceProviders')
+                ->when($search !== '', function ($query) use ($search) {
+                    $query->where(function ($builder) use ($search) {
+                        $builder->where('name', 'like', "%{$search}%")
+                            ->orWhere('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%")
+                            ->orWhere('name_fr', 'like', "%{$search}%")
+                            ->orWhere('slug', 'like', "%{$search}%");
+                    });
+                })
+                ->when($sectionId === 'root', fn ($query) => $query->whereNull('parent_id'))
+                ->when($sectionId && $sectionId !== 'root', fn ($query) => $query->where('parent_id', $sectionId))
+                ->when($status === 'active', fn ($query) => $query->where('is_active', true))
+                ->when($status === 'inactive', fn ($query) => $query->where('is_active', false))
+                ->orderByDesc('is_section')
+                ->orderBy('sort_order')
                 ->orderBy('name')
-                ->get();
+                ->paginate(30)
+                ->withQueryString();
+
+            $stats = [
+                'totalCategories' => Category::count(),
+                'activeCategories' => Category::where('is_active', true)->count(),
+                'inactiveCategories' => Category::where('is_active', false)->count(),
+                'sections' => $sections->count(),
+            ];
 
             return response()
-                ->view('admin.categories.index', compact('sections', 'allCategories'))
+                ->view('admin.categories.index', compact('sections', 'allCategories', 'stats', 'search', 'sectionId', 'status'))
                 ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
                 ->header('Pragma', 'no-cache')
                 ->header('Expires', '0');
@@ -614,16 +638,22 @@ class AdminController extends Controller
                     }
                 }
 
-                // Build update data with multi-language fields
+                // Build update data with multi-language fields.
+                // Nullable fields use array_key_exists so an intentionally
+                // emptied value (e.g. "None" for parent_id) actually clears the
+                // column instead of silently coalescing back to the old value.
                 $updateData = [
                     'slug' => $slug,
-                    'parent_id' => $validated['parent_id'] ?? $category->parent_id,
                     'is_section' => $validated['is_section'] ?? $category->is_section,
                     'is_active' => $validated['is_active'] ?? $category->is_active,
                     'sort_order' => $validated['sort_order'] ?? $category->sort_order,
-                    'icon' => $validated['icon'] ?? $category->icon,
-                    'color' => $validated['color'] ?? $category->color,
                 ];
+
+                foreach (['parent_id', 'icon', 'color', 'meta_title', 'meta_description'] as $nullable) {
+                    if (array_key_exists($nullable, $validated)) {
+                        $updateData[$nullable] = $validated[$nullable];
+                    }
+                }
 
                 // Update name fields if provided
                 if (isset($validated['name_ar'])) {
@@ -721,43 +751,11 @@ class AdminController extends Controller
     }
 
     /**
-     * Deactivate a category
-     */
-    public function deactivateCategory(Category $category)
-    {
-        try {
-            $category->update(['is_active' => false]);
-            $log = $this->logAction('deactivate', $category);
-            $this->clearApplicationCaches();
-
-            $this->flashSuccessWithUndo(__('admin.category_updated_successfully'), $log);
-            return redirect()->back();
-        } catch (\Exception $e) {
-            ErrorHelper::flashNotification($e->getMessage(), 'error');
-            return redirect()->back();
-        }
-    }
-
-    /**
-     * Activate a category
-     */
-    public function activateCategory(Category $category)
-    {
-        try {
-            $category->update(['is_active' => true]);
-            $log = $this->logAction('activate', $category);
-            $this->clearApplicationCaches();
-
-            $this->flashSuccessWithUndo(__('admin.category_updated_successfully'), $log);
-            return redirect()->back();
-        } catch (\Exception $e) {
-            ErrorHelper::flashNotification($e->getMessage(), 'error');
-            return redirect()->back();
-        }
-    }
-
-    /**
-     * Toggle category active status (convenience method)
+     * Toggle category active status.
+     *
+     * (The old separate activateCategory()/deactivateCategory() methods had no
+     * routes pointing at them and have been removed — this is the single entry
+     * point used by admin.categories.toggle.)
      */
     public function toggleCategoryStatus(Category $category)
     {
@@ -765,11 +763,9 @@ class AdminController extends Controller
             $newStatus = !$category->is_active;
             $category->update(['is_active' => $newStatus]);
 
-            // Clear category-specific caches
+            $log = $this->logAction($newStatus ? 'activate' : 'deactivate', $category);
             $this->clearApplicationCaches();
 
-
-            // Log the action
             Log::info('Category status toggled by admin', [
                 'category_id' => $category->id,
                 'name' => $category->name,
@@ -781,7 +777,7 @@ class AdminController extends Controller
                 ? __('admin.category_activated_successfully')
                 : __('admin.category_deactivated_successfully');
 
-            ErrorHelper::flashNotification($message, 'success');
+            $this->flashSuccessWithUndo($message, $log);
             return redirect()->back();
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -826,6 +822,244 @@ class AdminController extends Controller
         }
     }
 
+    /* =====================================================================
+     |  BULK USER ACTIONS
+     * ===================================================================== */
+
+    public function bulkUsers(Request $request)
+    {
+        return $this->runBulkAction($request, 'users');
+    }
+
+    public function bulkCategories(Request $request)
+    {
+        return $this->runBulkAction($request, 'categories');
+    }
+
+    public function bulkLocations(Request $request)
+    {
+        return $this->runBulkAction($request, 'locations');
+    }
+
+    protected function bulkActions(string $resource): array
+    {
+        return match ($resource) {
+            'users' => [
+                'activate' => __('admin.bulk_verb_activated'),
+                'deactivate' => __('admin.bulk_verb_deactivated'),
+                'trash' => __('admin.bulk_verb_trashed'),
+            ],
+            'categories', 'locations' => [
+                'activate' => __('admin.bulk_verb_activated'),
+                'deactivate' => __('admin.bulk_verb_deactivated'),
+                'delete' => __('admin.bulk_verb_deleted'),
+            ],
+            default => [],
+        };
+    }
+
+    protected function bulkQuery(string $resource): Builder
+    {
+        return match ($resource) {
+            'users' => User::query(),
+            // withCount so the delete guards do not fire a query per row.
+            'categories' => Category::query()->withCount(['serviceProviders', 'allChildren']),
+            'locations' => Location::query()->withCount('serviceProviders'),
+            default => User::query()->whereRaw('1 = 0'),
+        };
+    }
+
+    /**
+     * @return true|string
+     */
+    protected function applyBulkAction(string $resource, string $action, $model)
+    {
+        return match ($resource) {
+            'users' => $this->applyBulkUserAction($action, $model),
+            'categories' => $this->applyBulkCategoryAction($action, $model),
+            'locations' => $this->applyBulkLocationAction($action, $model),
+            default => __('admin.bulk_reason_failed'),
+        };
+    }
+
+    /**
+     * Bulk user actions run through the SAME protections as the single-item
+     * routes: you can never act on yourself, and you can never remove the last
+     * active admin — the batch just reports those rows as skipped.
+     *
+     * @return true|string
+     */
+    private function applyBulkUserAction(string $action, User $user)
+    {
+        if ($user->id === Auth::id()) {
+            return __('admin.bulk_reason_self');
+        }
+
+        return match ($action) {
+            'activate' => $this->bulkActivateUser($user),
+            'deactivate' => $this->bulkDeactivateUser($user),
+            'trash' => $this->bulkTrashUser($user),
+            default => __('admin.bulk_reason_failed'),
+        };
+    }
+
+    /**
+     * Categories keep the "deactivate before delete" workflow, and a category
+     * that still has children or providers can never be removed in bulk.
+     *
+     * @return true|string
+     */
+    private function applyBulkCategoryAction(string $action, Category $category)
+    {
+        switch ($action) {
+            case 'activate':
+                if ($category->is_active) {
+                    return __('admin.bulk_reason_already_active');
+                }
+                $category->update(['is_active' => true]);
+                $this->logAction('activate', $category);
+                break;
+
+            case 'deactivate':
+                if (!$category->is_active) {
+                    return __('admin.bulk_reason_already_inactive');
+                }
+                $category->update(['is_active' => false]);
+                $this->logAction('deactivate', $category);
+                break;
+
+            case 'delete':
+                if ($category->is_active) {
+                    return __('admin.bulk_reason_must_deactivate_first');
+                }
+                if ((int) ($category->all_children_count ?? 0) > 0) {
+                    return __('admin.bulk_reason_has_children');
+                }
+                if ((int) ($category->service_providers_count ?? 0) > 0) {
+                    return __('admin.bulk_reason_has_providers');
+                }
+                $this->logAction('delete', $category, ['deleted' => $category->toArray()]);
+                $category->delete();
+                break;
+
+            default:
+                return __('admin.bulk_reason_failed');
+        }
+
+        $this->clearApplicationCaches();
+
+        return true;
+    }
+
+    /**
+     * @return true|string
+     */
+    private function applyBulkLocationAction(string $action, Location $location)
+    {
+        switch ($action) {
+            case 'activate':
+                if ($location->is_active) {
+                    return __('admin.bulk_reason_already_active');
+                }
+                $location->update(['is_active' => true]);
+                $this->logAction('activate', $location);
+                break;
+
+            case 'deactivate':
+                if (!$location->is_active) {
+                    return __('admin.bulk_reason_already_inactive');
+                }
+                $location->update(['is_active' => false]);
+                $this->logAction('deactivate', $location);
+                break;
+
+            case 'delete':
+                if ($location->is_active) {
+                    return __('admin.bulk_reason_must_deactivate_first');
+                }
+                if ((int) ($location->service_providers_count ?? 0) > 0) {
+                    return __('admin.bulk_reason_has_providers');
+                }
+                if ($location->image && Storage::disk('public')->exists($location->image)) {
+                    Storage::disk('public')->delete($location->image);
+                }
+                $this->logAction('delete', $location, ['deleted' => $location->toArray()]);
+                $location->delete();
+                break;
+
+            default:
+                return __('admin.bulk_reason_failed');
+        }
+
+        $this->clearApplicationCaches();
+
+        return true;
+    }
+
+    private function bulkActivateUser(User $user)
+    {
+        if ($user->is_active) {
+            return __('admin.bulk_reason_already_active');
+        }
+
+        $user->update(['is_active' => true]);
+        $this->logAction('activate', $user);
+
+        return true;
+    }
+
+    private function bulkDeactivateUser(User $user)
+    {
+        if (!$user->is_active) {
+            return __('admin.bulk_reason_already_inactive');
+        }
+
+        if ($this->wouldRemoveLastActiveAdmin($user)) {
+            return __('admin.bulk_reason_last_admin');
+        }
+
+        $user->update(['is_active' => false]);
+        $this->logAction('deactivate', $user);
+
+        return true;
+    }
+
+    private function bulkTrashUser(User $user)
+    {
+        if ($user->trashed()) {
+            return __('admin.bulk_reason_already_trashed');
+        }
+
+        if ($user->isAdmin() && User::where('role', 'admin')->where('id', '!=', $user->id)->count() === 0) {
+            return __('admin.bulk_reason_last_admin');
+        }
+
+        // Mirrors deleteUser(): deactivate + soft delete, nothing destroyed.
+        $user->update(['is_active' => false]);
+        $this->logAction('delete', $user, [
+            'trashed_user_email' => $user->email,
+            'trashed_user_name' => $user->name,
+        ]);
+        $user->delete();
+
+        return true;
+    }
+
+    /**
+     * Would deactivating this user leave the platform with no active admin?
+     */
+    private function wouldRemoveLastActiveAdmin(User $user): bool
+    {
+        if (!$user->isAdmin()) {
+            return false;
+        }
+
+        return User::where('role', 'admin')
+            ->where('is_active', true)
+            ->where('id', '!=', $user->id)
+            ->count() === 0;
+    }
+
     /**
      * Display list of all users with search, role filter, status filter, and sorting
      */
@@ -837,7 +1071,8 @@ class AdminController extends Controller
                 ? $request->get('sortField', 'created_at') : 'created_at';
             $sortDirection = $request->get('sortDirection', 'desc') === 'asc' ? 'asc' : 'desc';
 
-            $query = User::with('serviceProvider');
+            // withCount feeds the "Activity" column in the users table.
+            $query = User::with('serviceProvider')->withCount(['reviews', 'comments']);
 
             // Search filter
             if ($search = $request->get('search')) {
@@ -888,14 +1123,24 @@ class AdminController extends Controller
     public function toggleUserStatus(User $user)
     {
         try {
-            // Prevent deactivating the last admin
-            if ($user->isAdmin() && !$user->is_active) {
-                $activeAdmins = User::where('role', 'admin')
+            // Never let an admin lock themselves out of the panel.
+            if ($user->id === Auth::id()) {
+                ErrorHelper::flashNotification(
+                    __('admin.cannot_deactivate_yourself'),
+                    'error'
+                );
+                return redirect()->back();
+            }
+
+            // Prevent deactivating the last remaining active admin.
+            // (Guard applies when the user is currently ACTIVE, i.e. about to be turned off.)
+            if ($user->isAdmin() && $user->is_active) {
+                $otherActiveAdmins = User::where('role', 'admin')
                     ->where('is_active', true)
                     ->where('id', '!=', $user->id)
                     ->count();
-                
-                if ($activeAdmins === 0) {
+
+                if ($otherActiveAdmins === 0) {
                     ErrorHelper::flashNotification(
                         __('admin.cannot_deactivate_last_admin'),
                         'error'
@@ -907,7 +1152,7 @@ class AdminController extends Controller
             $newStatus = !$user->is_active;
             $user->update(['is_active' => $newStatus]);
 
-            // Clear caches to reflect changes immediately
+            $this->logAction($newStatus ? 'activate' : 'deactivate', $user);
             $this->clearApplicationCaches();
 
             // Log the action
@@ -932,97 +1177,51 @@ class AdminController extends Controller
     }
 
     /**
-     * Delete a user account permanently with all related data (Hard Delete)
+     * Move a user to the trash bin (reversible soft delete).
+     *
+     * Nothing is destroyed here: the account is deactivated and soft deleted so
+     * it disappears from the public site while staying fully restorable from
+     * admin/users/trash. Irreversible cleanup lives in forceDeleteUser().
      */
     public function deleteUser(User $user)
     {
         try {
-            // Prevent deleting yourself
-            if ($user->id === auth()->id()) {
-                ErrorHelper::flashNotification(
-                    __('admin.cannot_delete_yourself'),
-                    'error'
-                );
-                return redirect()->back();
-            }
-
-            // Prevent deleting the last admin
-            if ($user->isAdmin()) {
-                $adminCount = User::where('role', 'admin')->count();
-                if ($adminCount <= 1) {
-                    ErrorHelper::flashNotification(
-                        __('admin.cannot_delete_last_admin'),
-                        'error'
-                    );
-                    return redirect()->back();
-                }
+            if ($guard = $this->guardUserRemoval($user)) {
+                return $guard;
             }
 
             return DB::transaction(function () use ($user) {
                 $userName = $user->name;
-                $userEmail = $user->email;
 
-                // 1. Cleanup Service Provider Profile and Media
-                if ($user->serviceProvider) {
-                    $provider = $user->serviceProvider;
-                    
-                    // Cleanup Spatie Media Library collection
-                    if (method_exists($provider, 'clearMediaCollection')) {
-                        $provider->clearMediaCollection('gallery');
-                    }
-                    
-                    // Cleanup manually managed profile image
-                    if ($provider->profile_image && Storage::disk('public')->exists($provider->profile_image)) {
-                        Storage::disk('public')->delete($provider->profile_image);
-                    }
+                // Public provider listings filter on users.is_active and skip
+                // trashed users, so deactivating + soft deleting is enough to
+                // pull the profile off the site without destroying anything.
+                $user->update(['is_active' => false]);
 
-                    // Cleanup business license file if exists
-                    if ($provider->business_license && Storage::disk('public')->exists($provider->business_license)) {
-                        Storage::disk('public')->delete($provider->business_license);
-                    }
-                    
-                    $provider->delete();
-                }
-
-                // 2. Cleanup User-authored content
-                // These use the relationships added to User model
-                $user->reviews()->delete();
-                $user->comments()->forceDelete(); // Comments use SoftDeletes, so we forceDelete
-                $user->endorsements()->delete();
-                $user->bookings()->delete();
-                
-                // 3. Cleanup Pivot tables
-                $user->savedProviders()->detach();
-                $user->readAdminNotifications()->detach();
-
-                // 4. Log the action before deletion for audit purposes
-                // Note: The log will contain the email for future reference
-                $this->logAction('permanent_delete', $user, [
-                    'deleted_user_email' => $userEmail,
-                    'deleted_user_name' => $userName,
-                    'data_cleaned' => ['provider', 'reviews', 'comments', 'endorsements', 'bookings', 'bookmarks']
+                $log = $this->logAction('delete', $user, [
+                    'trashed_user_email' => $user->email,
+                    'trashed_user_name' => $userName,
                 ]);
 
-                // 5. Finally, delete the user record
-                $user->delete();
+                $user->delete(); // soft delete
 
-                // Clear caches
                 $this->clearApplicationCaches();
 
-                Log::info('User permanently deleted by admin', [
-                    'deleted_user_id' => $user->id,
-                    'deleted_user_email' => $userEmail,
+                Log::info('User moved to trash by admin', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
                     'admin_id' => Auth::id(),
                 ]);
 
-                ErrorHelper::flashNotification(
-                    __('admin.user_deleted_successfully', ['name' => $userName]),
-                    'success'
+                $this->flashSuccessWithUndo(
+                    __('admin.user_moved_to_trash', ['name' => $userName]),
+                    $log
                 );
+
                 return redirect()->back();
             });
         } catch (\Exception $e) {
-            Log::error('Permanent user deletion failed: ' . $e->getMessage());
+            Log::error('Moving user to trash failed: ' . $e->getMessage());
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
             return redirect()->back();
@@ -1030,11 +1229,40 @@ class AdminController extends Controller
     }
 
     /**
+     * Shared guard for both trashing and permanently deleting a user.
+     * Returns a redirect when the removal must be blocked, null otherwise.
+     */
+    protected function guardUserRemoval(User $user)
+    {
+        if ($user->id === Auth::id()) {
+            ErrorHelper::flashNotification(__('admin.cannot_delete_yourself'), 'error');
+            return redirect()->back();
+        }
+
+        if ($user->isAdmin()) {
+            $otherAdmins = User::where('role', 'admin')
+                ->where('id', '!=', $user->id)
+                ->count();
+
+            if ($otherAdmins === 0) {
+                ErrorHelper::flashNotification(__('admin.cannot_delete_last_admin'), 'error');
+                return redirect()->back();
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Display soft deleted users
      */
     public function usersTrash()
     {
-        $users = User::onlyTrashed()->latest()->paginate(20)->withQueryString();
+        $users = User::onlyTrashed()
+            ->latest('deleted_at')
+            ->paginate(20)
+            ->withQueryString();
+
         return view('admin.users.trash', compact('users'));
     }
 
@@ -1051,14 +1279,50 @@ class AdminController extends Controller
      */
     public function updateUser(Request $request, User $user)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required|in:admin,client,service_provider',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $user->update($request->only('name', 'email', 'role', 'is_active'));
+        $isSelf = $user->id === Auth::id();
+        $newRole = $validated['role'];
+        $newStatus = $request->boolean('is_active');
+
+        // You may never change your own role or status from this form; the view
+        // locks both fields, this is the server-side counterpart.
+        if ($isSelf) {
+            $newRole = $user->role;
+            $newStatus = $user->is_active;
+        }
+
+        // Demoting or deactivating the last remaining active admin would lock
+        // everyone out of the panel.
+        $losesAdmin = $user->isAdmin() && ($newRole !== 'admin' || $newStatus === false);
+        if ($losesAdmin) {
+            $otherActiveAdmins = User::where('role', 'admin')
+                ->where('is_active', true)
+                ->where('id', '!=', $user->id)
+                ->count();
+
+            if ($otherActiveAdmins === 0) {
+                ErrorHelper::flashNotification(__('admin.cannot_deactivate_last_admin'), 'error');
+                return redirect()->back()->withInput();
+            }
+        }
+
+        $oldValues = $user->getOriginal();
+
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $newRole,
+            'is_active' => $newStatus,
+        ]);
+
+        $this->logUpdate($user, $oldValues);
+        $this->clearApplicationCaches();
 
         ErrorHelper::flashNotification(__('admin.user_updated_successfully'), 'success');
         return redirect()->route('admin.users');
@@ -1069,42 +1333,97 @@ class AdminController extends Controller
      */
     public function restoreUser($id)
     {
-        $user = User::withTrashed()->findOrFail($id);
-        $user->restore();
+        try {
+            $user = User::withTrashed()->findOrFail($id);
 
-        ErrorHelper::flashNotification(__('admin.user_restored_successfully'), 'success');
-        return redirect()->back();
+            DB::transaction(function () use ($user) {
+                $user->restore();
+                $user->update(['is_active' => true]);
+
+                $this->logAction('restore', $user);
+            });
+
+            $this->clearApplicationCaches();
+
+            ErrorHelper::flashNotification(__('admin.user_restored_successfully'), 'success');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            $error = ErrorHelper::handle($e);
+            ErrorHelper::flashNotification($error['message'], $error['type']);
+            return redirect()->back();
+        }
     }
 
     /**
-     * Permanently delete a user
+     * Permanently delete a user and every piece of data they own.
+     *
+     * This is the irreversible half of the trash workflow and is only reachable
+     * from admin/users/trash. Files on disk are removed too, so there is no undo.
      */
     public function forceDeleteUser($id)
     {
         try {
-            DB::transaction(function () use ($id) {
-                $user = User::withTrashed()->findOrFail($id);
-                
-                if ($user->id === auth()->id()) {
-                    throw new \Exception(__('admin.cannot_delete_yourself'));
+            $user = User::withTrashed()->findOrFail($id);
+
+            if ($guard = $this->guardUserRemoval($user)) {
+                return $guard;
+            }
+
+            DB::transaction(function () use ($user) {
+                $userName = $user->name;
+                $userEmail = $user->email;
+
+                // 1. Service provider profile, media and uploaded documents.
+                // (ServiceProvider does not use SoftDeletes, so no withTrashed here.)
+                $provider = $user->serviceProvider;
+
+                if ($provider) {
+                    if (method_exists($provider, 'clearMediaCollection')) {
+                        $provider->clearMediaCollection('gallery');
+                    }
+
+                    foreach ([$provider->profile_image, $provider->business_license] as $file) {
+                        if ($file && Storage::disk('public')->exists($file)) {
+                            Storage::disk('public')->delete($file);
+                        }
+                    }
+
+                    $provider->reviews()->delete();
+                    $provider->endorsements()->delete();
+                    $provider->delete();
                 }
 
-                // Cleanup related data (similar to deleteUser logic but for force delete)
-                if ($user->isServiceProvider()) {
-                    $provider = $user->serviceProvider;
-                    if ($provider) {
-                        $provider->reviews()->delete();
-                        $provider->endorsements()->delete();
-                        $provider->delete();
-                    }
-                }
+                // 2. Content authored by the user.
+                $user->reviews()->delete();
+                $user->comments()->withTrashed()->forceDelete();
+                $user->endorsements()->delete();
+                $user->bookings()->delete();
+
+                // 3. Pivot tables.
+                $user->savedProviders()->detach();
+                $user->readAdminNotifications()->detach();
+
+                // 4. Audit trail (kept even though the row disappears).
+                $this->logAction('permanent_delete', $user, [
+                    'deleted_user_email' => $userEmail,
+                    'deleted_user_name' => $userName,
+                    'data_cleaned' => ['provider', 'media', 'reviews', 'comments', 'endorsements', 'bookings', 'bookmarks'],
+                ]);
 
                 $user->forceDelete();
+
+                Log::warning('User permanently deleted by admin', [
+                    'deleted_user_email' => $userEmail,
+                    'admin_id' => Auth::id(),
+                ]);
             });
+
+            $this->clearApplicationCaches();
 
             ErrorHelper::flashNotification(__('admin.user_permanently_deleted'), 'success');
             return redirect()->back();
         } catch (\Exception $e) {
+            Log::error('Permanent user deletion failed: ' . $e->getMessage());
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
             return redirect()->back();
@@ -1116,11 +1435,9 @@ class AdminController extends Controller
      */
     protected function flashSuccessWithUndo(string $message, AdminLog $log)
     {
-        $undoLink = route('admin.undo', $log->id);
-        $undoHtml = ' <a href="#" class="alert-link ms-2 fw-bold" onclick="event.preventDefault(); document.getElementById(\'undo-form-' . $log->id . '\').submit();">' . __('admin.undo') . '</a>' .
-            '<form id="undo-form-' . $log->id . '" action="' . $undoLink . '" method="POST" style="display: none;">' . csrf_field() . '</form>';
-
-        ErrorHelper::flashNotification($message . $undoHtml, 'success');
+        // The undo affordance is rendered by <x-error-handler /> from the log id,
+        // so the flash payload stays plain text (no HTML injected into the session).
+        ErrorHelper::flashNotification($message, 'success', $log->id);
     }
 
     /**
@@ -1129,8 +1446,8 @@ class AdminController extends Controller
     public function clearCache(Request $request)
     {
         try {
-            $this->clearApplicationCaches();
-            ErrorHelper::flashNotification(__('admin.cache_cleared', [], app()->getLocale()), 'success');
+            $this->flushAllCaches();
+            ErrorHelper::flashNotification(__('admin.cache_cleared'), 'success');
             return redirect()->back();
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
@@ -1142,19 +1459,44 @@ class AdminController extends Controller
     /**
      * Clear all application caches safely
      */
+    /**
+     * Invalidate only the caches an admin write can actually invalidate.
+     *
+     * This deliberately does NOT call view:clear / route:clear / config:clear:
+     * those wipe the production optimisation caches (making every subsequent
+     * request slow until `optimize` runs again) and `cache:clear` would also
+     * flush unrelated stores — including sessions when the session driver
+     * shares the cache backend.
+     */
     protected function clearApplicationCaches(): void
     {
         try {
-            Artisan::call('view:clear');
-            Artisan::call('route:clear');
-            Artisan::call('config:clear');
-            Artisan::call('cache:clear');
-
-            // PERFORMANCE: Invalidate category and location caches
             app(CategoryCacheService::class)->invalidateCache();
             app(LocationCacheService::class)->invalidateCache();
+
+            foreach (self::ADMIN_DASHBOARD_CACHE_KEYS as $key) {
+                Cache::forget($key);
+            }
         } catch (\Exception $e) {
             Log::warning('Failed to clear application caches', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Full cache flush, only triggered by the explicit "Clear Caches"
+     * maintenance button — never as a side effect of a CRUD write.
+     */
+    protected function flushAllCaches(): void
+    {
+        $this->clearApplicationCaches();
+
+        try {
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+        } catch (\Exception $e) {
+            Log::warning('Failed to flush application caches', [
                 'error' => $e->getMessage(),
             ]);
         }

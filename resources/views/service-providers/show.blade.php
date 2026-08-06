@@ -30,7 +30,7 @@
                     <div class="profile-header"></div>
 
                     <!-- Profile Image -->
-                    <div class="profile-image-container" @if(auth()->check() && auth()->id() === $serviceProvider->user_id) id="profileImageClickable" style="cursor: pointer;" title="{{ __('service_provider.click_to_change_image') }}" @endif>
+                    <div class="profile-image-container" id="edit-photo" @if(auth()->check() && auth()->id() === $serviceProvider->user_id) style="cursor: pointer;" title="{{ __('service_provider.click_to_change_image') }}" @endif>
                         <img src="{{ $serviceProvider->display_image_url }}"
                             alt="{{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}"
                             class="profile-image" loading="lazy" id="profileImagePreview"
@@ -130,7 +130,7 @@
                                     @method('PUT')
 
                                     {{-- Basic Information --}}
-                                    <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="card mb-3 border-0 shadow-sm" id="edit-basic-info">
                                         <div class="card-header bg-primary text-white">
                                             <h6 class="mb-0"><i
                                                     class="fas fa-info-circle me-2"></i>{{ __('service_provider.basic_information') }}
@@ -230,7 +230,7 @@
                                     </div>
 
                                     {{-- Contact Information - Category is READ-ONLY --}}
-                                    <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="card mb-3 border-0 shadow-sm" id="edit-contact">
                                         <div class="card-header bg-success text-white">
                                             <h6 class="mb-0"><i
                                                     class="fas fa-phone me-2"></i>{{ __('service_provider.contact_info') }}
@@ -400,7 +400,7 @@
                                     </div>
 
                                     {{-- Available Service Areas (additional locations) --}}
-                                    <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="card mb-3 border-0 shadow-sm" id="edit-service-areas">
                                         <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
                                             <h6 class="mb-0">
                                                 <i class="fas fa-map-location-dot me-2"></i>{{ __('service_provider.service_areas_section') }}
@@ -475,7 +475,7 @@
                                     </div>
 
                                     {{-- Services & Files --}}
-                                    <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="card mb-3 border-0 shadow-sm" id="edit-services">
                                         <div class="card-header bg-warning text-dark">
                                             <h6 class="mb-0"><i
                                                     class="fas fa-briefcase me-2"></i>{{ __('service_provider.services_files') }}
@@ -515,7 +515,7 @@
                                             @endphp
 
                                             @if($isOwner || $galleryMedia->count() > 0)
-                                            <div class="mb-4"
+                                            <div class="mb-4" id="edit-gallery"
                                                  x-data="galleryManager({
                                                      providerId: {{ $serviceProvider->id }},
                                                      images: {{ Js::from($galleryMedia->map(fn ($m) => [
@@ -943,7 +943,7 @@
 
 
                         <!-- Reviews Section -->
-                        <div class="mt-5">
+                        <div class="mt-5" id="reviews">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h4 class="fw-bold text-primary">
                                     <i class="fas fa-star me-2"></i>{{ __('service_provider.customer_reviews_title') }}
@@ -1537,7 +1537,7 @@
             }
 
             // Click-to-change Profile Image
-            const imageContainer = document.getElementById('profileImageClickable');
+            const imageContainer = document.getElementById('edit-photo');
             const imageInput = document.getElementById('profileImageInput');
             const imageOverlay = document.getElementById('imageOverlay');
             const imageSpinner = document.getElementById('imageUploadSpinner');

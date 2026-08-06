@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\User;
 use App\Helpers\ErrorHelper;
+use App\Traits\HandlesBulkActions;
+use App\Traits\LogsAdminActions;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +16,9 @@ use Illuminate\Support\Facades\Log;
 
 class AdminReviewController extends Controller
 {
+    use LogsAdminActions;
+    use HandlesBulkActions;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -29,26 +35,28 @@ class AdminReviewController extends Controller
                 ->orderByDesc('created_at');
 
             // Filter by status
-            if ($request->get('status') === 'active') {
-                $query->where('is_active', true);
-            } elseif ($request->get('status') === 'pending') {
-                $query->where('is_active', false)->whereNull('admin_approved_at');
+            match ($request->input('status')) {
+                'active' => $query->where('is_active', true),
+                'pending' => $query->where('is_active', false)->whereNull('admin_approved_at'),
+                'rejected' => $query->where('is_active', false)->whereNotNull('admin_approved_at'),
+                'featured' => $query->where('is_featured', true),
+                default => null,
+            };
+
+            // filled() (not has()) so an empty select value means "no filter"
+            // rather than matching WHERE rating = ''.
+            if ($request->filled('rating')) {
+                $query->where('rating', (int) $request->input('rating'));
             }
 
-            // Filter by rating
-            if ($request->has('rating')) {
-                $query->where('rating', $request->get('rating'));
+            if ($request->filled('provider_id')) {
+                $query->where('service_provider_id', (int) $request->input('provider_id'));
             }
 
-            // Filter by provider
-            if ($request->has('provider_id')) {
-                $query->where('service_provider_id', $request->get('provider_id'));
-            }
-
-            $perPage = $request->get('per_page', 20);
             $allowedPerPage = [10, 25, 50, 100];
-            if (!in_array($perPage, $allowedPerPage)) {
-                $perPage = 20;
+            $perPage = (int) $request->input('per_page', 25);
+            if (!in_array($perPage, $allowedPerPage, true)) {
+                $perPage = 25;
             }
 
             $reviews = $query->paginate($perPage)->withQueryString();
@@ -63,12 +71,129 @@ class AdminReviewController extends Controller
                 'average_rating' => Review::where('is_active', true)->avg('rating') ?? 0,
             ];
 
-            return view('admin.reviews.index', compact('reviews', 'stats'));
+            return view('admin.reviews.index', compact('reviews', 'stats', 'perPage'));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             ErrorHelper::flashNotification($error['message'], $error['type']);
             return redirect()->route('admin.dashboard');
         }
+    }
+
+    /* =====================================================================
+     |  BULK ACTIONS
+     * ===================================================================== */
+
+    public function bulk(Request $request)
+    {
+        return $this->runBulkAction($request, 'reviews');
+    }
+
+    protected function bulkActions(string $resource): array
+    {
+        return [
+            'approve' => __('admin.bulk_verb_approved'),
+            'reject' => __('admin.bulk_verb_rejected'),
+            'feature' => __('admin.bulk_verb_featured'),
+            'unfeature' => __('admin.bulk_verb_unfeatured'),
+            'delete' => __('admin.bulk_verb_deleted'),
+        ];
+    }
+
+    protected function bulkQuery(string $resource): Builder
+    {
+        // Review::approve()/reject() touch $this->client and recalculate the
+        // provider rating, so those relations are eager loaded: it avoids an
+        // N+1 across the batch and keeps the strict lazy-loading guard
+        // (Model::preventLazyLoading in local/staging) from aborting each row.
+        return Review::query()->with(['client', 'serviceProvider']);
+    }
+
+    /**
+     * @return true|string
+     */
+    protected function applyBulkAction(string $resource, string $action, $review)
+    {
+        /** @var \App\Models\User $admin */
+        $admin = Auth::user();
+
+        return match ($action) {
+            'approve' => $this->bulkApprove($review, $admin),
+            'reject' => $this->bulkReject($review, $admin),
+            'feature' => $this->bulkFeature($review),
+            'unfeature' => $this->bulkUnfeature($review),
+            'delete' => $this->bulkDelete($review),
+            default => __('admin.bulk_reason_failed'),
+        };
+    }
+
+    private function bulkApprove(Review $review, $admin)
+    {
+        if ($review->is_active) {
+            return __('admin.bulk_reason_already_approved');
+        }
+
+        $review->approve($admin);
+        $this->logApprove($review);
+
+        return true;
+    }
+
+    private function bulkReject(Review $review, $admin)
+    {
+        if (!$review->is_active && $review->admin_approved_at) {
+            return __('admin.bulk_reason_already_rejected');
+        }
+
+        $review->reject($admin);
+        $this->logReject($review);
+
+        return true;
+    }
+
+    private function bulkFeature(Review $review)
+    {
+        // Same guard as the single-item route: only published reviews may be
+        // featured, otherwise a hidden review would surface on the profile.
+        if (!$review->is_active) {
+            return __('admin.bulk_reason_not_approved');
+        }
+
+        if ($review->is_featured) {
+            return __('admin.bulk_reason_already_featured');
+        }
+
+        $review->update(['is_featured' => true]);
+        $this->logAction('feature', $review);
+
+        return true;
+    }
+
+    private function bulkUnfeature(Review $review)
+    {
+        if (!$review->is_featured) {
+            return __('admin.bulk_reason_not_featured');
+        }
+
+        $review->update(['is_featured' => false]);
+        $this->logAction('unfeature', $review);
+
+        return true;
+    }
+
+    private function bulkDelete(Review $review)
+    {
+        $providerId = $review->service_provider_id;
+        $wasPublished = (bool) $review->is_active;
+
+        $this->logAction('delete', $review, ['deleted' => $review->toArray()]);
+        $review->delete();
+
+        // Deleting a published review changes the provider's average.
+        if ($wasPublished && $providerId) {
+            Review::recalculateProviderRating($providerId);
+        }
+
+        return true;
     }
 
     /**
@@ -103,6 +228,7 @@ class AdminReviewController extends Controller
             return DB::transaction(function () use ($review, $admin) {
                 // Call model's approve method which handles rating recalculation
                 $review->approve($admin);
+                $this->logApprove($review);
 
                 Log::info('Review approved by admin', [
                     'review_id' => $review->id,
@@ -144,6 +270,7 @@ class AdminReviewController extends Controller
             return DB::transaction(function () use ($review, $admin, $reason) {
                 // Call model's reject method which handles rating recalculation
                 $review->reject($admin);
+                $this->logReject($review, $reason);
 
                 Log::info('Review rejected by admin', [
                     'review_id' => $review->id,
@@ -230,10 +357,26 @@ class AdminReviewController extends Controller
     {
         try {
             $reviewId = $review->id;
-            $review->delete();
+            $providerId = $review->service_provider_id;
+            $wasPublished = (bool) $review->is_active;
+
+            DB::transaction(function () use ($review, $providerId, $wasPublished) {
+                $this->logAction('delete', $review, ['deleted' => $review->toArray()]);
+
+                $review->delete();
+
+                // Review has no soft deletes and delete() bypasses the model's
+                // approve/reject hooks, so the provider's average rating has to
+                // be recomputed here or it keeps counting a review that is gone.
+                if ($wasPublished && $providerId) {
+                    Review::recalculateProviderRating($providerId);
+                }
+            });
 
             Log::info('Review deleted by admin', [
                 'review_id' => $reviewId,
+                'provider_id' => $providerId,
+                'admin_id' => Auth::id(),
             ]);
 
             ErrorHelper::flashNotification(

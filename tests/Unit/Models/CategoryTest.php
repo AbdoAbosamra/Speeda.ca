@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Models;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\Category;
 use App\Models\ServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,7 +13,7 @@ class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_can_be_created_with_valid_data()
     {
         $category = Category::factory()->create([
@@ -31,7 +33,7 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_required_attributes()
     {
         $category = Category::factory()->create([
@@ -49,7 +51,7 @@ class CategoryTest extends TestCase
         $this->assertEquals('#28a745', $category->color);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_parent_child_relationships()
     {
         $parentCategory = Category::factory()->create(['name' => 'Home Services']);
@@ -63,7 +65,7 @@ class CategoryTest extends TestCase
         $this->assertTrue($parentCategory->children->contains($childCategory));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_have_many_service_providers()
     {
         $category = Category::factory()->create();
@@ -75,7 +77,7 @@ class CategoryTest extends TestCase
         $this->assertTrue($category->serviceProviders->contains($serviceProvider2));
     }
 
-    /** @test */
+    #[Test]
     public function it_uses_soft_deletes()
     {
         $category = Category::factory()->create(['name' => 'Test Category']);
@@ -88,7 +90,7 @@ class CategoryTest extends TestCase
         $this->assertNotNull(Category::withTrashed()->find($categoryId));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_restored_after_soft_delete()
     {
         $category = Category::factory()->create(['name' => 'Test Category']);
@@ -105,7 +107,7 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function factory_creates_valid_categories()
     {
         $categories = Category::factory()->count(5)->create();
@@ -122,7 +124,7 @@ class CategoryTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_name_field()
     {
         $this->expectException(\Illuminate\Database\QueryException::class);
@@ -133,7 +135,7 @@ class CategoryTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_marked_as_section()
     {
         $category = Category::factory()->create([

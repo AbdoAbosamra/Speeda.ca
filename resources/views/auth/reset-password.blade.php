@@ -5,7 +5,7 @@
 ])
 
 @section('content')
-    <form class="password-form" method="POST" action="{{ route('password.store') }}">
+    <form class="password-form" method="POST" action="{{ route('password.store') }}" onsubmit="this.querySelector('button[type=submit]').disabled = true; return true;">
         @csrf
 
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
@@ -24,11 +24,13 @@
                     autofocus
                     autocomplete="username"
                     placeholder="{{ __('general.email_placeholder') }}"
+                    aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
+                    @if($errors->has('email')) aria-describedby="email-error" @endif
                 >
             </div>
 
             @foreach ($errors->get('email') as $message)
-                <p class="password-error">{{ $message }}</p>
+                <p class="password-error" id="email-error" role="alert">{{ $message }}</p>
             @endforeach
         </div>
 
@@ -43,15 +45,17 @@
                     name="password"
                     required
                     autocomplete="new-password"
+                    aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                    aria-describedby="password-rules-hint @if($errors->has('password')) password-error @endif"
                 >
                 <button class="password-toggle" type="button" data-password-toggle="password" aria-label="{{ __('auth.toggle_password_visibility') }}" aria-pressed="false">
                     <i class="fas fa-eye" aria-hidden="true"></i>
                 </button>
             </div>
-            <p class="password-help">{{ __('auth.password_rules_hint') }}</p>
+            <p class="password-help" id="password-rules-hint">{{ __('auth.password_rules_hint') }}</p>
 
             @foreach ($errors->get('password') as $message)
-                <p class="password-error">{{ $message }}</p>
+                <p class="password-error" id="password-error" role="alert">{{ $message }}</p>
             @endforeach
         </div>
 
@@ -66,6 +70,8 @@
                     name="password_confirmation"
                     required
                     autocomplete="new-password"
+                    aria-invalid="{{ $errors->has('password_confirmation') ? 'true' : 'false' }}"
+                    @if($errors->has('password_confirmation')) aria-describedby="password-confirmation-error" @endif
                 >
                 <button class="password-toggle" type="button" data-password-toggle="password_confirmation" aria-label="{{ __('auth.toggle_password_visibility') }}" aria-pressed="false">
                     <i class="fas fa-eye" aria-hidden="true"></i>
@@ -73,7 +79,7 @@
             </div>
 
             @foreach ($errors->get('password_confirmation') as $message)
-                <p class="password-error">{{ $message }}</p>
+                <p class="password-error" id="password-confirmation-error" role="alert">{{ $message }}</p>
             @endforeach
         </div>
 

@@ -6,10 +6,13 @@ use App\Models\ServiceProvider;
 use App\Support\AdminAnalyticsExclusion;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AdminProviderActivityMonitorService
 {
+    private const SUMMARY_CACHE_KEY = 'admin_provider_monitor_summary';
+
     public function paginateProviders(int $perPage = 15, ?Request $request = null): LengthAwarePaginator
     {
         $query = $this->baseProviderActivityQuery();
@@ -65,6 +68,20 @@ class AdminProviderActivityMonitorService
             }
         }
 
+        // Listing status filter (admin management, not analytics).
+        if ($request && $listing = $request->input('listing_status')) {
+            match ($listing) {
+                'active' => $query->where('sp.is_active', true)->where('u.is_active', true),
+                'hidden' => $query->where(function ($q) {
+                    $q->where('sp.is_active', false)->orWhere('u.is_active', false);
+                }),
+                'verified' => $query->where('sp.is_verified', true),
+                'unverified' => $query->where('sp.is_verified', false),
+                'featured' => $query->where('sp.is_featured', true),
+                default => null,
+            };
+        }
+
         // Apply activity date filter
         if ($request && $activity = $request->input('activity')) {
             switch ($activity) {
@@ -99,7 +116,32 @@ class AdminProviderActivityMonitorService
         return $query->paginate($perPage)->withQueryString();
     }
 
+    /**
+     * Headline counters for the provider monitor.
+     *
+     * Cached for a minute: the underlying query joins analytics + media
+     * aggregates for EVERY provider with no limit, so recomputing it on each
+     * page view (including every filter change) is expensive and the numbers do
+     * not need to be second-accurate.
+     */
     public function getIndexSummary(): array
+    {
+        return Cache::remember(
+            self::SUMMARY_CACHE_KEY,
+            now()->addMinute(),
+            fn () => $this->buildIndexSummary()
+        );
+    }
+
+    /**
+     * Drop the cached summary after an admin changes a provider.
+     */
+    public static function forgetSummaryCache(): void
+    {
+        Cache::forget(self::SUMMARY_CACHE_KEY);
+    }
+
+    private function buildIndexSummary(): array
     {
         $rows = $this->baseProviderActivityQuery()->get();
 
@@ -117,6 +159,10 @@ class AdminProviderActivityMonitorService
             'total_views' => $totalViews,
             'total_clicks' => $totalClicks,
             'conversion_rate' => $totalViews > 0 ? round(($totalClicks / $totalViews) * 100, 1) : 0,
+            // Listing management counters.
+            'hidden' => $rows->filter(fn ($row) => !$row->is_active || !$row->owner_is_active)->count(),
+            'verified' => $rows->where('is_verified', 1)->count(),
+            'featured' => $rows->where('is_featured', 1)->count(),
         ];
     }
 
@@ -188,6 +234,8 @@ class AdminProviderActivityMonitorService
                 sp.whatsapp_number,
                 sp.services_offered,
                 sp.is_verified,
+                sp.is_featured,
+                sp.is_active,
                 sp.is_certified,
                 u.name as owner_name,
                 u.email as owner_email,

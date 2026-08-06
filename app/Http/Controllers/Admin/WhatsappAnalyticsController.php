@@ -79,6 +79,11 @@ class WhatsappAnalyticsController extends Controller
             'location_id' => $request->input('location_id') ?: null,
             'phone_search' => trim((string) $request->input('phone_search')) ?: null,
             'device_type' => $request->input('device_type') ?: null,
+            // The service already filters on these two dimensions and the page
+            // charts both of them, but they were never read from the request —
+            // so you could see the breakdown yet not drill into it.
+            'source_page' => $request->input('source_page') ?: null,
+            'locale' => $request->input('locale') ?: null,
         ];
     }
 }

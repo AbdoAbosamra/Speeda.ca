@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Auth;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Models\User;
 use App\Models\ServiceProvider;
 use App\Models\Category;
@@ -60,7 +62,7 @@ class ComprehensiveRegistrationTest extends TestCase
         ], $overrides);
     }
 
-    /** @test */
+    #[Test]
     public function registration_page_is_displayed()
     {
         $this->get('/register')
@@ -68,7 +70,7 @@ class ComprehensiveRegistrationTest extends TestCase
             ->assertViewIs('auth.register');
     }
 
-    /** @test */
+    #[Test]
     public function client_registers_successfully_with_minimal_data()
     {
         Event::fake();
@@ -97,7 +99,7 @@ class ComprehensiveRegistrationTest extends TestCase
         Event::assertDispatched(\Illuminate\Auth\Events\Registered::class);
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_registers_successfully_with_complete_data()
     {
         $response = $this->post('/register', $this->providerData([
@@ -119,7 +121,7 @@ class ComprehensiveRegistrationTest extends TestCase
         $this->assertEquals('+15145555678', $serviceProvider->whatsapp_number);
     }
 
-    /** @test */
+    #[Test]
     public function service_provider_registration_requires_all_fields()
     {
         $baseData = [
@@ -155,7 +157,7 @@ class ComprehensiveRegistrationTest extends TestCase
         ]))->assertSessionHasErrors(['terms']);
     }
 
-    /** @test */
+    #[Test]
     public function email_validation_works_correctly()
     {
         $baseData = [
@@ -180,7 +182,7 @@ class ComprehensiveRegistrationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function email_uniqueness_is_enforced()
     {
         User::factory()->create(['email' => 'existing@example.com']);
@@ -196,7 +198,7 @@ class ComprehensiveRegistrationTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function password_validation_enforces_security_rules()
     {
         $baseData = [
@@ -218,7 +220,7 @@ class ComprehensiveRegistrationTest extends TestCase
         ]))->assertSessionHasErrors(['password']);
     }
 
-    /** @test */
+    #[Test]
     public function mobile_phone_validation_works()
     {
         $invalidPhones = ['123', '01234567890', 'not-a-phone-number'];
@@ -243,7 +245,7 @@ class ComprehensiveRegistrationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function whatsapp_number_is_optional_but_validated_if_provided()
     {
         // Without WhatsApp - should pass
@@ -276,7 +278,7 @@ class ComprehensiveRegistrationTest extends TestCase
         $this->app['auth']->logout();
     }
 
-    /** @test */
+    #[Test]
     public function unicode_names_are_supported()
     {
         $testNames = [
@@ -306,7 +308,7 @@ class ComprehensiveRegistrationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function registration_handles_duplicate_email()
     {
         $userData = [
@@ -327,7 +329,7 @@ class ComprehensiveRegistrationTest extends TestCase
         $this->assertEquals(1, User::where('email', 'concurrent@example.com')->count());
     }
 
-    /** @test */
+    #[Test]
     public function role_based_redirects_work_correctly()
     {
         $this->post('/register', [
@@ -349,7 +351,7 @@ class ComprehensiveRegistrationTest extends TestCase
         $this->assertNotNull($provider->serviceProvider);
     }
 
-    /** @test */
+    #[Test]
     public function csrf_protection_can_be_bypassed_in_tests()
     {
         $response = $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)
@@ -364,7 +366,7 @@ class ComprehensiveRegistrationTest extends TestCase
         $response->assertRedirect(route('home'));
     }
 
-    /** @test */
+    #[Test]
     public function malicious_names_are_rejected_by_validation()
     {
         $this->post('/register', [

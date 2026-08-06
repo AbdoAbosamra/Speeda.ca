@@ -185,11 +185,39 @@ class PasswordResetTest extends TestCase
             $response = $this->post('/reset-password', [
                 'token' => $notification->token,
                 'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'short',
+                'password_confirmation' => 'short',
             ]);
 
             $response->assertSessionHasErrors('password');
+
+            return true;
+        });
+    }
+
+    public function test_password_can_be_reset_with_mixed_case_email(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'email' => 'user@example.com',
+        ]);
+
+        $this->post('/forgot-password', ['email' => 'User@Example.Com']);
+
+        Notification::assertSentTo($user, ResetPasswordNotification::class, function ($notification) use ($user) {
+            $response = $this->post('/reset-password', [
+                'token' => $notification->token,
+                'email' => 'uSeR@eXaMpLe.CoM',
+                'password' => 'SecureReset123!',
+                'password_confirmation' => 'SecureReset123!',
+            ]);
+
+            $response
+                ->assertSessionHasNoErrors()
+                ->assertRedirect(route('login'));
+
+            $this->assertTrue(Hash::check('SecureReset123!', $user->refresh()->password));
 
             return true;
         });

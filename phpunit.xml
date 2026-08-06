@@ -23,13 +23,20 @@
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
+            <!-- Owned by the dedicated Security suite below; excluding it here
+                 keeps the two suites disjoint so PHPUnit stops warning about
+                 the same file being registered twice. -->
+            <exclude>tests/Feature/Security</exclude>
         </testsuite>
+        <!--
+            NOTE: "Security" overlaps the Feature suite and the old "All" suite
+            re-added every Unit/Feature file, which made PHPUnit emit 25
+            "already added to test suite" warnings on every run. "All" has been
+            removed (Unit + Feature already cover everything); run the Security
+            subset explicitly with the testsuite option when needed.
+        -->
         <testsuite name="Security">
             <directory>tests/Feature/Security</directory>
-        </testsuite>
-        <testsuite name="All">
-            <directory>tests</directory>
-            <exclude>tests/Browser</exclude>
         </testsuite>
     </testsuites>
 

@@ -128,10 +128,20 @@
 
     {{-- Users Table --}}
     <div class="card border-0 shadow-sm" style="border-radius: 1.25rem;">
+        <x-admin.bulk-form
+            :action="route('admin.users.bulk')"
+            label="users"
+            :actions="[
+                'activate'   => ['label' => __('admin.activate_bulk'), 'icon' => 'fa-user-check', 'variant' => 'success'],
+                'deactivate' => ['label' => __('admin.deactivate_bulk'), 'icon' => 'fa-user-slash', 'variant' => 'warning'],
+                'trash'      => ['label' => __('admin.trash'), 'icon' => 'fa-trash', 'variant' => 'danger', 'confirm' => __('admin.bulk_confirm_trash')],
+            ]"
+        >
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th class="ps-4 py-3" style="width:1%;"><x-admin.bulk-checkbox master /></th>
                         <th class="ps-4 py-3">
                             <a href="{{ request()->fullUrlWithQuery(['sortField' => 'name', 'sortDirection' => request('sortField') === 'name' && request('sortDirection') === 'asc' ? 'desc' : 'asc']) }}" 
                                class="text-decoration-none text-muted small fw-semibold text-uppercase tracking-wide">
@@ -163,6 +173,7 @@
                 <tbody>
                     @forelse($users as $user)
                         <tr class="{{ !$user->is_active ? 'opacity-50' : '' }}">
+                            <td class="ps-4"><x-admin.bulk-checkbox :value="$user->id" /></td>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
@@ -228,7 +239,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5">
+                            <td colspan="7" class="text-center py-5">
                                 <i class="fas fa-search fa-3x text-muted opacity-25 mb-3 d-block"></i>
                                 <h5 class="fw-bold">No users found</h5>
                                 <p class="text-muted mb-0">No users match your current search or filter criteria.</p>
@@ -238,6 +249,7 @@
                 </tbody>
             </table>
         </div>
+        </x-admin.bulk-form>
 
         {{-- Pagination --}}
         @if($users->hasPages())

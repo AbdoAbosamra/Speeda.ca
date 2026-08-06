@@ -125,4 +125,7 @@ return [
     'expansion_bullet1' => 'More trusted service providers.',
     'expansion_bullet2' => 'More locations.',
     'expansion_bullet3' => 'More convenience for local communities.',
+    'testimonials_title' => 'What Our Providers Say',
+    'testimonials_subtitle' => 'Real feedback from service providers growing their business with Speeda.',
+    'testimonials_out_of_five' => 'out of 5 stars',
 ];

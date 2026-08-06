@@ -526,6 +526,194 @@
             </div>
         </section>
 
+        @if(isset($siteTestimonials) && $siteTestimonials->count() === 3)
+        <section class="home-section home-testimonials-section">
+            <div class="container">
+                <div class="home-testimonials-head fade-in-up">
+                    <h2 class="home-testimonials-title">{{ __('home.testimonials_title') }}</h2>
+                    <p class="home-testimonials-subtitle">{{ __('home.testimonials_subtitle') }}</p>
+                </div>
+                <div class="home-testimonials-grid">
+                    @foreach($siteTestimonials as $testimonial)
+                        <article class="home-testimonial-card fade-in-up">
+                            <span class="home-testimonial-quote-mark" aria-hidden="true">&ldquo;</span>
+
+                            <div class="home-testimonial-stars"
+                                 role="img"
+                                 aria-label="{{ $testimonial->rating }} {{ __('home.testimonials_out_of_five') }}">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fa{{ $i <= $testimonial->rating ? 's' : 'r' }} fa-star" aria-hidden="true"></i>
+                                @endfor
+                            </div>
+
+                            <p class="home-testimonial-text">{{ $testimonial->testimonial_text }}</p>
+
+                            <footer class="home-testimonial-author">
+                                @if($testimonial->display_photo)
+                                    <img class="home-testimonial-avatar"
+                                         src="{{ $testimonial->display_photo }}"
+                                         alt="{{ $testimonial->display_name }}"
+                                         width="52" height="52" loading="lazy">
+                                @else
+                                    <span class="home-testimonial-avatar home-testimonial-avatar-initial" aria-hidden="true">
+                                        {{ $testimonial->display_initial }}
+                                    </span>
+                                @endif
+
+                                <span class="home-testimonial-identity">
+                                    <span class="home-testimonial-name">{{ $testimonial->display_name }}</span>
+                                    @if($testimonial->display_city)
+                                        <span class="home-testimonial-city">
+                                            <i class="fas fa-location-dot" aria-hidden="true"></i>{{ $testimonial->display_city }}
+                                        </span>
+                                    @elseif($testimonial->display_title)
+                                        <span class="home-testimonial-city">{{ $testimonial->display_title }}</span>
+                                    @endif
+                                </span>
+                            </footer>
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+        @endif
+
+        @push('styles')
+        <style>
+            .home-testimonials-head { text-align: center; max-width: 640px; margin: 0 auto 2.5rem; }
+            .home-testimonials-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: #0F1F3D; margin-bottom: 0.5rem; }
+            .home-testimonials-subtitle { color: #64748B; font-size: 1rem; }
+
+            .home-testimonials-grid {
+                display: grid;
+                /*
+                 * minmax(0, 1fr) — NOT 1fr. A bare `1fr` resolves to
+                 * minmax(auto, 1fr), and `auto` refuses to shrink below the
+                 * content's min-content width. A single long unbroken word in a
+                 * testimonial then blew the column out and made the whole PAGE
+                 * scroll sideways.
+                 */
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 1.5rem;
+                align-items: stretch;
+            }
+
+            .home-testimonial-card {
+                position: relative;
+                overflow: hidden;
+                background: #ffffff;
+                border: 1px solid #E9EDF5;
+                border-radius: 20px;
+                padding: 2.25rem 1.75rem 1.5rem;
+                box-shadow: 0 4px 24px rgba(15, 31, 61, 0.06);
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                min-width: 0; /* let the grid actually shrink this track */
+                transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+            }
+            .home-testimonial-card::before {
+                content: '';
+                position: absolute;
+                inset: 0 0 auto 0;
+                height: 4px;
+                background: linear-gradient(90deg, #6366F1, #8B5CF6);
+                opacity: 0;
+                transition: opacity .2s ease;
+            }
+            .home-testimonial-card:hover {
+                transform: translateY(-4px);
+                border-color: #DDD6FE;
+                box-shadow: 0 18px 40px -18px rgba(15, 31, 61, 0.28);
+            }
+            .home-testimonial-card:hover::before { opacity: 1; }
+
+            .home-testimonial-quote-mark {
+                position: absolute;
+                top: -0.75rem;
+                inset-inline-end: 1rem;
+                font-size: 6rem;
+                line-height: 1;
+                font-family: Georgia, 'Times New Roman', serif;
+                color: rgba(99, 102, 241, 0.10);
+                pointer-events: none;
+                user-select: none;
+            }
+
+            .home-testimonial-stars { color: #F59E0B; font-size: 0.95rem; letter-spacing: 2px; }
+
+            .home-testimonial-text {
+                color: #374151;
+                font-size: 1rem;
+                line-height: 1.75;
+                margin: 0;
+                flex: 1;
+                /* Long unbroken strings must wrap instead of widening the card. */
+                overflow-wrap: anywhere;
+                word-break: break-word;
+                /* Keep every card the same height regardless of quote length. */
+                display: -webkit-box;
+                -webkit-line-clamp: 6;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .home-testimonial-author {
+                display: flex;
+                align-items: center;
+                gap: 0.85rem;
+                border-top: 1px solid #F1F5F9;
+                min-width: 0;
+                background: #ffffff;
+                padding: 1rem 0 0;
+            }
+            .home-testimonial-avatar {
+                width: 52px;
+                height: 52px;
+                border-radius: 50%;
+                object-fit: cover;
+                flex-shrink: 0;
+                border: 2px solid #fff;
+                box-shadow: 0 0 0 2px #EEF2FF;
+                background: #EEF2FF;
+            }
+            .home-testimonial-avatar-initial {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+                font-size: 1.25rem;
+                color: #4F46E5;
+            }
+            .home-testimonial-identity { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+            .home-testimonial-name {
+                font-weight: 700;
+                color: #0F1F3D;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .home-testimonial-city {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3rem;
+                font-size: 0.85rem;
+                color: #64748B;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .home-testimonial-city i { color: #94A3B8; font-size: 0.8rem; }
+
+            @media (max-width: 992px) {
+                .home-testimonials-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            }
+            @media (max-width: 640px) {
+                .home-testimonials-grid { grid-template-columns: minmax(0, 1fr); max-width: 480px; margin: 0 auto; }
+            }
+        </style>
+        @endpush
+
         <section class="home-section">
             <div class="container">
                 <div class="home-shell coverage-map-card fade-in-up">

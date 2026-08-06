@@ -2,6 +2,8 @@
 
 namespace Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -16,7 +18,7 @@ class SimplifiedBrowserTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function homepage_loads_correctly()
     {
         $response = $this->get('/');
@@ -28,7 +30,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Homepage loads and displays correctly');
     }
 
-    /** @test */
+    #[Test]
     public function registration_page_displays_form()
     {
         $response = $this->get('/register');
@@ -42,7 +44,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Registration form displays all required fields');
     }
 
-    /** @test */
+    #[Test]
     public function service_providers_listing_works()
     {
         $response = $this->get('/service-providers');
@@ -54,7 +56,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Service providers listing page works');
     }
 
-    /** @test */
+    #[Test]
     public function categories_page_loads()
     {
         $response = $this->get('/categories');
@@ -65,7 +67,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Categories page loads correctly');
     }
 
-    /** @test */
+    #[Test]
     public function locations_page_loads()
     {
         $response = $this->get('/locations');
@@ -76,7 +78,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Locations page loads correctly');
     }
 
-    /** @test */
+    #[Test]
     public function language_switching_endpoint_exists()
     {
         // Test language switching endpoints
@@ -89,7 +91,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Language switching endpoints work');
     }
 
-    /** @test */
+    #[Test]
     public function static_pages_load_correctly()
     {
         $pages = [
@@ -108,7 +110,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'All static pages load correctly');
     }
 
-    /** @test */
+    #[Test]
     public function search_functionality_endpoint_works()
     {
         $response = $this->get('/service-providers?search=test');
@@ -119,7 +121,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Search functionality endpoint works');
     }
 
-    /** @test */
+    #[Test]
     public function csrf_token_endpoint_works()
     {
         $response = $this->get('/csrf-token');
@@ -130,7 +132,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'CSRF token endpoint works correctly');
     }
 
-    /** @test */
+    #[Test]
     public function error_pages_display_correctly()
     {
         // Test 404 page
@@ -140,7 +142,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, '404 error page displays correctly');
     }
 
-    /** @test */
+    #[Test]
     public function authentication_routes_exist()
     {
         // Test login route (redirects to register)
@@ -154,7 +156,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Authentication routes are properly configured');
     }
 
-    /** @test */
+    #[Test]
     public function protected_routes_redirect_unauthenticated_users()
     {
         $protectedRoutes = [
@@ -171,7 +173,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Protected routes properly redirect unauthenticated users');
     }
 
-    /** @test */
+    #[Test]
     public function json_responses_work_correctly()
     {
         // Test API-like endpoints
@@ -182,7 +184,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'JSON responses work correctly');
     }
 
-    /** @test */
+    #[Test]
     public function form_validation_works()
     {
         // Test registration validation without CSRF (should fail)
@@ -192,7 +194,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Form validation and CSRF protection work');
     }
 
-    /** @test */
+    #[Test]
     public function mobile_user_agent_handling()
     {
         $response = $this->withHeaders([
@@ -205,7 +207,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Mobile user agents are handled correctly');
     }
 
-    /** @test */
+    #[Test]
     public function multilingual_content_structure_works()
     {
         // Test that multilingual routes work
@@ -221,7 +223,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Multilingual content structure works');
     }
 
-    /** @test */
+    #[Test]
     public function ajax_requests_work()
     {
         $response = $this->withHeaders([
@@ -234,7 +236,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'AJAX requests are handled correctly');
     }
 
-    /** @test */
+    #[Test]
     public function responsive_layout_meta_tags_present()
     {
         $response = $this->get('/');
@@ -245,7 +247,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Responsive layout meta tags are present');
     }
 
-    /** @test */
+    #[Test]
     public function security_headers_are_present()
     {
         $response = $this->get('/');
@@ -255,7 +257,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Security headers are configured in middleware');
     }
 
-    /** @test */
+    #[Test]
     public function caching_headers_work_for_static_assets()
     {
         // Test CSS/JS asset handling
@@ -268,7 +270,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Static asset handling is configured');
     }
 
-    /** @test */
+    #[Test]
     public function seo_friendly_urls_work()
     {
         // Test SEO-friendly URL structure
@@ -278,7 +280,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'SEO-friendly URLs are working');
     }
 
-    /** @test */
+    #[Test]
     public function breadcrumb_navigation_structure()
     {
         $response = $this->get('/service-providers');
@@ -288,7 +290,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Breadcrumb navigation structure exists');
     }
 
-    /** @test */
+    #[Test]
     public function accessibility_features_present()
     {
         $response = $this->get('/');
@@ -299,7 +301,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Basic accessibility features are present');
     }
 
-    /** @test */
+    #[Test]
     public function performance_optimization_headers()
     {
         $response = $this->get('/');
@@ -310,7 +312,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Performance optimization is configured');
     }
 
-    /** @test */
+    #[Test]
     public function browser_compatibility_meta_tags()
     {
         $response = $this->get('/');
@@ -321,7 +323,7 @@ class SimplifiedBrowserTest extends TestCase
         $this->assertTrue(true, 'Browser compatibility meta tags are present');
     }
 
-    /** @test */
+    #[Test]
     public function progressive_web_app_support()
     {
         $response = $this->get('/');

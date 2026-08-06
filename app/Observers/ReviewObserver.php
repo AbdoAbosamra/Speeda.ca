@@ -60,7 +60,8 @@ class ReviewObserver
      */
     private function recalculateProviderRating(Review $review): void
     {
-        $provider = $review->serviceProvider;
+        $provider = ServiceProvider::find($review->service_provider_id);
+
         if ($provider) {
             $provider->recalculateRating();
         }

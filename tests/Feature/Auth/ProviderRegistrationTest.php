@@ -41,8 +41,8 @@ class ProviderRegistrationTest extends TestCase
             'profession' => (string) $this->profession->id,
             'city' => 'Montreal',
             'terms' => true,
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => 'SecureReset123!',
+            'password_confirmation' => 'SecureReset123!',
         ]);
 
         $this->assertAuthenticated();
@@ -66,8 +66,8 @@ class ProviderRegistrationTest extends TestCase
             'name' => 'Client User',
             'email' => $email,
             'role' => 'client',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'password' => 'SecureReset123!',
+            'password_confirmation' => 'SecureReset123!',
         ]);
 
         $this->assertAuthenticated();

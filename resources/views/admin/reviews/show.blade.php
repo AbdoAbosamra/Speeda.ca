@@ -12,10 +12,13 @@
                     <a href="{{ route('admin.reviews') }}" class="btn btn-outline-secondary rounded-pill px-3">
                         <i class="fas fa-arrow-left me-2"></i>Back to Reviews
                     </a>
-                    <a href="{{ route('service-providers.show', $review->serviceProvider->id) }}"
-                        class="btn btn-outline-primary rounded-pill px-3" target="_blank" rel="noopener">
-                        <i class="fas fa-user me-2"></i>View Provider
-                    </a>
+                    {{-- Guarded: an orphaned review (provider removed) used to 500 here. --}}
+                    @if($review->serviceProvider)
+                        <a href="{{ route('service-providers.show', $review->serviceProvider->id) }}"
+                            class="btn btn-outline-primary rounded-pill px-3" target="_blank" rel="noopener">
+                            <i class="fas fa-user me-2"></i>View Provider
+                        </a>
+                    @endif
                 </div>
             </div>
 
@@ -31,7 +34,9 @@
                         <div class="col-md-4">
                             <div class="text-muted mb-2">Provider</div>
                             <div class="fw-semibold">
-                                {{ $review->serviceProvider->user->name ?? ('Provider #' . $review->service_provider_id) }}
+                                {{ $review->serviceProvider?->company_name
+                                    ?? $review->serviceProvider?->user?->name
+                                    ?? ('Provider #' . $review->service_provider_id) }}
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -52,17 +57,19 @@
                     </div>
 
                     <div class="d-flex gap-2 flex-wrap">
-                        @if(!$review->is_active && !$review->admin_approved_at)
+                        @if(!$review->is_active)
                             <form action="{{ route('admin.reviews.approve', $review) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-success rounded-pill px-4">
-                                    <i class="fas fa-check me-2"></i>Approve
+                                    <i class="fas fa-check me-2"></i>{{ $review->admin_approved_at ? 'Re-approve' : 'Approve' }}
                                 </button>
                             </form>
+                        @endif
 
-                            <form action="{{ route('admin.reviews.reject', $review) }}" method="POST">
+                        @if($review->is_active || !$review->admin_approved_at)
+                            <form action="{{ route('admin.reviews.reject', $review) }}" method="POST"
+                                  onsubmit="return confirm('Reject this review?');">
                                 @csrf
-                                <input type="hidden" name="reason" value="Other">
                                 <button type="submit" class="btn btn-danger rounded-pill px-4">
                                     <i class="fas fa-times me-2"></i>Reject
                                 </button>

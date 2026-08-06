@@ -64,7 +64,7 @@
 
                     <label class="admin-field admin-field-wide">
                         <span>Content EN <strong>*</strong></span>
-                        <textarea name="content_en" rows="16" required placeholder="<h2>Section title</h2><p>Legal text...</p>">{{ old('content_en', $page->content_en) }}</textarea>
+                        <textarea name="content_en" rows="16" required class="rich-editor" data-editor-dir="ltr" placeholder="<h2>Section title</h2><p>Legal text...</p>">{{ old('content_en', $page->content_en) }}</textarea>
                         @error('content_en')<small>{{ $message }}</small>@enderror
                     </label>
 
@@ -91,7 +91,7 @@
 
                     <label class="admin-field admin-field-wide">
                         <span>المحتوى AR <strong>*</strong></span>
-                        <textarea name="content_ar" rows="16" required dir="rtl" placeholder="<h2>عنوان القسم</h2><p>النص القانوني...</p>">{{ old('content_ar', $page->content_ar) }}</textarea>
+                        <textarea name="content_ar" rows="16" required class="rich-editor" data-editor-dir="rtl" dir="rtl" placeholder="<h2>عنوان القسم</h2><p>النص القانوني...</p>">{{ old('content_ar', $page->content_ar) }}</textarea>
                         @error('content_ar')<small>{{ $message }}</small>@enderror
                     </label>
 
@@ -118,7 +118,7 @@
 
                     <label class="admin-field admin-field-wide">
                         <span>Content FR <strong>*</strong></span>
-                        <textarea name="content_fr" rows="16" required placeholder="<h2>Titre de section</h2><p>Texte juridique...</p>">{{ old('content_fr', $page->content_fr) }}</textarea>
+                        <textarea name="content_fr" rows="16" required class="rich-editor" data-editor-dir="ltr" placeholder="<h2>Titre de section</h2><p>Texte juridique...</p>">{{ old('content_fr', $page->content_fr) }}</textarea>
                         @error('content_fr')<small>{{ $message }}</small>@enderror
                     </label>
 
@@ -309,7 +309,6 @@
 
         .admin-field textarea {
             min-height: 8rem;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
             line-height: 1.55;
         }
 
@@ -366,4 +365,46 @@
             }
         }
     </style>
+@endpush
+
+@push('scripts')
+    {{-- Rich text editor (TinyMCE) for legal page content fields --}}
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js"></script>
+    <script>
+        (() => {
+            if (typeof tinymce === 'undefined') return;
+
+            document.querySelectorAll('textarea.rich-editor').forEach((el) => {
+                const dir = el.getAttribute('data-editor-dir') === 'rtl' ? 'rtl' : 'ltr';
+
+                tinymce.init({
+                    target: el,
+                    directionality: dir,
+                    height: 500,
+                    menubar: false,
+                    branding: false,
+                    promotion: false,
+                    plugins: 'lists link table code autolink hr',
+                    toolbar: 'undo redo | blocks | bold italic underline strikethrough | bullist numlist | blockquote | link table | alignleft aligncenter alignright | removeformat | code',
+                    block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4',
+                    link_default_target: '_blank',
+                    link_assume_external_targets: true,
+                    default_link_target: '_blank',
+                    rel_list: [{ title: 'External (safe)', value: 'noopener noreferrer' }],
+                    convert_urls: false,
+                    invalid_elements: 'script',
+                    content_style: 'body{font-family:inherit;font-size:16px;line-height:1.8}',
+                    setup: (editor) => {
+                        editor.on('change keyup', () => editor.save());
+                    },
+                });
+            });
+
+            // Flush all editors into their textareas right before the form submits.
+            const form = document.querySelector('form.admin-legal-form');
+            form?.addEventListener('submit', () => {
+                if (typeof tinymce !== 'undefined') tinymce.triggerSave();
+            });
+        })();
+    </script>
 @endpush

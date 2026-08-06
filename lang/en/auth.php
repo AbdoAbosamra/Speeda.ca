@@ -71,7 +71,7 @@ return [
     'password_reset_visual_text' => 'Keep your account protected with a short-lived reset link and a stronger password.',
     'secure_account_access' => 'Secure account access',
     'remembered_password' => 'Remembered your password?',
-    'password_rules_hint' => 'Use at least 12 characters with uppercase, lowercase, numbers, and symbols.',
+    'password_rules_hint' => 'Use at least 8 characters.',
     'toggle_password_visibility' => 'Show or hide password',
     'reset_password_button' => 'Reset Password',
     'reset_password_email_subject' => 'Reset your Speeda password',

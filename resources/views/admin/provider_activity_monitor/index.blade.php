@@ -43,6 +43,27 @@
                         <span>Need Profile Work</span>
                     </div>
                 </article>
+                <a href="{{ route('admin.provider_activity_monitor.index', ['listing_status' => 'hidden']) }}" class="pam-summary-card">
+                    <span class="pam-summary-icon pam-tone-red"><i class="fas fa-eye-slash"></i></span>
+                    <div>
+                        <strong>{{ number_format($summary['hidden'] ?? 0) }}</strong>
+                        <span>Hidden Listings</span>
+                    </div>
+                </a>
+                <a href="{{ route('admin.provider_activity_monitor.index', ['listing_status' => 'verified']) }}" class="pam-summary-card">
+                    <span class="pam-summary-icon pam-tone-blue"><i class="fas fa-circle-check"></i></span>
+                    <div>
+                        <strong>{{ number_format($summary['verified'] ?? 0) }}</strong>
+                        <span>Verified</span>
+                    </div>
+                </a>
+                <a href="{{ route('admin.provider_activity_monitor.index', ['listing_status' => 'featured']) }}" class="pam-summary-card">
+                    <span class="pam-summary-icon pam-tone-amber"><i class="fas fa-star"></i></span>
+                    <div>
+                        <strong>{{ number_format($summary['featured'] ?? 0) }}</strong>
+                        <span>Featured</span>
+                    </div>
+                </a>
                 <article class="pam-summary-card">
                     <span class="pam-summary-icon pam-tone-slate"><i class="fas fa-moon"></i></span>
                     <div>
@@ -140,6 +161,18 @@
                     </label>
 
                     <label class="pam-field">
+                        <span>Listing</span>
+                        <select name="listing_status">
+                            <option value="">Any listing</option>
+                            <option value="active" @selected(request('listing_status') === 'active')>Live</option>
+                            <option value="hidden" @selected(request('listing_status') === 'hidden')>Hidden</option>
+                            <option value="verified" @selected(request('listing_status') === 'verified')>Verified</option>
+                            <option value="unverified" @selected(request('listing_status') === 'unverified')>Not verified</option>
+                            <option value="featured" @selected(request('listing_status') === 'featured')>Featured</option>
+                        </select>
+                    </label>
+
+                    <label class="pam-field">
                         <span>Sort</span>
                         <select name="sort">
                             <option value="attention" @selected(request('sort', 'attention') === 'attention')>Needs attention</option>
@@ -172,16 +205,30 @@
                 </form>
             </section>
 
+            <x-admin.bulk-form
+                :action="route('admin.providers.bulk')"
+                label="providers"
+                :actions="[
+                    'show'      => ['label' => __('admin.bulk_verb_shown'), 'icon' => 'fa-eye', 'variant' => 'success'],
+                    'hide'      => ['label' => __('admin.bulk_verb_hidden'), 'icon' => 'fa-eye-slash', 'variant' => 'warning'],
+                    'verify'    => ['label' => __('admin.verified'), 'icon' => 'fa-circle-check'],
+                    'unverify'  => ['label' => __('admin.bulk_verb_unverified'), 'icon' => 'fa-circle-xmark'],
+                    'feature'   => ['label' => __('admin.feature'), 'icon' => 'fa-star'],
+                    'unfeature' => ['label' => __('admin.unfeature'), 'icon' => 'fa-star-half-stroke'],
+                ]"
+            >
             <x-admin.table-card class="pam-table-card">
                 <table class="admin-data-table pam-table">
                     <thead>
                         <tr>
+                            <th style="width:1%;"><x-admin.bulk-checkbox master /></th>
                             <th>Provider</th>
                             <th>Profile Health</th>
                             <th>Lead Activity</th>
                             <th>Missing / Risk</th>
                             <th>Account</th>
                             <th>Last Activity</th>
+                            <th>Listing</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
@@ -217,6 +264,7 @@
                                 if (!$hasExperience) $missing[] = ['label' => 'Experience', 'tone' => 'warn'];
                             @endphp
                             <tr>
+                                <td><x-admin.bulk-checkbox :value="$p->id" /></td>
                                 <td>
                                     <div class="pam-provider-cell">
                                         <span class="pam-avatar">
@@ -284,21 +332,80 @@
                                     </div>
                                 </td>
                                 <td>
+                                    {{-- Listing status: is_active is the admin-controlled listing flag,
+                                         owner_is_active is the account flag. Both must be on to be public. --}}
+                                    <div class="pam-status-cell">
+                                        @if(!$p->owner_is_active)
+                                            <span class="pam-badge pam-badge-off" title="Owner account is deactivated">
+                                                <i class="fas fa-user-slash"></i> Account off
+                                            </span>
+                                        @elseif(!$p->is_active)
+                                            <span class="pam-badge pam-badge-off" title="Listing hidden by an admin">
+                                                <i class="fas fa-eye-slash"></i> Hidden
+                                            </span>
+                                        @else
+                                            <span class="pam-badge pam-badge-on"><i class="fas fa-eye"></i> Live</span>
+                                        @endif
+
+                                        @if($p->is_verified)
+                                            <span class="pam-badge pam-badge-verified"><i class="fas fa-circle-check"></i> Verified</span>
+                                        @endif
+                                        @if($p->is_featured)
+                                            <span class="pam-badge pam-badge-featured"><i class="fas fa-star"></i> Featured</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
                                     <div class="pam-actions">
-                                        <a href="{{ route('service-providers.show', $p->id) }}" class="pam-icon-action" target="_blank" rel="noopener" title="View public profile">
-                                            <i class="fas fa-user"></i>
-                                            <span>Profile</span>
+                                        <a href="{{ route('admin.providers.edit', $p->id) }}" class="pam-icon-action pam-icon-primary" title="Edit provider">
+                                            <i class="fas fa-pen"></i>
+                                            <span>Edit</span>
                                         </a>
-                                        <a href="{{ route('admin.provider_activity_monitor.show', $p->id) }}" class="pam-icon-action pam-icon-primary" title="Open analytics timeline">
+
+                                        <form action="{{ route('admin.providers.toggle_active', $p->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="pam-icon-action"
+                                                    title="{{ $p->is_active ? 'Hide listing from the public site' : 'Show listing on the public site' }}">
+                                                <i class="fas {{ $p->is_active ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+                                                <span>{{ $p->is_active ? 'Hide' : 'Show' }}</span>
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('admin.providers.toggle_verified', $p->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="pam-icon-action"
+                                                    title="{{ $p->is_verified ? 'Remove verification' : 'Mark as verified' }}">
+                                                <i class="fas {{ $p->is_verified ? 'fa-circle-xmark' : 'fa-circle-check' }}"></i>
+                                                <span>{{ $p->is_verified ? 'Unverify' : 'Verify' }}</span>
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('admin.providers.toggle_featured', $p->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="pam-icon-action"
+                                                    title="{{ $p->is_featured ? 'Remove from featured' : 'Feature this provider' }}">
+                                                <i class="{{ $p->is_featured ? 'far' : 'fas' }} fa-star"></i>
+                                                <span>{{ $p->is_featured ? 'Unfeature' : 'Feature' }}</span>
+                                            </button>
+                                        </form>
+
+                                        <a href="{{ route('admin.provider_activity_monitor.show', $p->id) }}" class="pam-icon-action" title="Open analytics timeline">
                                             <i class="fas fa-chart-line"></i>
                                             <span>Timeline</span>
+                                        </a>
+                                        <a href="{{ route('service-providers.show', $p->id) }}" class="pam-icon-action" target="_blank" rel="noopener" title="View public profile">
+                                            <i class="fas fa-arrow-up-right-from-square"></i>
+                                            <span>Public</span>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7">
+                                <td colspan="9">
                                     <x-admin.empty-state
                                         icon="fas fa-chart-line"
                                         title="No providers match these filters"
@@ -316,6 +423,7 @@
                     </tbody>
                 </table>
             </x-admin.table-card>
+            </x-admin.bulk-form>
 
             @if($providers->hasPages())
                 <div class="admin-pagination-wrap">
@@ -677,9 +785,39 @@
         .pam-actions {
             display: flex;
             justify-content: flex-end;
+            flex-wrap: wrap;
             gap: 0.45rem;
             min-width: 150px;
         }
+
+        .pam-actions form {
+            display: inline;
+        }
+
+        /* Listing status badges */
+        .pam-status-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.3rem;
+            min-width: 110px;
+        }
+
+        .pam-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .pam-badge-on { background: rgba(16, 185, 129, 0.12); color: #047857; }
+        .pam-badge-off { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
+        .pam-badge-verified { background: rgba(37, 99, 235, 0.12); color: #1d4ed8; }
+        .pam-badge-featured { background: rgba(245, 158, 11, 0.15); color: #b45309; }
 
         .pam-icon-action {
             display: inline-flex;

@@ -63,11 +63,15 @@ class Comment extends Model
     }
 
     /**
-     * Scope to get only pending (unapproved) comments.
+     * Scope to get only pending (never moderated) comments.
+     *
+     * Moderation state is keyed off approved_at, not rejection_reason: the
+     * rejection reason is optional, so a comment rejected without one used to
+     * fall straight back into the pending queue.
      */
     public function scopePending($query)
     {
-        return $query->where('is_active', false)->whereNull('rejection_reason');
+        return $query->where('is_active', false)->whereNull('approved_at');
     }
 
     /**
@@ -79,11 +83,24 @@ class Comment extends Model
     }
 
     /**
-     * Scope to get only rejected comments.
+     * Scope to get only rejected comments (moderated, but not published).
      */
     public function scopeRejected($query)
     {
-        return $query->whereNotNull('rejection_reason');
+        return $query->where('is_active', false)->whereNotNull('approved_at');
+    }
+
+    /**
+     * Has this comment been through moderation at all?
+     */
+    public function isRejected(): bool
+    {
+        return !$this->is_active && $this->approved_at !== null;
+    }
+
+    public function isPending(): bool
+    {
+        return !$this->is_active && $this->approved_at === null;
     }
 
     /**

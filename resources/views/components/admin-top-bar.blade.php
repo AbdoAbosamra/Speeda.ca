@@ -3,108 +3,82 @@
     $isRtl = in_array(app()->getLocale(), ['ar', 'he', 'ur', 'fa']);
     $currentRoute = request()->route()?->getName();
 
-    $breadcrumbs = [];
     $dashboardRoute = Route::has('admin.dashboard') ? route('admin.dashboard') : '#';
+    $breadcrumbs = [['label' => 'Dashboard', 'url' => $dashboardRoute]];
 
-    if ($currentRoute === 'admin.dashboard' && Route::has('admin.dashboard')) {
-        $breadcrumbs = [['label' => 'Dashboard', 'url' => $dashboardRoute]];
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.categories') && Route::has('admin.categories')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Categories', 'url' => route('admin.categories')]
-        ];
-        if (in_array($currentRoute, ['admin.categories.edit'])) {
-            $breadcrumbs[] = ['label' => 'Edit', 'url' => '#'];
+    // route-name prefix => [section label, index route name]. Longest prefix wins,
+    // so admin.users.trash resolves before admin.users.
+    $breadcrumbSections = [
+        'admin.users.trash' => ['Users Trash', 'admin.users.trash'],
+        'admin.users' => ['Users', 'admin.users'],
+        'admin.categories' => ['Categories', 'admin.categories'],
+        'admin.locations' => ['Locations', 'admin.locations'],
+        'admin.blog.posts' => ['Blogs', 'admin.blog.posts.index'],
+        'admin.legal-pages' => ['Legal Pages', 'admin.legal-pages.index'],
+        'admin.reviews' => ['Reviews', 'admin.reviews'],
+        'admin.comments' => ['Comments', 'admin.comments'],
+        'admin.testimonials' => ['Testimonials', 'admin.testimonials.index'],
+        'admin.notifications' => ['Notifications', 'admin.notifications.index'],
+        'admin.email_journey' => ['Email Journey', 'admin.email_journey.index'],
+        'admin.visitors' => ['Visitor Analytics', 'admin.visitors'],
+        'admin.whatsapp_analytics' => ['WhatsApp Analytics', 'admin.whatsapp_analytics.index'],
+        'admin.provider_activity_monitor' => ['Providers', 'admin.provider_activity_monitor.index'],
+        'admin.login_activity' => ['Login Activity', 'admin.login_activity.index'],
+        'admin.activity_logs' => ['Activity Logs', 'admin.activity_logs'],
+    ];
+
+    $leafLabels = [
+        'create' => 'Create',
+        'edit' => 'Edit',
+        'show' => 'View',
+        'trash' => null, // already a section
+    ];
+
+    if ($currentRoute && $currentRoute !== 'admin.dashboard') {
+        foreach ($breadcrumbSections as $prefix => [$label, $indexRoute]) {
+            if (!str_starts_with($currentRoute, $prefix) || !Route::has($indexRoute)) {
+                continue;
+            }
+
+            $breadcrumbs[] = ['label' => $label, 'url' => route($indexRoute)];
+
+            $leaf = \Illuminate\Support\Str::afterLast($currentRoute, '.');
+            if (($leafLabels[$leaf] ?? null) && $currentRoute !== $indexRoute) {
+                $breadcrumbs[] = ['label' => $leafLabels[$leaf], 'url' => '#'];
+            }
+
+            break;
         }
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.locations') && Route::has('admin.locations')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Locations', 'url' => route('admin.locations')]
-        ];
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.users') && Route::has('admin.users')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Users', 'url' => route('admin.users')]
-        ];
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.blog.posts') && Route::has('admin.blog.posts.index')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Blogs', 'url' => route('admin.blog.posts.index')]
-        ];
-        if ($currentRoute === 'admin.blog.posts.create') {
-            $breadcrumbs[] = ['label' => 'Create', 'url' => '#'];
-        }
-        if ($currentRoute === 'admin.blog.posts.edit') {
-            $breadcrumbs[] = ['label' => 'Edit', 'url' => '#'];
-        }
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.reviews') && Route::has('admin.reviews')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Reviews', 'url' => route('admin.reviews')]
-        ];
-        if ($currentRoute === 'admin.reviews.show' && Route::has('admin.reviews.show')) {
-            $breadcrumbs[] = ['label' => 'View', 'url' => '#'];
-        }
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.comments') && Route::has('admin.comments')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Comments', 'url' => route('admin.comments')]
-        ];
-        if ($currentRoute === 'admin.comments.show' && Route::has('admin.comments.show')) {
-            $breadcrumbs[] = ['label' => 'View', 'url' => '#'];
-        }
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.visitors') && Route::has('admin.visitors')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Analytics', 'url' => route('admin.visitors')]
-        ];
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.activity_logs') && Route::has('admin.activity_logs')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Activity Logs', 'url' => route('admin.activity_logs')]
-        ];
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.notifications') && Route::has('admin.notifications.index')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Notifications', 'url' => route('admin.notifications.index')]
-        ];
-        if ($currentRoute === 'admin.notifications.create') {
-            $breadcrumbs[] = ['label' => 'Create', 'url' => '#'];
-        }
-    }
-    elseif (str_starts_with($currentRoute ?? '', 'admin.provider_activity_monitor') && Route::has('admin.provider_activity_monitor.index')) {
-        $breadcrumbs = [
-            ['label' => 'Dashboard', 'url' => $dashboardRoute],
-            ['label' => 'Provider Analytics', 'url' => route('admin.provider_activity_monitor.index')]
-        ];
-        if ($currentRoute === 'admin.provider_activity_monitor.show') {
-            $breadcrumbs[] = ['label' => 'Details', 'url' => '#'];
-        }
-    }
-    else {
-        $breadcrumbs = [['label' => 'Dashboard', 'url' => $dashboardRoute]];
     }
 
-    $adminMenu = [
-        ['label' => 'Dashboard', 'icon' => 'fa-gauge-high', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
-        ['label' => 'Users', 'icon' => 'fa-users', 'route' => 'admin.users', 'active' => 'admin.users*'],
-        ['label' => 'Reviews', 'icon' => 'fa-star', 'route' => 'admin.reviews', 'active' => 'admin.reviews*'],
-        ['label' => 'Blogs', 'icon' => 'fa-newspaper', 'route' => 'admin.blog.posts.index', 'active' => 'admin.blog.posts*'],
-        ['label' => 'Notifications', 'icon' => 'fa-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications*'],
-        ['label' => 'Visitor Analytics', 'icon' => 'fa-chart-line', 'route' => 'admin.visitors', 'active' => 'admin.visitors*'],
-        ['label' => 'Provider Analytics', 'icon' => 'fa-briefcase', 'route' => 'admin.provider_activity_monitor.index', 'active' => 'admin.provider_activity_monitor*'],
-        ['label' => 'Categories', 'icon' => 'fa-folder-tree', 'route' => 'admin.categories', 'active' => 'admin.categories*'],
-        ['label' => 'Locations', 'icon' => 'fa-location-dot', 'route' => 'admin.locations', 'active' => 'admin.locations*'],
-        ['label' => 'Activity Logs', 'icon' => 'fa-clipboard-list', 'route' => 'admin.activity_logs', 'active' => 'admin.activity_logs*'],
+    // This dropdown is the only admin navigation that is actually rendered, so
+    // every admin module must appear here — anything missing is unreachable
+    // without typing the URL by hand.
+    $adminMenuGroups = [
+        'Workspace' => [
+            ['label' => 'Dashboard', 'icon' => 'fa-gauge-high', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
+            ['label' => 'Users', 'icon' => 'fa-users', 'route' => 'admin.users', 'active' => 'admin.users'],
+            ['label' => 'Users Trash', 'icon' => 'fa-trash-can', 'route' => 'admin.users.trash', 'active' => 'admin.users.trash'],
+            ['label' => 'Providers', 'icon' => 'fa-briefcase', 'route' => 'admin.provider_activity_monitor.index', 'active' => 'admin.provider_activity_monitor*|admin.providers*'],
+            ['label' => 'Login Activity', 'icon' => 'fa-right-to-bracket', 'route' => 'admin.login_activity.index', 'active' => 'admin.login_activity*'],
+        ],
+        'Content & Moderation' => [
+            ['label' => 'Reviews', 'icon' => 'fa-star', 'route' => 'admin.reviews', 'active' => 'admin.reviews*'],
+            ['label' => 'Comments', 'icon' => 'fa-comments', 'route' => 'admin.comments', 'active' => 'admin.comments*'],
+            ['label' => 'Testimonials', 'icon' => 'fa-quote-right', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials*'],
+            ['label' => 'Blogs', 'icon' => 'fa-newspaper', 'route' => 'admin.blog.posts.index', 'active' => 'admin.blog.posts*'],
+            ['label' => 'Legal Pages', 'icon' => 'fa-scale-balanced', 'route' => 'admin.legal-pages.index', 'active' => 'admin.legal-pages*'],
+            ['label' => 'Categories', 'icon' => 'fa-folder-tree', 'route' => 'admin.categories', 'active' => 'admin.categories*'],
+            ['label' => 'Locations', 'icon' => 'fa-location-dot', 'route' => 'admin.locations', 'active' => 'admin.locations*'],
+        ],
+        'Engagement & Insights' => [
+            ['label' => 'Notifications', 'icon' => 'fa-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications*'],
+            ['label' => 'Email Journey', 'icon' => 'fa-envelope-open-text', 'route' => 'admin.email_journey.index', 'active' => 'admin.email_journey*'],
+            ['label' => 'Email Templates', 'icon' => 'fa-pen-to-square', 'route' => 'admin.email_templates.index', 'active' => 'admin.email_templates*'],
+            ['label' => 'Visitor Analytics', 'icon' => 'fa-chart-line', 'route' => 'admin.visitors', 'active' => 'admin.visitors*'],
+            ['label' => 'WhatsApp Analytics', 'icon' => 'fa-comment-dots', 'route' => 'admin.whatsapp_analytics.index', 'active' => 'admin.whatsapp_analytics*'],
+            ['label' => 'Activity Logs', 'icon' => 'fa-clipboard-list', 'route' => 'admin.activity_logs', 'active' => 'admin.activity_logs*'],
+        ],
     ];
 @endphp
 
@@ -126,13 +100,18 @@
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-1"
                  class="admin-menu-dropdown">
-                @foreach($adminMenu as $item)
-                    @if(Route::has($item['route']))
-                        <a href="{{ route($item['route']) }}" class="admin-menu-item {{ request()->routeIs($item['active']) ? 'active' : '' }}">
-                            <i class="fas {{ $item['icon'] }}"></i>
-                            <span>{{ $item['label'] }}</span>
-                        </a>
-                    @endif
+                @foreach($adminMenuGroups as $groupLabel => $items)
+                    <div class="admin-menu-group-label">{{ $groupLabel }}</div>
+                    <div class="admin-menu-group">
+                        @foreach($items as $item)
+                            @if(Route::has($item['route']))
+                                <a href="{{ route($item['route']) }}" class="admin-menu-item {{ request()->routeIs($item['active']) ? 'active' : '' }}">
+                                    <i class="fas {{ $item['icon'] }}"></i>
+                                    <span>{{ $item['label'] }}</span>
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
                 @endforeach
             </div>
         </div>
@@ -175,11 +154,8 @@
         <div class="admin-user" x-data="userDropdown()">
             <button class="admin-user-btn" @click="toggle" :class="{ 'active': open }" aria-expanded="false">
                 <span class="user-avatar">
-                    @if($user && $user->profile_photo_url)
-                        <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
-                    @else
-                        <span class="avatar-placeholder">{{ $user ? substr($user->name, 0, 1) : 'A' }}</span>
-                    @endif
+                    {{-- User has no avatar column, so the initial is the avatar. --}}
+                    <span class="avatar-placeholder">{{ $user ? mb_substr($user->name, 0, 1) : 'A' }}</span>
                 </span>
                 <span class="user-info">
                     <span class="user-name">{{ $user->name ?? 'Admin' }}</span>
@@ -230,6 +206,8 @@
 
 :root {
     --admin-top-bar-height: 68px; /* Slightly slimmer for a more modern look */
+    /* Kept at 0: the admin layout is top-bar only. The sidebar component that
+       this variable used to offset was never rendered and has been removed. */
     --admin-sidebar-width: 0px;
     --top-bar-blur: 16px; /* Increased blur for premium glassmorphism */
     --dropdown-shadow: 0 25px 40px -10px rgba(0,0,0,0.08), 0 10px 15px -5px rgba(0,0,0,0.04);
@@ -776,15 +754,40 @@
     top: calc(100% + 12px);
     left: 0;
     z-index: 1200;
-    width: min(360px, calc(100vw - 2rem));
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.35rem;
+    width: min(420px, calc(100vw - 2rem));
+    max-height: min(72vh, 640px);
+    overflow-y: auto;
     padding: 0.75rem;
     border: 1px solid var(--border-subtle);
     border-radius: 20px;
     background: #fff;
     box-shadow: var(--dropdown-shadow);
+}
+
+[dir="rtl"] .admin-menu-dropdown {
+    left: auto;
+    right: 0;
+}
+
+.admin-menu-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+}
+
+.admin-menu-group-label {
+    padding: 0.6rem 0.5rem 0.35rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+.admin-menu-group-label:not(:first-child) {
+    margin-top: 0.4rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 0.75rem;
 }
 
 .admin-menu-item {

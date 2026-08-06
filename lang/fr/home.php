@@ -125,4 +125,7 @@ return [
     'expansion_bullet1' => 'Plus de prestataires de services de confiance.',
     'expansion_bullet2' => "Plus d'emplacements.",
     'expansion_bullet3' => 'Plus de commodité pour les communautés locales.',
+    'testimonials_title' => 'Ce que disent nos prestataires',
+    'testimonials_subtitle' => 'De vrais témoignages de prestataires qui développent leur activité avec Speeda.',
+    'testimonials_out_of_five' => 'sur 5 étoiles',
 ];

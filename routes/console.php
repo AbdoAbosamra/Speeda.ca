@@ -28,3 +28,11 @@ Artisan::command('providers:backfill-profile-completion', function () {
 
     $this->info("Backfill completed. Updated {$count} providers.");
 })->purpose('Recalculate profile_completion_percent for all existing providers');
+
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('providers:send-journey-emails')
+    ->dailyAt('10:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+

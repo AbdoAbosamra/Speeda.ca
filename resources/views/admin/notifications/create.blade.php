@@ -158,6 +158,17 @@
                             </div>
                         </div>
 
+                        {{-- Expiry used to be hardcoded to 30 days with no way to change it. --}}
+                        <div class="admin-form-group">
+                            <label for="expires_in_days">Expires after (days)</label>
+                            <input type="number" name="expires_in_days" id="expires_in_days"
+                                   min="1" max="365" value="{{ old('expires_in_days', 30) }}">
+                            <small class="admin-form-hint">Between 1 and 365 days. Defaults to 30.</small>
+                            @error('expires_in_days')
+                                <span class="admin-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <div class="admin-form-actions">
                             <button type="button" class="admin-btn admin-btn-secondary" id="previewBtn">
                                 <i class="fas fa-eye"></i>
@@ -184,7 +195,7 @@
                             </li>
                             <li>
                                 <i class="fas fa-clock"></i>
-                                <span><strong>Expires:</strong> 30 days from creation</span>
+                                <span><strong>Expires:</strong> configurable, 30 days by default</span>
                             </li>
                             <li>
                                 <i class="fas fa-globe"></i>

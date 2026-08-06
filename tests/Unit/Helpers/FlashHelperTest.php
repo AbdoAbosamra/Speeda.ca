@@ -2,12 +2,14 @@
 
 namespace Tests\Unit\Helpers;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Helpers\FlashHelper;
 use Tests\TestCase;
 
 class FlashHelperTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_flashes_success_messages()
     {
         FlashHelper::success('Operation completed successfully');
@@ -15,7 +17,7 @@ class FlashHelperTest extends TestCase
         $this->assertEquals('Operation completed successfully', session('success'));
     }
 
-    /** @test */
+    #[Test]
     public function it_flashes_success_toast_messages()
     {
         FlashHelper::success('Toast message', true);
@@ -24,7 +26,7 @@ class FlashHelperTest extends TestCase
         $this->assertNull(session('success'));
     }
 
-    /** @test */
+    #[Test]
     public function it_flashes_error_messages()
     {
         FlashHelper::error('Something went wrong');
@@ -32,7 +34,7 @@ class FlashHelperTest extends TestCase
         $this->assertEquals('Something went wrong', session('error'));
     }
 
-    /** @test */
+    #[Test]
     public function it_flashes_error_toast_messages()
     {
         FlashHelper::error('Error toast', true);
@@ -41,7 +43,7 @@ class FlashHelperTest extends TestCase
         $this->assertNull(session('error'));
     }
 
-    /** @test */
+    #[Test]
     public function it_flashes_info_messages()
     {
         FlashHelper::info('Information message');
@@ -49,7 +51,7 @@ class FlashHelperTest extends TestCase
         $this->assertEquals('Information message', session('info'));
     }
 
-    /** @test */
+    #[Test]
     public function it_flashes_warning_messages()
     {
         FlashHelper::warning('Warning message');

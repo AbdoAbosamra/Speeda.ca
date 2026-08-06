@@ -98,7 +98,10 @@ jobs:
       - name: Run Laravel tests
         run: |
           if find tests -name '*Test.php' -print -quit | grep -q .; then
-            php artisan test --testsuite=All --ansi
+            # No --testsuite flag: runs every suite in phpunit.xml (Unit, Feature,
+            # Security). The old "All" suite was removed from phpunit.xml, so
+            # --testsuite=All matched nothing and passed with zero tests run.
+            php artisan test --ansi
           else
             echo "No Laravel tests found; skipping."
           fi

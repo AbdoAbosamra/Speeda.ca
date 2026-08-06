@@ -2,13 +2,15 @@
 
 namespace Tests\Unit\Rules;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use App\Rules\BusinessHoursValidation;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Validator;
 
 class BusinessHoursValidationTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_validates_correct_business_hours_format()
     {
         $validHours = [
@@ -27,7 +29,7 @@ class BusinessHoursValidationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_rejects_invalid_business_hours_format()
     {
         $invalidHours = [
@@ -47,7 +49,7 @@ class BusinessHoursValidationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_weekly_schedule_array()
     {
         $validSchedule = [
@@ -85,7 +87,7 @@ class BusinessHoursValidationTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_closed_days_properly()
     {
         $scheduleWithClosedDays = [

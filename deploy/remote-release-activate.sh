@@ -53,7 +53,11 @@ MAINTENANCE_MODE="${MAINTENANCE_MODE:-false}"
 DEPLOY_ROOT="${PROJECT_PATH%/}"
 RELEASES_DIR="$DEPLOY_ROOT/releases"
 SHARED_DIR="$DEPLOY_ROOT/shared"
-CURRENT_LINK="$DEPLOY_ROOT/current"
+# The symlink that is swapped atomically. On CloudPanel this is the site's own
+# document path (/home/<user>/htdocs/<domain>), so the vhost keeps pointing
+# where CloudPanel put it and NO nginx change — and no root — is ever needed.
+# Defaults to the classic <root>/current layout when PUBLIC_LINK is unset.
+CURRENT_LINK="${PUBLIC_LINK:-$DEPLOY_ROOT/current}"
 RELEASE_PATH="$RELEASES_DIR/$RELEASE_NAME"
 SHARED_ENV="$SHARED_DIR/.env"
 SHARED_STORAGE="$SHARED_DIR/storage"

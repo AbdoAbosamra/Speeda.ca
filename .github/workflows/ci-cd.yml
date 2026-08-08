@@ -16,6 +16,10 @@ env:
   PHP_VERSION: "8.4"
   NODE_VERSION: "22"
   DEFAULT_DEPLOY_BRANCH: "main"
+  # Floor for the "did the suite actually run" guard below. Kept well under the
+  # real count so adding or removing a few tests never trips it; it only catches
+  # the failure mode where the suite silently collapses to (almost) nothing.
+  MIN_TESTS: "250"
 
 jobs:
   ci:
@@ -98,10 +102,23 @@ jobs:
       - name: Run Laravel tests
         run: |
           if find tests -name '*Test.php' -print -quit | grep -q .; then
+            mkdir -p test-reports
+
             # No --testsuite flag: runs every suite in phpunit.xml (Unit, Feature,
             # Security). The old "All" suite was removed from phpunit.xml, so
             # --testsuite=All matched nothing and passed with zero tests run.
-            php artisan test --ansi
+            php artisan test --ansi --log-junit=test-reports/junit.xml
+
+            # A green CI that executed nothing is worse than a red one: it hid a
+            # broken test step for weeks. Assert the suite actually ran.
+            count=$(php -r '$x=@simplexml_load_file("test-reports/junit.xml"); $t=0; if($x){foreach($x->testsuite as $s){$t+=(int)$s["tests"];}} echo $t;')
+            echo "Executed ${count} tests"
+            echo "Executed ${count} tests" >> "$GITHUB_STEP_SUMMARY"
+
+            if [ "${count:-0}" -lt "$MIN_TESTS" ]; then
+              echo "::error::Expected at least ${MIN_TESTS} tests to run, but only ${count:-0} did."
+              exit 1
+            fi
           else
             echo "No Laravel tests found; skipping."
           fi

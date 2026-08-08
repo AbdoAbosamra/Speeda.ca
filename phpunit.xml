@@ -11,7 +11,7 @@
          failOnDeprecation="false"
          failOnPhpunitDeprecation="false"
          failOnPhpunitWarning="false"
-         failOnEmptyTestSuite="false"
+         failOnEmptyTestSuite="true"
          beStrictAboutOutputDuringTests="true"
          cacheDirectory=".phpunit.cache"
          backupGlobals="false"

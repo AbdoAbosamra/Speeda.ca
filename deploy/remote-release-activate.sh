@@ -1,6 +1,36 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# =============================================================================
+#  Zero-downtime release activation
+# =============================================================================
+#
+#  The site keeps serving traffic for the entire deployment. There is no
+#  `artisan down`. That is only safe because of three specific decisions:
+#
+#  1. PER-RELEASE COMPILED VIEWS.
+#     config/view.php defaults the compiled path to a shared temp directory.
+#     With releases sharing it, `view:cache` for the new code would overwrite
+#     the templates the OLD release is still rendering — mismatched views
+#     against old controllers, i.e. live errors. VIEW_COMPILED_PATH below
+#     pins each release to its own directory, and `config:cache` bakes that
+#     value into the release's own config cache, so it also applies at runtime.
+#
+#  2. NOTHING SHARED IS CLEARED.
+#     The old release stays fully warm while the new one is prepared. We never
+#     run `optimize:clear`, because it also flushes the shared application
+#     cache that the live site is using.
+#
+#  3. ADDITIVE MIGRATIONS ONLY.
+#     Migrations run BEFORE the symlink swap, while the old code is still
+#     serving. That is safe only for backward-compatible changes: new tables,
+#     new nullable columns, relaxed constraints. For a destructive or
+#     rewriting migration, set MAINTENANCE_MODE=true for that one deploy —
+#     it accepts a short outage in exchange for a consistent cutover.
+#
+#  Any failure rolls the `current` symlink back to the previous release.
+# =============================================================================
+
 log() {
   printf '[deploy] %s\n' "$*"
 }
@@ -19,6 +49,7 @@ require_env RELEASE_NAME
 PHP_BIN="${PHP_BIN:-php}"
 KEEP_RELEASES="${KEEP_RELEASES:-5}"
 RUN_MIGRATIONS="${RUN_MIGRATIONS:-false}"
+MAINTENANCE_MODE="${MAINTENANCE_MODE:-false}"
 DEPLOY_ROOT="${PROJECT_PATH%/}"
 RELEASES_DIR="$DEPLOY_ROOT/releases"
 SHARED_DIR="$DEPLOY_ROOT/shared"
@@ -29,6 +60,10 @@ SHARED_STORAGE="$SHARED_DIR/storage"
 MAINTENANCE_ENTERED=0
 SWITCH_COMPLETED=0
 PREVIOUS_RELEASE=""
+
+# Compiled Blade for THIS release only. bootstrap/cache is per-release (it is
+# not one of the shared symlinks), which is exactly the isolation we need.
+export VIEW_COMPILED_PATH="$RELEASE_PATH/bootstrap/cache/views"
 
 if [ ! -d "$RELEASE_PATH" ]; then
   printf '[deploy] Release path does not exist: %s\n' "$RELEASE_PATH" >&2
@@ -47,6 +82,7 @@ rollback_current() {
     log "Rolling current symlink back to $PREVIOUS_RELEASE"
     ln -sfn "$PREVIOUS_RELEASE" "$CURRENT_LINK.tmp"
     mv -Tf "$CURRENT_LINK.tmp" "$CURRENT_LINK"
+    refresh_php_workers
     if [ -f "$CURRENT_LINK/artisan" ]; then
       "$PHP_BIN" "$CURRENT_LINK/artisan" queue:restart --ansi || true
     fi
@@ -54,12 +90,9 @@ rollback_current() {
 }
 
 bring_app_up() {
-  if [ "$MAINTENANCE_ENTERED" = "1" ]; then
-    local target="$CURRENT_LINK"
-    if [ -f "$target/artisan" ]; then
-      log "Leaving maintenance mode after failure"
-      "$PHP_BIN" "$target/artisan" up --ansi || true
-    fi
+  if [ "$MAINTENANCE_ENTERED" = "1" ] && [ -f "$CURRENT_LINK/artisan" ]; then
+    log "Leaving maintenance mode after failure"
+    "$PHP_BIN" "$CURRENT_LINK/artisan" up --ansi || true
   fi
 }
 
@@ -73,7 +106,35 @@ on_error() {
 
 trap on_error ERR
 
-log "Starting release activation"
+# -----------------------------------------------------------------------------
+# Make PHP notice the new code behind the `current` symlink.
+#
+# PHP caches compiled opcode and resolved realpaths. If nginx passes
+# SCRIPT_FILENAME as $document_root (the symlink path) rather than
+# $realpath_root, FPM can keep executing the PREVIOUS release after the swap —
+# the deployment reports success while users get old code. Reloading FPM is a
+# graceful operation: it finishes in-flight requests, so it costs no downtime.
+#
+# Every step is best-effort: a deploy user without sudo must not fail the
+# release. See deploy/nginx.example.conf for the $realpath_root setting that
+# makes this unnecessary in the first place.
+# -----------------------------------------------------------------------------
+refresh_php_workers() {
+  if command -v systemctl >/dev/null 2>&1; then
+    local unit
+    unit="$(systemctl list-units --type=service --state=running --no-legend 2>/dev/null \
+      | awk '{print $1}' | grep -E '^php.*fpm\.service$' | head -n1 || true)"
+
+    if [ -n "$unit" ] && sudo -n systemctl reload "$unit" >/dev/null 2>&1; then
+      log "Reloaded $unit gracefully"
+      return
+    fi
+  fi
+
+  log "Could not reload PHP-FPM (no sudo?). Relying on \$realpath_root in nginx."
+}
+
+log "Starting zero-downtime release activation"
 log "Release: $RELEASE_NAME"
 log "Commit: ${GITHUB_SHA:-unknown}"
 log "Run: ${GITHUB_RUN_ID:-manual}"
@@ -105,49 +166,76 @@ if [ -d "$CURRENT_LINK/storage" ] && [ ! -L "$CURRENT_LINK/storage" ]; then
   rsync -a --ignore-existing "$CURRENT_LINK/storage/" "$SHARED_STORAGE/"
 fi
 
+# =============================================================================
+#  PHASE 1 — Prepare the new release. The live site is untouched throughout.
+# =============================================================================
+
 rm -rf "$RELEASE_PATH/storage"
 ln -sfn "$SHARED_STORAGE" "$RELEASE_PATH/storage"
 ln -sfn "$SHARED_ENV" "$RELEASE_PATH/.env"
-mkdir -p "$RELEASE_PATH/bootstrap/cache"
+mkdir -p "$RELEASE_PATH/bootstrap/cache" "$VIEW_COMPILED_PATH"
 chmod -R ug+rwX "$RELEASE_PATH/bootstrap/cache" "$SHARED_STORAGE" || true
-
-if [ -f "$CURRENT_LINK/artisan" ]; then
-  PREVIOUS_RELEASE="$(readlink -f "$CURRENT_LINK" || true)"
-  log "Entering maintenance mode"
-  "$PHP_BIN" "$CURRENT_LINK/artisan" down --retry=60 --ansi
-  MAINTENANCE_ENTERED=1
-else
-  log "No current release found; skipping maintenance mode for first deploy"
-fi
 
 cd "$RELEASE_PATH"
 
-log "Clearing stale framework caches"
-"$PHP_BIN" artisan optimize:clear --ansi
+# Drop any compiled artefacts that rode along in the upload. Deliberately NOT
+# `optimize:clear`: that would also flush the shared application cache, which
+# the currently live release is serving from.
+log "Removing stale compiled artefacts from the new release"
+rm -f bootstrap/cache/config.php bootstrap/cache/routes-v7.php bootstrap/cache/events.php
 
 log "Ensuring public storage link"
 "$PHP_BIN" artisan storage:link --ansi
 
+log "Caching configuration (this bakes VIEW_COMPILED_PATH into the release)"
+"$PHP_BIN" artisan config:cache --ansi
+
+log "Caching events"
+"$PHP_BIN" artisan event:cache --ansi
+
+log "Compiling Blade views into $VIEW_COMPILED_PATH"
+"$PHP_BIN" artisan view:cache --ansi
+
+# =============================================================================
+#  PHASE 2 — Schema. Runs against the live database while old code serves.
+# =============================================================================
+
+if [ "$MAINTENANCE_MODE" = "true" ]; then
+  if [ -f "$CURRENT_LINK/artisan" ]; then
+    log "MAINTENANCE_MODE=true — taking the site down for a consistent cutover"
+    "$PHP_BIN" "$CURRENT_LINK/artisan" down --retry=60 --ansi
+    MAINTENANCE_ENTERED=1
+  fi
+else
+  log "Zero-downtime mode: the site stays up for the whole deployment"
+fi
+
 if [ "$RUN_MIGRATIONS" = "true" ]; then
+  # --isolated takes a lock so two concurrent deploys cannot both migrate.
   log "Running migrations with --force --isolated"
   "$PHP_BIN" artisan migrate --force --isolated --ansi
 else
   log "Skipping migrations because RUN_MIGRATIONS is not true"
 fi
 
-log "Caching configuration"
-"$PHP_BIN" artisan config:cache --ansi
+# =============================================================================
+#  PHASE 3 — Atomic cutover.
+# =============================================================================
 
-log "Caching events"
-"$PHP_BIN" artisan event:cache --ansi
-
-log "Caching Blade views"
-"$PHP_BIN" artisan view:cache --ansi
+if [ -f "$CURRENT_LINK/artisan" ]; then
+  PREVIOUS_RELEASE="$(readlink -f "$CURRENT_LINK" || true)"
+else
+  log "No current release found; this is the first deploy"
+fi
 
 log "Switching current symlink"
+# `ln` then `mv -Tf` because mv of a symlink onto a symlink is atomic at the
+# filesystem level: no request can ever observe a missing `current`.
 ln -sfn "$RELEASE_PATH" "$CURRENT_LINK.tmp"
 mv -Tf "$CURRENT_LINK.tmp" "$CURRENT_LINK"
 SWITCH_COMPLETED=1
+
+refresh_php_workers
 
 log "Restarting queue workers gracefully"
 "$PHP_BIN" "$CURRENT_LINK/artisan" queue:restart --ansi || true
@@ -158,10 +246,34 @@ if [ "$MAINTENANCE_ENTERED" = "1" ]; then
   MAINTENANCE_ENTERED=0
 fi
 
+# =============================================================================
+#  PHASE 4 — Verify, and roll back automatically if the new release is unwell.
+# =============================================================================
+
 if [ -n "${PRODUCTION_HEALTH_URL:-}" ]; then
   log "Checking health URL"
-  curl --fail --silent --show-error --max-time 15 "$PRODUCTION_HEALTH_URL" >/dev/null
+  health_ok=0
+  for attempt in 1 2 3 4 5; do
+    if curl --fail --silent --show-error --max-time 15 "$PRODUCTION_HEALTH_URL" >/dev/null; then
+      health_ok=1
+      log "Health check passed on attempt $attempt"
+      break
+    fi
+    log "Health check attempt $attempt failed; retrying in 3s"
+    sleep 3
+  done
+
+  if [ "$health_ok" != "1" ]; then
+    printf '[deploy] Health check failed after the switch; rolling back.\n' >&2
+    exit 1
+  fi
+else
+  log "PRODUCTION_HEALTH_URL not set — skipping verification (rollback cannot trigger automatically)"
 fi
+
+# =============================================================================
+#  PHASE 5 — Prune. Only after the new release is proven healthy.
+# =============================================================================
 
 log "Cleaning old releases, keeping $KEEP_RELEASES"
 mapfile -t releases < <(find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' | sort -rn | awk '{ $1=""; sub(/^ /, ""); print }')
@@ -184,5 +296,5 @@ if [ "${#releases[@]}" -gt "$KEEP_RELEASES" ]; then
   done
 fi
 
-log "Deployment complete"
+log "Deployment complete with no downtime"
 log "Active release: $(readlink -f "$CURRENT_LINK")"

@@ -131,6 +131,10 @@ jobs:
       DEPLOY_BRANCH: ${{ vars.DEPLOY_BRANCH || 'main' }}
       KEEP_RELEASES: ${{ vars.KEEP_RELEASES || '5' }}
       RUN_MIGRATIONS: ${{ vars.RUN_MIGRATIONS || 'false' }}
+      # Off by default: deployments are zero-downtime. Set to 'true' for the
+      # one deploy that carries a destructive or rewriting migration, where a
+      # brief outage buys a consistent cutover.
+      MAINTENANCE_MODE: ${{ vars.MAINTENANCE_MODE || 'false' }}
       PHP_BIN: ${{ vars.PHP_BIN || 'php' }}
       PRODUCTION_HEALTH_URL: ${{ vars.PRODUCTION_HEALTH_URL || '' }}
 
@@ -246,7 +250,7 @@ jobs:
         run: |
           set -euo pipefail
           ssh -i ~/.ssh/speeda_deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-            "PROJECT_PATH='$PROJECT_PATH' RELEASE_NAME='$RELEASE_NAME' KEEP_RELEASES='$KEEP_RELEASES' RUN_MIGRATIONS='$RUN_MIGRATIONS' PHP_BIN='$PHP_BIN' PRODUCTION_HEALTH_URL='$PRODUCTION_HEALTH_URL' GITHUB_SHA='$GITHUB_SHA' GITHUB_RUN_ID='$GITHUB_RUN_ID' bash -s" \
+            "PROJECT_PATH='$PROJECT_PATH' RELEASE_NAME='$RELEASE_NAME' KEEP_RELEASES='$KEEP_RELEASES' RUN_MIGRATIONS='$RUN_MIGRATIONS' MAINTENANCE_MODE='$MAINTENANCE_MODE' PHP_BIN='$PHP_BIN' PRODUCTION_HEALTH_URL='$PRODUCTION_HEALTH_URL' GITHUB_SHA='$GITHUB_SHA' GITHUB_RUN_ID='$GITHUB_RUN_ID' bash -s" \
             < deploy/remote-release-activate.sh
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}

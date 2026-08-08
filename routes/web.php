@@ -233,6 +233,20 @@ Route::middleware(['auth'])->prefix('comments')->name('comments.')->group(functi
     Route::post('/{comment}/flag', [CommentController::class, 'flag'])->name('flag');
 });
 
+// ==================== BROADCAST UNSUBSCRIBE ====================
+// Reached from a signed link inside a broadcast email. No auth on purpose:
+// requiring a login to unsubscribe is how opt-out links quietly stop working,
+// and CASL expects it to work straight from the inbox. The signature is what
+// proves the link belongs to that specific user.
+Route::middleware('signed')->group(function () {
+    Route::get('/email/unsubscribe/{user}', [\App\Http\Controllers\BroadcastUnsubscribeController::class, 'show'])
+        ->name('broadcast.unsubscribe');
+    Route::post('/email/unsubscribe/{user}', [\App\Http\Controllers\BroadcastUnsubscribeController::class, 'store'])
+        ->name('broadcast.unsubscribe.confirm');
+    Route::post('/email/resubscribe/{user}', [\App\Http\Controllers\BroadcastUnsubscribeController::class, 'resubscribe'])
+        ->name('broadcast.resubscribe');
+});
+
 // ==================== ADMIN ROUTES ====================
 // throttle:120,1 is a safety net against runaway scripts / credential-stuffed
 // sessions hammering the panel; it is well above normal interactive use.
@@ -375,6 +389,17 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
     Route::get('/email-journey/preview/{type}', [App\Http\Controllers\Admin\AdminEmailJourneyController::class, 'preview'])->name('email_journey.preview');
     Route::get('/email-journey/{serviceProvider}', [App\Http\Controllers\Admin\AdminEmailJourneyController::class, 'show'])->name('email_journey.show');
     Route::post('/email-journey/{serviceProvider}/send-test', [App\Http\Controllers\Admin\AdminEmailJourneyController::class, 'sendTest'])->name('email_journey.send_test');
+
+    // Provider Broadcasts (admin writes a one-off email and sends it to providers)
+    // The literal /preview segment is declared before the {broadcast} wildcard
+    // so it is not swallowed by model binding.
+    Route::post('broadcasts/preview', [App\Http\Controllers\Admin\AdminProviderBroadcastController::class, 'preview'])->name('broadcasts.preview');
+    Route::post('broadcasts/{broadcast}/send-test', [App\Http\Controllers\Admin\AdminProviderBroadcastController::class, 'sendTest'])->name('broadcasts.send_test');
+    Route::post('broadcasts/{broadcast}/send', [App\Http\Controllers\Admin\AdminProviderBroadcastController::class, 'send'])->name('broadcasts.send');
+    Route::get('broadcasts/{broadcast}/progress', [App\Http\Controllers\Admin\AdminProviderBroadcastController::class, 'progress'])->name('broadcasts.progress');
+    Route::resource('broadcasts', App\Http\Controllers\Admin\AdminProviderBroadcastController::class)
+        ->parameters(['broadcasts' => 'broadcast'])
+        ->names('broadcasts');
 });
 
 // Service Provider Notification Routes

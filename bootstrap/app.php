@@ -29,6 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
             TrackUserPresence::class, // Presence heartbeat (last_seen_at)
         ]);
 
+        // Gmail/Outlook one-click unsubscribe POSTs straight from the inbox and
+        // carries no session or CSRF token. The URL's signature is the proof of
+        // authenticity here, so CSRF has nothing to add.
+        $middleware->validateCsrfTokens(except: [
+            'email/unsubscribe/*',
+        ]);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'handle.large.uploads' => \App\Http\Middleware\HandleLargeUploads::class,

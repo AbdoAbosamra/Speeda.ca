@@ -26,6 +26,7 @@ class User extends Authenticatable
         'last_login_at', // timestamp of the most recent login
         'last_login_ip', // IP of the most recent login
         'last_seen_at', // presence heartbeat (updated on activity)
+        'broadcast_opt_out_at', // unsubscribed from admin broadcast emails (CASL)
     ];
 
     protected $hidden = [
@@ -44,6 +45,7 @@ class User extends Authenticatable
             'fifth_review_email_sent_at' => 'datetime',
             'last_login_at' => 'datetime',
             'last_seen_at' => 'datetime',
+            'broadcast_opt_out_at' => 'datetime',
             'login_count' => 'integer',
         ];
     }

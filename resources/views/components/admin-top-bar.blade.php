@@ -19,6 +19,7 @@
         'admin.comments' => ['Comments', 'admin.comments'],
         'admin.testimonials' => ['Testimonials', 'admin.testimonials.index'],
         'admin.notifications' => ['Notifications', 'admin.notifications.index'],
+        'admin.broadcasts' => ['Email All Providers', 'admin.broadcasts.index'],
         'admin.email_journey' => ['Email Journey', 'admin.email_journey.index'],
         'admin.visitors' => ['Visitor Analytics', 'admin.visitors'],
         'admin.whatsapp_analytics' => ['WhatsApp Analytics', 'admin.whatsapp_analytics.index'],
@@ -73,6 +74,7 @@
         ],
         'Engagement & Insights' => [
             ['label' => 'Notifications', 'icon' => 'fa-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications*'],
+            ['label' => 'Email All Providers', 'icon' => 'fa-bullhorn', 'route' => 'admin.broadcasts.index', 'active' => 'admin.broadcasts*'],
             ['label' => 'Email Journey', 'icon' => 'fa-envelope-open-text', 'route' => 'admin.email_journey.index', 'active' => 'admin.email_journey*'],
             ['label' => 'Email Templates', 'icon' => 'fa-pen-to-square', 'route' => 'admin.email_templates.index', 'active' => 'admin.email_templates*'],
             ['label' => 'Visitor Analytics', 'icon' => 'fa-chart-line', 'route' => 'admin.visitors', 'active' => 'admin.visitors*'],

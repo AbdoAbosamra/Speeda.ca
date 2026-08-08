@@ -201,6 +201,27 @@ log "Compiling Blade views into $VIEW_COMPILED_PATH"
 "$PHP_BIN" artisan view:cache --ansi
 
 # =============================================================================
+#  HOLD GATE — prepare-only mode.
+#
+#  When $DEPLOY_ROOT/HOLD_SWITCH exists, the release is built and verified but
+#  NOTHING that touches production happens: no migrations, no symlink swap. The
+#  deploy exits successfully, leaving a ready release that a later run (after
+#  the file is removed) can cut over to in seconds.
+#
+#  It is a file on the server rather than a workflow input on purpose: whoever
+#  controls production controls the gate, and a push cannot bypass it.
+# =============================================================================
+
+if [ -f "$DEPLOY_ROOT/HOLD_SWITCH" ]; then
+  log "HOLD_SWITCH present — prepare-only mode"
+  log "Release is built and cached at: $RELEASE_PATH"
+  log "Migrations SKIPPED. Symlink NOT switched. Production untouched."
+  log "Live target still points at: $(readlink -f "$CURRENT_LINK" 2>/dev/null || echo "$CURRENT_LINK")"
+  log "To complete: remove $DEPLOY_ROOT/HOLD_SWITCH and re-run the deployment."
+  exit 0
+fi
+
+# =============================================================================
 #  PHASE 2 — Schema. Runs against the live database while old code serves.
 # =============================================================================
 
@@ -226,10 +247,20 @@ fi
 #  PHASE 3 — Atomic cutover.
 # =============================================================================
 
-if [ -f "$CURRENT_LINK/artisan" ]; then
+# A real directory cannot be replaced by `mv -Tf` (mv refuses to overwrite a
+# non-empty directory), and treating it as PREVIOUS_RELEASE would later point
+# the symlink at itself. Migrating a legacy flat deployment is a deliberate
+# one-time human step, not something a push should perform.
+if [ -e "$CURRENT_LINK" ] && [ ! -L "$CURRENT_LINK" ]; then
+  printf '[deploy] %s is a real directory, not a symlink.\n' "$CURRENT_LINK" >&2
+  printf '[deploy] Move it aside and create the symlink once, by hand, before deploying.\n' >&2
+  exit 1
+fi
+
+if [ -L "$CURRENT_LINK" ] && [ -f "$CURRENT_LINK/artisan" ]; then
   PREVIOUS_RELEASE="$(readlink -f "$CURRENT_LINK" || true)"
 else
-  log "No current release found; this is the first deploy"
+  log "No previous release linked; this is the first cutover"
 fi
 
 log "Switching current symlink"

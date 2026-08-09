@@ -9,8 +9,11 @@ on:
       - "**"
   workflow_dispatch:
 
+# contents: write is needed to publish the built Vite assets as a release
+# asset, which is how the server obtains them (it runs Node 18; the toolchain
+# needs 20+, so it cannot build them itself).
 permissions:
-  contents: read
+  contents: write
 
 env:
   PHP_VERSION: "8.4"
@@ -133,51 +136,19 @@ jobs:
           QUEUE_CONNECTION: sync
           MAIL_MAILER: array
 
-  deploy:
-    name: Deploy production
+  publish-build:
+    name: Publish build artifact
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     needs: ci
     if: ${{ github.event_name == 'push' && github.ref_name == (vars.DEPLOY_BRANCH || 'main') }}
-    environment: production
     concurrency:
-      group: speeda-production-deploy
+      group: speeda-publish-build
       cancel-in-progress: false
-
-    env:
-      DEPLOY_BRANCH: ${{ vars.DEPLOY_BRANCH || 'main' }}
-      KEEP_RELEASES: ${{ vars.KEEP_RELEASES || '5' }}
-      RUN_MIGRATIONS: ${{ vars.RUN_MIGRATIONS || 'false' }}
-      # Off by default: deployments are zero-downtime. Set to 'true' for the
-      # one deploy that carries a destructive or rewriting migration, where a
-      # brief outage buys a consistent cutover.
-      MAINTENANCE_MODE: ${{ vars.MAINTENANCE_MODE || 'false' }}
-      # The symlink swapped at cutover. On CloudPanel this is the site's own
-      # document path, so the vhost never has to change.
-      PUBLIC_LINK: ${{ vars.PUBLIC_LINK || '' }}
-      PHP_BIN: ${{ vars.PHP_BIN || 'php' }}
-      PRODUCTION_HEALTH_URL: ${{ vars.PRODUCTION_HEALTH_URL || '' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Confirm production branch
-        run: |
-          echo "Deploy branch: ${DEPLOY_BRANCH}"
-          echo "Current branch: ${GITHUB_REF_NAME}"
-          test "${GITHUB_REF_NAME}" = "${DEPLOY_BRANCH}"
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          extensions: bcmath, ctype, dom, fileinfo, gd, intl, mbstring, mysql, pdo_mysql, pdo_sqlite, sqlite3, tokenizer, xml, zip
-          coverage: none
-          tools: composer:v2
-
-      - name: Install production PHP dependencies
-        run: composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader --ansi
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -191,89 +162,41 @@ jobs:
       - name: Build production assets
         run: npm run build
 
-      - name: Prepare release package
+      # The server pulls this over plain HTTPS. It cannot build the assets
+      # itself: it runs Node 18 and the toolchain needs 20+.
+      - name: Package assets
         run: |
           set -euo pipefail
-          RELEASE_NAME="${GITHUB_SHA::12}-$(date -u +%Y%m%d%H%M%S)"
-          RELEASE_DIR=".deploy-release"
+          tar -czf build.tar.gz public/build
+          sha256sum build.tar.gz | awk '{print $1}' > build.tar.gz.sha256
+          echo "Packaged $(du -h build.tar.gz | cut -f1)"
 
-          echo "RELEASE_NAME=${RELEASE_NAME}" >> "$GITHUB_ENV"
-          rm -rf "$RELEASE_DIR"
-          mkdir -p "$RELEASE_DIR"
-
-          rsync -a --delete ./ "$RELEASE_DIR"/ \
-            --exclude ".deploy-release" \
-            --exclude ".git" \
-            --exclude ".github" \
-            --exclude ".env" \
-            --exclude ".env.*" \
-            --exclude "node_modules" \
-            --exclude "storage" \
-            --exclude "public/hot" \
-            --exclude "public/storage" \
-            --exclude ".phpunit.cache" \
-            --exclude ".phpunit.result.cache" \
-            --exclude "coverage" \
-            --exclude "test-reports"
-
-          echo "Prepared release ${RELEASE_NAME}"
-
-      - name: Configure SSH
-        run: |
-          set -euo pipefail
-          : "${SSH_HOST:?Missing SSH_HOST secret}"
-          : "${SSH_USER:?Missing SSH_USER secret}"
-          : "${SSH_PORT:?Missing SSH_PORT secret}"
-          : "${SSH_PRIVATE_KEY:?Missing SSH_PRIVATE_KEY secret}"
-          : "${PROJECT_PATH:?Missing PROJECT_PATH secret}"
-
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/speeda_deploy_key
-          chmod 600 ~/.ssh/speeda_deploy_key
-          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+      # Deployment transport is PULL, not push. GitHub-hosted runners could not
+      # reliably SSH to the server: fail2ban is active there and drops packets
+      # from runner IPs, which rotate across ranges too wide to allowlist.
+      # Publishing here and letting the server fetch removes the inbound
+      # dependency entirely, along with the need to store an SSH key in CI.
+      - name: Publish build for the server to pull
         env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
-
-      - name: Create remote release directory
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          ssh -i ~/.ssh/speeda_deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-            "PROJECT_PATH='$PROJECT_PATH' RELEASE_NAME='$RELEASE_NAME' bash -s" <<'REMOTE'
-          set -euo pipefail
-          mkdir -p "$PROJECT_PATH/releases/$RELEASE_NAME" "$PROJECT_PATH/shared"
-          REMOTE
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+          TAG="build-${GITHUB_SHA}"
+          gh release create "$TAG" --title "$TAG" --notes "Vite assets for ${GITHUB_SHA}" --target "$GITHUB_SHA" 2>/dev/null \
+            || echo "release $TAG already exists"
+          gh release upload "$TAG" build.tar.gz build.tar.gz.sha256 --clobber
+          echo "Published $TAG" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload release over SSH
+      - name: Deployment instructions
         run: |
-          set -euo pipefail
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/speeda_deploy_key -p ${SSH_PORT}" \
-            .deploy-release/ \
-            "${SSH_USER}@${SSH_HOST}:${PROJECT_PATH}/releases/${RELEASE_NAME}/"
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
-
-      - name: Activate release
-        run: |
-          set -euo pipefail
-          ssh -i ~/.ssh/speeda_deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-            "PROJECT_PATH='$PROJECT_PATH' RELEASE_NAME='$RELEASE_NAME' PUBLIC_LINK='$PUBLIC_LINK' KEEP_RELEASES='$KEEP_RELEASES' RUN_MIGRATIONS='$RUN_MIGRATIONS' MAINTENANCE_MODE='$MAINTENANCE_MODE' PHP_BIN='$PHP_BIN' PRODUCTION_HEALTH_URL='$PRODUCTION_HEALTH_URL' GITHUB_SHA='$GITHUB_SHA' GITHUB_RUN_ID='$GITHUB_RUN_ID' bash -s" \
-            < deploy/remote-release-activate.sh
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+          {
+            echo "### Ready to deploy"
+            echo ""
+            echo "Run on the server as \`speeda\`:"
+            echo ""
+            echo '```bash'
+            echo "/home/speeda/deploy/pull-deploy.sh ${GITHUB_SHA}"
+            echo '```'
+            echo ""
+            echo "HOLD_SWITCH gates the cutover; while it exists the release is only prepared."
+          } >> "$GITHUB_STEP_SUMMARY"

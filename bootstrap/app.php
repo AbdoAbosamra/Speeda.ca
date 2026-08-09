@@ -117,6 +117,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            // Never swallow an HTTP exception. By the time this runs, Laravel
+            // has already normalised "page missing", "not allowed", "token
+            // expired" and friends into an HttpException carrying the status
+            // the client must actually receive. Redirecting them instead turned
+            // every 404 into a soft-404 pointing at the homepage — which search
+            // engines index as a redirect — and downgraded 403s to 302s.
+            //
+            // Deliberately keyed on the interface, not on individual codes, so
+            // every current and future HTTP status keeps its real semantics.
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                return null;
+            }
+
             // Log the error for debugging
             \Illuminate\Support\Facades\Log::error('Application error: '.$e->getMessage(), [
                 'exception' => $e,

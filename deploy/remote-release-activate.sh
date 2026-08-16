@@ -200,6 +200,9 @@ log "Caching events"
 log "Compiling Blade views into $VIEW_COMPILED_PATH"
 "$PHP_BIN" artisan view:cache --ansi
 
+log "Regenerating sitemap with production URLs"
+"$PHP_BIN" artisan seo:generate-sitemap --ansi
+
 # =============================================================================
 #  HOLD GATE — prepare-only mode.
 #

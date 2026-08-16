@@ -123,6 +123,9 @@ log "Building release caches"
 "$PHP_BIN" artisan event:cache --ansi >/dev/null
 "$PHP_BIN" artisan view:cache --ansi >/dev/null
 
+log "Regenerating sitemap with production URLs"
+"$PHP_BIN" artisan seo:generate-sitemap --ansi >/dev/null
+
 # -------------------------------------------------------------- 4. VERIFY ---
 log "Verifying release"
 "$PHP_BIN" artisan tinker --execute='

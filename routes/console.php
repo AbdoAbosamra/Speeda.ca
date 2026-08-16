@@ -36,3 +36,11 @@ Schedule::command('providers:send-journey-emails')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Regenerate the XML sitemap daily so new providers, categories,
+// locations, and blog posts are picked up automatically. Runs at
+// 03:00 to avoid peak traffic and after any nightly data jobs.
+Schedule::command('seo:generate-sitemap')
+    ->dailyAt('03:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+

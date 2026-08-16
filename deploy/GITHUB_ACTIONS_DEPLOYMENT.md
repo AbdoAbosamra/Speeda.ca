@@ -1,148 +1,137 @@
-# GitHub Actions CI/CD Deployment
+# Deployment
 
-This workflow deploys Speeda.ca with a release directory structure and **zero
-downtime**. It does not package `.env`, does not commit secrets, and does not
-run data seeders or destructive database commands.
+Speeda.ca deploys with **zero downtime** using immutable releases and an atomic
+symlink swap. The transport is **pull-based**: the server fetches from GitHub
+over HTTPS. CI never connects to the server.
 
-## GitHub Configuration
+## Why pull and not push
 
-Create these repository secrets:
+The original workflow SSH'd from a GitHub-hosted runner. It failed at
+`Configure SSH` after exactly 5s — `ssh-keyscan`'s default timeout — meaning
+packets were dropped rather than refused. `fail2ban` is active on the host and
+`sshd` listens on `0.0.0.0:22` with `PermitRootLogin yes`, so it is probed
+constantly and bans aggressively. Runner IPs rotate across ranges far too wide
+to allowlist, which is why one run succeeded and the next two failed unchanged.
 
-- `SSH_HOST`
-- `SSH_USER`
-- `SSH_PORT`
-- `SSH_PRIVATE_KEY`
-- `PROJECT_PATH`
+Inverting the direction removed the dependency instead of working around it:
 
-Create these repository variables:
+- no inbound port has to be open to CI
+- **no SSH private key needs to exist in GitHub secrets**
+- runner IP churn stops mattering
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `DEPLOY_BRANCH` | `main` | Branch that triggers a production deploy. |
-| `KEEP_RELEASES` | `5` | Previous releases retained for rollback. |
-| `RUN_MIGRATIONS` | `false` | Set to `true` only for a reviewed schema deployment. |
-| `MAINTENANCE_MODE` | `false` | Set to `true` only for a destructive migration (see below). |
-| `PHP_BIN` | `php` | PHP binary on the server. |
-| `PRODUCTION_HEALTH_URL` | — | e.g. `https://speeda.ca/up`. **Set this** — automatic rollback depends on it. |
+## Pieces
 
-Use a repository variable, not a secret, for `DEPLOY_BRANCH` because GitHub
-evaluates it before the deployment job starts. Branch names are not sensitive.
+| Piece | Role |
+| --- | --- |
+| `.github/workflows/ci-cd.yml` | Tests, then builds Vite assets and publishes them as a GitHub Release asset (`build-<sha>`) with a sha256 |
+| `deploy/pull-deploy.sh` | Runs **on the server** as `speeda`. Fetches, builds, verifies, and (if allowed) cuts over |
+| `$DEPLOY_ROOT/HOLD_SWITCH` | Server-side gate. While present, releases are prepared but production is never touched |
 
-## Server Layout
+The server runs Node 18 and the Vite toolchain needs 20+, which is why assets
+are built in CI rather than on the box.
 
-`PROJECT_PATH` should point to the deployment root:
+## Server layout
 
 ```text
-PROJECT_PATH/
-  current -> releases/<active-release>
-  releases/
-  shared/
-    .env
-    storage/
+/home/speeda/deploy/
+  releases/<sha12>-<timestamp>/    immutable; no .git, no node_modules, no tests
+  shared/.env                      never in git
+  shared/storage/                  uploads survive every deploy
+  backups/
+  HOLD_SWITCH
+
+/home/speeda/htdocs/speeda_live -> releases/<active>     ← the atomic swap target
+/home/speeda/htdocs/speeda.ca                            ← legacy flat dir, kept as fallback
 ```
 
-Nginx must point at **`PROJECT_PATH/current/public`** — the symlink, never a
-specific release. Before the first deployment, create `PROJECT_PATH/shared/.env`
-directly on the server. Do not store production `.env` values in GitHub or in
-the repository.
+CloudPanel's Document Root is `speeda_live/public`. Nothing in a deploy touches
+CloudPanel or nginx, and no step needs `sudo`.
 
-Copy `deploy/nginx.example.conf`. Two settings in it are load-bearing for
-zero-downtime; read the comments there before changing them.
+## Deploying
 
-## What CI Runs
+```bash
+# on the server, as speeda
+/home/speeda/deploy/pull-deploy.sh <commit-sha>
 
-- Composer validation.
-- PHP dependency install.
-- Node dependency install.
-- Laravel config cache validation.
-- Laravel route listing validation.
-- Blade view cache validation.
-- Vite production asset build.
-- The full Laravel test suite (Unit, Feature, Security).
+# with schema changes (takes and verifies a backup first)
+RUN_MIGRATIONS=true /home/speeda/deploy/pull-deploy.sh <commit-sha>
+```
 
-The workflow intentionally does not run `route:cache` because the current app
-has closure routes in `routes/web.php`.
+`pull-deploy.sh` is executed from the **server's copy**, not from the fetched
+source. Update it on the server when it changes in the repo.
 
-## Zero-Downtime Deployment
+### What makes it zero-downtime
 
-The site serves traffic for the entire deployment. There is no `artisan down`.
-Three things make that safe — all three are in
-`deploy/remote-release-activate.sh`:
+Everything expensive happens inside the new release directory, which nothing is
+serving: dependency install, config/event/view caches, sitemap generation.
+Only then does the symlink move, via `ln -sfn` + `mv -Tf` — atomic at the
+filesystem level, so no request can observe a missing path.
 
-**1. Per-release compiled views.** `config/view.php` defaults the compiled Blade
-path to a shared temp directory. If releases shared it, caching the new
-release's views would overwrite the templates the *old* release is still
-rendering, producing live errors. The script exports `VIEW_COMPILED_PATH` into
-each release's own `bootstrap/cache/views`, and `config:cache` bakes that value
-into the release's config cache so it also applies at runtime.
+Three details carry the guarantee:
 
-**2. Nothing shared is cleared.** The old release stays warm the whole time. The
-script never runs `optimize:clear`, which would flush the shared application
-cache the live site is using; it deletes only that release's own compiled
-config, events, and routes.
+1. **Compiled views are per-release.** The shared `.env` sets `TMPDIR` inside
+   `storage`, so without `VIEW_COMPILED_PATH` every release would compile Blade
+   into the same shared directory and overwrite the templates the *live*
+   release is rendering. `config:cache` bakes the override in so it also applies
+   at runtime.
+2. **Nothing shared is cleared.** `optimize:clear` is never run: it would flush
+   the application cache the live site is using.
+3. **Opcache follows the swap.** `opcache.validate_timestamps=1`,
+   `revalidate_freq=2` and `pm=ondemand` with a 10s idle timeout mean workers
+   turn over within seconds and pick up the new path.
 
-**3. Opcache sees the new code immediately.** With
-`fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name`, each release
-resolves to a distinct real path, so PHP's opcache keys differ per release and
-the swap takes effect instantly. The script additionally attempts a graceful
-`systemctl reload php*-fpm` as a fallback; it is best-effort and never fails the
-deploy.
+### Migrations
 
-### Order of operations
+Migrations run **before** the swap, while the old code still serves. That is
+only safe for backward-compatible changes: new tables, new nullable columns,
+relaxed constraints. Dropping or renaming a column the old code still reads, or
+rewriting rows it depends on, needs a planned window instead.
 
-1. Link shared `.env` and `storage` into the new release.
-2. Build config, event, and view caches inside the new release.
-3. Run `storage:link`.
-4. Run migrations when `RUN_MIGRATIONS=true` — **while the old code still
-   serves**.
-5. Swap the `current` symlink atomically (`mv -Tf`).
-6. Refresh PHP workers, restart queue workers gracefully.
-7. Health-check the live URL, retrying 5 times.
-8. Roll back automatically if the health check fails.
-9. Prune old releases only after the new one is proven healthy.
+A database dump is taken first and rejected unless it is non-empty and passes
+`gzip -t`.
 
-### When to break zero-downtime
+## Verifying a deploy
 
-Step 4 runs migrations against the live database while the previous release is
-still executing. That is safe **only for backward-compatible migrations**:
+```bash
+readlink -f /home/speeda/htdocs/speeda_live        # active release (prefix = commit)
+curl -o /dev/null -w '%{http_code}\n' https://speeda.ca/up                        # 200
+curl -o /dev/null -w '%{http_code}\n' https://speeda.ca/this-page-does-not-exist  # 404
+```
 
-- Creating tables
-- Adding nullable columns
-- Relaxing a constraint
-- Adding indexes
+There is no `.git` in a release, so `git rev-parse` cannot tell you what is
+deployed — read the symlink instead.
 
-It is **not** safe for dropping or renaming a column still referenced by the old
-code, changing a column's type, or backfilling that rewrites rows the old code
-reads. For those, set the `MAINTENANCE_MODE` repository variable to `true` for
-that one deploy. It takes the site down before migrating and brings it back up
-after the cutover, trading a short outage for a consistent one. Set it back to
-`false` afterwards.
+The 404 probe is not cosmetic. A catch-all exception handler once turned every
+404 into a 302 to the homepage, and `pull-deploy.sh` asserts real 404 semantics
+after cutover specifically so that class of regression rolls itself back.
 
 ## Rollback
 
-Rollback is automatic when `PRODUCTION_HEALTH_URL` is set and the new release
-fails its health check. To roll back manually:
-
 ```bash
-cd "$PROJECT_PATH"
-ls -1dt releases/*
-ln -sfn "$PROJECT_PATH/releases/<previous-release>" current.tmp
-mv -Tf current.tmp current
-sudo systemctl reload php8.4-fpm
-php current/artisan queue:restart
+ln -sfn /home/speeda/deploy/releases/<previous> /home/speeda/htdocs/speeda_live.tmp
+mv -Tf /home/speeda/htdocs/speeda_live.tmp /home/speeda/htdocs/speeda_live
+php /home/speeda/htdocs/speeda_live/artisan queue:restart
 ```
 
-Do not run `optimize:clear` during a rollback — the previous release still has
-its own valid caches, and clearing shared state would slow the whole site down
-for no benefit. Do not run seeders or destructive database commands.
+Seconds, and automatic if the post-cutover health check fails. As a last resort,
+point CloudPanel's Document Root back at `speeda.ca/public`.
 
-Note that a rollback reverts **code only**. Migrations are not reversed; this is
-why the backward-compatibility rule above matters — the previous release must be
-able to run against the newer schema.
+Rollback reverts **code only** — migrations are not reversed, which is why the
+backward-compatibility rule matters: the previous release has to run against the
+newer schema.
 
-## Queue Workers
+## Queue and scheduler
 
-Several features (including admin broadcast emails) depend on a running queue
-worker. Configure Supervisor from `deploy/supervisor.example.conf`. Without a
-worker, queued jobs accumulate silently in the `jobs` table with no visible
-error.
+Both run from the `speeda` user's crontab — no root, no Supervisor:
+
+```cron
+* * * * * cd /home/speeda/htdocs/speeda_live && php artisan schedule:run
+* * * * * flock -n /home/speeda/deploy/queue.lock -c "cd /home/speeda/htdocs/speeda_live && php artisan queue:work --stop-when-empty --max-time=55 --tries=3"
+```
+
+`flock` prevents overlap; `--max-time=55` guarantees the worker exits before the
+next minute. Paths go through the `speeda_live` symlink, so cron never needs
+updating when a release changes.
+
+Queued work includes provider journey emails and admin broadcasts. **Without a
+worker they accumulate silently in the `jobs` table with no visible error.**

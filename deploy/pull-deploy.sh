@@ -194,11 +194,31 @@ nf="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "${HEALTH_URL%/up}/__
 log "404 semantics verified"
 
 # ---------------------------------------------------------------- 9. PRUNE ---
-# Only after the release is proven healthy, and never the active one.
+# Past this point the new release is LIVE and has passed both health probes, so
+# nothing below may be allowed to fail the script.
+#
+# The previous version piped `find` into a `while` loop. A loop returns the
+# status of its last command, `pipefail` propagates that through the pipeline,
+# and `set -e` then fires the ERR trap — which calls rollback() with SWITCHED=1.
+# A failed `rm` while tidying up would therefore have UNDONE a healthy, verified
+# deployment. Disarming the trap first makes that impossible by construction.
+trap - ERR
+set +e
+
 cur="$(readlink -f "$PUBLIC_LINK")"
-find "$RELEASES" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' | sort -rn | tail -n +$((KEEP_RELEASES+1)) \
-  | while read -r _ old; do
-      [ "$(readlink -f "$old")" != "$cur" ] && { log "pruning $old"; rm -rf "$old"; }
-    done
+
+# mapfile instead of a pipeline into `while`: the loop runs in this shell, so no
+# subshell exit status can escape into the (now disarmed) trap.
+mapfile -t old_releases < <(
+  find "$RELEASES" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
+    | sort -rn | tail -n +$((KEEP_RELEASES + 1)) | cut -d' ' -f2-
+)
+
+for old in "${old_releases[@]}"; do
+  [ -n "$old" ] || continue
+  [ "$(readlink -f "$old")" = "$cur" ] && continue   # never the active release
+  log "pruning $old"
+  rm -rf "$old" || log "could not prune $old (ignored)"
+done
 
 log "Deployed $SHA with no downtime"

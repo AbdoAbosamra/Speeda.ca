@@ -40,7 +40,6 @@ class ServiceProviderTest extends TestCase
             'experience_years' => 5,
             'hourly_rate' => 50.00,
             'emergency_available' => true,
-            'is_verified' => false
         ]);
 
         $this->assertInstanceOf(ServiceProvider::class, $serviceProvider);
@@ -48,7 +47,6 @@ class ServiceProviderTest extends TestCase
         $this->assertEquals('+15551234567', $serviceProvider->phone);
         $this->assertEquals(5, $serviceProvider->experience_years);
         $this->assertTrue($serviceProvider->emergency_available);
-        $this->assertFalse($serviceProvider->is_verified);
     }
 
     #[Test]
@@ -128,14 +126,12 @@ class ServiceProviderTest extends TestCase
     public function boolean_fields_are_cast_correctly()
     {
         $serviceProvider = ServiceProvider::factory()->create([
-            'is_verified' => 0,
-            'is_featured' => 1,
-            'emergency_available' => 1
+            'emergency_available' => 1,
+            'available_weekends' => 0,
         ]);
 
-        $this->assertFalse($serviceProvider->is_verified);
-        $this->assertTrue($serviceProvider->is_featured);
         $this->assertTrue($serviceProvider->emergency_available);
+        $this->assertFalse($serviceProvider->available_weekends);
     }
 
     #[Test]
@@ -174,17 +170,6 @@ class ServiceProviderTest extends TestCase
         $availableCount = ServiceProvider::where('emergency_available', true)->count();
 
         $this->assertEquals(1, $availableCount);
-    }
-
-    #[Test]
-    public function it_can_scope_verified_providers()
-    {
-        ServiceProvider::factory()->create(['is_verified' => true]);
-        ServiceProvider::factory()->create(['is_verified' => false]);
-
-        $verifiedCount = ServiceProvider::where('is_verified', true)->count();
-
-        $this->assertEquals(1, $verifiedCount);
     }
 
     #[Test]

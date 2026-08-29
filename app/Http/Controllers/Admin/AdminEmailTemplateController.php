@@ -177,6 +177,10 @@ class AdminEmailTemplateController extends Controller
             'dashboardUrl' => $provider ? route('service-providers.show', $provider->id) : url('/'),
             'stats' => $this->previewStats($key),
             'progress' => $this->previewProgress($key),
+            // Inert placeholder: the preview should show the opt-out footer
+            // recipients see, without offering the admin a live link that
+            // would unsubscribe whoever the sample provider happens to be.
+            'unsubscribeUrl' => '#',
         ]);
     }
 
@@ -217,13 +221,12 @@ class AdminEmailTemplateController extends Controller
     private function previewProgress(string $key): array
     {
         $steps = [
-            'welcome' => [0, 'Step 0 of 6 complete (0%)'],
-            'photo' => [0, 'Step 0 of 6 complete (0%)'],
-            'services' => [17, 'Step 1 of 6 complete (17%)'],
-            'bio' => [33, 'Step 2 of 6 complete (33%)'],
-            'experience' => [50, 'Step 3 of 6 complete (50%)'],
-            'gallery' => [67, 'Step 4 of 6 complete (67%)'],
-            'service_areas' => [83, 'Step 5 of 6 complete (83%)'],
+            'welcome' => [0, 'Step 0 of 5 complete (0%)'],
+            'photo' => [0, 'Step 0 of 5 complete (0%)'],
+            'services' => [20, 'Step 1 of 5 complete (20%)'],
+            'bio' => [40, 'Step 2 of 5 complete (40%)'],
+            'experience' => [60, 'Step 3 of 5 complete (60%)'],
+            'gallery' => [80, 'Step 4 of 5 complete (80%)'],
         ];
 
         if (!isset($steps[$key])) {

@@ -16,6 +16,7 @@ class ShowcaseWorkEmail extends TemplatedEmail
         parent::__construct(
             $provider->company_name ?: ($provider->user?->name ?: 'Provider'),
             $dashboardUrl,
+            $provider->user,
         );
     }
 
@@ -26,6 +27,6 @@ class ShowcaseWorkEmail extends TemplatedEmail
 
     protected function progress(): array
     {
-        return ['label' => 'Onboarding Progress', 'text' => 'Step 4 of 6 complete (67%)', 'percent' => 67];
+        return ['label' => 'Onboarding Progress', 'text' => 'Step 4 of 5 complete (80%)', 'percent' => 80];
     }
 }

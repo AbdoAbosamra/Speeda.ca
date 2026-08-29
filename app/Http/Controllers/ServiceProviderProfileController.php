@@ -73,8 +73,6 @@ class ServiceProviderProfileController extends Controller
             DB::transaction(function () use ($validated, $request) {
                 $validated['user_id'] = auth()->id();
                 $validated['business_slug'] = $this->generateUniqueSlug($validated['business_name']);
-                $validated['is_verified'] = true; // Auto-verified
-
                 // تعيين القيم الافتراضية
                 $validated['views'] = 0;
                 $validated['average_rating'] = 0;

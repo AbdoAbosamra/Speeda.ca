@@ -1,7 +1,7 @@
 @extends('emails.provider.layout')
 
 @section('content')
-    <span class="step-badge">Step 2 of 6</span>
+    <span class="step-badge">Step 2 of 5</span>
     <h2 class="main-headline">Help Customers Find You Instantly 🛠️</h2>
     
     <p class="lead-text">
@@ -33,7 +33,7 @@
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" style="width: 17%"></div>
         </div>
-        <span class="progress-text">Step 1 of 6 complete (17%)</span>
+        <span class="progress-text">Step 1 of 5 complete (20%)</span>
     </div>
 
     <blockquote class="closing-quote">

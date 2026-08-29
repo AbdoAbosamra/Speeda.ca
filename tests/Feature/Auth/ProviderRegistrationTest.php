@@ -51,6 +51,11 @@ class ProviderRegistrationTest extends TestCase
         $this->assertNotNull($user);
         $this->assertEquals('service_provider', $user->role);
 
+        // Providers are treated as verified at signup. The stamp used to be
+        // passed to User::create(), where it was silently dropped because the
+        // column is not mass-assignable, so every provider stayed unverified.
+        $this->assertNotNull($user->email_verified_at);
+
         // A ServiceProvider record (the provider profile) should exist.
         $serviceProvider = ServiceProvider::where('user_id', $user->id)->first();
         $this->assertNotNull($serviceProvider, 'ServiceProvider was not created');

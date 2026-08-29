@@ -269,24 +269,6 @@
                         </button>
                     </form>
 
-                    <form action="{{ route('admin.providers.toggle_verified', $provider->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="pad-btn pad-btn-ghost">
-                            <i class="fas {{ $provider->is_verified ? 'fa-circle-xmark' : 'fa-circle-check' }}"></i>
-                            {{ $provider->is_verified ? 'Unverify' : 'Verify' }}
-                        </button>
-                    </form>
-
-                    <form action="{{ route('admin.providers.toggle_featured', $provider->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="pad-btn pad-btn-ghost">
-                            <i class="{{ $provider->is_featured ? 'far' : 'fas' }} fa-star"></i>
-                            {{ $provider->is_featured ? 'Unfeature' : 'Feature' }}
-                        </button>
-                    </form>
-
                     <a href="{{ route('service-providers.show', $provider->id) }}" class="pad-btn pad-btn-ghost" target="_blank" rel="noopener">
                         <i class="fas fa-arrow-up-right-from-square"></i> Public Profile
                     </a>

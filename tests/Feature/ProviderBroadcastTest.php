@@ -10,6 +10,7 @@ use App\Models\ProviderBroadcast;
 use App\Models\ProviderBroadcastRecipient;
 use App\Models\ServiceProvider;
 use App\Models\User;
+use App\Services\ProviderBroadcastService;
 use App\Support\AdminHtml;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -405,23 +406,41 @@ class ProviderBroadcastTest extends TestCase
         $provider = $this->makeProvider();
         $user = $provider->user;
 
-        $showUrl = URL::signedRoute('broadcast.unsubscribe', ['user' => $user->id]);
+        $showUrl = URL::signedRoute('email.unsubscribe', ['user' => $user->id]);
         $this->get($showUrl)->assertOk()->assertSee('Unsubscribe from Speeda emails');
 
-        $confirmUrl = URL::signedRoute('broadcast.unsubscribe.confirm', ['user' => $user->id]);
+        $confirmUrl = URL::signedRoute('email.unsubscribe.confirm', ['user' => $user->id]);
         $this->post($confirmUrl)->assertOk();
 
+        // The link stops everything, not only broadcasts: both flags are set,
+        // so the older broadcast-only checks stay in agreement with it.
+        $this->assertNotNull($user->fresh()->email_opt_out_at);
         $this->assertNotNull($user->fresh()->broadcast_opt_out_at);
     }
 
     public function test_an_unsubscribed_provider_can_resubscribe(): void
     {
-        $provider = $this->makeProvider(userAttributes: ['broadcast_opt_out_at' => now()]);
+        $provider = $this->makeProvider(userAttributes: [
+            'broadcast_opt_out_at' => now(),
+            'email_opt_out_at' => now(),
+        ]);
         $user = $provider->user;
 
-        $this->post(URL::signedRoute('broadcast.resubscribe', ['user' => $user->id]))->assertOk();
+        $this->post(URL::signedRoute('email.resubscribe', ['user' => $user->id]))->assertOk();
 
         $this->assertNull($user->fresh()->broadcast_opt_out_at);
+        $this->assertNull($user->fresh()->email_opt_out_at);
+    }
+
+    public function test_the_global_opt_out_also_excludes_someone_from_broadcasts(): void
+    {
+        $this->makeProvider(userAttributes: ['email_opt_out_at' => now()]);
+        $wanted = $this->makeProvider();
+
+        $recipients = app(ProviderBroadcastService::class)->recipientQuery()->pluck('id');
+
+        $this->assertTrue($recipients->contains($wanted->id));
+        $this->assertCount(1, $recipients);
     }
 
     public function test_the_email_carries_a_working_unsubscribe_link(): void

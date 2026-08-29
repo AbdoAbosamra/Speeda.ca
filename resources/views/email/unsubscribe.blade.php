@@ -6,19 +6,20 @@
             @if(!empty($justResubscribed))
                 <i class="fas fa-circle-check unsubscribe-icon is-good"></i>
                 <h1>You're subscribed again</h1>
-                <p>You'll keep receiving news and updates from Speeda at <strong>{{ $user->email }}</strong>.</p>
+                <p>You'll keep receiving updates and notifications from Speeda at <strong>{{ $user->email }}</strong>.</p>
             @elseif($alreadyOptedOut)
                 <i class="fas fa-circle-check unsubscribe-icon is-good"></i>
                 <h1>{{ !empty($justUnsubscribed) ? 'You have been unsubscribed' : 'You are already unsubscribed' }}</h1>
                 <p>
-                    We will no longer send news or announcement emails to <strong>{{ $user->email }}</strong>.
+                    We will no longer send updates, tips, review notifications or announcements to
+                    <strong>{{ $user->email }}</strong>.
                 </p>
                 <p class="unsubscribe-note">
-                    You will still receive essential account emails — password resets and notifications about
-                    your own reviews — because your account depends on them.
+                    You will still receive essential account emails — password resets and email verification —
+                    because signing in depends on them.
                 </p>
 
-                <form action="{{ URL::signedRoute('broadcast.resubscribe', ['user' => $user->id]) }}" method="POST">
+                <form action="{{ URL::signedRoute('email.resubscribe', ['user' => $user->id]) }}" method="POST">
                     @csrf
                     <button type="submit" class="unsubscribe-btn is-secondary">
                         Changed your mind? Resubscribe
@@ -28,14 +29,15 @@
                 <i class="fas fa-envelope-circle-check unsubscribe-icon"></i>
                 <h1>Unsubscribe from Speeda emails</h1>
                 <p>
-                    Stop sending news and announcements to <strong>{{ $user->email }}</strong>?
+                    Stop sending updates, tips, review notifications and announcements to
+                    <strong>{{ $user->email }}</strong>?
                 </p>
                 <p class="unsubscribe-note">
-                    Essential account emails — password resets and notifications about your own reviews —
-                    will keep arriving.
+                    Essential account emails — password resets and email verification — will keep arriving,
+                    so you can always get back into your account.
                 </p>
 
-                <form action="{{ URL::signedRoute('broadcast.unsubscribe.confirm', ['user' => $user->id]) }}" method="POST">
+                <form action="{{ URL::signedRoute('email.unsubscribe.confirm', ['user' => $user->id]) }}" method="POST">
                     @csrf
                     <button type="submit" class="unsubscribe-btn">Yes, unsubscribe me</button>
                 </form>

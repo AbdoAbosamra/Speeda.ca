@@ -55,7 +55,8 @@ class SendProviderBroadcastEmail implements ShouldQueue
 
         // Re-checked at send time, not just at queue time: someone who
         // unsubscribes while a large send is draining must not still be mailed.
-        if ($user->broadcast_opt_out_at !== null) {
+        // Covers both the broadcast-only opt-out and the global one.
+        if ($user->hasOptedOutOfBroadcasts()) {
             $recipient->markFailed('Recipient unsubscribed before delivery.');
             $broadcast->refreshProgress();
 

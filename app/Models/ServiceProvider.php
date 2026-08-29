@@ -59,8 +59,6 @@ class ServiceProvider extends Model implements HasMedia
         'profile_completion_popup_shown_at',
         'business_license',
         'business_type',
-        'is_verified',
-        'is_featured',
         'is_active',
         'is_certified',
         'certification',
@@ -76,13 +74,18 @@ class ServiceProvider extends Model implements HasMedia
 
     /**
      * The attributes that should be cast.
+     *
+     * Note: photo_uploaded_by_admin_at, photo_consent_admin_id and
+     * photo_consent_proof_path are deliberately absent from $fillable above.
+     * They record who uploaded the current photo and when, so they are only
+     * ever set through forceFill() in the dedicated methods below
+     * (recordAdminPhotoUpload, clearAdminPhotoConsent) — never through a
+     * generic update() call.
      */
     protected $casts = [
         'emergency_available' => 'boolean',
         'available_weekends' => 'boolean',
         'available_evenings' => 'boolean',
-        'is_verified' => 'boolean',
-        'is_featured' => 'boolean',
         'is_active' => 'boolean',
         'is_certified' => 'boolean',
         'experience_years' => 'integer',
@@ -93,6 +96,7 @@ class ServiceProvider extends Model implements HasMedia
         'profile_completion_popup_shown_at' => 'datetime',
         'first_review_received_email_sent_at' => 'datetime',
         'fifth_review_received_email_sent_at' => 'datetime',
+        'photo_uploaded_by_admin_at' => 'datetime',
         'languages' => 'array',
         'specializations' => 'array',
         'services_offered' => 'array',
@@ -223,6 +227,71 @@ class ServiceProvider extends Model implements HasMedia
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The admin who uploaded the currently-set admin photo, if any.
+     */
+    public function photoConsentAdmin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'photo_consent_admin_id');
+    }
+
+    /**
+     * Whether the current profile photo was placed by an admin rather than by
+     * the provider themselves. False once the provider uploads their own
+     * photo, since that clears these columns entirely.
+     */
+    public function photoWasUploadedByAdmin(): bool
+    {
+        return $this->photo_uploaded_by_admin_at !== null;
+    }
+
+    /**
+     * Whether there is a consent-proof image on file for the current
+     * admin-uploaded photo (e.g. a screenshot of the provider agreeing over
+     * WhatsApp). Purely evidence to show the provider and the admin — nothing
+     * reads this to decide whether the photo itself is allowed to be shown.
+     */
+    public function hasPhotoConsentProof(): bool
+    {
+        return $this->photo_consent_proof_path !== null;
+    }
+
+    /**
+     * Record that an admin uploaded the current photo, with an optional proof
+     * image. Takes effect immediately — nothing about the photo update waits
+     * on the provider; the proof is there for them to see, not to act on.
+     */
+    public function recordAdminPhotoUpload(int $adminId, ?string $proofPath = null): void
+    {
+        $this->forceFill([
+            'photo_uploaded_by_admin_at' => now(),
+            'photo_consent_admin_id' => $adminId,
+            'photo_consent_proof_path' => $proofPath,
+        ])->save();
+    }
+
+    /**
+     * Clear the admin-photo trail when the CURRENT photo stops being the
+     * admin's: the provider replaces it with one of their own. Whatever proof
+     * existed applied to a photo that no longer exists, so it is deleted too.
+     */
+    public function clearAdminPhotoConsent(): void
+    {
+        if (!$this->photoWasUploadedByAdmin()) {
+            return;
+        }
+
+        if ($this->photo_consent_proof_path && Storage::disk('public')->exists($this->photo_consent_proof_path)) {
+            Storage::disk('public')->delete($this->photo_consent_proof_path);
+        }
+
+        $this->forceFill([
+            'photo_uploaded_by_admin_at' => null,
+            'photo_consent_admin_id' => null,
+            'photo_consent_proof_path' => null,
+        ])->save();
     }
 
     /**
@@ -587,30 +656,11 @@ class ServiceProvider extends Model implements HasMedia
     }
 
     /**
-     * Get the certification status badge.
-     */
-    public function getVerificationBadgeAttribute(): string
-    {
-        return '';
-    }
-
-    /**
      * Get the service locations as a comma-separated string.
      */
     public function getServiceLocationsAttribute(): string
     {
         return $this->locations->pluck('city')->join(', ');
-    }
-
-    /**
-     * Scope a query to only include verified service providers.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeVerified($query)
-    {
-        return $query;
     }
 
     /**

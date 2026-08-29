@@ -76,4 +76,23 @@ return [
   'verification_link_sent' => 'Un nouveau lien de vérification a été envoyé à votre adresse email.',
   'login' => 'Connexion',
   'account_disabled' => 'Your account is disabled. Please contact admin.',
+
+  // Connexion Google
+  'continue_with_google' => 'Continuer avec Google',
+  'google_cancelled' => 'La connexion Google a été annulée. Vous pouvez réessayer ou utiliser votre email.',
+  'google_failed' => "Nous n'avons pas pu terminer la connexion Google. Veuillez réessayer.",
+  'google_no_email' => "Votre compte Google n'a pas partagé d'adresse email, dont nous avons besoin pour créer votre compte.",
+  'google_email_unverified' => "Google n'a pas vérifié cette adresse email, nous ne pouvons donc pas l'utiliser pour la connexion.",
+  'google_session_expired' => 'Cela a pris trop de temps. Veuillez recommencer la connexion Google.',
+  'google_complete_title' => 'Dernière étape',
+  'google_complete_intro' => "Une dernière étape — dites-nous comment vous comptez utiliser Speeda.",
+  'google_signed_in_as' => 'Connecté en tant que',
+  'google_role_question' => 'Comment allez-vous utiliser Speeda ?',
+  'google_role_client_hint' => "Je cherche à embaucher un prestataire.",
+  'google_role_provider_hint' => 'Je propose des services et veux être trouvé.',
+  'google_finish_client' => 'Créer mon compte',
+  'google_finish_provider' => 'Créer mon profil de prestataire',
+  'google_only_account' => 'Ce compte se connecte avec Google. Utilisez le bouton « Continuer avec Google » ci-dessus.',
+  'optional' => 'facultatif',
+  'select_city' => 'Choisissez votre ville',
 ];

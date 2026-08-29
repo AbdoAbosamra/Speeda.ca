@@ -39,4 +39,15 @@ return [
         'api_key' => env('GOOGLE_TRANSLATE_API_KEY'),
     ],
 
+    /*
+     * Google sign-in (Socialite). Leaving the id or secret unset disables the
+     * feature: the buttons disappear and the routes 404, so a half-configured
+     * deployment shows no dead button rather than a Google error page.
+     */
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL') . '/auth/google/callback'),
+    ],
+
 ];

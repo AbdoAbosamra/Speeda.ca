@@ -14,7 +14,7 @@ class FirstReviewReceivedEmail extends TemplatedEmail
     public function __construct(ServiceProvider $provider, string $profileUrl)
     {
         $name = $provider->company_name ?: ($provider->user?->name ?: 'Service Provider');
-        parent::__construct($name, $profileUrl);
+        parent::__construct($name, $profileUrl, $provider->user);
     }
 
     protected function templateKey(): string

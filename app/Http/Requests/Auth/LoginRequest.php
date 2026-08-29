@@ -112,8 +112,17 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($credentials, $remember)) {
             RateLimiter::hit($this->throttleKey());
 
+            // A Google-created account has no password, so every password is
+            // wrong for it. "Credentials do not match" is true but sends
+            // people to the reset-password flow for an account that never had
+            // a password, so name the real reason instead. Shown only for an
+            // account that exists, which the form already implies.
+            $existing = \App\Models\User::where('email', $credentials['email'] ?? null)->first();
+
             throw ValidationException::withMessages([
-                'login' => __('auth.failed'),
+                'login' => $existing?->isGoogleOnly()
+                    ? __('auth.google_only_account')
+                    : __('auth.failed'),
             ])->redirectTo(route('register'));
         }
 

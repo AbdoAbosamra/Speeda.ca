@@ -1,7 +1,7 @@
 @extends('emails.provider.layout')
 
 @section('content')
-    <span class="step-badge">Step 1 of 6</span>
+    <span class="step-badge">Step 1 of 5</span>
     <h2 class="main-headline">One Photo Can Change Everything 📸</h2>
     
     <p class="lead-text">
@@ -48,7 +48,7 @@
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" style="width: 0%"></div>
         </div>
-        <span class="progress-text">Step 0 of 6 complete (0%)</span>
+        <span class="progress-text">Step 0 of 5 complete (0%)</span>
     </div>
 
     <blockquote class="closing-quote">

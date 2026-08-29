@@ -75,9 +75,6 @@ class AdminProviderActivityMonitorService
                 'hidden' => $query->where(function ($q) {
                     $q->where('sp.is_active', false)->orWhere('u.is_active', false);
                 }),
-                'verified' => $query->where('sp.is_verified', true),
-                'unverified' => $query->where('sp.is_verified', false),
-                'featured' => $query->where('sp.is_featured', true),
                 default => null,
             };
         }
@@ -161,8 +158,6 @@ class AdminProviderActivityMonitorService
             'conversion_rate' => $totalViews > 0 ? round(($totalClicks / $totalViews) * 100, 1) : 0,
             // Listing management counters.
             'hidden' => $rows->filter(fn ($row) => !$row->is_active || !$row->owner_is_active)->count(),
-            'verified' => $rows->where('is_verified', 1)->count(),
-            'featured' => $rows->where('is_featured', 1)->count(),
         ];
     }
 
@@ -233,8 +228,6 @@ class AdminProviderActivityMonitorService
                 sp.phone,
                 sp.whatsapp_number,
                 sp.services_offered,
-                sp.is_verified,
-                sp.is_featured,
                 sp.is_active,
                 sp.is_certified,
                 u.name as owner_name,

@@ -272,4 +272,10 @@ return [
   'available_all_areas' => 'متاح في جميع المناطق',
   'site_developer' => 'مطوّر الموقع',
   'site_developer_tooltip' => 'مطوّر هذا الموقع',
+
+    // إقرار الموافقة على صورة رفعها الفريق (يظهر في لوحتك فقط، أبدًا للعامة)
+    'photo_consent_info_title' => 'تم رفع هذه الصورة بواسطة فريقنا',
+    'photo_consent_info_body' => 'لو في حاجة في الصورة دي مش مظبوطة، تواصل معنا وهنظبطها.',
+    'photo_consent_proof_label' => 'إثبات الموافقة المرفق:',
+    'photo_consent_proof_view' => 'عرض',
 ];

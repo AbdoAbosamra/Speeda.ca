@@ -16,6 +16,7 @@ class WriteDescriptionEmail extends TemplatedEmail
         parent::__construct(
             $provider->company_name ?: ($provider->user?->name ?: 'Provider'),
             $dashboardUrl,
+            $provider->user,
         );
     }
 
@@ -26,6 +27,6 @@ class WriteDescriptionEmail extends TemplatedEmail
 
     protected function progress(): array
     {
-        return ['label' => 'Onboarding Progress', 'text' => 'Step 2 of 6 complete (33%)', 'percent' => 33];
+        return ['label' => 'Onboarding Progress', 'text' => 'Step 2 of 5 complete (40%)', 'percent' => 40];
     }
 }

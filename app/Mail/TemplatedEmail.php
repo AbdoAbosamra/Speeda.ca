@@ -3,6 +3,8 @@
 namespace App\Mail;
 
 use App\Models\EmailTemplate;
+use App\Models\User;
+use App\Support\UnsubscribeLink;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -25,10 +27,24 @@ abstract class TemplatedEmail extends Mailable implements ShouldQueue
     /** Resolved copy, memoised so envelope() and content() agree. */
     private ?array $resolved = null;
 
+    /**
+     * $recipient is the account the mail is going to. It is optional only so a
+     * mailable can still be rendered for preview without one; every real send
+     * passes it, and without it the email goes out with no opt-out link.
+     */
     public function __construct(
         public readonly string $recipientName,
         public readonly string $dashboardUrl,
+        public readonly ?User $recipient = null,
     ) {}
+
+    /**
+     * Signed opt-out link for this recipient, or null when unknown.
+     */
+    protected function unsubscribeUrl(): ?string
+    {
+        return UnsubscribeLink::forNullable($this->recipient);
+    }
 
     /**
      * Key in EmailTemplate::defaults().
@@ -70,7 +86,26 @@ abstract class TemplatedEmail extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: $this->content_()['subject']);
+        $unsubscribeUrl = $this->unsubscribeUrl();
+
+        if ($unsubscribeUrl === null) {
+            return new Envelope(subject: $this->content_()['subject']);
+        }
+
+        return new Envelope(
+            subject: $this->content_()['subject'],
+            // Powers the "Unsubscribe" control Gmail and Outlook render next to
+            // the sender name. Mailbox providers read its presence as a strong
+            // positive reputation signal, so it also protects delivery of the
+            // mail people do want.
+            using: [
+                function (\Symfony\Component\Mime\Email $message) use ($unsubscribeUrl) {
+                    $headers = $message->getHeaders();
+                    $headers->addTextHeader('List-Unsubscribe', '<' . $unsubscribeUrl . '>');
+                    $headers->addTextHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+                },
+            ],
+        );
     }
 
     public function content(): Content
@@ -83,6 +118,7 @@ abstract class TemplatedEmail extends Mailable implements ShouldQueue
                 'stats' => $this->stats(),
                 'progress' => $this->progress(),
                 'footerNote' => $this->footerNote(),
+                'unsubscribeUrl' => $this->unsubscribeUrl(),
             ],
         );
     }

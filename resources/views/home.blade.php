@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @push('styles')
-    @vite('resources/css/app.css')
     <style>
         .hero-subtitle-badge {
             display: inline-flex !important;
@@ -397,6 +396,13 @@
                 </div>
             </div>
         </section>
+
+        {{-- Admin-managed video. $homeVideo is null unless the section is
+             switched on AND has something playable, so the whole block —
+             markup, styles and script — simply does not exist otherwise. --}}
+        @if($homeVideo)
+            @include('partials.home-video', ['homeVideo' => $homeVideo])
+        @endif
 
         @if($featuredProviders->isNotEmpty())
             <section class="home-section">

@@ -40,7 +40,6 @@ class ServiceProviderFactory extends Factory
             'phone' => $this->generateCanadianPhone(),
             'whatsapp_number' => fake()->optional(0.7)->numerify('+1##########'),
             'address' => fake()->optional(0.8)->address(),
-            'is_verified' => fake()->boolean(60),
             'business_type' => fake()->randomElement(['individual', 'company']),
             'business_license' => fake()->optional(0.3)->regexify('[A-Z0-9]{10}'),
             'languages' => fake()->randomElements(['en', 'fr', 'ar'], fake()->numberBetween(1, 2)),
@@ -83,7 +82,6 @@ class ServiceProviderFactory extends Factory
             'certification' => 'Licensed & Certified',
             'business_license' => fake()->regexify('[A-Z]{2}[0-9]{6}'),
             'profile_completion_percent' => 100,
-            'is_verified' => true,
         ]);
     }
 
@@ -124,13 +122,12 @@ class ServiceProviderFactory extends Factory
             'certification' => null,
             'business_license' => null,
             'profile_completion_percent' => fake()->numberBetween(0, 40),
-            'is_verified' => false,
         ]);
     }
 
     public function inactive(): static
     {
-        return $this->state(fn() => ['is_verified' => false]);
+        return $this->state(fn() => ['is_active' => false]);
     }
 
     public function topRated(): static

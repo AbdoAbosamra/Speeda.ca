@@ -70,10 +70,3 @@
         </div>
     </div>
 @endif
-
-{{-- Alpine.js for animations (if not already included) --}}
-@once
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    @endpush
-@endonce

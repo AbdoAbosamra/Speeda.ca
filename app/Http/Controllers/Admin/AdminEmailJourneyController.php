@@ -45,7 +45,6 @@ class AdminEmailJourneyController extends Controller
             'bio'           => '📝 Description',
             'experience'    => '📅 Experience',
             'gallery'       => '🖼️ Gallery',
-            'service_areas' => '🌍 Service Areas',
             'complete'      => '🏆 Complete',
             'reviews'       => '⭐ Reviews',
         ];
@@ -70,7 +69,6 @@ class AdminEmailJourneyController extends Controller
             'bio'           => '📝 Description',
             'experience'    => '📅 Experience',
             'gallery'       => '🖼️ Gallery',
-            'service_areas' => '🌍 Service Areas',
             'complete'      => '🏆 Complete',
             'reviews'       => '⭐ Reviews',
         ];
@@ -100,7 +98,6 @@ class AdminEmailJourneyController extends Controller
             'bio'           => 'emails.provider.write-description',
             'experience'    => 'emails.provider.add-experience',
             'gallery'       => 'emails.provider.showcase-work',
-            'service_areas' => 'emails.provider.add-service-areas',
             'complete'      => 'emails.provider.profile-complete',
             'reviews'       => 'emails.provider.build-reputation',
             default         => abort(404, "Unknown email type: {$type}"),
@@ -110,6 +107,8 @@ class AdminEmailJourneyController extends Controller
             'providerName' => $provider->company_name ?? $provider->user?->name ?? 'Demo Provider',
             'dashboardUrl' => $dashboardUrl,
             'subject'      => "Preview: {$type}",
+            // Inert placeholder so the preview shows the opt-out footer too.
+            'unsubscribeUrl' => '#',
         ]);
     }
 
@@ -127,7 +126,7 @@ class AdminEmailJourneyController extends Controller
     public function sendTest(Request $request, ServiceProvider $serviceProvider)
     {
         $validated = $request->validate([
-            'expected_type' => 'required|in:welcome,photo,services,bio,experience,gallery,service_areas,complete,reviews',
+            'expected_type' => 'required|in:welcome,photo,services,bio,experience,gallery,complete,reviews',
         ]);
 
         $serviceProvider->load('user');

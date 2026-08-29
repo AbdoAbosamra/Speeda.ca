@@ -70,7 +70,7 @@ class HttpExceptionHandlingTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->get(URL::signedRoute('broadcast.unsubscribe', ['user' => $user->id]))
+        $this->get(URL::signedRoute('email.unsubscribe', ['user' => $user->id]))
             ->assertStatus(200);
     }
 

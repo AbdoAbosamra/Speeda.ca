@@ -685,6 +685,11 @@ class ServiceProviderController extends Controller
                 // Update service provider record
                 $serviceProvider->update(['profile_image' => $path]);
 
+                // A photo the provider chose themselves needs no admin
+                // consent trail; whatever existed belonged to the photo this
+                // one just replaced.
+                $serviceProvider->clearAdminPhotoConsent();
+
                 // Recalculate profile completion after image upload
                 $completionPercent = app(CalculateProfileCompletionAction::class)->execute($serviceProvider);
 

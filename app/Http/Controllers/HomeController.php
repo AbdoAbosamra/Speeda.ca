@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\SEO\Services\SeoMetaService;
 use App\Models\Category;
+use App\Models\HomeVideo;
 use App\Models\ServiceProvider;
 use App\Models\Review;
 use App\Models\Endorsement;
@@ -96,6 +97,10 @@ class HomeController extends Controller
         // Admin-managed provider testimonials — shown only when exactly 3 are active.
         $siteTestimonials = SiteTestimonial::forHomePage();
 
-        return view('home', compact('categories', 'locationClusters', 'providerStats', 'featuredProviders', 'latestBlogPosts', 'siteTestimonials'));
+        // Admin-managed video section — null unless it is switched on and has
+        // a playable video, in which case the home view renders nothing.
+        $homeVideo = HomeVideo::forHomePage();
+
+        return view('home', compact('categories', 'locationClusters', 'providerStats', 'featuredProviders', 'latestBlogPosts', 'siteTestimonials', 'homeVideo'));
     }
 }

@@ -97,6 +97,28 @@ class CategoryCacheService
     }
 
     /**
+     * Terminal professions grouped by their top-level section.
+     * Used by every provider signup form.
+     */
+    public function getGroupedTerminalCategories(): Collection
+    {
+        $professions = $this->getTerminalCategories();
+        $allCategories = Category::where('is_active', true)->get()->keyBy('id');
+
+        return $professions
+            ->groupBy(function ($category) use ($allCategories) {
+                $root = $category;
+
+                while ($root->parent_id && isset($allCategories[$root->parent_id])) {
+                    $root = $allCategories[$root->parent_id];
+                }
+
+                return $root->localized_name;
+            })
+            ->sortKeys();
+    }
+
+    /**
      * Get filter groups (categories for dropdown filters).
      * Used in provider listing sidebar.
      *

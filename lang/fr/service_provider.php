@@ -272,4 +272,10 @@ Complétez votre profil maintenant.',
   'available_all_areas' => 'Disponible dans toutes les zones',
   'site_developer' => 'Développeur du site',
   'site_developer_tooltip' => 'Développeur de ce site web',
+
+    // Consentement pour une photo téléchargée par l\'équipe (visible uniquement sur votre tableau de bord)
+    'photo_consent_info_title' => 'Cette photo a été téléchargée par notre équipe',
+    'photo_consent_info_body' => 'Si quelque chose vous semble incorrect à propos de cette photo, contactez-nous.',
+    'photo_consent_proof_label' => 'Preuve de consentement disponible :',
+    'photo_consent_proof_view' => 'Voir',
 ];

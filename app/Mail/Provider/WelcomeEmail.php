@@ -16,6 +16,7 @@ class WelcomeEmail extends TemplatedEmail
         parent::__construct(
             $provider->company_name ?: ($provider->user?->name ?: 'Provider'),
             $dashboardUrl,
+            $provider->user,
         );
     }
 
@@ -26,6 +27,6 @@ class WelcomeEmail extends TemplatedEmail
 
     protected function progress(): array
     {
-        return ['label' => 'Onboarding Progress', 'text' => 'Step 0 of 6 complete (0%)', 'percent' => 0];
+        return ['label' => 'Onboarding Progress', 'text' => 'Step 0 of 5 complete (0%)', 'percent' => 0];
     }
 }

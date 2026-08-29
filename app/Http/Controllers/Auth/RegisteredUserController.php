@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Models\Category;
 use App\Models\Location;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\CategoryCacheService;
 use App\Services\LocationCacheService;
+use App\Support\SignupLocations;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -26,26 +26,14 @@ class RegisteredUserController extends Controller
         // PERFORMANCE: Use cached terminal categories from Redis (24h TTL)
         $professions = app(CategoryCacheService::class)->getTerminalCategories();
 
-        // Eager load ALL active categories into a lookup map to resolve roots without lazy loading
-        $allCategories = Category::where('is_active', true)->get()->keyBy('id');
-
-        // Group terminal professions by their top-level root section (Level 1) for hierarchical optgroup rendering
-        $professionGroups = $professions
-            ->groupBy(function ($category) use ($allCategories) {
-                // Find the root section (top ancestor where parent_id is null) using the lookup map
-                $root = $category;
-                while ($root->parent_id && isset($allCategories[$root->parent_id])) {
-                    $root = $allCategories[$root->parent_id];
-                }
-                return $root->localized_name;
-            })
-            ->sortKeys();
+        $professionGroups = app(CategoryCacheService::class)->getGroupedTerminalCategories();
 
         // @change 2026-06-07 | Pass active locations to view for dynamic grouped city dropdown
         // Locations are ordered by region then city name for readable grouping.
         $locations = app(LocationCacheService::class)->getActiveLocations();
+        $locationGroups = SignupLocations::groupActiveLocations($locations);
 
-        return view('auth.register', compact('professions', 'professionGroups', 'locations'));
+        return view('auth.register', compact('professions', 'professionGroups', 'locations', 'locationGroups'));
 
     }
 

@@ -4,11 +4,59 @@
     @vite(['resources/css/provider-profile.css'])
 @endpush
 
+@push('styles')
+    <style>
+        .photo-consent-note {
+            display: flex;
+            align-items: flex-start;
+            gap: .85rem;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+        .photo-consent-note > i {
+            font-size: 1.25rem;
+            color: #2563eb;
+            flex-shrink: 0;
+            margin-top: .15rem;
+        }
+        .photo-consent-note-text strong { display: block; color: #1e3a8a; font-size: .95rem; }
+        .photo-consent-note-text p { margin: .25rem 0 0; color: #1e40af; font-size: .85rem; }
+        .photo-consent-note-text a {
+            display: inline-flex; align-items: center; gap: .3rem; margin-top: .5rem;
+            color: #1d4ed8; font-weight: 700; font-size: .85rem; text-decoration: none;
+        }
+        .photo-consent-note-text a:hover { text-decoration: underline; }
+    </style>
+@endpush
+
 @section('content')
     {{-- Notification Card --}}
     @include('components.notification-card')
 
     <div class="container mt-4">
+        {{-- Admin-uploaded photo notice. Owner-only, never rendered for a
+             visitor or another provider, and nothing about it appears on the
+             public parts of this page. Purely informational — there is
+             nothing here for the provider to act on. --}}
+        @if(auth()->check() && auth()->id() === $serviceProvider->user_id && $serviceProvider->photoWasUploadedByAdmin())
+            <div class="photo-consent-note">
+                <i class="fas fa-image"></i>
+                <div class="photo-consent-note-text">
+                    <strong>{{ __('service_provider.photo_consent_info_title') }}</strong>
+                    <p>{{ __('service_provider.photo_consent_info_body') }}</p>
+                    @if($serviceProvider->hasPhotoConsentProof())
+                        <a href="{{ Storage::url($serviceProvider->photo_consent_proof_path) }}" target="_blank" rel="noopener">
+                            <i class="fas fa-paperclip"></i>
+                            {{ __('service_provider.photo_consent_proof_label') }} {{ __('service_provider.photo_consent_proof_view') }}
+                        </a>
+                    @endif
+                </div>
+            </div>
+        @endif
+
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">

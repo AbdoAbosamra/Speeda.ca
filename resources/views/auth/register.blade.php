@@ -429,6 +429,20 @@
             font-weight: 500;
         }
 
+        .select-group-header {
+            padding: 0.65rem 1rem;
+            border-top: 1px solid #e5e7eb;
+            background: #f8faff;
+            color: #4f46e5;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .select-option.grouped-option {
+            padding-inline-start: 1.5rem;
+        }
+
         .select-option:first-child {
             border-radius: 8px 8px 0 0;
         }
@@ -1595,6 +1609,20 @@
                 aria-labelledby="login-tab">
                 @csrf
 
+                @if (\App\Services\GoogleAuthService::isEnabled())
+                    <div class="social-login">
+                        <a href="{{ route('google.redirect') }}" class="social-button" id="google-login"
+                            data-google-base="{{ route('google.redirect') }}">
+                            <i class="fab fa-google"></i>
+                            {{ __('auth.continue_with_google') }}
+                        </a>
+                    </div>
+
+                    <div class="divider">
+                        <span>{{ __('auth.or') }}</span>
+                    </div>
+                @endif
+
                 <div class="form-group" id="mobile-field">
                     <label for="login-field" class="form-label">
                         <i class="fas fa-user-circle"></i>
@@ -1683,20 +1711,23 @@
                 role="tabpanel" id="register-panel" aria-labelledby="register-tab">
                 @csrf
 
-                <div class="social-login">
-                    <button type="button" class="social-button" id="google-signup">
-                        <i class="fab fa-google"></i>
-                        Google
-                    </button>
-                    <button type="button" class="social-button" id="facebook-signup">
-                        <i class="fab fa-facebook-f"></i>
-                        Facebook
-                    </button>
-                </div>
+                @if (\App\Services\GoogleAuthService::isEnabled())
+                    {{-- A link, not a button: this leaves the page for Google rather
+                         than submitting the registration form. The ?as= value is kept
+                         in step with the role radios by JS below, so a provider is
+                         asked for their trade and city on the way back. --}}
+                    <div class="social-login">
+                        <a href="{{ route('google.redirect') }}" class="social-button" id="google-signup"
+                            data-google-base="{{ route('google.redirect') }}">
+                            <i class="fab fa-google"></i>
+                            {{ __('auth.continue_with_google') }}
+                        </a>
+                    </div>
 
-                <div class="divider">
-                    <span>{{ __('auth.or') }}</span>
-                </div>
+                    <div class="divider">
+                        <span>{{ __('auth.or') }}</span>
+                    </div>
+                @endif
 
                 {{-- @change 2026-04-12 TASK-2 | Hid client-only registration down to essential credentials while keeping provider fields available behind role selection | Client signup should no longer collect phone details during registration | risk:LOW --}}
                 <div class="form-group" id="register-name-field">
@@ -1860,26 +1891,7 @@
                             <div class="select-arrow"></div>
                         </div>
                         <div class="select-options" id="profession-options">
-                            <div class="select-option" data-value="">{{ __('auth.select_profession') }}</div>
-                            @if(isset($professionGroups) && $professionGroups->count())
-                                @foreach($professionGroups as $groupName => $groupProfessions)
-                                    <div class="select-group-header" style="padding: 0.5rem 1rem; font-weight: 700; color: #667eea; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; background: #f8faff; border-top: 1px solid #e5e7eb; cursor: default; pointer-events: none;">
-                                        {{ $groupName }}
-                                    </div>
-                                    @foreach($groupProfessions as $p)
-                                        <div class="select-option" data-value="{{ $p->id }}" style="padding-inline-start: 1.5rem;">
-                                            {{ $p->localized_name }}
-                                        </div>
-                                    @endforeach
-                                @endforeach
-                            @elseif(isset($professions) && $professions)
-                                {{-- Fallback: flat list if grouping data unavailable --}}
-                                @foreach($professions as $p)
-                                    <div class="select-option" data-value="{{ $p->id }}">
-                                        {{ $p->localized_name }}
-                                    </div>
-                                @endforeach
-                            @endif
+                            @include('auth.partials.profession-options')
                         </div>
                         <input type="hidden" name="profession" id="profession-input" value="{{ old('profession') }}">
                     </div>
@@ -1902,49 +1914,7 @@
                             <div class="select-arrow"></div>
                         </div>
                         <div class="select-options" id="city-options">
-                            <div class="select-option" data-value="">{{ __('auth.select_city') }}</div>
-                            <?php
-                                /* @change 2026-06-07 | Signup city groups by province; cities still resolve from DB rows. */
-                                $regionGroups = [
-                                    'Quebec'  => ['montreal', 'laval', 'gatineau'],
-                                    'Ontario' => [
-                                        'ottawa',
-                                        'mississauga',
-                                        'brampton',
-                                        'oakville',
-                                        'burlington',
-                                        'milton',
-                                        'markham',
-                                        'vaughan',
-                                        'richmond hill',
-                                        'oshawa',
-                                        'whitby',
-                                        'ajax',
-                                        'city of toronto',
-                                    ],
-                                ];
-                                /* Index all active locations by lowercase city name for fast lookup */
-                                $locationIndex = ($locations ?? collect())->keyBy(fn($loc) => mb_strtolower(trim($loc->city)));
-                            ?>
-                            @foreach($regionGroups as $regionLabel => $regionCities)
-                                <?php
-                                    /* Filter to only cities that exist in DB (safe — ignores missing rows) */
-                                    $regionLocations = collect($regionCities)
-                                        ->map(fn($slug) => $locationIndex->get($slug))
-                                        ->filter();
-                                ?>
-                                @if($regionLocations->isNotEmpty())
-                                    {{-- Group header — matches profession dropdown visual style --}}
-                                    <div class="select-group-header" style="padding: 0.5rem 1rem; font-weight: 700; color: #667eea; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; background: #f8faff; border-top: 1px solid #e5e7eb; cursor: default; pointer-events: none;">
-                                        {{ $regionLabel }}
-                                    </div>
-                                    @foreach($regionLocations as $loc)
-                                        <div class="select-option" data-value="{{ $loc->city }}" style="padding-inline-start: 1.5rem;">
-                                            {{ $loc->city }}
-                                        </div>
-                                    @endforeach
-                                @endif
-                            @endforeach
+                            @include('auth.partials.signup-city-options')
                         </div>
 
                         <input type="hidden" name="city" id="city-input" value="{{ old('city') }}">
@@ -2081,8 +2051,30 @@
         const toast = document.getElementById('toast');
         const toastClose = document.getElementById('toast-close');
         const sessionStatus = document.getElementById('session-status');
-        const googleSignup = document.getElementById('google-signup');
-        const facebookSignup = document.getElementById('facebook-signup');
+        // Keep the Google sign-in link pointed at the right signup type. The
+        // server needs to know before the redirect, because on the way back a
+        // provider is sent to a second form and a client is not.
+        const googleLinks = document.querySelectorAll('[data-google-base]');
+
+        function syncGoogleIntent() {
+            googleLinks.forEach(link => {
+                const form = link.closest('form');
+                const checked = form?.querySelector('input[name="role"]:checked');
+                const asProvider = checked?.value === 'service_provider';
+                const base = link.dataset.googleBase;
+                link.href = asProvider ? base + '?as=service_provider' : base;
+            });
+        }
+
+        document.querySelectorAll('input[name="role"]').forEach(radio => {
+            radio.addEventListener('change', syncGoogleIntent);
+        });
+
+        // The role radios are also flipped by clicks on the styled option
+        // cards and by ?type= in the URL, neither of which fires 'change'.
+        document.addEventListener('click', () => setTimeout(syncGoogleIntent, 0));
+
+        syncGoogleIntent();
         const professionTrigger = document.getElementById('profession-trigger');
         const professionOptions = document.getElementById('profession-options');
         const professionValue = document.getElementById('profession-value');
@@ -2612,6 +2604,11 @@
             // Remove any non-digit characters
             let value = input.value.replace(/\D/g, '');
 
+            // Accept pasted Canadian numbers that include the +1 country code.
+            if (value.length === 11 && value.startsWith('1')) {
+                value = value.substring(1);
+            }
+
             // Limit to 10 digits
             value = value.substring(0, 10);
 
@@ -2801,26 +2798,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             selectLoginRole('client'); // Default login role
 
-            // Social Login buttons - Coming Soon
-            if (googleSignup) {
-                googleSignup.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    console.log('Google button clicked');
-                    showToast('{{ __("auth.coming_soon_google") ?? "Google Sign-Up Coming Soon! 🚀" }}', 'info', '{{ __("general.coming_soon") ?? "Coming Soon" }}');
-                });
-            } else {
-                console.error('Google signup button not found');
-            }
-
-            if (facebookSignup) {
-                facebookSignup.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    console.log('Facebook button clicked');
-                    showToast('{{ __("auth.coming_soon_facebook") ?? "Facebook Sign-Up Coming Soon! 🚀" }}', 'info', '{{ __("general.coming_soon") ?? "Coming Soon" }}');
-                });
-            } else {
-                console.error('Facebook signup button not found');
-            }
+            // Google sign-in is a real link now; the old "coming soon" handlers
+            // that swallowed the click are gone. Facebook was dropped.
 
             // For the register form, avoid forcing a 'client' selection on load.
             // Respect old input (server-side validation) or URL params if provided

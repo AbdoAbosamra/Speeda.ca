@@ -13,7 +13,7 @@ class WelcomeClientEmail extends TemplatedEmail
 {
     public function __construct(User $user, string $browseUrl)
     {
-        parent::__construct($user->name ?: 'there', $browseUrl);
+        parent::__construct($user->name ?: 'there', $browseUrl, $user);
     }
 
     protected function templateKey(): string

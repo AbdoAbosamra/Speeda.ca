@@ -67,7 +67,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.providers.update', $provider) }}" method="POST" class="prov-form">
+            <form action="{{ route('admin.providers.update', $provider) }}" method="POST" class="prov-form" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
 
@@ -147,6 +147,60 @@
                         </div>
                     </div>
 
+                    {{-- Photo + consent. This whole card, and the consent state it records,
+                         is never rendered on the public profile — only here (admin) and on
+                         the provider's own dashboard. --}}
+                    <div class="prov-card">
+                        <h3>{{ __('admin.provider_photo') }}</h3>
+
+                        <div class="prov-photo-row">
+                            <div class="prov-photo-preview">
+                                @if($provider->profile_image_url)
+                                    <img src="{{ $provider->profile_image_url }}" alt="">
+                                @else
+                                    <div class="prov-photo-placeholder"><i class="fas fa-user"></i></div>
+                                @endif
+                            </div>
+
+                            <div class="prov-field" style="flex:1; margin-bottom:0;">
+                                <label for="profile_image">{{ __('admin.provider_photo_replace') }}</label>
+                                <input type="file" name="profile_image" id="profile_image" accept="image/*">
+                                <small class="prov-hint">{{ __('admin.provider_photo_hint') }}</small>
+                                @error('profile_image') <span class="prov-error">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <div class="prov-field" id="photo-consent-proof-row" style="display:none;">
+                            <label for="photo_consent_proof">{{ __('admin.photo_consent_proof_label') }}</label>
+                            <input type="file" name="photo_consent_proof" id="photo_consent_proof" accept="image/*,.pdf">
+                            <small class="prov-hint">{{ __('admin.photo_consent_proof_hint') }}</small>
+                            @error('photo_consent_proof') <span class="prov-error">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="prov-consent-status">
+                            <span class="prov-consent-status-label">{{ __('admin.photo_consent_status_title') }}</span>
+                            @if(!$provider->photoWasUploadedByAdmin())
+                                <p>{{ __('admin.photo_consent_status_none') }}</p>
+                            @else
+                                <p class="is-confirmed">
+                                    <i class="fas fa-circle-check"></i>
+                                    {{ __('admin.photo_consent_status_uploaded', [
+                                        'admin' => $provider->photoConsentAdmin->name ?? '—',
+                                        'date' => $provider->photo_uploaded_by_admin_at?->format('M d, Y'),
+                                    ]) }}
+                                </p>
+                                @if($provider->hasPhotoConsentProof())
+                                    <a href="{{ Storage::url($provider->photo_consent_proof_path) }}" target="_blank" rel="noopener" class="prov-consent-proof-link">
+                                        <i class="fas fa-paperclip"></i> {{ __('admin.photo_consent_proof_view') }}
+                                    </a>
+                                @else
+                                    <p class="prov-consent-no-proof">{{ __('admin.photo_consent_no_proof') }}</p>
+                                @endif
+                            @endif
+                            <small>{{ __('admin.photo_consent_hidden_note') }}</small>
+                        </div>
+                    </div>
+
                     <div class="prov-card">
                         <h3>{{ __('admin.listing_status') }}</h3>
 
@@ -157,26 +211,6 @@
                             <span>
                                 <strong>{{ __('admin.listing_visible') }}</strong>
                                 <small>{{ __('admin.listing_visible_hint') }}</small>
-                            </span>
-                        </label>
-
-                        <label class="prov-switch">
-                            <input type="hidden" name="is_verified" value="0">
-                            <input type="checkbox" name="is_verified" value="1"
-                                   @checked(old('is_verified', $provider->is_verified))>
-                            <span>
-                                <strong>{{ __('admin.verified') }}</strong>
-                                <small>{{ __('admin.verified_hint') }}</small>
-                            </span>
-                        </label>
-
-                        <label class="prov-switch">
-                            <input type="hidden" name="is_featured" value="0">
-                            <input type="checkbox" name="is_featured" value="1"
-                                   @checked(old('is_featured', $provider->is_featured))>
-                            <span>
-                                <strong>{{ __('admin.featured') }}</strong>
-                                <small>{{ __('admin.featured_hint') }}</small>
                             </span>
                         </label>
 
@@ -268,5 +302,55 @@
         .prov-danger p { margin: 0; font-size: .85rem; color: #64748b; }
         .admin-btn-danger { background: #dc2626; color: #fff; border: none; }
         .admin-btn-danger:hover { background: #b91c1c; color: #fff; }
+
+        .prov-photo-row { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1rem; }
+        .prov-photo-preview {
+            width: 84px; height: 84px; border-radius: 14px; overflow: hidden; flex-shrink: 0;
+            background: #f1f5f9; border: 1px solid #e2e8f0;
+        }
+        .prov-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .prov-photo-placeholder {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; font-size: 1.75rem;
+        }
+        .prov-hint { display: block; margin-top: .35rem; font-size: .78rem; color: #64748b; }
+
+        .prov-consent-status {
+            margin-top: 1rem; padding: .85rem 1rem; border-radius: 12px; background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+        }
+        .prov-consent-status-label {
+            display: block; font-size: .72rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: .06em; color: #94a3b8; margin-bottom: .35rem;
+        }
+        .prov-consent-status p { margin: 0 0 .35rem; font-size: .85rem; color: #334155; }
+        .prov-consent-status p.is-confirmed { color: #047857; }
+        .prov-consent-status p.prov-consent-no-proof { color: #94a3b8; font-style: italic; }
+        .prov-consent-status small { display: block; color: #94a3b8; font-size: .76rem; margin-top: .35rem; }
+        .prov-consent-proof-link {
+            display: inline-flex; align-items: center; gap: .4rem; font-size: .85rem;
+            font-weight: 700; color: #2563eb; text-decoration: none;
+        }
+        .prov-consent-proof-link:hover { text-decoration: underline; }
     </style>
 @endsection
+
+@push('scripts')
+    <script>
+        // The proof-upload field only makes sense once a new photo has
+        // actually been chosen — hiding it otherwise avoids an admin
+        // attaching "proof" to a form that changes nothing about the photo.
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.getElementById('profile_image');
+            const proofRow = document.getElementById('photo-consent-proof-row');
+            if (!fileInput || !proofRow) return;
+
+            function syncProofVisibility() {
+                proofRow.style.display = fileInput.files && fileInput.files.length ? 'block' : 'none';
+            }
+
+            fileInput.addEventListener('change', syncProofVisibility);
+            syncProofVisibility();
+        });
+    </script>
+@endpush

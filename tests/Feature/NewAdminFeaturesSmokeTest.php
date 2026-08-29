@@ -17,6 +17,8 @@ use App\Services\ProviderEmailJourneyService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 /**
@@ -117,7 +119,7 @@ class NewAdminFeaturesSmokeTest extends TestCase
         $this->assertSame('Custom headline', $resolved['headline']);
 
         // Cheap woof check for the badge default staying else
-        $this->assertSame('Step 1 of 6', $resolved['badge']);
+        $this->assertSame('Step 1 of 5', $resolved['badge']);
 
         // Reset restores the built-in default
         $this->delete(route('admin.email_templates.reset', 'photo'))
@@ -141,7 +143,7 @@ class NewAdminFeaturesSmokeTest extends TestCase
         $provider = $this->makeProvider();
         $provider->user->update(['role' => 'service_provider', 'is_active' => true]);
 
-        foreach (['welcome', 'photo', 'services', 'bio', 'experience', 'gallery', 'service_areas', 'complete', 'reviews'] as $type) {
+        foreach (['welcome', 'photo', 'services', 'bio', 'experience', 'gallery', 'complete', 'reviews'] as $type) {
             $this->get(route('admin.email_journey.preview', $type))->assertOk();
         }
     }
@@ -181,7 +183,7 @@ class NewAdminFeaturesSmokeTest extends TestCase
         // Dry run never touches provider_email_logs, even when an email is due.
         $this->assertSame(0, ProviderEmailLog::count(), 'Dry run must not persist a log row.');
         if ($sent !== null) {
-            $this->assertContains($sent, ['photo', 'services', 'bio', 'experience', 'gallery', 'service_areas', 'complete', 'reviews']);
+            $this->assertContains($sent, ['photo', 'services', 'bio', 'experience', 'gallery', 'complete', 'reviews']);
         }
 
         $stats = $svc->getAdminStats();
@@ -263,7 +265,21 @@ class NewAdminFeaturesSmokeTest extends TestCase
     {
         $provider = $this->makeProvider();
 
-        $this->get(route('admin.providers.edit', $provider->id))->assertOk();
+        $this->get(route('admin.providers.edit', $provider->id))
+            ->assertOk()
+            ->assertDontSee('name="is_verified"', false)
+            ->assertDontSee('name="is_featured"', false);
+
+        $monitorView = file_get_contents(resource_path('views/admin/provider_activity_monitor/index.blade.php'));
+        $this->assertStringNotContainsString('toggle_featured', $monitorView);
+        $this->assertStringNotContainsString('value="featured"', $monitorView);
+        $this->assertStringNotContainsString('>Featured<', $monitorView);
+        $this->assertStringNotContainsString('>Verified<', $monitorView);
+
+        $this->assertFalse(Route::has('admin.providers.toggle_verified'));
+        $this->assertFalse(Route::has('admin.providers.toggle_featured'));
+        $this->assertFalse(Schema::hasColumn('service_providers', 'is_verified'));
+        $this->assertFalse(Schema::hasColumn('service_providers', 'is_featured'));
 
         $this->patch(route('admin.providers.update', $provider->id), [
             'company_name' => 'Renamed Co',
@@ -272,17 +288,17 @@ class NewAdminFeaturesSmokeTest extends TestCase
             'is_featured' => 1,
         ])->assertRedirect(route('admin.providers.edit', $provider->id));
 
-        $this->assertDatabaseHas('service_providers', ['id' => $provider->id, 'company_name' => 'Renamed Co', 'is_active' => 1]);
+        $this->assertDatabaseHas('service_providers', [
+            'id' => $provider->id,
+            'company_name' => 'Renamed Co',
+            'is_active' => 1,
+        ]);
 
         // Toggles flip the flags
         $this->patch(route('admin.providers.toggle_active', $provider->id))->assertRedirect();
         $this->assertDatabaseHas('service_providers', ['id' => $provider->id, 'is_active' => 0]);
         $this->patch(route('admin.providers.toggle_active', $provider->id))->assertRedirect();
         $this->assertDatabaseHas('service_providers', ['id' => $provider->id, 'is_active' => 1]);
-
-        $wasFeatured = (bool) ServiceProvider::find($provider->id)->is_featured;
-        $this->patch(route('admin.providers.toggle_featured', $provider->id))->assertRedirect();
-        $this->assertDatabaseHas('service_providers', ['id' => $provider->id, 'is_featured' => !$wasFeatured]);
 
         // Bulk hide + show
         $this->post(route('admin.providers.bulk'), ['bulk_action' => 'hide', 'ids' => [$provider->id]])->assertRedirect();

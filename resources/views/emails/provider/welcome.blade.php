@@ -26,7 +26,7 @@
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" style="width: 0%"></div>
         </div>
-        <span class="progress-text">Step 0 of 6 complete (0%)</span>
+        <span class="progress-text">Step 0 of 5 complete (0%)</span>
     </div>
 
     <blockquote class="closing-quote">

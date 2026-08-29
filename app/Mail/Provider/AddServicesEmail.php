@@ -16,6 +16,7 @@ class AddServicesEmail extends TemplatedEmail
         parent::__construct(
             $provider->company_name ?: ($provider->user?->name ?: 'Provider'),
             $dashboardUrl,
+            $provider->user,
         );
     }
 
@@ -26,6 +27,6 @@ class AddServicesEmail extends TemplatedEmail
 
     protected function progress(): array
     {
-        return ['label' => 'Onboarding Progress', 'text' => 'Step 1 of 6 complete (17%)', 'percent' => 17];
+        return ['label' => 'Onboarding Progress', 'text' => 'Step 1 of 5 complete (20%)', 'percent' => 20];
     }
 }

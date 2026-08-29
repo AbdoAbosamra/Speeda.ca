@@ -148,7 +148,6 @@
                     ['label'=>'Business Bio','done'=>$timeline['snapshot']['has_bio'],'emoji'=>'📝'],
                     ['label'=>'Years of Experience','done'=>$timeline['snapshot']['has_experience'],'emoji'=>'📅'],
                     ['label'=>'Gallery Photos','done'=>$timeline['snapshot']['has_gallery'],'emoji'=>'🖼️'],
-                    ['label'=>'Service Areas','done'=>$timeline['snapshot']['has_service_areas'],'emoji'=>'🌍'],
                     ['label'=>'Customer Reviews','done'=>$timeline['snapshot']['has_reviews'],'emoji'=>'⭐'],
                 ] as $item)
                     <div class="ej-check-card {{ $item['done'] ? 'is-done' : '' }}">

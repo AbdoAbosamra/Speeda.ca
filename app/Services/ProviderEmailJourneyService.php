@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Mail\Provider\AddExperienceEmail;
 use App\Mail\Provider\AddProfilePhotoEmail;
-use App\Mail\Provider\AddServiceAreasEmail;
 use App\Mail\Provider\AddServicesEmail;
 use App\Mail\Provider\BuildReputationEmail;
 use App\Mail\Provider\ProfileCompleteEmail;
@@ -26,7 +25,7 @@ use Illuminate\Support\Facades\Mail;
  * and records the outcome in provider_email_logs.
  *
  * Email sequence (each step unlocks only after the previous is complete):
- *  welcome → photo → services → bio → experience → gallery → service_areas → complete → reviews
+ *  welcome → photo → services → bio → experience → gallery → complete → reviews
  */
 class ProviderEmailJourneyService
 {
@@ -40,7 +39,6 @@ class ProviderEmailJourneyService
     public const EMAIL_BIO           = 'bio';
     public const EMAIL_EXPERIENCE    = 'experience';
     public const EMAIL_GALLERY       = 'gallery';
-    public const EMAIL_SERVICE_AREAS = 'service_areas';
     public const EMAIL_COMPLETE      = 'complete';
     public const EMAIL_REVIEWS       = 'reviews';
 
@@ -55,7 +53,6 @@ class ProviderEmailJourneyService
         self::EMAIL_BIO           => 3,
         self::EMAIL_EXPERIENCE    => 3,
         self::EMAIL_GALLERY       => 3,
-        self::EMAIL_SERVICE_AREAS => 3,
         self::EMAIL_COMPLETE      => 1,   // Never resend – celebration email
         self::EMAIL_REVIEWS       => 4,   // 1 initial + 3 resends
     ];
@@ -71,7 +68,6 @@ class ProviderEmailJourneyService
         self::EMAIL_BIO           => [1 => 5, 2 => 7, 3 => 10],
         self::EMAIL_EXPERIENCE    => [1 => 5, 2 => 7, 3 => 10],
         self::EMAIL_GALLERY       => [1 => 5, 2 => 10, 3 => 14],
-        self::EMAIL_SERVICE_AREAS => [1 => 5, 2 => 7, 3 => 10],
         self::EMAIL_REVIEWS       => [1 => 3, 2 => 7, 3 => 14, 4 => 21],
     ];
 
@@ -90,7 +86,7 @@ class ProviderEmailJourneyService
     {
         // Ensure user exists and is active
         $user = $provider->user;
-        if (!$user || !$user->is_active || empty($user->email)) {
+        if (!$user || !$user->is_active || empty($user->email) || $user->hasOptedOutOfEmail()) {
             return null;
         }
 
@@ -121,7 +117,7 @@ class ProviderEmailJourneyService
     public function sendWelcomeEmail(ServiceProvider $provider): void
     {
         $user = $provider->user;
-        if (!$user || empty($user->email)) {
+        if (!$user || empty($user->email) || $user->hasOptedOutOfEmail()) {
             return;
         }
 
@@ -136,7 +132,7 @@ class ProviderEmailJourneyService
 
         try {
             Mail::to($user->email, $provider->company_name ?? $user->name)
-                ->queue(new WelcomeEmail($provider));
+                ->queue(new WelcomeEmail($provider, route('service-providers.show', $provider->id)));
 
             ProviderEmailLog::create([
                 'service_provider_id' => $provider->id,
@@ -212,20 +208,12 @@ class ProviderEmailJourneyService
             return null;
         }
 
-        // Step 6 – Service areas
-        if (!$this->hasServiceAreas($provider)) {
-            if (!$this->emailSent($logs, self::EMAIL_SERVICE_AREAS)) {
-                return self::EMAIL_SERVICE_AREAS;
-            }
-            return null;
-        }
-
-        // Step 7 – Profile complete celebration
+        // Step 6 – Profile complete celebration
         if (!$this->emailSent($logs, self::EMAIL_COMPLETE)) {
             return self::EMAIL_COMPLETE;
         }
 
-        // Step 8 – Reviews (send 3 days after the complete email)
+        // Step 7 – Reviews (send 3 days after the complete email)
         $completeSentAt = $logs[self::EMAIL_COMPLETE]?->sent_at;
         $reviewsReady   = $completeSentAt && $completeSentAt->diffInDays(now()) >= 3;
         $hasReviews     = $provider->activeReviews()->count() > 0;
@@ -273,11 +261,6 @@ class ProviderEmailJourneyService
         return $provider->getMedia('gallery')->count() > 0;
     }
 
-    public function hasServiceAreas(ServiceProvider $provider): bool
-    {
-        return $provider->serviceAreas()->where('is_active', true)->count() > 0;
-    }
-
     /**
      * Build a full completion snapshot for a provider (used in admin panel).
      */
@@ -289,7 +272,6 @@ class ProviderEmailJourneyService
             'has_bio'           => $this->hasBio($provider),
             'has_experience'    => $this->hasExperience($provider),
             'has_gallery'       => $this->hasGallery($provider),
-            'has_service_areas' => $this->hasServiceAreas($provider),
             'has_reviews'       => $provider->activeReviews()->count() > 0,
         ];
     }
@@ -337,7 +319,6 @@ class ProviderEmailJourneyService
             self::EMAIL_BIO           => !$this->hasBio($provider),
             self::EMAIL_EXPERIENCE    => !$this->hasExperience($provider),
             self::EMAIL_GALLERY       => !$this->hasGallery($provider),
-            self::EMAIL_SERVICE_AREAS => !$this->hasServiceAreas($provider),
             self::EMAIL_REVIEWS       => $provider->activeReviews()->count() === 0,
             default                   => false,
         };
@@ -362,7 +343,7 @@ class ProviderEmailJourneyService
         bool $isResend
     ): ?string {
         $user = $provider->user;
-        if (!$user || empty($user->email)) {
+        if (!$user || empty($user->email) || $user->hasOptedOutOfEmail()) {
             return null;
         }
 
@@ -471,7 +452,6 @@ class ProviderEmailJourneyService
             self::EMAIL_BIO           => '#edit-basic-info',
             self::EMAIL_EXPERIENCE    => '#edit-basic-info',
             self::EMAIL_GALLERY       => '#edit-gallery',
-            self::EMAIL_SERVICE_AREAS => '#edit-service-areas',
             self::EMAIL_REVIEWS       => '#reviews',
         ];
 
@@ -485,7 +465,6 @@ class ProviderEmailJourneyService
             self::EMAIL_BIO           => new WriteDescriptionEmail($provider, $dashboardUrl),
             self::EMAIL_EXPERIENCE    => new AddExperienceEmail($provider, $dashboardUrl),
             self::EMAIL_GALLERY       => new ShowcaseWorkEmail($provider, $dashboardUrl),
-            self::EMAIL_SERVICE_AREAS => new AddServiceAreasEmail($provider, $dashboardUrl),
             self::EMAIL_COMPLETE      => new ProfileCompleteEmail($provider, $baseUrl),
             self::EMAIL_REVIEWS       => new BuildReputationEmail($provider, $dashboardUrl),
             default                   => throw new \InvalidArgumentException("Unknown email type: {$type}"),

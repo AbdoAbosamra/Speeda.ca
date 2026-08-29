@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Rules\CanadianPhoneNumber;
+use App\Support\SignupLocations;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
@@ -11,25 +12,6 @@ use Illuminate\Validation\Rules\Password;
  */
 class RegisterRequest extends FormRequest
 {
-    private const SIGNUP_CITIES = [
-        'montreal' => 'Montreal',
-        'laval' => 'Laval',
-        'gatineau' => 'Gatineau',
-        'ottawa' => 'Ottawa',
-        'mississauga' => 'Mississauga',
-        'brampton' => 'Brampton',
-        'oakville' => 'Oakville',
-        'burlington' => 'Burlington',
-        'milton' => 'Milton',
-        'markham' => 'Markham',
-        'vaughan' => 'Vaughan',
-        'richmond hill' => 'Richmond Hill',
-        'oshawa' => 'Oshawa',
-        'whitby' => 'Whitby',
-        'ajax' => 'Ajax',
-        'city of toronto' => 'City of Toronto',
-    ];
-
     public function authorize(): bool
     {
         return true;
@@ -72,8 +54,7 @@ class RegisterRequest extends FormRequest
                 'string',
                 'max:100',
                 function ($attribute, $value, $fail) {
-                    $normalizedCity = mb_strtolower(trim($value));
-                    if (!array_key_exists($normalizedCity, self::SIGNUP_CITIES)) {
+                    if (!SignupLocations::supports($value)) {
                         $fail(__('validation.city_invalid'));
                         return;
                     }
@@ -139,9 +120,8 @@ class RegisterRequest extends FormRequest
 
         // Normalize city name to the canonical signup label.
         if ($this->has('city')) {
-            $cityKey = mb_strtolower(trim($this->input('city')));
             $this->merge([
-                'city' => self::SIGNUP_CITIES[$cityKey] ?? trim($this->input('city')),
+                'city' => SignupLocations::normalize($this->input('city')),
             ]);
         }
     }

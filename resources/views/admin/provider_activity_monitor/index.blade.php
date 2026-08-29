@@ -50,20 +50,6 @@
                         <span>Hidden Listings</span>
                     </div>
                 </a>
-                <a href="{{ route('admin.provider_activity_monitor.index', ['listing_status' => 'verified']) }}" class="pam-summary-card">
-                    <span class="pam-summary-icon pam-tone-blue"><i class="fas fa-circle-check"></i></span>
-                    <div>
-                        <strong>{{ number_format($summary['verified'] ?? 0) }}</strong>
-                        <span>Verified</span>
-                    </div>
-                </a>
-                <a href="{{ route('admin.provider_activity_monitor.index', ['listing_status' => 'featured']) }}" class="pam-summary-card">
-                    <span class="pam-summary-icon pam-tone-amber"><i class="fas fa-star"></i></span>
-                    <div>
-                        <strong>{{ number_format($summary['featured'] ?? 0) }}</strong>
-                        <span>Featured</span>
-                    </div>
-                </a>
                 <article class="pam-summary-card">
                     <span class="pam-summary-icon pam-tone-slate"><i class="fas fa-moon"></i></span>
                     <div>
@@ -166,9 +152,6 @@
                             <option value="">Any listing</option>
                             <option value="active" @selected(request('listing_status') === 'active')>Live</option>
                             <option value="hidden" @selected(request('listing_status') === 'hidden')>Hidden</option>
-                            <option value="verified" @selected(request('listing_status') === 'verified')>Verified</option>
-                            <option value="unverified" @selected(request('listing_status') === 'unverified')>Not verified</option>
-                            <option value="featured" @selected(request('listing_status') === 'featured')>Featured</option>
                         </select>
                     </label>
 
@@ -211,10 +194,6 @@
                 :actions="[
                     'show'      => ['label' => __('admin.bulk_verb_shown'), 'icon' => 'fa-eye', 'variant' => 'success'],
                     'hide'      => ['label' => __('admin.bulk_verb_hidden'), 'icon' => 'fa-eye-slash', 'variant' => 'warning'],
-                    'verify'    => ['label' => __('admin.verified'), 'icon' => 'fa-circle-check'],
-                    'unverify'  => ['label' => __('admin.bulk_verb_unverified'), 'icon' => 'fa-circle-xmark'],
-                    'feature'   => ['label' => __('admin.feature'), 'icon' => 'fa-star'],
-                    'unfeature' => ['label' => __('admin.unfeature'), 'icon' => 'fa-star-half-stroke'],
                 ]"
             >
             <x-admin.table-card class="pam-table-card">
@@ -314,9 +293,6 @@
                                         <span class="pam-flag {{ $ownerActive ? 'pam-flag-good' : 'pam-flag-bad' }}">
                                             {{ $ownerActive ? 'Active user' : 'Inactive user' }}
                                         </span>
-                                        @if($p->is_verified)
-                                            <span class="pam-flag pam-flag-good">Verified</span>
-                                        @endif
                                         @if($p->is_certified)
                                             <span class="pam-flag pam-flag-info">Certified</span>
                                         @endif
@@ -346,13 +322,6 @@
                                         @else
                                             <span class="pam-badge pam-badge-on"><i class="fas fa-eye"></i> Live</span>
                                         @endif
-
-                                        @if($p->is_verified)
-                                            <span class="pam-badge pam-badge-verified"><i class="fas fa-circle-check"></i> Verified</span>
-                                        @endif
-                                        @if($p->is_featured)
-                                            <span class="pam-badge pam-badge-featured"><i class="fas fa-star"></i> Featured</span>
-                                        @endif
                                     </div>
                                 </td>
                                 <td>
@@ -365,30 +334,10 @@
                                         <form action="{{ route('admin.providers.toggle_active', $p->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="pam-icon-action"
+                                            <button type="submit" class="pam-icon-action {{ $p->is_active ? 'pam-icon-warning' : 'pam-icon-success' }}"
                                                     title="{{ $p->is_active ? 'Hide listing from the public site' : 'Show listing on the public site' }}">
                                                 <i class="fas {{ $p->is_active ? 'fa-eye-slash' : 'fa-eye' }}"></i>
                                                 <span>{{ $p->is_active ? 'Hide' : 'Show' }}</span>
-                                            </button>
-                                        </form>
-
-                                        <form action="{{ route('admin.providers.toggle_verified', $p->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="pam-icon-action"
-                                                    title="{{ $p->is_verified ? 'Remove verification' : 'Mark as verified' }}">
-                                                <i class="fas {{ $p->is_verified ? 'fa-circle-xmark' : 'fa-circle-check' }}"></i>
-                                                <span>{{ $p->is_verified ? 'Unverify' : 'Verify' }}</span>
-                                            </button>
-                                        </form>
-
-                                        <form action="{{ route('admin.providers.toggle_featured', $p->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="pam-icon-action"
-                                                    title="{{ $p->is_featured ? 'Remove from featured' : 'Feature this provider' }}">
-                                                <i class="{{ $p->is_featured ? 'far' : 'fas' }} fa-star"></i>
-                                                <span>{{ $p->is_featured ? 'Unfeature' : 'Feature' }}</span>
                                             </button>
                                         </form>
 
@@ -443,11 +392,19 @@
             --pam-border: var(--sp-color-border-strong, #dbe3ef);
             --pam-surface: var(--sp-color-surface, #ffffff);
             --pam-soft: var(--sp-color-surface-muted, #f8fafc);
+            color: var(--pam-text);
+        }
+
+        .pam-page .admin-section-block,
+        .pam-page .pam-table-card {
+            background: #ffffff;
+            border: 1px solid var(--pam-border);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
         }
 
         .pam-summary-grid {
             display: grid;
-            grid-template-columns: repeat(6, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 0.85rem;
             margin-bottom: 1.25rem;
         }
@@ -462,6 +419,16 @@
             border: 1px solid var(--pam-border);
             border-radius: var(--sp-radius-lg, 0.75rem);
             box-shadow: var(--sp-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+            color: var(--pam-text);
+            text-decoration: none;
+            transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+        }
+
+        a.pam-summary-card:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1);
+            color: var(--pam-text);
+            transform: translateY(-1px);
         }
 
         .pam-summary-icon {
@@ -504,14 +471,16 @@
             gap: 1rem;
             margin-bottom: 1.25rem;
             padding: 1.1rem 1.25rem;
-            background: #12313f;
-            color: #fff;
-            border-radius: var(--sp-radius-xl, 1rem);
+            background: #f0fdfa;
+            color: #134e4a;
+            border: 1px solid #99f6e4;
+            border-radius: var(--sp-radius-lg, 0.75rem);
+            box-shadow: 0 6px 18px rgba(15, 118, 110, 0.07);
         }
 
         .pam-band-eyebrow {
             margin: 0 0 0.2rem;
-            color: #9fe3c2;
+            color: #0f766e;
             font-size: 0.75rem;
             font-weight: 900;
             text-transform: uppercase;
@@ -522,6 +491,7 @@
             font-size: 1.1rem;
             font-weight: 900;
             letter-spacing: 0;
+            color: #134e4a;
         }
 
         .pam-issue-links {
@@ -537,18 +507,19 @@
             gap: 0.45rem;
             min-height: 2.35rem;
             padding: 0.45rem 0.65rem;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid #a7f3d0;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
+            background: #ffffff;
+            color: #0f766e;
             text-decoration: none;
             font-weight: 800;
             font-size: 0.8rem;
         }
 
         .pam-issue-chip:hover {
-            background: rgba(255, 255, 255, 0.16);
-            color: #fff;
+            background: #ccfbf1;
+            border-color: #5eead4;
+            color: #115e59;
         }
 
         .pam-issue-chip strong {
@@ -558,14 +529,14 @@
             min-width: 1.6rem;
             height: 1.6rem;
             border-radius: 999px;
-            background: #fff;
-            color: #12313f;
+            background: #ccfbf1;
+            color: #115e59;
             padding: 0 0.45rem;
         }
 
         .pam-filter-bar {
             display: grid;
-            grid-template-columns: minmax(220px, 1.4fr) repeat(5, minmax(132px, 0.6fr)) auto;
+            grid-template-columns: minmax(220px, 1.4fr) repeat(5, minmax(128px, 0.6fr)) minmax(72px, 0.3fr) auto;
             gap: 0.75rem;
             align-items: end;
         }
@@ -593,6 +564,13 @@
             color: var(--pam-text);
             padding: 0 0.85rem;
             font: inherit;
+        }
+
+        .pam-field input:focus,
+        .pam-field select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            outline: none;
         }
 
         .pam-search-input {
@@ -625,6 +603,22 @@
         .pam-table th,
         .pam-table td {
             vertical-align: middle;
+        }
+
+        .pam-table thead th {
+            background: #f8fafc;
+            color: #475569;
+            border-bottom: 1px solid var(--pam-border);
+        }
+
+        .pam-table tbody td {
+            background: #ffffff;
+            color: var(--pam-text);
+            border-bottom-color: #e8eef6;
+        }
+
+        .pam-table tbody tr:hover td {
+            background: #f8fbff;
         }
 
         .pam-provider-cell {
@@ -783,15 +777,14 @@
         }
 
         .pam-actions {
-            display: flex;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-            gap: 0.45rem;
-            min-width: 150px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(88px, 1fr));
+            gap: 0.5rem;
+            min-width: 196px;
         }
 
         .pam-actions form {
-            display: inline;
+            display: block;
         }
 
         /* Listing status badges */
@@ -816,9 +809,6 @@
 
         .pam-badge-on { background: rgba(16, 185, 129, 0.12); color: #047857; }
         .pam-badge-off { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
-        .pam-badge-verified { background: rgba(37, 99, 235, 0.12); color: #1d4ed8; }
-        .pam-badge-featured { background: rgba(245, 158, 11, 0.15); color: #b45309; }
-
         .pam-icon-action {
             display: inline-flex;
             align-items: center;
@@ -832,6 +822,14 @@
             text-decoration: none;
             font-size: 0.78rem;
             font-weight: 900;
+            justify-content: center;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .pam-icon-action i,
+        .pam-icon-action span {
+            color: inherit !important;
         }
 
         .pam-icon-action:hover {
@@ -842,12 +840,36 @@
         .pam-icon-primary {
             border-color: #0f766e;
             background: #0f766e;
-            color: #fff;
+            color: #ffffff !important;
         }
 
         .pam-icon-primary:hover {
             background: #115e59;
-            color: #fff;
+            color: #ffffff !important;
+        }
+
+        .pam-icon-warning {
+            border-color: #fed7aa;
+            background: #fff7ed;
+            color: #9a3412 !important;
+        }
+
+        .pam-icon-warning:hover {
+            border-color: #fb923c;
+            background: #ffedd5;
+            color: #7c2d12 !important;
+        }
+
+        .pam-icon-success {
+            border-color: #a7f3d0;
+            background: #ecfdf5;
+            color: #047857 !important;
+        }
+
+        .pam-icon-success:hover {
+            border-color: #34d399;
+            background: #d1fae5;
+            color: #065f46 !important;
         }
 
         @media (max-width: 1280px) {

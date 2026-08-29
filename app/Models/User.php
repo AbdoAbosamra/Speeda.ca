@@ -27,6 +27,7 @@ class User extends Authenticatable
         'last_login_ip', // IP of the most recent login
         'last_seen_at', // presence heartbeat (updated on activity)
         'broadcast_opt_out_at', // unsubscribed from admin broadcast emails (CASL)
+        'email_opt_out_at', // unsubscribed from ALL non-essential email
     ];
 
     protected $hidden = [
@@ -46,6 +47,8 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'last_seen_at' => 'datetime',
             'broadcast_opt_out_at' => 'datetime',
+            'email_opt_out_at' => 'datetime',
+            'google_linked_at' => 'datetime',
             'login_count' => 'integer',
         ];
     }
@@ -127,6 +130,42 @@ class User extends Authenticatable
 
         $this->forceFill(['role' => $role]);
         $this->save();
+    }
+
+    /**
+     * Whether this user has opted out of every non-essential email.
+     *
+     * Checked at SEND time, not only when a send is queued: someone who
+     * unsubscribes while a batch is draining must not still be mailed.
+     *
+     * Transactional mail (password reset, email verification) intentionally
+     * does not consult this — silencing it would lock the user out of their
+     * own account, and it is not what an unsubscribe link promises to stop.
+     */
+    public function hasOptedOutOfEmail(): bool
+    {
+        return $this->email_opt_out_at !== null;
+    }
+
+    /**
+     * Broadcasts are stopped by either the broadcast-only opt-out (the older,
+     * narrower flag) or the global one.
+     */
+    public function hasOptedOutOfBroadcasts(): bool
+    {
+        return $this->broadcast_opt_out_at !== null || $this->hasOptedOutOfEmail();
+    }
+
+    /**
+     * An account that can only be entered through Google: created by signing
+     * in with Google and never given a password since.
+     *
+     * Used to explain a failed password login instead of repeating "these
+     * credentials do not match", which is true but useless here.
+     */
+    public function isGoogleOnly(): bool
+    {
+        return $this->google_id !== null && blank($this->password);
     }
 
     public function isServiceProvider(): bool

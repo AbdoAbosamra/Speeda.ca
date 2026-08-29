@@ -57,10 +57,6 @@ class AdminProviderController extends Controller
         return [
             'show' => __('admin.bulk_verb_shown'),
             'hide' => __('admin.bulk_verb_hidden'),
-            'verify' => __('admin.bulk_verb_verified'),
-            'unverify' => __('admin.bulk_verb_unverified'),
-            'feature' => __('admin.bulk_verb_featured'),
-            'unfeature' => __('admin.bulk_verb_unfeatured'),
         ];
     }
 
@@ -77,10 +73,6 @@ class AdminProviderController extends Controller
         $map = [
             'show' => ['is_active', true, 'bulk_reason_already_active'],
             'hide' => ['is_active', false, 'bulk_reason_already_inactive'],
-            'verify' => ['is_verified', true, 'bulk_reason_already_verified'],
-            'unverify' => ['is_verified', false, 'bulk_reason_not_verified'],
-            'feature' => ['is_featured', true, 'bulk_reason_already_featured'],
-            'unfeature' => ['is_featured', false, 'bulk_reason_not_featured'],
         ];
 
         if (!isset($map[$action])) {
@@ -107,7 +99,7 @@ class AdminProviderController extends Controller
 
     public function edit(ServiceProvider $serviceProvider): View
     {
-        $serviceProvider->load(['user', 'category', 'location']);
+        $serviceProvider->load(['user', 'category', 'location', 'photoConsentAdmin']);
 
         return view('admin.providers.edit', [
             'provider' => $serviceProvider,
@@ -128,8 +120,13 @@ class AdminProviderController extends Controller
             'bio' => ['nullable', 'string', 'max:5000'],
             'experience_years' => ['nullable', 'integer', 'min:0', 'max:80'],
             'is_active' => ['nullable', 'boolean'],
-            'is_verified' => ['nullable', 'boolean'],
-            'is_featured' => ['nullable', 'boolean'],
+            'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120'],
+            // Optional evidence (e.g. a screenshot of the provider agreeing
+            // over WhatsApp) attached alongside the photo. Never required —
+            // the photo update takes effect regardless of whether proof is
+            // attached; this is a record for the provider and admin to see,
+            // not a gate on the upload.
+            'photo_consent_proof' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp,pdf', 'max:5120'],
         ]);
 
         try {
@@ -138,8 +135,6 @@ class AdminProviderController extends Controller
             $data = [
                 'company_name' => $validated['company_name'],
                 'is_active' => $request->boolean('is_active'),
-                'is_verified' => $request->boolean('is_verified'),
-                'is_featured' => $request->boolean('is_featured'),
             ];
 
             // Nullable fields are only written when submitted, so clearing an
@@ -150,9 +145,40 @@ class AdminProviderController extends Controller
                 }
             }
 
+            $uploadedNewPhoto = false;
+            $proofPath = null;
+
+            if ($request->hasFile('profile_image')) {
+                if ($serviceProvider->profile_image && Storage::disk('public')->exists($serviceProvider->profile_image)) {
+                    Storage::disk('public')->delete($serviceProvider->profile_image);
+                }
+
+                $data['profile_image'] = $request->file('profile_image')->store('service-providers/profiles', 'public');
+                $uploadedNewPhoto = true;
+
+                if ($request->hasFile('photo_consent_proof')) {
+                    $proofPath = $request->file('photo_consent_proof')->store('service-providers/photo-consent-proofs', 'public');
+                }
+            }
+
             $serviceProvider->update($data);
 
+            // Separate from update() above: this records who uploaded the
+            // photo and is deliberately not mass-assignable, so it is only
+            // ever set here, right after a photo the admin chose to upload.
+            if ($uploadedNewPhoto) {
+                $serviceProvider->recordAdminPhotoUpload(auth()->id(), $proofPath);
+            }
+
             $this->logUpdate($serviceProvider, $oldValues, $serviceProvider->company_name);
+
+            if ($uploadedNewPhoto) {
+                $this->logAction('update', $serviceProvider, [
+                    'field' => 'profile_image',
+                    'consent_proof_attached' => $proofPath !== null,
+                ], $serviceProvider->company_name);
+            }
+
             $this->forgetProviderCaches();
 
             ErrorHelper::flashNotification(__('admin.provider_updated_successfully'), 'success');
@@ -175,24 +201,6 @@ class AdminProviderController extends Controller
             $serviceProvider,
             'is_active',
             fn (bool $on) => $on ? __('admin.provider_shown') : __('admin.provider_hidden')
-        );
-    }
-
-    public function toggleVerified(ServiceProvider $serviceProvider): RedirectResponse
-    {
-        return $this->toggleFlag(
-            $serviceProvider,
-            'is_verified',
-            fn (bool $on) => $on ? __('admin.provider_verified') : __('admin.provider_unverified')
-        );
-    }
-
-    public function toggleFeatured(ServiceProvider $serviceProvider): RedirectResponse
-    {
-        return $this->toggleFlag(
-            $serviceProvider,
-            'is_featured',
-            fn (bool $on) => $on ? __('admin.provider_featured') : __('admin.provider_unfeatured')
         );
     }
 

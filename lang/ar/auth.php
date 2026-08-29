@@ -76,4 +76,23 @@ return [
   'verification_link_sent' => 'تم إرسال رابط تحقق جديد إلى بريدك الإلكتروني.',
   'login' => 'دخول',
   'account_disabled' => 'Your account is disabled. Please contact admin.',
+
+  // تسجيل الدخول بجوجل
+  'continue_with_google' => 'المتابعة باستخدام جوجل',
+  'google_cancelled' => 'تم إلغاء تسجيل الدخول بجوجل. يمكنك المحاولة مرة أخرى أو استخدام بريدك الإلكتروني.',
+  'google_failed' => 'تعذّر إكمال تسجيل الدخول بجوجل. برجاء المحاولة مرة أخرى.',
+  'google_no_email' => 'حساب جوجل الخاص بك لم يشارك بريدًا إلكترونيًا، ونحن نحتاجه لإنشاء حسابك.',
+  'google_email_unverified' => 'جوجل لم تتحقق من هذا البريد الإلكتروني، لذلك لا يمكننا استخدامه لتسجيل الدخول.',
+  'google_session_expired' => 'استغرق الأمر وقتًا طويلًا. برجاء بدء تسجيل الدخول بجوجل من جديد.',
+  'google_complete_title' => 'خطوة أخيرة',
+  'google_complete_intro' => 'خطوة أخيرة — قُل لنا هتستخدم سبيدا إزاي.',
+  'google_signed_in_as' => 'مسجّل الدخول باسم',
+  'google_role_question' => 'هتستخدم سبيدا إزاي؟',
+  'google_role_client_hint' => 'بدوّر على مقدّم خدمة أشتغل معاه.',
+  'google_role_provider_hint' => 'بقدّم خدمات وعايز الناس توصل لي.',
+  'google_finish_client' => 'إنشاء حسابي',
+  'google_finish_provider' => 'إنشاء ملفي كمقدم خدمة',
+  'google_only_account' => 'هذا الحساب يسجّل الدخول عبر جوجل. استخدم زر "المتابعة باستخدام جوجل" بالأعلى.',
+  'optional' => 'اختياري',
+  'select_city' => 'اختر مدينتك',
 ];

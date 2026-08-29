@@ -45,6 +45,13 @@ class UserEngagementEmailService
             return;
         }
 
+        // Checked before the send-once flag is stamped, so someone who
+        // unsubscribes and later resubscribes has not silently burned their
+        // welcome email in the meantime.
+        if ($user->hasOptedOutOfEmail()) {
+            return;
+        }
+
         $updated = User::whereKey($user->id)
             ->whereNull('client_welcome_email_sent_at')
             ->update(['client_welcome_email_sent_at' => now()]);
@@ -97,7 +104,7 @@ class UserEngagementEmailService
      */
     private function handleClientReviewMilestones(User $user): void
     {
-        if (!$user->isClient() || !$user->email) {
+        if (!$user->isClient() || !$user->email || $user->hasOptedOutOfEmail()) {
             return;
         }
 
@@ -151,7 +158,7 @@ class UserEngagementEmailService
         $provider->loadMissing('user');
 
         $providerEmail = $provider->user?->email;
-        if (!$providerEmail) {
+        if (!$providerEmail || $provider->user->hasOptedOutOfEmail()) {
             return;
         }
 

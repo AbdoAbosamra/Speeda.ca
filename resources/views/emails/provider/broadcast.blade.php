@@ -12,12 +12,8 @@
     $unsubscribeUrl signed, per-recipient opt-out link (CASL)
 --}}
 
-@section('footer_note')
-    You're receiving this because you registered as a service provider on Speeda.<br>
-    <a href="{{ $unsubscribeUrl }}" style="color: rgba(255,255,255,0.55); text-decoration: underline;">
-        Unsubscribe from these emails
-    </a>
-@endsection
+{{-- The opt-out link itself is rendered by the layout, from $unsubscribeUrl. --}}
+@section('footer_note', "You're receiving this because you registered as a service provider on Speeda.")
 
 @section('content')
     {{-- Preheader: the grey preview line mail clients show next to the subject.

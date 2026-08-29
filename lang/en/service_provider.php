@@ -281,4 +281,10 @@ return [
     'available_all_areas' => 'Available in all areas',
     'site_developer' => 'Site Developer',
     'site_developer_tooltip' => 'Developer of this website',
+
+    // Admin-uploaded photo consent (own dashboard only, never public)
+    'photo_consent_info_title' => 'This photo was uploaded by our team',
+    'photo_consent_info_body' => 'If anything about this photo doesn\'t look right, contact us and we\'ll sort it out.',
+    'photo_consent_proof_label' => 'Consent proof on file:',
+    'photo_consent_proof_view' => 'View',
 ];

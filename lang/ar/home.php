@@ -128,4 +128,7 @@ return [
     'testimonials_title' => 'ماذا يقول مزودو الخدمة لدينا',
     'testimonials_subtitle' => 'آراء حقيقية من مزودي الخدمة الذين ينمّون أعمالهم مع Speeda.',
     'testimonials_out_of_five' => 'من 5 نجوم',
+
+    // سكشن الفيديو
+    'video_play' => 'تشغيل الفيديو',
 ];

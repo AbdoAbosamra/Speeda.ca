@@ -7,9 +7,9 @@ use App\Models\ProviderBroadcast;
 use App\Models\ProviderBroadcastRecipient;
 use App\Models\ServiceProvider;
 use App\Models\User;
+use App\Support\UnsubscribeLink;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
 
 /**
  * Builds and dispatches an admin broadcast to service providers.
@@ -43,6 +43,7 @@ class ProviderBroadcastService
             ->whereHas('user', function ($query) {
                 $query->where('is_active', true)
                     ->whereNull('broadcast_opt_out_at')
+                    ->whereNull('email_opt_out_at')
                     ->whereNotNull('email')
                     ->where('email', '!=', '');
             })
@@ -133,7 +134,7 @@ class ProviderBroadcastService
      */
     public function unsubscribeUrl(User $user): string
     {
-        return URL::signedRoute('broadcast.unsubscribe', ['user' => $user->id]);
+        return UnsubscribeLink::for($user);
     }
 
     /**

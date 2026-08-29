@@ -128,4 +128,7 @@ return [
     'testimonials_title' => 'Ce que disent nos prestataires',
     'testimonials_subtitle' => 'De vrais témoignages de prestataires qui développent leur activité avec Speeda.',
     'testimonials_out_of_five' => 'sur 5 étoiles',
+
+    // Section vidéo
+    'video_play' => 'Lire la vidéo',
 ];

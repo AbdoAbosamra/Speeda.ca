@@ -128,4 +128,7 @@ return [
     'testimonials_title' => 'What Our Providers Say',
     'testimonials_subtitle' => 'Real feedback from service providers growing their business with Speeda.',
     'testimonials_out_of_five' => 'out of 5 stars',
+
+    // Admin-managed video section
+    'video_play' => 'Play video',
 ];

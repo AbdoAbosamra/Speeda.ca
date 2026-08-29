@@ -11,7 +11,7 @@
         <p class="next-step-label" style="color: #059669;">Achievement Unlocked</p>
         <h4 class="next-step-title">100% Completed Profile!</h4>
         <p class="next-step-desc">
-            Your profile has everything a customer looks for: a professional photo, detailed services, years of experience, a compelling bio, and service areas. Well done!
+            Your profile has everything a customer looks for: a professional photo, detailed services, years of experience, a compelling bio, and a gallery of your work. Well done!
         </p>
     </div>
 

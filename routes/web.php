@@ -233,18 +233,21 @@ Route::middleware(['auth'])->prefix('comments')->name('comments.')->group(functi
     Route::post('/{comment}/flag', [CommentController::class, 'flag'])->name('flag');
 });
 
-// ==================== BROADCAST UNSUBSCRIBE ====================
-// Reached from a signed link inside a broadcast email. No auth on purpose:
-// requiring a login to unsubscribe is how opt-out links quietly stop working,
-// and CASL expects it to work straight from the inbox. The signature is what
-// proves the link belongs to that specific user.
+// ==================== EMAIL UNSUBSCRIBE ====================
+// Reached from the footer of any non-transactional Speeda email. No auth on
+// purpose: requiring a login to unsubscribe is how opt-out links quietly stop
+// working, and mailbox providers expect it to work straight from the inbox.
+// The signature is what proves the link belongs to that specific user.
+//
+// The URIs are unchanged from when this covered broadcasts only, so opt-out
+// links inside already-delivered mail keep working.
 Route::middleware('signed')->group(function () {
-    Route::get('/email/unsubscribe/{user}', [\App\Http\Controllers\BroadcastUnsubscribeController::class, 'show'])
-        ->name('broadcast.unsubscribe');
-    Route::post('/email/unsubscribe/{user}', [\App\Http\Controllers\BroadcastUnsubscribeController::class, 'store'])
-        ->name('broadcast.unsubscribe.confirm');
-    Route::post('/email/resubscribe/{user}', [\App\Http\Controllers\BroadcastUnsubscribeController::class, 'resubscribe'])
-        ->name('broadcast.resubscribe');
+    Route::get('/email/unsubscribe/{user}', [\App\Http\Controllers\EmailUnsubscribeController::class, 'show'])
+        ->name('email.unsubscribe');
+    Route::post('/email/unsubscribe/{user}', [\App\Http\Controllers\EmailUnsubscribeController::class, 'store'])
+        ->name('email.unsubscribe.confirm');
+    Route::post('/email/resubscribe/{user}', [\App\Http\Controllers\EmailUnsubscribeController::class, 'resubscribe'])
+        ->name('email.resubscribe');
 });
 
 // ==================== ADMIN ROUTES ====================
@@ -330,8 +333,6 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
     Route::get('/providers/{serviceProvider}/edit', [App\Http\Controllers\Admin\AdminProviderController::class, 'edit'])->name('providers.edit');
     Route::patch('/providers/{serviceProvider}', [App\Http\Controllers\Admin\AdminProviderController::class, 'update'])->name('providers.update');
     Route::patch('/providers/{serviceProvider}/toggle-active', [App\Http\Controllers\Admin\AdminProviderController::class, 'toggleActive'])->name('providers.toggle_active');
-    Route::patch('/providers/{serviceProvider}/toggle-verified', [App\Http\Controllers\Admin\AdminProviderController::class, 'toggleVerified'])->name('providers.toggle_verified');
-    Route::patch('/providers/{serviceProvider}/toggle-featured', [App\Http\Controllers\Admin\AdminProviderController::class, 'toggleFeatured'])->name('providers.toggle_featured');
     Route::delete('/providers/{serviceProvider}', [App\Http\Controllers\Admin\AdminProviderController::class, 'destroy'])->name('providers.destroy');
 
     // WhatsApp Click Intelligence (read-only analytics)
@@ -368,6 +369,14 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
     Route::patch('/testimonials/{testimonial}', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'update'])->name('testimonials.update');
     Route::patch('/testimonials/{testimonial}/toggle', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'toggle'])->name('testimonials.toggle');
     Route::delete('/testimonials/{testimonial}', [App\Http\Controllers\Admin\AdminTestimonialController::class, 'destroy'])->name('testimonials.destroy');
+
+    // Home page video section (single record — no index/create, just an editor)
+    Route::get('/home-video', [App\Http\Controllers\Admin\AdminHomeVideoController::class, 'edit'])->name('home_video.edit');
+    Route::match(['put', 'post'], '/home-video', [App\Http\Controllers\Admin\AdminHomeVideoController::class, 'update'])
+        ->middleware('handle.large.uploads')
+        ->name('home_video.update');
+    Route::delete('/home-video/file', [App\Http\Controllers\Admin\AdminHomeVideoController::class, 'destroyVideo'])->name('home_video.destroy_file');
+    Route::delete('/home-video/poster', [App\Http\Controllers\Admin\AdminHomeVideoController::class, 'destroyPoster'])->name('home_video.destroy_poster');
 
     // Notifications Management
     Route::post('/notifications/bulk', [App\Http\Controllers\Admin\AdminNotificationController::class, 'bulk'])->name('notifications.bulk');

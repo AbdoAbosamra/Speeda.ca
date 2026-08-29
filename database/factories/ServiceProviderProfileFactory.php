@@ -54,8 +54,6 @@ class ServiceProviderProfileFactory extends Factory
             'profile_image' => null,
             'portfolio_images' => json_encode([]),
             'portfolio_videos' => json_encode([]),
-            'is_verified' => fake()->boolean(60),
-            'is_featured' => fake()->boolean(20),
             'business_type' => fake()->randomElement(['individual', 'company']),
             'company_name' => fake()->optional()->company(),
             'business_license' => fake()->optional()->word(),
@@ -89,26 +87,6 @@ class ServiceProviderProfileFactory extends Factory
         $number = fake()->numberBetween(1000, 9999);
 
         return "+1{$areaCode}{$exchange}{$number}";
-    }
-
-    /**
-     * Create a featured profile.
-     */
-    public function featured(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_featured' => true,
-        ]);
-    }
-
-    /**
-     * Create a verified profile.
-     */
-    public function verified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_verified' => true,
-        ]);
     }
 
     /**

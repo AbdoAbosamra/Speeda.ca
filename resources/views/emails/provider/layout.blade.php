@@ -380,6 +380,18 @@
             margin: 0;
         }
 
+        .footer-unsubscribe {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            margin: 12px 0 0;
+        }
+
+        .footer-unsubscribe a {
+            color: rgba(255,255,255,0.55);
+            text-decoration: underline;
+        }
+
+
         /* === MOBILE === */
         @media only screen and (max-width: 600px) {
             .email-body { padding: 32px 24px 28px; }
@@ -427,6 +439,15 @@
             </div>
             <p class="footer-copyright">© {{ date('Y') }} Speeda. All rights reserved.<br>
             @yield('footer_note', "You're receiving this because you registered as a service provider on Speeda.")</p>
+
+            {{-- Opt-out. Rendered for every email that supplies a link, i.e.
+                 everything except transactional account mail (password reset,
+                 email verification), which never passes one. --}}
+            @if(!empty($unsubscribeUrl))
+                <p class="footer-unsubscribe">
+                    <a href="{{ $unsubscribeUrl }}">Unsubscribe from these emails</a>
+                </p>
+            @endif
         </div>
 
     </div>

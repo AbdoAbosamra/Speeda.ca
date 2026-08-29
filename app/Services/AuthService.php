@@ -61,14 +61,36 @@ class AuthService
         }
 
         // @change 2026-04-12 TASK-2 | Derived a fallback client name when the form omits it | Allow email/password-only client registration without changing provider registration | risk:LOW
-        return User::create([
+        // A Google signup arrives with no password and an address Google has
+        // already verified, so both fields are decided per-signup rather than
+        // assumed. Hashing is skipped entirely for a null password - the
+        // account simply has no password to check against.
+        $isGoogleSignup = !empty($data['google_id']);
+
+        $user = User::create([
             'name' => $this->resolveRegistrationName($data),
             'email' => $data['email'],
             'role' => $data['role'],
             'profession' => $profession,
-            'password' => Hash::make($data['password']),
-            'email_verified_at' => $data['role'] === 'service_provider' ? now() : null,
+            'password' => empty($data['password']) ? null : Hash::make($data['password']),
         ]);
+
+        // Set outside the create() array on purpose. These columns are not
+        // mass-assignable - letting request input reach email_verified_at
+        // would let anyone self-verify - so passing them to create() silently
+        // drops them, which is exactly what used to happen to the provider
+        // verification stamp here.
+        $verified = $isGoogleSignup || $data['role'] === 'service_provider';
+
+        if ($verified || $isGoogleSignup) {
+            $user->forceFill(array_filter([
+                'email_verified_at' => $verified ? now() : null,
+                'google_id' => $data['google_id'] ?? null,
+                'google_linked_at' => $isGoogleSignup ? now() : null,
+            ]))->save();
+        }
+
+        return $user;
     }
 
     private function resolveRegistrationName(array $data): string
@@ -124,7 +146,6 @@ class AuthService
             'whatsapp_number' => $data['whatsapp_number'] ?? null,
             'company_name' => $user->name,
             'bio' => 'Service provider profile. Please complete your details.',
-            'is_verified' => false,
             'views' => 0,
             'rating' => 0,
         ]);

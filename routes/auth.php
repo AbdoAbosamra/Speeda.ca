@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -26,6 +27,30 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store'])
         ->middleware('throttle:10,1');
+
+    // ==================== GOOGLE SIGN-IN ====================
+    // EnsureGoogleAuthEnabled 404s the group when no credentials are
+    // configured, so an unconfigured deployment exposes no half-working entry
+    // point. Throttled because each redirect starts an OAuth round trip.
+    Route::middleware(\App\Http\Middleware\EnsureGoogleAuthEnabled::class)->group(function () {
+        Route::get('auth/google/redirect', [GoogleAuthController::class, 'redirect'])
+            ->name('google.redirect')
+            ->middleware('throttle:10,1');
+
+        Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])
+            ->name('google.callback')
+            ->middleware('throttle:10,1');
+
+        // Step two, for every new account: the role, and — for a provider —
+        // the trade, city and phone that a provider profile cannot exist
+        // without and Google does not supply.
+        Route::get('auth/google/complete', [GoogleAuthController::class, 'showComplete'])
+            ->name('google.complete');
+
+        Route::post('auth/google/complete', [GoogleAuthController::class, 'storeComplete'])
+            ->name('google.complete.store')
+            ->middleware('throttle:5,1');
+    });
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

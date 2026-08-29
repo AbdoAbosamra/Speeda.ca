@@ -87,4 +87,23 @@ return [
     // Account Status
     'account_disabled' => 'Your account is disabled. Please contact admin.',
     'login' => 'Login',
+
+    // Google sign-in
+    'continue_with_google' => 'Continue with Google',
+    'google_cancelled' => 'Google sign-in was cancelled. You can try again or use your email instead.',
+    'google_failed' => "We couldn't complete the Google sign-in. Please try again.",
+    'google_no_email' => 'Your Google account did not share an email address, which we need to create your account.',
+    'google_email_unverified' => 'Google has not verified this email address, so we cannot use it to sign in.',
+    'google_session_expired' => 'That took a little too long. Please start the Google sign-in again.',
+    'google_complete_title' => 'Almost there',
+    'google_complete_intro' => 'One last step — tell us how you will be using Speeda.',
+    'google_signed_in_as' => 'Signed in as',
+    'google_role_question' => 'How will you be using Speeda?',
+    'google_role_client_hint' => 'I am looking to hire a service provider.',
+    'google_role_provider_hint' => 'I offer services and want to be found.',
+    'google_finish_client' => 'Create my account',
+    'google_finish_provider' => 'Create my provider profile',
+    'google_only_account' => 'This account signs in with Google. Use the "Continue with Google" button above.',
+    'optional' => 'optional',
+    'select_city' => 'Select your city',
 ];

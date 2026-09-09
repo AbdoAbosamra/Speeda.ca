@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 use Throwable;
 
 /**
@@ -51,11 +52,56 @@ class GoogleAuthController extends Controller
      */
     public function redirect(Request $request): RedirectResponse
     {
+        // Google always returns to the one host registered as the redirect URI.
+        // Starting the round trip from a different host that resolves to the
+        // same server — 127.0.0.1 instead of localhost, or the bare domain
+        // instead of www — means the session cookie is written for one host and
+        // read back on another, so the CSRF state Socialite stored is simply
+        // not there on return. The failure surfaces as a generic "sign-in
+        // failed" with nothing pointing at the cause, so move to the canonical
+        // host first and keep the whole flow on one origin.
+        if ($canonical = $this->canonicalRedirect($request)) {
+            return $canonical;
+        }
+
         $intent = $request->query('as') === 'service_provider' ? 'service_provider' : 'client';
 
         $request->session()->put(GoogleAuthService::SESSION_INTENT, $intent);
 
         return Socialite::driver('google')->redirect();
+    }
+
+    /**
+     * A redirect to this same route on the host Google will return to, or null
+     * when the request is already there (the normal case).
+     */
+    private function canonicalRedirect(Request $request): ?RedirectResponse
+    {
+        $parts = parse_url((string) config('services.google.redirect'));
+
+        if (empty($parts['host'])) {
+            return null;
+        }
+
+        // Host only, deliberately. Cookies are not scoped by port or scheme, so
+        // localhost:8000 and localhost:80 share a session and need no redirect —
+        // only a genuinely different host name does.
+        if (strcasecmp($parts['host'], $request->getHost()) === 0) {
+            return null;
+        }
+
+        $target = ($parts['scheme'] ?? $request->getScheme()).'://'.$parts['host']
+            .(isset($parts['port']) ? ':'.$parts['port'] : '');
+
+        Log::info('[GoogleAuth] Restarting sign-in on the canonical host', [
+            'from' => $request->getHost(),
+            'to' => $parts['host'],
+        ]);
+
+        return redirect()->away(
+            $target.$request->getPathInfo()
+            .($request->getQueryString() ? '?'.$request->getQueryString() : '')
+        );
     }
 
     /**
@@ -71,10 +117,42 @@ class GoogleAuthController extends Controller
 
         try {
             $googleUser = Socialite::driver('google')->user();
-        } catch (Throwable $e) {
-            Log::warning('[GoogleAuth] Callback failed', ['error' => $e->getMessage()]);
+        } catch (InvalidStateException $e) {
+            // The state Socialite stored before the round trip is missing on
+            // return. Almost always the session went away in between — it timed
+            // out, cookies were cleared, or an old callback URL was reopened —
+            // rather than anything wrong with the Google account, so "start
+            // again" is the useful instruction, not "try again".
+            // Logged at error level on purpose. A sign-in nobody can complete
+            // is not a curiosity, and at the usual production LOG_LEVEL=error a
+            // warning here is discarded — leaving the one line that explains
+            // the failure unwritten exactly when it is needed.
+            Log::error('[GoogleAuth] State missing on return', [
+                'host' => $request->getHost(),
+                'has_session_cookie' => $request->hasCookie(config('session.cookie')),
+                'expected_host' => parse_url((string) config('services.google.redirect'), PHP_URL_HOST),
+            ]);
 
-            return redirect()->route('register')->with('error', __('auth.google_failed'));
+            return redirect()->route('register')->with('error', __('auth.google_session_expired'));
+        } catch (Throwable $e) {
+            // An authorization code is single use: loading the callback twice —
+            // a refresh, a back button, a link opened from history — spends it
+            // on the first load and Google rejects the second with
+            // invalid_grant. Telling that person to "try again" sends them
+            // round the same loop, so it gets the "start again" message.
+            $reused = str_contains($e->getMessage(), 'invalid_grant');
+
+            Log::error('[GoogleAuth] Callback failed', [
+                'exception' => $e::class,
+                'error' => $e->getMessage(),
+                'host' => $request->getHost(),
+                'likely_reused_code' => $reused,
+            ]);
+
+            return redirect()->route('register')->with(
+                'error',
+                $reused ? __('auth.google_session_expired') : __('auth.google_failed')
+            );
         }
 
         if (blank($googleUser->getEmail())) {

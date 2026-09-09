@@ -143,6 +143,57 @@ class GoogleAuthTest extends TestCase
         $this->assertSame('service_provider', session(GoogleAuthService::SESSION_INTENT));
     }
 
+    /**
+     * Google returns to exactly one registered host. Starting the flow from a
+     * different name for the same server — 127.0.0.1 rather than localhost, or
+     * the bare domain rather than www — writes the session cookie under one
+     * host and reads it back under another, so Socialite's state is gone on
+     * return and sign-in fails with nothing explaining why. The flow has to
+     * move to the canonical host before it leaves for Google.
+     */
+    public function test_sign_in_started_on_another_host_moves_to_the_callback_host_first(): void
+    {
+        config(['services.google.redirect' => 'http://localhost:8000/auth/google/callback']);
+
+        $response = $this->get('http://127.0.0.1:8000/auth/google/redirect?as=service_provider')
+            ->assertRedirect();
+
+        $location = $response->headers->get('Location');
+
+        $this->assertSame('localhost', parse_url($location, PHP_URL_HOST));
+        $this->assertSame('/auth/google/redirect', parse_url($location, PHP_URL_PATH));
+        // The intent has to survive the hop, or the provider lands in the
+        // client sign-up form after a redirect they never asked for.
+        $this->assertSame('as=service_provider', parse_url($location, PHP_URL_QUERY));
+    }
+
+    public function test_a_matching_host_goes_straight_to_google_without_a_detour(): void
+    {
+        config(['services.google.redirect' => 'http://localhost/auth/google/callback']);
+
+        $location = $this->get('http://localhost/auth/google/redirect')
+            ->assertRedirect()
+            ->headers->get('Location');
+
+        $this->assertSame('accounts.google.com', parse_url($location, PHP_URL_HOST));
+    }
+
+    /**
+     * A port is not part of a cookie's identity, so localhost:8000 and
+     * localhost share a session and must not be bounced between each other —
+     * that would be an infinite redirect on any setup behind a proxy.
+     */
+    public function test_a_differing_port_alone_is_not_treated_as_a_different_host(): void
+    {
+        config(['services.google.redirect' => 'http://localhost:8000/auth/google/callback']);
+
+        $location = $this->get('http://localhost/auth/google/redirect')
+            ->assertRedirect()
+            ->headers->get('Location');
+
+        $this->assertSame('accounts.google.com', parse_url($location, PHP_URL_HOST));
+    }
+
     /* ================================================================== */
     /*  New accounts                                                       */
     /* ================================================================== */

@@ -121,6 +121,11 @@ log "Building release caches"
 "$PHP_BIN" artisan storage:link --ansi >/dev/null
 "$PHP_BIN" artisan config:cache --ansi >/dev/null
 "$PHP_BIN" artisan event:cache --ansi >/dev/null
+# Route caching was missing here, so every production request was rebuilding the
+# whole route table. It is also a build-time correctness check: a route that
+# cannot be serialised fails HERE, on a release nobody is serving yet, instead
+# of after the cutover.
+"$PHP_BIN" artisan route:cache --ansi >/dev/null
 "$PHP_BIN" artisan view:cache --ansi >/dev/null
 
 log "Regenerating sitemap with production URLs"
@@ -128,15 +133,7 @@ log "Regenerating sitemap with production URLs"
 
 # -------------------------------------------------------------- 4. VERIFY ---
 log "Verifying release"
-"$PHP_BIN" artisan tinker --execute='
-  $f = [];
-  if (app()->version() === "") $f[] = "version";
-  if (config("app.debug") !== false) $f[] = "APP_DEBUG must be false";
-  if (!str_starts_with(config("view.compiled"), base_path())) $f[] = "view.compiled not release-local";
-  try { DB::select("select 1"); } catch (\Throwable $e) { $f[] = "database unreachable"; }
-  if ($f) { fwrite(STDERR, "VERIFY FAILED: ".implode(", ", $f).PHP_EOL); exit(1); }
-  echo "verify ok".PHP_EOL;
-' >/dev/null
+"$PHP_BIN" artisan deploy:verify --ansi
 
 # ------------------------------------------------------------ 5. MIGRATIONS --
 # Backup first, always, and prove it is usable before touching the schema.

@@ -49,6 +49,17 @@ CloudPanel or nginx, and no step needs `sudo`.
 
 ## Deploying
 
+The shared production environment must set `APP_ENV=production`,
+`APP_DEBUG=false`, `APP_URL=https://speeda.ca`, and `SESSION_ENCRYPT=true`.
+Set a private `ANALYTICS_SALT`; if it is absent, analytics use `APP_KEY` as
+the secret instead of a public default. Deployment runs `deploy:verify`
+before activation and rejects unsafe settings. Tinker is a development
+dependency and is no longer required for this verification.
+
+After updating an existing local checkout from the Livewire version, run
+`composer install` followed by `php artisan view:clear` to discard old compiled
+templates. Immutable production releases already compile their own views.
+
 ```bash
 # on the server, as speeda
 /home/speeda/deploy/pull-deploy.sh <commit-sha>

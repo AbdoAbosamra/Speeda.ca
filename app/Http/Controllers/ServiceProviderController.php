@@ -672,10 +672,7 @@ class ServiceProviderController extends Controller
             }
 
             if ($request->hasFile('profile_image')) {
-                // Delete old image if exists
-                if ($serviceProvider->profile_image && Storage::disk('public')->exists($serviceProvider->profile_image)) {
-                    Storage::disk('public')->delete($serviceProvider->profile_image);
-                }
+                $previousImage = $serviceProvider->profile_image;
 
                 // Store new image
                 $image = $request->file('profile_image');
@@ -684,6 +681,15 @@ class ServiceProviderController extends Controller
 
                 // Update service provider record
                 $serviceProvider->update(['profile_image' => $path]);
+
+                // Only once the replacement is on disk and recorded — a delete
+                // that runs first leaves the provider with no photo if the
+                // write then fails.
+                if ($previousImage
+                    && $previousImage !== $path
+                    && Storage::disk('public')->exists($previousImage)) {
+                    Storage::disk('public')->delete($previousImage);
+                }
 
                 // A photo the provider chose themselves needs no admin
                 // consent trail; whatever existed belonged to the photo this

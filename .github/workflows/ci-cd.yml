@@ -39,6 +39,10 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: bcmath, ctype, dom, fileinfo, gd, intl, mbstring, mysql, pdo_mysql, pdo_sqlite, sqlite3, tokenizer, xml, zip
+          # Runner defaults are 2M/8M, far below what the upload forms accept.
+          # deploy:verify asserts these limits, so CI has to run with the same
+          # ones the server needs or the check is never really exercised.
+          ini-values: upload_max_filesize=16M, post_max_size=64M
           coverage: none
           tools: composer:v2
 
@@ -54,6 +58,9 @@ jobs:
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --no-progress --ansi
+
+      - name: Check literal translations in all supported languages
+        run: php check_translations.php
 
       - name: Setup Node
         uses: actions/setup-node@v4

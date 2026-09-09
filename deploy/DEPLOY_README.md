@@ -104,7 +104,23 @@ sudo crontab -e
 * * * * * cd /var/www/<your-project> && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-10) إعداد Supervisor للـ queues:
+10) حدود رفع الملفات في PHP:
+
+صورة المعرض مسموح لغاية 10 ميجا. لو حدود PHP أقل من كده، الملف بيترفض قبل ما التطبيق يشوفه أصلاً.
+
+```ini
+; /etc/php/8.4/fpm/php.ini
+upload_max_filesize = 16M
+post_max_size = 64M
+```
+
+```bash
+sudo systemctl reload php8.4-fpm
+```
+
+خلّي `client_max_body_size` في nginx مساوية لـ `post_max_size`، وإلا nginx بيرجّع 413 قبل ما PHP تشتغل. أمر `php artisan deploy:verify` بيرفض النشر لو حدود PHP أصغر من اللازم.
+
+11) إعداد Supervisor للـ queues:
 ```bash
 sudo cp /home/deployuser/<repo>/deploy/supervisor.example.conf /etc/supervisor/conf.d/<your-project>-worker.conf
 sudo supervisorctl reread

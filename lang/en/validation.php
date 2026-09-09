@@ -160,7 +160,7 @@ return [
     'string' => 'The :attribute field must be a string.',
     'timezone' => 'The :attribute field must be a valid timezone.',
     'unique' => 'The :attribute has already been taken.',
-    'uploaded' => 'The :attribute failed to upload.',
+    'uploaded' => 'The :attribute could not be uploaded. The file may be larger than the server accepts, or the upload was interrupted — try again with a smaller file.',
     'uppercase' => 'The :attribute field must be uppercase.',
     'url' => 'The :attribute field must be a valid URL.',
     'ulid' => 'The :attribute field must be a valid ULID.',
@@ -195,7 +195,23 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'profile_image' => 'profile photo',
+        'gallery_images' => 'gallery image',
+        'photo_consent_proof' => 'consent proof',
+        'certification' => 'certification',
+        'featured_image' => 'featured image',
+        'video_file' => 'video',
+        'poster' => 'poster image',
+    ],
+
+    // Upload failures reported by PHP before validation runs. Each one names a
+    // different fix, so they are deliberately not one shared message.
+    'upload_too_large' => 'The :attribute is larger than this server accepts (:max MB maximum). Please choose a smaller file.',
+    'upload_interrupted' => 'The :attribute was only partly uploaded — the connection dropped. Please try again.',
+    'upload_server_error' => 'The :attribute could not be saved on the server. This is a server problem, not a problem with your file — please tell an administrator.',
+    'upload_blocked' => 'The :attribute was blocked by the server.',
+    'upload_failed' => 'The :attribute could not be uploaded. Please try again.',
 
     // Custom Speeda validation helpers
     'correct_errors_prompt' => 'Please correct the following errors:',

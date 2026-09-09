@@ -173,12 +173,16 @@ class ServiceProviderProfileController extends Controller
         try {
             // Handle profile image upload
             if ($request->hasFile('profile_image')) {
-                // Delete old image if exists
-                if ($serviceProvider->profile_image) {
-                    Storage::disk('public')->delete($serviceProvider->profile_image);
-                }
+                $previousImage = $serviceProvider->profile_image;
+
                 $validated['profile_image'] = $request->file('profile_image')
                     ->store('service-providers/profiles', 'public');
+
+                // Deleted only after the replacement exists, so a failed write
+                // cannot leave the profile with no image at all.
+                if ($previousImage && $previousImage !== $validated['profile_image']) {
+                    Storage::disk('public')->delete($previousImage);
+                }
             }
 
             $serviceProvider->update($validated);

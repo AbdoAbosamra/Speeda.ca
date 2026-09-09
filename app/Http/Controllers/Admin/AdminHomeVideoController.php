@@ -86,14 +86,16 @@ class AdminHomeVideoController extends Controller
 
             if ($request->hasFile('video_file')) {
                 // Replace rather than accumulate: the old file can never be
-                // reached again once the column points elsewhere.
-                $video->deleteVideoFile();
+                // reached again once the column points elsewhere. Dropped only
+                // after the new file lands, so a failed write leaves the
+                // existing video playing instead of removing it.
                 $data['video_path'] = $request->file('video_file')->store(HomeVideo::VIDEO_DIR, 'public');
+                $video->deleteVideoFile();
             }
 
             if ($request->hasFile('poster')) {
-                $video->deletePosterFile();
                 $data['poster_path'] = $request->file('poster')->store(HomeVideo::POSTER_DIR, 'public');
+                $video->deletePosterFile();
             }
 
             $data['updated_by'] = auth()->id();

@@ -148,7 +148,7 @@ return [
     'string' => 'حقل :attribute يجب أن يكون نصاً.',
     'timezone' => 'حقل :attribute يجب أن يكون منطقة زمنية صالحة.',
     'unique' => 'قيمة :attribute مستخدمة بالفعل.',
-    'uploaded' => 'فشل تحميل :attribute.',
+    'uploaded' => 'تعذّر رفع :attribute. غالبًا حجم الملف أكبر مما يقبله السيرفر، أو الرفع اتقطع في النص — جرّب ملف أصغر تاني.',
     'uppercase' => 'حقل :attribute يجب أن يكون بأحرف كبيرة.',
     'url' => 'حقل :attribute يجب أن يكون رابطاً صالحاً.',
     'ulid' => 'حقل :attribute يجب أن يكون ULID صالحاً.',
@@ -167,7 +167,22 @@ return [
         ],
     ],
 
-    'attributes' => [],
+    'attributes' => [
+        'profile_image' => 'الصورة الشخصية',
+        'gallery_images' => 'صورة المعرض',
+        'photo_consent_proof' => 'إثبات الموافقة',
+        'certification' => 'الشهادة',
+        'featured_image' => 'الصورة الرئيسية',
+        'video_file' => 'الفيديو',
+        'poster' => 'صورة الغلاف',
+    ],
+
+    // رسائل فشل الرفع اللي بيرجّعها PHP قبل التحقق. كل واحدة ليها حل مختلف.
+    'upload_too_large' => 'حجم :attribute أكبر من اللي السيرفر بيقبله (الحد :max ميجابايت). اختار ملف أصغر من فضلك.',
+    'upload_interrupted' => 'رفع :attribute اتقطع في النص — الاتصال انقطع. جرّب تاني من فضلك.',
+    'upload_server_error' => 'مقدرناش نحفظ :attribute على السيرفر. المشكلة دي من السيرفر مش من الملف بتاعك — بلّغ المسؤول من فضلك.',
+    'upload_blocked' => 'السيرفر رفض :attribute.',
+    'upload_failed' => 'تعذّر رفع :attribute. جرّب تاني من فضلك.',
 
     // Custom Speeda validation helpers
     'correct_errors_prompt' => 'يرجى تصحيح الأخطاء التالية:',

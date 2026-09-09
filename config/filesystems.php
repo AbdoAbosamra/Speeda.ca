@@ -43,8 +43,14 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
+            // A failed write must throw, not return false. With 'throw' => false
+            // a full or unwritable storage/ directory silently returns false,
+            // which callers then write into the image column — the record ends
+            // up pointing at nothing while the UI reports success. Uploads run
+            // inside transactions with a catch, so throwing rolls the record
+            // back and shows a real error instead.
+            'throw' => true,
+            'report' => true,
         ],
 
         's3' => [

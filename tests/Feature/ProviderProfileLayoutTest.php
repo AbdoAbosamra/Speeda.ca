@@ -150,18 +150,22 @@ class ProviderProfileLayoutTest extends TestCase
     }
 
     /**
-     * There is exactly one WhatsApp call to action, in the contact card, and it
-     * shows at every width. A second copy used to sit near the top of the page
-     * for phones; because the card stacks under the profile below lg, both
-     * rendered and the visitor scrolled past the same green button twice on
-     * every non-desktop size.
+     * The WhatsApp call to action is deliberately shown twice below lg and once
+     * from lg up.
      *
-     * Visibility is decided by Bootstrap's display utilities rather than by
-     * what is in the markup, so this resolves those utilities the way a browser
-     * would and counts what is actually visible — a reintroduced duplicate is
-     * caught whether it is a new element or a changed class.
+     * On a phone or tablet the contact card stacks at the bottom of a long
+     * page, so a second copy sits near the top under the name — someone on a
+     * phone should not have to scroll past the gallery and the reviews to find
+     * the one button the page exists for. On desktop the card is its own column
+     * and visible from the start, so the top copy is hidden and only the card's
+     * remains.
+     *
+     * Both are always present in the HTML; which one shows is decided entirely
+     * by Bootstrap's display utilities. This resolves those the way a browser
+     * does and counts what is actually visible, so removing either copy — or
+     * changing a class so both render on desktop — fails here.
      */
-    public function test_exactly_one_whatsapp_call_to_action_shows_at_every_width(): void
+    public function test_the_whatsapp_button_repeats_below_lg_and_appears_once_above(): void
     {
         $provider = $this->provider();
         $provider->update(['whatsapp_number' => '+15551234567']);
@@ -177,9 +181,11 @@ class ProviderProfileLayoutTest extends TestCase
         $label = __('service_provider.contact_whatsapp');
         $nodes = $xpath->query("//button[contains(., '{$label}')] | //a[contains(., '{$label}')]");
 
-        $this->assertGreaterThan(0, $nodes->length, 'No WhatsApp call to action was rendered at all.');
+        $this->assertSame(2, $nodes->length, 'Expected both WhatsApp buttons in the markup.');
 
-        foreach (['phone' => false, 'desktop' => true] as $width => $isLarge) {
+        $expected = ['phone or tablet' => [false, 2], 'desktop' => [true, 1]];
+
+        foreach ($expected as $width => [$isLarge, $want]) {
             $visible = 0;
 
             foreach ($nodes as $node) {
@@ -188,8 +194,27 @@ class ProviderProfileLayoutTest extends TestCase
                 }
             }
 
-            $this->assertSame(1, $visible, "Expected one WhatsApp button on {$width}, found {$visible}.");
+            $this->assertSame($want, $visible, "Expected {$want} WhatsApp button(s) on {$width}, found {$visible}.");
         }
+
+        // The one that survives on desktop has to be the contact card's, not
+        // the top copy — otherwise the card loses its only way to make contact.
+        $onDesktop = null;
+        foreach ($nodes as $node) {
+            if ($this->isVisibleAt($node, true)) {
+                $onDesktop = $node;
+            }
+        }
+
+        $inCard = false;
+        for ($n = $onDesktop; $n instanceof \DOMElement; $n = $n->parentNode) {
+            if (str_contains($n->getAttribute('class') ?: '', 'col-lg-4')) {
+                $inCard = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($inCard, 'The button left on desktop is not the one inside the contact card.');
     }
 
     /**

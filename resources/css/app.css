@@ -2588,9 +2588,17 @@ footer a:hover {
    MICRO-BREAKPOINTS (320px)
    ============================================ */
 @media (max-width: 320px) {
-    .container {
-        padding-inline-start: 10px !important;
-        padding-inline-end: 10px !important;
+    /*
+     * Tighten the gutter rather than only the padding. Bootstrap derives a
+     * container's padding from --bs-gutter-x and gives .row the matching
+     * negative margin, so overriding the padding alone left 12px margins
+     * against 10px of padding — 2px hanging off each side, which is a
+     * horizontal scrollbar on a 320px screen. Setting the variable moves both
+     * halves together and keeps the intended 10px.
+     */
+    .container,
+    .container .row {
+        --bs-gutter-x: 1.25rem;
     }
     .display-4 {
         font-size: 1.75rem !important;

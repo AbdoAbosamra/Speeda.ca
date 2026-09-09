@@ -87,23 +87,16 @@
 @endphp
 
 {{-- @change 2026-04-14 TASK-5 | Removed admin top-bar notification scaffolding | Admin notifications now live on the dedicated page without navbar duplication | risk:LOW --}}
-<nav class="admin-top-bar" x-data="adminTopBar()" x-init="init()">
+<nav class="admin-top-bar" id="adminTopBar">
     <!-- Left Section -->
     <div class="admin-top-bar-left">
-        <div class="admin-menu" x-data="{ open: false }">
-            <button class="admin-menu-btn" type="button" @click="open = !open" :class="{ 'active': open }" aria-label="Open admin menu">
+        <div class="admin-menu" id="adminMenuWrap">
+            <button class="admin-menu-btn" id="adminMenuBtn" type="button" aria-label="Open admin menu" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-table-cells-large"></i>
                 <span>Admin Menu</span>
-                <i class="fas fa-chevron-down admin-menu-chevron" :class="{ 'rotate-180': open }"></i>
+                <i class="fas fa-chevron-down admin-menu-chevron"></i>
             </button>
-            <div x-show="open" @click.away="open = false" @keydown.escape.window="open = false"
-                 x-transition:enter="transition ease-out duration-150"
-                 x-transition:enter-start="opacity-0 translate-y-1"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 x-transition:leave="transition ease-in duration-100"
-                 x-transition:leave-start="opacity-100 translate-y-0"
-                 x-transition:leave-end="opacity-0 translate-y-1"
-                 class="admin-menu-dropdown">
+            <div id="adminMenuDropdown" class="admin-menu-dropdown">
                 @foreach($adminMenuGroups as $groupLabel => $items)
                     <div class="admin-menu-group-label">{{ $groupLabel }}</div>
                     <div class="admin-menu-group">
@@ -155,8 +148,8 @@
     <!-- Right Section -->
     <div class="admin-top-bar-right">
         <!-- User Dropdown -->
-        <div class="admin-user" x-data="userDropdown()">
-            <button class="admin-user-btn" @click="toggle" :class="{ 'active': open }" aria-expanded="false">
+        <div class="admin-user" id="adminUserWrap">
+            <button class="admin-user-btn" id="adminUserBtn" type="button" aria-haspopup="true" aria-expanded="false">
                 <span class="user-avatar">
                     {{-- User has no avatar column, so the initial is the avatar. --}}
                     <span class="avatar-placeholder">{{ $user ? mb_substr($user->name, 0, 1) : 'A' }}</span>
@@ -165,16 +158,9 @@
                     <span class="user-name">{{ $user->name ?? 'Admin' }}</span>
                     <span class="user-role">{{ $user && $user->isAdmin() ? 'Administrator' : 'Moderator' }}</span>
                 </span>
-                <i class="fas fa-chevron-down user-chevron" :class="{ 'rotate-180': open }"></i>
+                <i class="fas fa-chevron-down user-chevron"></i>
             </button>
-            <div x-show="open" @click.away="close" @keydown.escape.window="close"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 scale-100"
-                 x-transition:leave-end="opacity-0 scale-95"
-                 class="admin-dropdown user-dropdown">
+            <div id="adminUserDropdown" class="admin-dropdown user-dropdown">
                 <div class="dropdown-header d-lg-none">
                     <span class="user-name">{{ $user->name ?? 'Admin' }}</span>
                     <span class="user-email">{{ $user->email ?? '' }}</span>
@@ -207,6 +193,21 @@
 /* Enhanced with subtle gradients, sharper shadows, and fluid animations for a modern, high-end feel. 
    Fully integrated with Speeda's dashboard aesthetics: clean lines, indigo accents, and premium interactions. 
    No changes to Laravel logic or PHP – pure CSS evolution. */
+
+/* Dropdowns are hidden by default (fail-closed) and toggled with plain JS,
+   so they work even if Alpine/Vite fail to load. No x-data/x-show here. */
+.admin-menu-dropdown,
+.admin-user .admin-dropdown {
+    display: none;
+}
+.admin-menu.open .admin-menu-dropdown,
+.admin-user.open .admin-dropdown {
+    display: block;
+}
+.admin-menu.open .admin-menu-chevron,
+.admin-user.open .user-chevron {
+    transform: rotate(180deg);
+}
 
 :root {
     --admin-top-bar-height: 68px; /* Slightly slimmer for a more modern look */
@@ -847,25 +848,69 @@
 }
 </style>
 
+{{-- Plain-JS dropdown toggles (deliberately NOT Alpine): the menus must open
+     and close even when Vite/Alpine fail to load. Fail-closed via CSS above. --}}
 <script>
-document.addEventListener('alpine:init', () => {
-    // Admin Top Bar State
-    Alpine.data('adminTopBar', () => ({
-        sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
-        init() {
-            document.body.classList.remove('sidebar-collapsed');
-        },
-        toggleSidebar() {
-            return;
-        }
-    }));
+(function () {
+    if (window.__adminTopBarInit) return;
+    window.__adminTopBarInit = true;
 
-    // User Dropdown
-    Alpine.data('userDropdown', () => ({
-        open: false,
-        toggle() { this.open = !this.open; },
-        close() { this.open = false; }
-    }));
-});
+    function pair(wrapId, btnId) {
+        var wrap = document.getElementById(wrapId);
+        var btn = document.getElementById(btnId);
+        if (!wrap || !btn) return null;
+        return {
+            wrap: wrap,
+            btn: btn,
+            isOpen: function () { return wrap.classList.contains('open'); },
+            set: function (open) {
+                wrap.classList.toggle('open', open);
+                btn.classList.toggle('active', open);
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+        };
+    }
+
+    function init() {
+        var menu = pair('adminMenuWrap', 'adminMenuBtn');
+        var user = pair('adminUserWrap', 'adminUserBtn');
+        if (!menu && !user) return;
+
+        function closeAll() {
+            if (menu) menu.set(false);
+            if (user) user.set(false);
+        }
+
+        if (menu) menu.btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var willOpen = !menu.isOpen();
+            closeAll();
+            menu.set(willOpen);
+        });
+
+        if (user) user.btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var willOpen = !user.isOpen();
+            closeAll();
+            user.set(willOpen);
+        });
+
+        document.addEventListener('click', function (e) {
+            var insideMenu = menu && menu.wrap.contains(e.target);
+            var insideUser = user && user.wrap.contains(e.target);
+            if (!insideMenu && !insideUser) closeAll();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeAll();
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
 </script>
 @endonce

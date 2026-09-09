@@ -10,12 +10,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        $this->call([
-            AdminUserSeeder::class, // permanent admin (login `admin`), safe on prod
-            CategorySeeder::class,  // MUST run first (categories before locations)
-            SafeCategoryUpdateSeeder::class,
-            LocationSeeder::class,
-        ]);
+        $this->call(AdminUserSeeder::class);
+        if (! \Illuminate\Support\Facades\DB::table('categories')->exists()) {
+            $this->call([CategorySeeder::class, SafeCategoryUpdateSeeder::class]);
+        }
+        $this->call(LocationSeeder::class);
 
         $this->command->info('🎉 Database seeded successfully!');
         $this->command->info('   ✅ Categories: 57 (7 sections + 50 categories)');

@@ -75,4 +75,5 @@ return [
     'loading' => 'Chargement...',
     'new' => 'nouveau',
     'main_navigation' => 'Navigation principale',
+    'category' => 'Catégorie',
 ];

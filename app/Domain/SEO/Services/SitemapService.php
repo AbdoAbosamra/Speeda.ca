@@ -32,7 +32,8 @@ class SitemapService
         // call to route() inside this method produces https://speeda.ca/...
         // instead of http://localhost/...
         // -----------------------------------------------------------------
-        $originalRoot = UrlFacade::to('/');
+        $originalGenerator = UrlFacade::getFacadeRoot();
+        UrlFacade::swap(clone $originalGenerator);
         $rootUrl = rtrim($baseUrl ?? config('app.url'), '/');
         UrlFacade::forceRootUrl($rootUrl);
 
@@ -125,7 +126,7 @@ class SitemapService
             // Restore the original URL generator state so that other parts of
             // the application are not affected if this runs in a long-lived
             // process (e.g. queue worker).
-            UrlFacade::forceRootUrl($originalRoot);
+            UrlFacade::swap($originalGenerator);
         }
     }
 

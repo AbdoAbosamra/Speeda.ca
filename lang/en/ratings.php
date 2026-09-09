@@ -18,4 +18,5 @@ return [
     'click_to_rate' => 'Click to rate',
     'stars' => 'stars',
     'out_of_5' => 'out of 5',
+    'only_clients_can_rate' => 'Only clients can rate service providers.',
 ];

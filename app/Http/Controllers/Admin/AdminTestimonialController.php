@@ -233,16 +233,16 @@ class AdminTestimonialController extends Controller
     }
 
     /**
-     * Flash a reminder when the active count is not exactly 3, since the
-     * home section only renders with exactly 3 active testimonials.
+     * Flash a reminder when there are no active testimonials, since the
+     * home section needs at least 1 active testimonial to render.
      */
     private function warnIfNotThreeActive(): void
     {
         $activeCount = SiteTestimonial::where('is_active', true)->count();
 
-        if ($activeCount !== SiteTestimonial::DISPLAY_COUNT) {
+        if ($activeCount === 0) {
             ErrorHelper::flashNotification(
-                "Home section needs exactly 3 active testimonials to show (currently {$activeCount}).",
+                "Home section has no active testimonials and is currently hidden.",
                 'warning'
             );
         }

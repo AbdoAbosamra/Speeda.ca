@@ -61,7 +61,7 @@ class AdminLog extends Model
             'model_name' => $modelName,
             'changes' => $changes,
             'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
+            'user_agent' => \App\Support\DeviceType::fromUserAgent(request()->userAgent()),
         ]);
     }
 

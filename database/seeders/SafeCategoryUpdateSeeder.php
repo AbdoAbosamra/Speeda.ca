@@ -226,9 +226,12 @@ foreach ($categoriesToDelete as $id) {
     }
 
     $userCount = DB::table('service_providers')->where('category_id', $id)->count();
-    $profileCount = DB::table('service_provider_profiles')->where('category_id', $id)->count();
-    $pivotCount = DB::table('service_provider_categories')->where('category_id', $id)->count();
-    $locationCount = DB::table('location_category')->where('category_id', $id)->count();
+    $profileCount = \Illuminate\Support\Facades\Schema::hasTable('service_provider_profiles')
+        ? DB::table('service_provider_profiles')->where('category_id', $id)->count() : 0;
+    $pivotCount = \Illuminate\Support\Facades\Schema::hasTable('service_provider_categories')
+        ? DB::table('service_provider_categories')->where('category_id', $id)->count() : 0;
+    $locationCount = \Illuminate\Support\Facades\Schema::hasTable('location_category')
+        ? DB::table('location_category')->where('category_id', $id)->count() : 0;
 
     if ($userCount > 0 || $profileCount > 0 || $pivotCount > 0 || $locationCount > 0) {
         $this->command->error("  ❌ CANNOT DELETE ID {$id} ({$category->name}) - Data exists!");
@@ -276,7 +279,9 @@ foreach ($categoriesToDelete as $id) {
         // ========================================
         // STEP 6: Update AUTO_INCREMENT
         // ========================================
-        DB::statement('ALTER TABLE categories AUTO_INCREMENT = 98');
+        if (in_array(DB::getDriverName(), ['mysql', 'mariadb'])) {
+            DB::statement('ALTER TABLE categories AUTO_INCREMENT = 98');
+        }
         $this->command->info('🔢 Updated AUTO_INCREMENT to 98');
 
         // ========================================

@@ -1,74 +1,44 @@
 <?php
 
+// Check literal keys without booting the app or using fallback translations.
 require __DIR__.'/vendor/autoload.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
 
-$viewsDir = __DIR__ . '/resources/views';
-$langDirs = ['en', 'ar', 'fr'];
-$baseLangDir = __DIR__ . '/lang';
-
-$missingKeys = [];
-$foundKeys = [];
-
-function checkDirectory($dir) {
-    global $foundKeys;
-    $files = scandir($dir);
+$keys = [];
+foreach (['app', 'resources/views', 'routes'] as $directory) {
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__.'/'.$directory));
     foreach ($files as $file) {
-        if ($file === '.' || $file === '..') continue;
-        $path = $dir . '/' . $file;
-        if (is_dir($path)) {
-            checkDirectory($path);
-        } elseif (preg_match('/\.blade\.php$/', $file)) {
-            $content = file_get_contents($path);
-            // Match __('group.key') or trans('group.key') or @lang('group.key')
-            // Using a basic regex, could be improved but covers most cases
-            preg_match_all("/(?:__|trans|@lang)\s*\(\s*['\"]([^'\"]+)['\"]/", $content, $matches);
-            if (!empty($matches[1])) {
-                foreach ($matches[1] as $key) {
-                    // Skip keys that don't have a dot (might be JSON keys which are handled differently)
-                    if (str_contains($key, '.')) {
-                        $foundKeys[$key][] = $path;
-                    }
-                }
-            }
+        if (! $file->isFile() || $file->getExtension() !== 'php') {
+            continue;
+        }
+        preg_match_all('/(?:__|trans|trans_choice|@lang)\s*\(\s*([\'"])([a-zA-Z0-9_]+\.[a-zA-Z0-9_.-]+)\1\s*(?=[,)])/u', file_get_contents($file->getPathname()), $matches);
+        foreach ($matches[2] as $key) {
+            $keys[$key] = true;
         }
     }
 }
-
-checkDirectory($viewsDir);
-
-echo "Found " . count($foundKeys) . " unique translation keys in blade files.\n";
-
-$allMissing = [];
-
-foreach ($langDirs as $lang) {
-    foreach (array_keys($foundKeys) as $fullKey) {
-        $parts = explode('.', $fullKey, 2);
-        $group = $parts[0];
-        $key = $parts[1];
-        
-        $langFile = $baseLangDir . '/' . $lang . '/' . $group . '.php';
-        if (file_exists($langFile)) {
-            $translations = require $langFile;
-            if (!isset($translations[$key])) {
-                $allMissing[$lang][$fullKey] = true;
-            }
-        } else {
-            // Group file missing
-            $allMissing[$lang][$fullKey] = true;
+ksort($keys);
+$missing = [];
+foreach (['en', 'ar', 'fr'] as $locale) {
+    $groups = [];
+    foreach (array_keys($keys) as $fullKey) {
+        [$group, $key] = explode('.', $fullKey, 2);
+        if (! isset($groups[$group])) {
+            $path = __DIR__."/lang/{$locale}/{$group}.php";
+            $groups[$group] = is_file($path) ? require $path : [];
+        }
+        if (! Illuminate\Support\Arr::has($groups[$group], $key)) {
+            $missing[$locale][$fullKey] = true;
         }
     }
 }
-
-echo "\n--- Missing Translations ---\n";
-foreach ($allMissing as $lang => $keys) {
-    echo "\nLanguage: $lang\n";
-    foreach ($keys as $k => $v) {
-        echo "- $k\n";
+file_put_contents(__DIR__.'/missing_translations.json', json_encode($missing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).PHP_EOL);
+$unique = [];
+foreach ($missing as $locale => $localeKeys) {
+    foreach (array_keys($localeKeys) as $key) {
+        echo "{$locale}: {$key}\n";
+        $unique[$key] = true;
     }
 }
-
-file_put_contents(__DIR__ . '/missing_translations.json', json_encode($allMissing, JSON_PRETTY_PRINT));
-echo "\nSaved missing list to missing_translations.json\n";
+file_put_contents(__DIR__.'/unique_missing.txt', implode(PHP_EOL, array_keys($unique)).($unique ? PHP_EOL : ''));
+echo count($keys).' literal translation keys checked; '.count($unique)." missing keys. Dynamic expressions require runtime coverage.\n";
+exit($missing ? 1 : 0);

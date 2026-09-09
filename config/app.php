@@ -122,7 +122,7 @@ return [
 
     'key' => env('APP_KEY'),
 
-    'analytics_salt' => env('ANALYTICS_SALT', 'default-salt-change-in-production'),
+    'analytics_salt' => env('ANALYTICS_SALT') ?: env('APP_KEY'),
 
     'previous_keys' => [
         ...array_filter(

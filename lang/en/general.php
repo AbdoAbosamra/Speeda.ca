@@ -75,4 +75,5 @@ return [
     'loading' => 'Loading...',
     'new' => 'new',
     'main_navigation' => 'Main Navigation',
+    'category' => 'Category',
 ];

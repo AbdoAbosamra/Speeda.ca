@@ -2503,7 +2503,6 @@ i[class*=" fa-"] {
 
 /* ----- Admin Route: Navbar Override ----- */
 .admin-route-active .sp-nav,
-.admin-route-active nav:not(.admin-top-bar),
 .admin-route-active header[class*="nav"] {
     display: none !important;
 }

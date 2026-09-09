@@ -410,8 +410,8 @@
                     <div class="home-shell home-section-panel fade-in-up">
                         <div class="home-section-head">
                             <div>
-                                <h2 class="section-title mb-2">{{ __('home.top_providers_title') }}</h2>
-                                <p class="section-subtitle mb-0">{{ __('home.top_providers_desc') }}</p>
+                                <h2 class="section-title mb-2">{{ __('home.discover_providers_title') }}</h2>
+                                <p class="section-subtitle mb-0">{{ __('home.discover_providers_desc') }}</p>
                             </div>
                             <a href="{{ route('service-providers.index') }}" class="premium-btn-outline home-inline-action">
                                 {{ __('home.find_service_now') }}
@@ -532,14 +532,14 @@
             </div>
         </section>
 
-        @if(isset($siteTestimonials) && $siteTestimonials->count() === 3)
+        @if(isset($siteTestimonials) && $siteTestimonials->isNotEmpty())
         <section class="home-section home-testimonials-section">
             <div class="container">
                 <div class="home-testimonials-head fade-in-up">
                     <h2 class="home-testimonials-title">{{ __('home.testimonials_title') }}</h2>
                     <p class="home-testimonials-subtitle">{{ __('home.testimonials_subtitle') }}</p>
                 </div>
-                <div class="home-testimonials-grid">
+                <div class="home-testimonials-grid home-testimonials-count-{{ $siteTestimonials->count() }}">
                     @foreach($siteTestimonials as $testimonial)
                         <article class="home-testimonial-card fade-in-up">
                             <span class="home-testimonial-quote-mark" aria-hidden="true">&ldquo;</span>
@@ -602,6 +602,20 @@
                 grid-template-columns: repeat(3, minmax(0, 1fr));
                 gap: 1.5rem;
                 align-items: stretch;
+            }
+
+            .home-testimonials-grid.home-testimonials-count-1 {
+                grid-template-columns: minmax(0, 1fr);
+                max-width: 520px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .home-testimonials-grid.home-testimonials-count-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                max-width: 860px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .home-testimonial-card {
@@ -713,9 +727,15 @@
 
             @media (max-width: 992px) {
                 .home-testimonials-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                .home-testimonials-grid.home-testimonials-count-1 { grid-template-columns: minmax(0, 1fr); }
             }
             @media (max-width: 640px) {
-                .home-testimonials-grid { grid-template-columns: minmax(0, 1fr); max-width: 480px; margin: 0 auto; }
+                .home-testimonials-grid,
+                .home-testimonials-grid.home-testimonials-count-2 {
+                    grid-template-columns: minmax(0, 1fr);
+                    max-width: 480px;
+                    margin: 0 auto;
+                }
             }
         </style>
         @endpush

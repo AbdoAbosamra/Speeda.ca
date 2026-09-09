@@ -278,4 +278,6 @@ return [
     'photo_consent_info_body' => 'لو في حاجة في الصورة دي مش مظبوطة، تواصل معنا وهنظبطها.',
     'photo_consent_proof_label' => 'إثبات الموافقة المرفق:',
     'photo_consent_proof_view' => 'عرض',
+    'gallery_full' => 'يمكنك رفع :max صور بحد أقصى في المعرض.',
+    'gallery_image_added' => 'تمت إضافة الصورة إلى المعرض بنجاح.',
 ];

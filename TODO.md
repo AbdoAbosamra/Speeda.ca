@@ -1,46 +1,15 @@
-# TODO: إصلاح معرض الصور في Service Provider Gallery - خطة نهائية
+# حالة إصلاح معرض الصور — 8 سبتمبر 2026
 
-## ✅ **مكتمل [0/8]**
+أُغلقت خطة التشخيص القديمة بعد اختبار الكود الحالي وإصلاحه:
 
-### 1. [ ] إنشاء ملف تشخيص شامل للـ MediaLibrary
-```
-resources/views/service-providers/gallery-diagnostic.blade.php
-```
+- [x] إصلاح تحويلات Spatie باستخدام Fit::Crop وتوليد WebP فعليًا.
+- [x] التحقق من الرفع والاستبدال وحماية الصورة القديمة عند الفشل.
+- [x] تنظيف الرفع الجديد غير المكتمل بدل استخدام صورة قديمة كأنها نتيجة ناجحة.
+- [x] تصحيح عدد الصور الراجع إلى الواجهة.
+- [x] الرجوع إلى الصورة الأصلية ثم الصورة الافتراضية عند غياب الملفات.
+- [x] اختبار صلاحيات الوصول إلى الصور.
+- [x] إزالة ملفات التشخيص والتجربة المشار إليها في التقرير.
 
-### 2. [ ] فحص وجود ServiceProviders و Media table
-```
-php artisan tinker → ServiceProvider::count() + media count
-```
+التحويلات الحالية متزامنة ولا تحتاج عامل Queue. تبقى طوابير البريد والمهام الأخرى بحاجة إلى العامل الموثق في إعدادات النشر.
 
-### 3. [ ] إضافة صور تجريبية لأول ServiceProvider
-```
-Tinker: $sp->addMedia(...) → 'provider_gallery'
-```
-
-### 4. [ ] إصلاح/تشغيل Queue للـ Conversions
-```
-php artisan queue:work --tries=3
-php artisan media-library:regenerate
-```
-
-### 5. [ ] تحسين Controller upload handler
-```
-ServiceProviderController.php → handle gallery_images[]
-```
-
-### 6. [ ] إضافة fallback placeholders في View
-```
-show.blade.php → لو فارغ يعرض 'Upload your gallery'
-```
-
-### 7. [ ] إضافة route للتشخيص
-```
-web.php → Route::get('/service-providers/{id}/gallery-diagnostic'
-```
-
-### 8. [ ] اختبار كامل + cleanup
-```
-اختبار على 3 providers → حذف diagnostic files
-```
-
-**Next Step: 1/8**
+تفاصيل المراجعة ونتائج الاختبارات: `_Project_Docs/VERIFIED_AUDIT_2026-09-08.md`.

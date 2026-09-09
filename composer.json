@@ -11,15 +11,12 @@
     "require": {
         "php": "^8.2",
         "artesaos/seotools": "^1.4",
-        "barryvdh/laravel-dompdf": "*",
+        "barryvdh/laravel-dompdf": "^3.1",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
         "laravel/mcp": "^0.3.2",
         "laravel/sanctum": "^4.2",
         "laravel/socialite": "^5.30",
-        "laravel/tinker": "^2.10.1",
-        "livewire/livewire": "^4.2",
-        "livewire/volt": "1.10.5",
         "outhebox/laravel-translations": "^1.4",
         "spatie/laravel-medialibrary": "^11.21",
         "spatie/laravel-sitemap": "^8.1"
@@ -33,7 +30,8 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.3"
+        "phpunit/phpunit": "^11.5.3",
+        "laravel/tinker": "^2.10.1"
     },
     "autoload": {
         "psr-4": {

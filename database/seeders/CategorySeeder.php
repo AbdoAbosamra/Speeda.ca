@@ -13,10 +13,12 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing categories (cross-database safe)
-        Schema::disableForeignKeyConstraints();
-        DB::table('categories')->truncate();
-        Schema::enableForeignKeyConstraints();
+        // This is initial catalog data. Never truncate an edited catalog or
+        // invalidate provider relationships when deployment seeding is repeated.
+        if (DB::table('categories')->exists()) {
+            $this->command->info('Existing category catalog preserved.');
+            return;
+        }
 
         $timestamp = '2025-11-25 16:17:30';
 

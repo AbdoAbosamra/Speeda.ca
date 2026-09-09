@@ -44,6 +44,7 @@ class AdminController extends Controller
      * changes underlying data. Keys mirror AdminDashboardService + helpers.
      */
     private const ADMIN_DASHBOARD_CACHE_KEYS = [
+        'admin_dashboard_summary',
         'admin_dash_action_center',
         'admin_dash_kpis',
         'admin_dash_funnel',
@@ -72,94 +73,96 @@ class AdminController extends Controller
     public function dashboard()
     {
         try {
-            // Get visitor statistics
-            $visitorStats = $this->visitorService->getStatistics();
+            $summary = Cache::remember('admin_dashboard_summary', 60, function () {
+                // Get visitor statistics
+                $visitorStats = $this->visitorService->getStatistics();
 
-            // WhatsApp Analytics Calculations.
-            // Every count below goes through whatsappClicksBetween() so admin
-            // activity is excluded consistently — the category/provider break-
-            // downs further down already did this, the headline numbers did not.
-            $now = Carbon::now();
+                // WhatsApp Analytics Calculations.
+                // Every count below goes through whatsappClicksBetween() so admin
+                // activity is excluded consistently — the category/provider break-
+                // downs further down already did this, the headline numbers did not.
+                $now = Carbon::now();
 
-            $dailyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->startOfDay(), $now);
-            $yesterdayWhatsappClicks = $this->whatsappClicksBetween(
-                $now->copy()->subDay()->startOfDay(),
-                $now->copy()->subDay()->endOfDay()
-            );
+                $dailyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->startOfDay(), $now);
+                $yesterdayWhatsappClicks = $this->whatsappClicksBetween(
+                    $now->copy()->subDay()->startOfDay(),
+                    $now->copy()->subDay()->endOfDay()
+                );
 
-            $dailyWhatsappTrend = $this->percentageChange($dailyWhatsappClicks, $yesterdayWhatsappClicks);
+                $dailyWhatsappTrend = $this->percentageChange($dailyWhatsappClicks, $yesterdayWhatsappClicks);
 
-            // Rolling 7-day window vs the previous 7-day window (equal length =
-            // a fair comparison; avoids the "partial current week vs full last
-            // week" distortion that always reads negative early in the period).
-            $weeklyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(7), $now);
-            $lastWeekWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(14), $now->copy()->subDays(7));
-            $weeklyWhatsappTrend = $this->percentageChange($weeklyWhatsappClicks, $lastWeekWhatsappClicks);
+                // Rolling 7-day window vs the previous 7-day window (equal length =
+                // a fair comparison; avoids the "partial current week vs full last
+                // week" distortion that always reads negative early in the period).
+                $weeklyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(7), $now);
+                $lastWeekWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(14), $now->copy()->subDays(7));
+                $weeklyWhatsappTrend = $this->percentageChange($weeklyWhatsappClicks, $lastWeekWhatsappClicks);
 
-            // Rolling 30-day window vs the previous 30-day window.
-            $monthlyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(30), $now);
-            $lastMonthWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(60), $now->copy()->subDays(30));
-            $monthlyWhatsappTrend = $this->percentageChange($monthlyWhatsappClicks, $lastMonthWhatsappClicks);
+                // Rolling 30-day window vs the previous 30-day window.
+                $monthlyWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(30), $now);
+                $lastMonthWhatsappClicks = $this->whatsappClicksBetween($now->copy()->subDays(60), $now->copy()->subDays(30));
+                $monthlyWhatsappTrend = $this->percentageChange($monthlyWhatsappClicks, $lastMonthWhatsappClicks);
 
-            $totalWhatsappClicks = $this->whatsappClicksBetween(null, null);
+                $totalWhatsappClicks = $this->whatsappClicksBetween(null, null);
 
-            $mostClickedCategoryData = DB::table('analytics')
-                ->join('service_providers', 'analytics.provider_id', '=', 'service_providers.id')
-                ->join('categories', 'service_providers.category_id', '=', 'categories.id')
-                ->where('analytics.action_type', 'click_whatsapp')
-                ->tap(fn($q) => AdminAnalyticsExclusion::apply($q, 'analytics.user_id'))
-                ->select('categories.name_en as name', DB::raw('count(analytics.id) as total_clicks'))
-                ->groupBy('categories.id', 'categories.name_en')
-                ->orderByDesc('total_clicks')
-                ->first();
-                
-            $mostClickedCategory = null;
-            if ($mostClickedCategoryData) {
-                $mostClickedCategory = [
-                    'name' => $mostClickedCategoryData->name ?: 'Unknown',
-                    'clicks' => $mostClickedCategoryData->total_clicks,
-                    'percentage' => $totalWhatsappClicks > 0 
-                        ? round(($mostClickedCategoryData->total_clicks / $totalWhatsappClicks) * 100, 1) 
-                        : 0
+                $mostClickedCategoryData = DB::table('analytics')
+                    ->join('service_providers', 'analytics.provider_id', '=', 'service_providers.id')
+                    ->join('categories', 'service_providers.category_id', '=', 'categories.id')
+                    ->where('analytics.action_type', 'click_whatsapp')
+                    ->tap(fn($q) => AdminAnalyticsExclusion::apply($q, 'analytics.user_id'))
+                    ->select('categories.name_en as name', DB::raw('count(analytics.id) as total_clicks'))
+                    ->groupBy('categories.id', 'categories.name_en')
+                    ->orderByDesc('total_clicks')
+                    ->first();
+
+                $mostClickedCategory = null;
+                if ($mostClickedCategoryData) {
+                    $mostClickedCategory = [
+                        'name' => $mostClickedCategoryData->name ?: 'Unknown',
+                        'clicks' => $mostClickedCategoryData->total_clicks,
+                        'percentage' => $totalWhatsappClicks > 0
+                            ? round(($mostClickedCategoryData->total_clicks / $totalWhatsappClicks) * 100, 1)
+                            : 0
+                    ];
+                }
+
+                // NOTE: the "Top Providers" table on the dashboard is rendered from
+                // $dashboard['top_providers'] (AdminDashboardService, cached). The
+                // duplicate raw-SQL ranking that used to live here was never read by
+                // the view and has been removed.
+
+                // Only the keys the dashboard view actually reads. The remaining
+                // counters (active/total categories & locations, total users,
+                // active notifications, new users today, 7/30/365-day visitors) were
+                // computed on every page load and never rendered.
+                $stats = [
+                    'liveVisitors' => $visitorStats['live_visitors'] ?? 0,
+                    'visitorsToday' => $this->getVisitorsToday(),
+                    'visitorsThisMonth' => $this->getVisitorsThisMonth(),
+                    'totalVisitors' => $visitorStats['total_visitors'] ?? 0,
+                    'totalProviders' => ServiceProvider::count(),
+                    'totalClients' => User::where('role', 'client')->count(),
+                    'totalBlogs' => Post::count(),
+                    'notificationsSent' => AdminNotification::count(),
+                    'pendingReviews' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
+                    'totalReviews' => Review::count(),
                 ];
-            }
 
-            // NOTE: the "Top Providers" table on the dashboard is rendered from
-            // $dashboard['top_providers'] (AdminDashboardService, cached). The
-            // duplicate raw-SQL ranking that used to live here was never read by
-            // the view and has been removed.
+                return compact(
+                    'stats',
+                    'dailyWhatsappClicks',
+                    'dailyWhatsappTrend',
+                    'weeklyWhatsappClicks',
+                    'weeklyWhatsappTrend',
+                    'monthlyWhatsappClicks',
+                    'monthlyWhatsappTrend',
+                    'mostClickedCategory'
+                );
+            });
 
-            // Only the keys the dashboard view actually reads. The remaining
-            // counters (active/total categories & locations, total users,
-            // active notifications, new users today, 7/30/365-day visitors) were
-            // computed on every page load and never rendered.
-            $stats = [
-                'liveVisitors' => $visitorStats['live_visitors'] ?? 0,
-                'visitorsToday' => $this->getVisitorsToday(),
-                'visitorsThisMonth' => $this->getVisitorsThisMonth(),
-                'totalVisitors' => $visitorStats['total_visitors'] ?? 0,
-                'totalProviders' => ServiceProvider::count(),
-                'totalClients' => User::where('role', 'client')->count(),
-                'totalBlogs' => Post::count(),
-                'notificationsSent' => AdminNotification::count(),
-                'pendingReviews' => Review::where('is_active', false)->whereNull('admin_approved_at')->count(),
-                'totalReviews' => Review::count(),
-            ];
-
-            // Rich operations data (action center, KPIs+trends, funnel, feeds).
             $dashboard = app(\App\Services\Admin\AdminDashboardService::class)->build();
 
-            return view('admin.dashboard', compact(
-                'stats',
-                'dashboard',
-                'dailyWhatsappClicks',
-                'dailyWhatsappTrend',
-                'weeklyWhatsappClicks',
-                'weeklyWhatsappTrend',
-                'monthlyWhatsappClicks',
-                'monthlyWhatsappTrend',
-                'mostClickedCategory'
-            ));
+            return view('admin.dashboard', array_merge($summary, ['dashboard' => $dashboard]));
         } catch (\Exception $e) {
             $error = ErrorHelper::handle($e);
             Log::error('Admin dashboard error: ' . $e->getMessage());

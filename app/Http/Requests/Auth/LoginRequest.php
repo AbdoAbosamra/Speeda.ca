@@ -22,6 +22,11 @@ class LoginRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // The documented admin alias selects an email, never a role. Resolve
+        // it before throttling so aliases and email share the same attempt key.
+        if ($this->input('login') === 'admin') {
+            $this->merge(['login' => config('auth.admin_email', 'admin@speeda.com')]);
+        }
         // Convert checkbox "on" to boolean true
         if ($this->has('remember') && $this->remember === 'on') {
             $this->merge([
@@ -69,15 +74,7 @@ class LoginRequest extends FormRequest
         $remember = $this->boolean('remember');
         $selectedRole = $this->input('role'); // Get selected role from form
 
-        // Determine if login field is email or mobile
-        // Special case: if user types 'admin', treat it as the admin email
-        if ($loginField === 'admin') {
-            $loginField = config('auth.admin_email', 'admin@speeda.com');
-            $this->merge(['login' => $loginField]);
-            $loginType = 'email';
-        } else {
-            $loginType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
-        }
+        $loginType = filter_var($loginField, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
 
         // Build credentials array
         $credentials = [

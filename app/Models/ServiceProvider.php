@@ -13,6 +13,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\MediaCollections\File;
+use Spatie\Image\Enums\Fit;
 
 /**
  * NOTE ON DELETES
@@ -182,7 +183,7 @@ class ServiceProvider extends Model implements HasMedia
     }
 
     /**
-     * Queued conversions:
+     * Synchronous conversions, available immediately after upload:
      * - Resize + optimize
      * - Convert to WebP
      * - Generate a thumbnail for the responsive gallery grid
@@ -195,7 +196,7 @@ class ServiceProvider extends Model implements HasMedia
             ->nonQueued()
             ->width(600)
             ->height(600)
-            ->fit('crop', 600, 600)
+            ->fit(Fit::Crop, 600, 600)
             ->quality(80)
             ->format('webp');
 
@@ -205,7 +206,7 @@ class ServiceProvider extends Model implements HasMedia
             ->nonQueued()
             ->width(1200)
             ->height(1200)
-            ->fit('crop', 1200, 1200)
+            ->fit(Fit::Crop, 1200, 1200)
             ->quality(85)
             ->format('webp');
     }
@@ -525,9 +526,15 @@ class ServiceProvider extends Model implements HasMedia
             return null;
         }
 
+        if ($conversionName && ! $media->hasGeneratedConversion($conversionName)) {
+            $conversionName = null;
+        }
+        $disk = $conversionName ? ($media->conversions_disk ?: $media->disk) : $media->disk;
         $relativePath = $media->getPathRelativeToRoot($conversionName ?? '');
-        if (!Storage::disk($media->disk)->exists($relativePath)) {
-            return null;
+        if (!Storage::disk($disk)->exists($relativePath)) {
+            return $conversionName
+                ? $this->getMediaPublicUrl($media)
+                : $this->default_image_url;
         }
 
         return $this->normalizePublicUrl($media->getUrl($conversionName ?? ''));

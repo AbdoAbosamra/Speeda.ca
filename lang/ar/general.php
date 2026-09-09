@@ -75,4 +75,5 @@ return [
     'loading' => 'جاري التحميل...',
     'new' => 'جديد',
     'main_navigation' => 'التنقل الرئيسي',
+    'category' => 'التصنيف',
 ];

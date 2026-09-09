@@ -99,6 +99,8 @@ return [
     // Homepage Redesign Additions
     'top_providers_title' => 'أفضل مقدمي الخدمات',
     'top_providers_desc' => 'اكتشف المحترفين الأعلى تقييمًا والمستعدين لمساعدتك.',
+    'discover_providers_title' => 'اكتشف مقدمي خدماتنا',
+    'discover_providers_desc' => 'تصفّح محترفينا المعتمدين الجاهزين لمساعدتك.',
     'verified_badge' => '',
     'reviews' => 'مراجعة',
     'recommendations' => 'توصية',

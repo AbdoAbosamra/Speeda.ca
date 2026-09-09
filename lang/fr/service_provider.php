@@ -278,4 +278,6 @@ Complétez votre profil maintenant.',
     'photo_consent_info_body' => 'Si quelque chose vous semble incorrect à propos de cette photo, contactez-nous.',
     'photo_consent_proof_label' => 'Preuve de consentement disponible :',
     'photo_consent_proof_view' => 'Voir',
+    'gallery_full' => 'Vous pouvez ajouter au maximum :max images à la galerie.',
+    'gallery_image_added' => 'Image ajoutée à la galerie avec succès.',
 ];

@@ -48,22 +48,19 @@ class EndorsementController extends Controller
         }
 
         try {
-            $existing = Endorsement::where('service_provider_id', $serviceProvider->id)
-                ->where('user_id', $user->id)
-                ->first();
+            $message = DB::transaction(function () use ($serviceProvider, $user) {
+                // Serialize toggles for this provider and keep the stored count in sync.
+                $provider = ServiceProvider::whereKey($serviceProvider->id)->lockForUpdate()->firstOrFail();
+                $existing = $provider->endorsements()->where('user_id', $user->id)->first();
+                if ($existing) {
+                    $existing->delete();
+                } else {
+                    $provider->endorsements()->create(['user_id' => $user->id]);
+                }
+                $provider->update(['endorsement_count' => $provider->endorsements()->count()]);
 
-            if ($existing) {
-                $existing->delete();
-                $serviceProvider->decrement('endorsement_count');
-                $message = 'Recommendation removed.';
-            } else {
-                Endorsement::create([
-                    'service_provider_id' => $serviceProvider->id,
-                    'user_id' => $user->id,
-                ]);
-                $serviceProvider->increment('endorsement_count');
-                $message = 'Provider recommended!';
-            }
+                return $existing ? 'Recommendation removed.' : 'Provider recommended!';
+            });
 
             return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {

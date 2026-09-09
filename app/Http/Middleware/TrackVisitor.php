@@ -43,8 +43,8 @@ class TrackVisitor
         }
 
         // GDPR-compliant hashing with salt using app key
-        $ipHash = hash_hmac('sha256', $request->ip(), config('app.key'));
-        $userAgentHash = hash_hmac('sha256', $request->userAgent(), config('app.key'));
+        $ipHash = hash_hmac('sha256', (string) $request->ip(), config('app.analytics_salt'));
+        $userAgentHash = hash_hmac('sha256', (string) $request->userAgent(), config('app.analytics_salt'));
 
         // Check if this visitor has already been recorded in the last 5 minutes
         $recentVisit = Visitor::where('ip_hash', $ipHash)

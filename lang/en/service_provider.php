@@ -287,4 +287,6 @@ return [
     'photo_consent_info_body' => 'If anything about this photo doesn\'t look right, contact us and we\'ll sort it out.',
     'photo_consent_proof_label' => 'Consent proof on file:',
     'photo_consent_proof_view' => 'View',
+    'gallery_full' => 'You can upload up to :max gallery images.',
+    'gallery_image_added' => 'Gallery image added successfully.',
 ];

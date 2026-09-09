@@ -99,6 +99,8 @@ return [
     // Homepage Redesign Additions
     'top_providers_title' => 'Meilleurs prestataires',
     'top_providers_desc' => 'Découvrez nos professionnels les mieux notés, prêts à vous aider.',
+    'discover_providers_title' => 'Découvrez nos prestataires',
+    'discover_providers_desc' => 'Parcourez nos professionnels vérifiés prêts à vous aider.',
     'verified_badge' => 'Vérifié',
     'reviews' => 'Avis',
     'recommendations' => 'Recommandations',

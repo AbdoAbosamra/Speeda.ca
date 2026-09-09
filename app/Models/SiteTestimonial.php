@@ -21,7 +21,10 @@ class SiteTestimonial extends Model
 {
     use HasFactory;
 
-    /** Number of active testimonials required for the home section to show. */
+    /** Maximum number of testimonials shown on the home page. */
+    public const MAX_DISPLAY = 3;
+
+    /** Legacy alias for backwards compatibility */
     public const DISPLAY_COUNT = 3;
 
     protected $fillable = [
@@ -122,17 +125,16 @@ class SiteTestimonial extends Model
     }
 
     /**
-     * The active testimonials to display on the home page, or an empty
-     * collection unless exactly DISPLAY_COUNT are active.
+     * The active testimonials to display on the home page.
+     * Returns up to MAX_DISPLAY testimonials, or an empty collection
+     * if none are active.
      */
     public static function forHomePage()
     {
-        $active = static::activeOrdered()
+        return static::activeOrdered()
             ->withDisplayRelations()
-            ->take(self::DISPLAY_COUNT)
+            ->take(self::MAX_DISPLAY)
             ->get();
-
-        return $active->count() === self::DISPLAY_COUNT ? $active : collect();
     }
 
     /**

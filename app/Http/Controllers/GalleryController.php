@@ -21,7 +21,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class GalleryController extends Controller
 {
     private const MAX_GALLERY_IMAGES = 4;
-    private const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+    private const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
     private const ALLOWED_MIMES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     /**
@@ -41,7 +41,7 @@ class GalleryController extends Controller
         }
 
         $request->validate([
-            'gallery_image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'gallery_image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
         ]);
 
         $file = $request->file('gallery_image');
@@ -55,21 +55,7 @@ class GalleryController extends Controller
         }
 
         try {
-            $media = null;
-            try {
-                $media = $serviceProvider
-                    ->addMedia($file)
-                    ->toMediaCollection('gallery');
-            } catch (\Throwable $conversionError) {
-                // Ignore Spatie conversion exceptions (e.g., missing GD functions).
-                // The media record and original file are already saved before conversions fire.
-                $media = $serviceProvider->getMedia('gallery')->sortByDesc('id')->first();
-                Log::warning('Gallery upload conversion failed: ' . $conversionError->getMessage());
-            }
-
-            if (!$media) {
-                throw new \Exception('Media upload failed entirely.');
-            }
+            $media = $this->storeMedia($serviceProvider, $file);
 
             app(CalculateProfileCompletionAction::class)->execute($serviceProvider->fresh());
 
@@ -77,7 +63,7 @@ class GalleryController extends Controller
                 'success' => true,
                 'message' => __('service_provider.gallery_image_added'),
                 'media'   => $this->mediaPayload($serviceProvider, $media),
-                'count'   => $serviceProvider->getMedia('gallery')->count(),
+                'count'   => $serviceProvider->media()->where('collection_name', 'gallery')->count(),
                 'max'     => self::MAX_GALLERY_IMAGES,
             ]);
         } catch (\Throwable $e) {
@@ -101,7 +87,7 @@ class GalleryController extends Controller
         $this->authorize('manageGallery', $serviceProvider);
 
         $request->validate([
-            'gallery_image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'gallery_image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
         ]);
 
         $file = $request->file('gallery_image');
@@ -113,25 +99,11 @@ class GalleryController extends Controller
             ], 422);
         }
 
+        $oldMedia = $this->resolveMedia($serviceProvider, $mediaId);
+
         try {
-            $oldMedia = $this->resolveMedia($serviceProvider, $mediaId);
 
-            $newMedia = null;
-            try {
-                // Add new
-                $newMedia = $serviceProvider
-                    ->addMedia($file)
-                    ->toMediaCollection('gallery');
-            } catch (\Throwable $conversionError) {
-                // Ignore Spatie conversion exceptions (e.g., missing GD functions).
-                // The media record and original file are already saved before conversions fire.
-                $newMedia = $serviceProvider->getMedia('gallery')->sortByDesc('id')->first();
-                Log::warning('Gallery replace conversion failed: ' . $conversionError->getMessage());
-            }
-
-            if (!$newMedia) {
-                throw new \Exception('Media replacement failed entirely.');
-            }
+            $newMedia = $this->storeMedia($serviceProvider, $file);
 
             // Then delete old (guaranteed atomic-ish swap)
             $oldMedia->delete();
@@ -164,8 +136,9 @@ class GalleryController extends Controller
     {
         $this->authorize('manageGallery', $serviceProvider);
 
+        $media = $this->resolveMedia($serviceProvider, $mediaId);
+
         try {
-            $media = $this->resolveMedia($serviceProvider, $mediaId);
             $media->delete();
 
             app(CalculateProfileCompletionAction::class)->execute($serviceProvider->fresh());
@@ -173,7 +146,7 @@ class GalleryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('service_provider.gallery_image_deleted'),
-                'count'   => $serviceProvider->getMedia('gallery')->count(),
+                'count'   => $serviceProvider->media()->where('collection_name', 'gallery')->count(),
                 'max'     => self::MAX_GALLERY_IMAGES,
             ]);
         } catch (\Throwable $e) {
@@ -191,6 +164,23 @@ class GalleryController extends Controller
     }
 
     // ─── Private helpers ─────────────────────────────────────────
+
+    private function storeMedia(ServiceProvider $provider, \Illuminate\Http\UploadedFile $file): Media
+    {
+        $token = (string) \Illuminate\Support\Str::uuid();
+        try {
+            return $provider->addMedia($file)
+                ->withCustomProperties(['upload_token' => $token])
+                ->toMediaCollection('gallery');
+        } catch (\Throwable $error) {
+            // Spatie saves the row before converting. Clean up only this
+            // failed upload, so retries cannot accumulate incomplete images.
+            $provider->media()->where('collection_name', 'gallery')
+                ->where('custom_properties->upload_token', $token)
+                ->get()->each->delete();
+            throw $error;
+        }
+    }
 
     private function resolveMedia(ServiceProvider $serviceProvider, int $mediaId): Media
     {

@@ -18,4 +18,5 @@ return [
     'click_to_rate' => 'Cliquez pour évaluer',
     'stars' => 'étoiles',
     'out_of_5' => 'sur 5',
+    'only_clients_can_rate' => 'Seuls les clients peuvent évaluer les prestataires.',
 ];

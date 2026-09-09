@@ -99,6 +99,8 @@ return [
     // Homepage Redesign Additions
     'top_providers_title' => 'Top Rated Providers',
     'top_providers_desc' => 'Discover our highest-rated professionals ready to assist you.',
+    'discover_providers_title' => 'Discover Our Providers',
+    'discover_providers_desc' => 'Browse our verified professionals ready to help you.',
     'verified_badge' => '',
     'reviews' => 'Reviews',
     'recommendations' => 'Recommendations',

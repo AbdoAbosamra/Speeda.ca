@@ -22,7 +22,6 @@ use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\LegalPageController as AdminLegalPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\VisitorAnalyticsController;
-use App\Http\Controllers\DebugController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -36,42 +35,6 @@ Route::get('/current-locale', [LocaleController::class, 'getCurrentLocale'])->na
 
 // ==================== PUBLIC ROUTES ====================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
-// Test translation route (internal diagnostics only)
-Route::middleware(['auth', 'admin'])->get('/test-translations', function () {
-    return response()->json([
-        'roadside_en' => __('categories.roadside_assistance_24_7'),
-        'accounting_en' => __('categories.accounting_bookkeeping_tax_preparation'),
-        'roadside_ar' => trans('categories.roadside_assistance_24_7', [], 'ar'),
-        'accounting_ar' => trans('categories.accounting_bookkeeping_tax_preparation', [], 'ar'),
-    ]);
-});
-
-// === DIAGNOSTIC ROUTE (Internal debugging only) ===
-Route::middleware(['auth', 'admin'])->get('/diagnostic', function () {
-    $totalSP = \App\Models\ServiceProvider::count();
-    $spWithImages = \App\Models\ServiceProvider::whereNotNull('profile_image')
-        ->where('profile_image', '!=', '')
-        ->count();
-
-    $serviceProviders = \App\Models\ServiceProvider::limit(3)->get();
-
-    $storageDir = storage_path('app/public/profile-images');
-    $storageFiles = [];
-    if (is_dir($storageDir)) {
-        $files = array_diff(scandir($storageDir), ['.', '..', '.gitignore']);
-        $storageFiles = array_values($files);
-    }
-    $storageCount = count($storageFiles);
-
-    return view('diagnostic', compact(
-        'totalSP',
-        'spWithImages',
-        'serviceProviders',
-        'storageFiles',
-        'storageCount'
-    ));
-})->name('diagnostic');
 
 // Static pages
 Route::get('/locations', [LocationController::class, 'index'])->name('location');
@@ -94,6 +57,7 @@ Route::get('/service-providers', [ServiceProviderController::class, 'index'])
 
 // Public profile view
 Route::get('/service-providers/{serviceProvider}', [ServiceProviderController::class, 'show'])
+    ->whereNumber('serviceProvider')
     ->name('service-providers.show');
 
 // Track contact reveal (no auth required, uses session)
@@ -117,8 +81,6 @@ Route::middleware(['auth'])->get('/dashboard', function () {
     return redirect()->route('service-providers.index');
 })->name('dashboard');
 
-// Simple authenticated diagnostics for debugging roles, migrations, storage, locations
-Route::middleware(['auth'])->get('/debug-status', [DebugController::class, 'status'])->name('debug.status');
 
 // ==================== USER PROFILE ROUTES ====================
 Route::middleware(['auth'])->group(function () {

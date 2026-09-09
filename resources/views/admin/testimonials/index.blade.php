@@ -21,14 +21,14 @@
                 </x-slot:actions>
             </x-admin.header>
 
-            {{-- Status banner: home section only shows with exactly 3 active --}}
-            @php($isReady = $activeCount === \App\Models\SiteTestimonial::DISPLAY_COUNT)
+            {{-- Status banner: home section shows with 1 or more active testimonials --}}
+            @php($isReady = $activeCount >= 1)
             <div class="admin-testimonial-status {{ $isReady ? 'is-ready' : 'is-warning' }}">
                 <i class="fas {{ $isReady ? 'fa-circle-check' : 'fa-triangle-exclamation' }}"></i>
                 @if($isReady)
-                    <span>{{ $activeCount }} active testimonials — the home section is live.</span>
+                    <span>{{ $activeCount }} active testimonial(s) — the home section is live (displaying up to {{ \App\Models\SiteTestimonial::MAX_DISPLAY }}).</span>
                 @else
-                    <span>{{ $activeCount }} active testimonial(s). The home section shows only when <strong>exactly 3</strong> are active; otherwise it is hidden.</span>
+                    <span>{{ $activeCount }} active testimonial(s). The home section shows when at least <strong>1</strong> is active; otherwise it is hidden.</span>
                 @endif
             </div>
 

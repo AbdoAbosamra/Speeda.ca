@@ -67,7 +67,9 @@ trait BuildsAnalyticsPayload
 
         if ($has('session_hash')) {
             $payload['session_hash'] = $sessionHash;
-        } elseif ($has('ip_address')) {
+        }
+
+        if ($has('ip_address')) {
             // Legacy schema: store a non-reversible token, never a real IP.
             $payload['ip_address'] = 'hash:' . substr($sessionHash, 0, 40);
         }

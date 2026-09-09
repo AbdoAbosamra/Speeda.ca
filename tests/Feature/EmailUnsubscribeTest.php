@@ -126,6 +126,60 @@ class EmailUnsubscribeTest extends TestCase
         $this->assertStringNotContainsString('/email/unsubscribe/', $html);
     }
 
+    /**
+     * The two data providers above are hand-written lists, so a mailable added
+     * later would simply not be tested — and a marketing email that ships
+     * without an opt-out link is exactly the thing that gets a sending domain
+     * blocked. This walks app/Mail instead of trusting the lists, and fails
+     * until the new class is either covered or declared transactional.
+     */
+    public function test_no_mailable_escapes_the_opt_out_checks(): void
+    {
+        $declared = array_merge(
+            array_column(self::providerMailables(), 0),
+            array_column(self::clientMailables(), 0),
+            [
+                // Carries the link through its own constructor argument, and is
+                // covered by ProviderBroadcastTest.
+                \App\Mail\Provider\BroadcastEmail::class,
+            ],
+        );
+
+        $found = [];
+
+        foreach (
+            new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator(app_path('Mail'), \FilesystemIterator::SKIP_DOTS)
+            ) as $file
+        ) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $class = 'App\\Mail\\' . str_replace(
+                [DIRECTORY_SEPARATOR, '.php'],
+                ['\\', ''],
+                substr($file->getPathname(), strlen(app_path('Mail')) + 1)
+            );
+
+            if (! class_exists($class) || (new \ReflectionClass($class))->isAbstract()) {
+                continue;
+            }
+
+            $found[] = $class;
+        }
+
+        $this->assertNotEmpty($found, 'No mailables were discovered — the scan is broken, not the mail.');
+
+        $uncovered = array_diff($found, $declared);
+
+        $this->assertSame([], array_values($uncovered), sprintf(
+            'These mailables are not covered by an opt-out test: %s. Add them to providerMailables()/clientMailables(), '
+            . 'or to the transactional list here if the mail is account-critical.',
+            implode(', ', $uncovered)
+        ));
+    }
+
     /* ================================================================== */
     /*  The flag actually stops mail                                       */
     /* ================================================================== */

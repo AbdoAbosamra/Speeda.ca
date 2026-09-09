@@ -150,6 +150,79 @@ class ProviderProfileLayoutTest extends TestCase
     }
 
     /**
+     * The page carries two WhatsApp calls to action: one near the top for
+     * phones, and one in the contact card. On a wide screen the card sits in
+     * its own column and the early one is hidden; on a phone the card stacks
+     * underneath the profile, so without a matching rule on the card's button
+     * the visitor scrolls past the same green button twice.
+     *
+     * Both are always in the HTML — which one shows is decided by Bootstrap's
+     * display utilities — so this resolves those utilities the way the browser
+     * would and counts what is actually visible at each width.
+     */
+    public function test_exactly_one_whatsapp_call_to_action_shows_at_every_width(): void
+    {
+        $provider = $this->provider();
+        $provider->update(['whatsapp_number' => '+15551234567']);
+
+        $html = $this->get(route('service-providers.show', $provider))->assertOk()->getContent();
+
+        $doc = new \DOMDocument;
+        libxml_use_internal_errors(true);
+        $doc->loadHTML('<?xml encoding="UTF-8">'.$html);
+        libxml_clear_errors();
+
+        $xpath = new \DOMXPath($doc);
+        $label = __('service_provider.contact_whatsapp');
+        $nodes = $xpath->query("//button[contains(., '{$label}')] | //a[contains(., '{$label}')]");
+
+        $this->assertGreaterThan(0, $nodes->length, 'No WhatsApp call to action was rendered at all.');
+
+        foreach (['phone' => false, 'desktop' => true] as $width => $isLarge) {
+            $visible = 0;
+
+            foreach ($nodes as $node) {
+                if ($this->isVisibleAt($node, $isLarge)) {
+                    $visible++;
+                }
+            }
+
+            $this->assertSame(1, $visible, "Expected one WhatsApp button on {$width}, found {$visible}.");
+        }
+    }
+
+    /**
+     * Resolves Bootstrap's d-* utilities on an element and its ancestors.
+     * `d-none` hides everywhere; `d-lg-none` hides from lg up; `d-lg-<value>`
+     * shows again from lg up. The last rule that applies at a width wins,
+     * which is why the lg variants are checked after the base one.
+     */
+    private function isVisibleAt(\DOMNode $node, bool $isLarge): bool
+    {
+        for ($n = $node; $n instanceof \DOMElement; $n = $n->parentNode) {
+            $classes = preg_split('/\s+/', $n->getAttribute('class') ?: '', -1, PREG_SPLIT_NO_EMPTY);
+
+            $display = in_array('d-none', $classes, true) ? 'none' : null;
+
+            if ($isLarge) {
+                foreach ($classes as $class) {
+                    if ($class === 'd-lg-none') {
+                        $display = 'none';
+                    } elseif (str_starts_with($class, 'd-lg-')) {
+                        $display = substr($class, 5);
+                    }
+                }
+            }
+
+            if ($display === 'none') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * The sidebar is a sibling of the main column, never a descendant of it.
      * Swallowing it is the other way this page loses its two-column layout.
      */

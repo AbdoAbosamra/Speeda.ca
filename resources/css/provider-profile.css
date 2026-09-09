@@ -1007,3 +1007,21 @@ small.text-muted {
     height: 1rem;
     border-width: 0.15em;
 }
+
+/*
+ * Text a provider typed themselves — the name, the description, the address —
+ * can contain a run of characters with no space in it: a long URL, an email,
+ * or simply typing without spacing. The default `overflow-wrap: normal` refuses
+ * to break inside a word, so on a phone the run is not wrapped but clipped, and
+ * the end of the sentence is silently lost. Measured at 375px: a 467px string
+ * inside a 311px column, with 156px of it unreachable.
+ *
+ * `anywhere` is the value that also lets the box shrink to the container,
+ * rather than only breaking after it has already overflowed.
+ */
+.profile-content h1,
+.profile-content .fs-6,
+.profile-card .provider-bio,
+.provider-contact-card .contact-value {
+    overflow-wrap: anywhere;
+}

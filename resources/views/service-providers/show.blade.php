@@ -1309,10 +1309,14 @@
                         @endphp
 
                         @if(!empty($whatsappNumberClean))
-                            {{-- WhatsApp Button (tracks analytics then opens WhatsApp) --}}
+                            {{-- WhatsApp Button (tracks analytics then opens WhatsApp).
+                                 Hidden below lg, where the same call to action already
+                                 sits near the top of the page under the name — this
+                                 card stacks underneath the profile on a phone, so
+                                 without d-none the two render one above the other. --}}
                             <button
                                 onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
-                                class="btn w-100 mb-3"
+                                class="btn w-100 mb-3 d-none d-lg-inline-flex align-items-center justify-content-center"
                                 style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
                                 <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
                             </button>

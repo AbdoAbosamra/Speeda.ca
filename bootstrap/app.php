@@ -21,12 +21,17 @@ return Application::configure(basePath: dirname(__DIR__))
         })->daily();
     })
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         // Add SetLocale, TrackVisitor, and CheckUserStatus to web middleware group
         $middleware->web(append: [
             SetLocale::class,
             TrackVisitor::class,
             CheckUserStatus::class, // Check if user account is active
             TrackUserPresence::class, // Presence heartbeat (last_seen_at)
+            // Must run before the controller validates: Laravel's validator
+            // collapses every PHP upload failure into one message that names no
+            // cause. This replaces it with the actual reason, per field.
+            \App\Http\Middleware\ExplainUploadFailures::class,
         ]);
 
         // Gmail/Outlook one-click unsubscribe POSTs straight from the inbox and

@@ -147,39 +147,6 @@
                             </div>
                         </div>
 
-                        {{-- Mobile-only WhatsApp Connect Button (Under Photo & Languages) --}}
-                        @if(!auth()->check() || auth()->id() !== $serviceProvider->user_id)
-                            @php
-                                $mobileWhatsappNumber = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
-                                $mobileWhatsappNumber = preg_replace('/[^0-9+]/', '', (string) $mobileWhatsappNumber);
-                                if (!empty($mobileWhatsappNumber)) {
-                                    if (!str_starts_with($mobileWhatsappNumber, '+')) {
-                                        if (str_starts_with($mobileWhatsappNumber, '1') && strlen($mobileWhatsappNumber) == 11) {
-                                            $mobileWhatsappNumber = '+' . $mobileWhatsappNumber;
-                                        } elseif (str_starts_with($mobileWhatsappNumber, '0')) {
-                                            $mobileWhatsappNumber = '+20' . ltrim($mobileWhatsappNumber, '0');
-                                        } else {
-                                            $mobileWhatsappNumber = '+20' . $mobileWhatsappNumber;
-                                        }
-                                    }
-                                    $mobileWhatsappClean = str_replace('+', '', $mobileWhatsappNumber);
-                                } else {
-                                    $mobileWhatsappClean = '';
-                                }
-                            @endphp
-
-                            @if(!empty($mobileWhatsappClean))
-                                <div class="d-lg-none mb-3">
-                                    <button
-                                        type="button"
-                                        onclick="revealContactInfo('{{ $mobileWhatsappClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
-                                        class="btn w-100 d-inline-flex align-items-center justify-content-center"
-                                        style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 1.5rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); font-size: 1rem;">
-                                        <i class="fab fa-whatsapp me-2 fs-5"></i> {{ __('service_provider.contact_whatsapp') }}
-                                    </button>
-                                </div>
-                            @endif
-                        @endif
 
                         @if(auth()->id() === $serviceProvider->user_id)
                             <!-- Owner-only Edit Section -->
@@ -1310,13 +1277,14 @@
 
                         @if(!empty($whatsappNumberClean))
                             {{-- WhatsApp Button (tracks analytics then opens WhatsApp).
-                                 Hidden below lg, where the same call to action already
-                                 sits near the top of the page under the name — this
-                                 card stacks underneath the profile on a phone, so
-                                 without d-none the two render one above the other. --}}
+                                 The only one on the page: a second copy used to sit
+                                 near the top for phones, but this card stacks under
+                                 the profile below lg, so both rendered and the same
+                                 green button appeared twice on every non-desktop
+                                 width. This one shows at every width instead. --}}
                             <button
                                 onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
-                                class="btn w-100 mb-3 d-none d-lg-inline-flex align-items-center justify-content-center"
+                                class="btn w-100 mb-3 d-inline-flex align-items-center justify-content-center"
                                 style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
                                 <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
                             </button>

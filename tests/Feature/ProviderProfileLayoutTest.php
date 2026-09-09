@@ -150,15 +150,16 @@ class ProviderProfileLayoutTest extends TestCase
     }
 
     /**
-     * The page carries two WhatsApp calls to action: one near the top for
-     * phones, and one in the contact card. On a wide screen the card sits in
-     * its own column and the early one is hidden; on a phone the card stacks
-     * underneath the profile, so without a matching rule on the card's button
-     * the visitor scrolls past the same green button twice.
+     * There is exactly one WhatsApp call to action, in the contact card, and it
+     * shows at every width. A second copy used to sit near the top of the page
+     * for phones; because the card stacks under the profile below lg, both
+     * rendered and the visitor scrolled past the same green button twice on
+     * every non-desktop size.
      *
-     * Both are always in the HTML — which one shows is decided by Bootstrap's
-     * display utilities — so this resolves those utilities the way the browser
-     * would and counts what is actually visible at each width.
+     * Visibility is decided by Bootstrap's display utilities rather than by
+     * what is in the markup, so this resolves those utilities the way a browser
+     * would and counts what is actually visible — a reintroduced duplicate is
+     * caught whether it is a new element or a changed class.
      */
     public function test_exactly_one_whatsapp_call_to_action_shows_at_every_width(): void
     {

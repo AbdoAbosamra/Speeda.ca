@@ -37,7 +37,8 @@ class AuthenticatedSessionController extends Controller
                     ->with('success', __('auth.login_success'));
             }
 
-            if ($user->role === 'service_provider') {
+            // A provider account whose profile row is missing would 500 here.
+            if ($user->role === 'service_provider' && $user->serviceProvider) {
                 return redirect()->intended(route('service-providers.show', $user->serviceProvider->id))
                     ->with('success', __('auth.login_success'));
             }

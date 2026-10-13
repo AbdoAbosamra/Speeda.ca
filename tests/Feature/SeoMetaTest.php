@@ -112,6 +112,12 @@ class SeoMetaTest extends TestCase
         $this->assertFileExists(public_path('images/og-home.jpg'));
     }
 
+    public function test_pages_without_controller_seo_use_their_own_title(): void
+    {
+        $this->get('/__no_such_page')->assertNotFound()
+            ->assertSee('<title>404 - Page Not Found | ' . config('app.name') . '</title>', false);
+    }
+
     public function test_static_pages_describe_themselves(): void
     {
         $this->get(route('about-us'))

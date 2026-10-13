@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\SEO\Services\SeoMetaService;
 use App\Models\LegalPage;
 use Illuminate\View\View;
 
@@ -26,7 +27,7 @@ class LegalPageController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return view('legal-pages.show', compact('page'));
+        return $this->render($page);
     }
 
     private function showDefaultPage(string $slug): View
@@ -41,10 +42,20 @@ class LegalPageController extends Controller
                 ->first();
 
             if ($page) {
-                return view('legal-pages.show', compact('page'));
+                return $this->render($page);
             }
         }
 
         return view($default['fallback_view']);
+    }
+
+    /**
+     * The admin writes an SEO title and description for each page; use them.
+     */
+    private function render(LegalPage $page): View
+    {
+        app(SeoMetaService::class)->applyPage($page->localized_seo_title, $page->localized_seo_description, url()->current());
+
+        return view('legal-pages.show', compact('page'));
     }
 }

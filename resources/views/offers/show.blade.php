@@ -3,6 +3,18 @@
 @include('partials.offers.styles')
 @include('partials.offers.scripts')
 
+@push('json-ld')
+    <script type="application/ld+json">{!! \App\Support\SafeJsonLd::encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => __('offers.breadcrumb_home'), 'item' => route('home')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => __('offers.page_title'), 'item' => route('offers.index')],
+            ['@type' => 'ListItem', 'position' => 3, 'name' => $offer->localized_title, 'item' => route('offers.show', $offer->slug)],
+        ],
+    ]) !!}</script>
+@endpush
+
 @section('content')
 @php
     $provider = $offer->serviceProvider;

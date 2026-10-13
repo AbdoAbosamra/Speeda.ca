@@ -17,6 +17,14 @@ class BlogPostSeoBuilder extends BaseSeoBuilder
             return new SeoData(title: config('app.name'));
         }
 
+        // Built from the route, not the visitor's URL: this result is cached
+        // per post, so a stray query string must not become the canonical.
+        $url = route('blogs.show', $post);
+        $hreflangs = [];
+        foreach (array_keys(config('app.supported_locales', ['en' => [], 'ar' => [], 'fr' => []])) as $locale) {
+            $hreflangs[$locale] = route('blogs.show', [$post, 'lang' => $locale]);
+        }
+
         $description = $post->localized_seo_description
             ?: Str::limit(strip_tags($post->localized_excerpt ?: $post->localized_content), 160);
 
@@ -26,8 +34,8 @@ class BlogPostSeoBuilder extends BaseSeoBuilder
             keywords: $post->localized_seo_keywords,
             ogImage: $post->image_url,
             ogType: 'article',
-            canonical: $post->canonical_url ?: $this->getCanonicalUrl(),
-            hreflangs: $this->getHreflangs(),
+            canonical: $post->canonical_url ?: $url,
+            hreflangs: $hreflangs,
             robots: $post->isIndexable() ? ($post->meta_robots ?: 'index, follow') : 'noindex, nofollow'
         );
     }

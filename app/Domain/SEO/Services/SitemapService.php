@@ -115,6 +115,13 @@ class SitemapService
             // 5. Published Blog Posts
             Post::query()->published()->chunk(100, function ($posts) use ($sitemap, $locales, &$urlCount) {
                 foreach ($posts as $post) {
+                    // A sitemap lists only pages that ask to be indexed under their own URL.
+                    if (! $post->isIndexable()
+                        || str_contains(strtolower((string) $post->meta_robots), 'noindex')
+                        || (filled($post->canonical_url) && rtrim($post->canonical_url, '/') !== rtrim(route('blogs.show', $post), '/'))) {
+                        continue;
+                    }
+
                     $sitemap->add($this->createCanonicalEntry(
                         route('blogs.show', $post),
                         0.7,

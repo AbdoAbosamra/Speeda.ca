@@ -65,7 +65,7 @@ class AdminDashboardService
 
             return [
                 'live' => Offer::live()->count(),
-                'ending_soon' => Offer::live()->whereBetween('ends_at', [today()->toDateString(), today()->addDays(7)->toDateString()])->count(),
+                'ending_soon' => Offer::live()->whereBetween('ends_at', [today()->toDateString(), today()->addDays(Offer::ENDING_SOON_DAYS)->toDateString()])->count(),
                 'pending_comments' => OfferComment::where('status', OfferComment::STATUS_PENDING)->count(),
                 'views' => (int) ($events[OfferEvent::VIEW] ?? 0),
                 'clicks' => (int) ($events[OfferEvent::CLAIM] ?? 0),

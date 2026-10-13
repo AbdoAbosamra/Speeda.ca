@@ -30,20 +30,49 @@ class SeoMetaService
         $this->injectIntoSeoTools($data);
     }
 
+    /**
+     * Full meta for a page that has no builder: title, description, canonical,
+     * one alternate per language, Open Graph and Twitter. The canonical is
+     * passed in (a route URL), never read from the visitor's query string.
+     */
+    public function applyPage(string $title, ?string $description, string $canonical, ?string $image = null, string $robots = 'index, follow'): void
+    {
+        $hreflangs = [];
+        foreach (array_keys(config('app.supported_locales', ['en' => [], 'ar' => [], 'fr' => []])) as $locale) {
+            $hreflangs[$locale] = $canonical . (str_contains($canonical, '?') ? '&' : '?') . 'lang=' . $locale;
+        }
+
+        $this->injectIntoSeoTools(new SeoData(
+            title: $title . ' | ' . config('app.name'),
+            description: $description ? \Illuminate\Support\Str::limit(trim(strip_tags($description)), 160) : __('seo.default_description'),
+            ogImage: $image,
+            canonical: $canonical,
+            hreflangs: $hreflangs,
+            robots: $robots,
+        ));
+    }
+
     public function getData(string $type, ?object $model = null): SeoData
     {
-        $locale = App::getLocale();
-        $modelId = $model?->id ?? 'default';
-        $cacheKey = "seo_meta_{$type}_{$modelId}_{$locale}";
-
-        return Cache::remember($cacheKey, 3600, function () use ($type, $model) {
+        $build = function () use ($type, $model) {
             $builderClass = $this->builders[$type] ?? null;
             if (!$builderClass) {
                 return new SeoData(title: config('app.name'));
             }
 
             return app($builderClass)->build($model);
-        });
+        };
+
+        // Only a model's own page is cached: its meta depends on the model and
+        // locale alone. Pages without a model (home, search, the category
+        // lists) are built from the current URL — one shared key let the first
+        // visitor's search title or page (/categories vs /service-providers)
+        // be served to everyone for an hour. They are cheap to build.
+        if ($model?->id === null) {
+            return $build();
+        }
+
+        return Cache::remember("seo_meta_{$type}_{$model->id}_" . App::getLocale(), 3600, $build);
     }
 
     protected function injectIntoSeoTools(SeoData $data): void
@@ -61,16 +90,18 @@ class SeoMetaService
             SEOTools::setCanonical($data->canonical);
         }
 
-        SEOTools::metatags()->addMeta('robots', $data->robots);
+        SEOTools::metatags()->setRobots($data->robots);
         SEOTools::opengraph()->setTitle($data->title);
         SEOTools::opengraph()->setDescription($data->description ?? '');
         SEOTools::opengraph()->setUrl($data->canonical ?: url()->current());
 
-        if ($data->ogImage) {
-            SEOTools::opengraph()->addImage($data->ogImage);
-            SEOTools::twitter()->setImage($data->ogImage);
-            SEOTools::jsonLd()->addImage($data->ogImage);
-        }
+        // Every page gets a share preview; pages without their own image use
+        // the site card rather than none (WhatsApp/Facebook show a bare link).
+        $image = $data->ogImage ?: asset('images/og-home.jpg');
+        SEOTools::opengraph()->addImage($image);
+        SEOTools::twitter()->setImage($image);
+        SEOTools::twitter()->setType('summary_large_image');
+        SEOTools::jsonLd()->addImage($image);
 
         SEOTools::opengraph()->setType($data->ogType);
         SEOTools::twitter()->setTitle($data->title);
@@ -84,6 +115,9 @@ class SeoMetaService
 
         foreach ($data->hreflangs as $lang => $url) {
             SEOTools::metatags()->addAlternateLanguage($lang, $url);
+        }
+        if ($data->hreflangs && $data->canonical) {
+            SEOTools::metatags()->addAlternateLanguage('x-default', $data->canonical);
         }
     }
 

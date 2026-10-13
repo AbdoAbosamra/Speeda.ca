@@ -18,7 +18,7 @@ class HomeSeoBuilder extends BaseSeoBuilder
             title: __('seo.home_title') . ' | ' . config('app.name'),
             description: __('seo.home_description'),
             keywords: __('seo.home_keywords'),
-            ogImage: asset('images/og-home.png'),
+            ogImage: asset('images/og-home.jpg'),
             canonical: route('home'),
             hreflangs: $hreflangs
         );

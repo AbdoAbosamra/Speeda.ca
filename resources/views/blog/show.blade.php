@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('json-ld')
-    <script type="application/ld+json">{!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    <script type="application/ld+json">{!! \App\Support\SafeJsonLd::encode($schemaData) !!}</script>
 @endpush
 
 @push('styles')
@@ -24,10 +24,6 @@
         .blog-content hr { border: 0; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
     </style>
 @endpush
-
-@section('head')
-    @include('seo.meta', ['seo' => $seo ?? null])
-@endsection
 
 @section('content')
     <section class="py-8 py-lg-12">

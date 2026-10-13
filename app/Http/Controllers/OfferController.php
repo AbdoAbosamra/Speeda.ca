@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\SEO\Services\SeoMetaService;
 use App\Models\Offer;
 use App\Models\OfferEvent;
 use App\Models\ServiceProvider;
 use App\Services\OfferTrackingService;
-use Artesaos\SEOTools\Facades\SEOTools;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
@@ -22,7 +21,7 @@ class OfferController extends Controller
 {
     private const PER_PAGE = 12;
 
-    public function __construct(private OfferTrackingService $tracker)
+    public function __construct(private OfferTrackingService $tracker, private SeoMetaService $seo)
     {
     }
 
@@ -39,13 +38,13 @@ class OfferController extends Controller
             ->whereBetween('ends_at', [today()->toDateString(), today()->addDays(Offer::ENDING_SOON_DAYS)->toDateString()])
             ->orderBy('ends_at')->ordered()->limit(4)->get();
 
-        SEOTools::setTitle(__('offers.meta_title', ['app_name' => config('app.name')]), false);
-        SEOTools::setDescription(__('offers.meta_description'));
-        SEOTools::setCanonical(route('offers.index'));
-        SEOTools::opengraph()->setUrl(route('offers.index'));
-        if ($page > 1) {
-            SEOTools::metatags()->addMeta('robots', 'noindex, follow');
-        }
+        $this->seo->applyPage(
+            __('offers.meta_title'),
+            __('offers.meta_description'),
+            route('offers.index'),
+            null,
+            $page > 1 ? 'noindex, follow' : 'index, follow',
+        );
 
         return view('offers.index', [
             'offers' => $offers,
@@ -98,19 +97,14 @@ class OfferController extends Controller
             && $viewer->favoriteOffers()->whereKey($offer->id)->exists();
         $comments = $offer->approvedComments()->take(30)->get();
 
-        $description = $offer->localized_summary ?: Str::limit(strip_tags((string) $offer->localized_details), 155);
-        SEOTools::setTitle($offer->localized_title . ' · ' . $offer->providerName() . ' | ' . config('app.name'), false);
-        SEOTools::setDescription($description ?: __('offers.meta_description'));
-        SEOTools::setCanonical(route('offers.show', $offer->slug));
-        SEOTools::opengraph()->setUrl(route('offers.show', $offer->slug));
-        SEOTools::opengraph()->setType('website');
-        if ($offer->image_url) {
-            SEOTools::opengraph()->addImage(url($offer->image_url));
-            SEOTools::twitter()->setImage(url($offer->image_url));
-        }
-        if (! $isLive) {
-            SEOTools::metatags()->addMeta('robots', 'noindex, follow');
-        }
+        $this->seo->applyPage(
+            $offer->localized_title . ' · ' . $offer->providerName(),
+            $offer->localized_summary ?: ($offer->localized_details ?: __('offers.meta_description')),
+            route('offers.show', $offer->slug),
+            $offer->image_url ? url($offer->image_url) : null,
+            // Ended offers keep their page for shared links but leave the index.
+            $isLive ? 'index, follow' : 'noindex, follow',
+        );
 
         return view('offers.show', [
             'offer' => $offer,

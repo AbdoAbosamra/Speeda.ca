@@ -45,7 +45,7 @@
     $firstErrorLocale = collect(array_keys($locales))->first(fn ($l) => $errors->hasAny(["title_$l", "summary_$l", "details_$l", "terms_$l", "badge_text_$l"])) ?? 'en';
 @endphp
 
-<div class="admin-cms-page ao-page" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<div class="admin-cms-page ao-page" dir="ltr">
     <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
         <x-admin.header
             eyebrow="Local Offers"
@@ -72,19 +72,6 @@
             @if($offer->exists) @method('PUT') @endif
 
             <div class="ao-editor-main">
-            <div class="ao-card mb-3">
-                <input type="hidden" name="mark_verified" value="0">
-                <label class="d-flex align-items-start gap-2">
-                    <input type="checkbox" name="mark_verified" value="1" @checked(old('mark_verified', (bool) $offer->verified_at))>
-                    <span>I have reviewed this offer's details, dates and destination with the provider.
-                        <small class="d-block text-muted">Visitors see "Reviewed by the SPEEDA team on &lt;date&gt;". The date is renewed when you change the provider, deal, dates or button and keep this ticked. Untick it to remove the badge.</small>
-                    </span>
-                </label>
-                @if($offer->verified_at)
-                    <small class="text-success">Reviewed {{ $offer->verified_at->format('M j, Y H:i') }}{{ $offer->verifier ? ' by ' . $offer->verifier->name : '' }}.</small>
-                @endif
-            </div>
-
                 {{-- ============ 1. PROVIDER ============ --}}
                 <section class="ao-card ao-sec">
                     <h3><span>1</span> Provider</h3>
@@ -260,6 +247,18 @@
                         <input type="hidden" name="is_featured" value="0">
                         <span class="ao-switch"><input type="checkbox" name="is_featured" value="1" x-model="s.featured"><span></span></span>
                         <span><strong>Show on the home page</strong><small>Also always listed on /offers and on the provider profile.</small></span>
+                    </label>
+                    <label class="ao-switch-row">
+                        <input type="hidden" name="mark_verified" value="0">
+                        <span class="ao-switch"><input type="checkbox" name="mark_verified" value="1" @checked(old('mark_verified', (bool) $offer->verified_at))><span></span></span>
+                        <span>
+                            <strong>Reviewed with the provider</strong>
+                            <small>Shows "Reviewed by the SPEEDA team on &lt;date&gt;" on the offer. The date renews when you change the provider, deal, dates or button with this on.
+                                @if($offer->verified_at)
+                                    <span class="text-success d-block">Reviewed {{ $offer->verified_at->format('M j, Y') }}{{ $offer->verifier ? ' by ' . $offer->verifier->name : '' }}.</span>
+                                @endif
+                            </small>
+                        </span>
                     </label>
                     <details class="ao-advanced">
                         <summary>Advanced</summary>

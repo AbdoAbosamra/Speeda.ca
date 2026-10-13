@@ -25,10 +25,18 @@ class ProviderSeoBuilder extends BaseSeoBuilder
             $hreflangs[$locale] = route('service-providers.show', [$provider, 'lang' => $locale]);
         }
 
+        // "Name - Category Ottawa", without stray separators when a part is missing.
+        $detail = trim(implode(' ', array_filter([$category, $city])));
+        $bio = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $provider->bio)));
+        if ($bio === 'Service provider profile. Please complete your details.') {
+            $bio = ''; // the signup placeholder, not a description
+        }
+
         return new SeoData(
-            title: $name . ' - ' . $category . ' ' . $city . ' | ' . config('app.name'),
-            description: $provider->bio ? mb_substr(strip_tags($provider->bio), 0, 160) : null,
-            ogImage: $provider->display_image_url,
+            title: ($detail !== '' ? $name . ' - ' . $detail : $name) . ' | ' . config('app.name'),
+            description: $bio !== '' ? \Illuminate\Support\Str::limit($bio, 157) : __('seo.provider_default_description', ['name' => $name]),
+            // Share previews need an absolute URL; the fallback image is a path.
+            ogImage: url($provider->display_image_url),
             ogType: 'profile',
             canonical: $canonicalUrl,
             hreflangs: $hreflangs

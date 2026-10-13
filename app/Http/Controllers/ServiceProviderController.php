@@ -164,7 +164,7 @@ class ServiceProviderController extends Controller
 
         // Protect against Soft 404: if a search or filter yields 0 results, tell search engines noindex, follow
         if ($serviceProviders->isEmpty() && ($request->filled('search') || $request->filled('category') || $request->filled('location') || $request->filled('city'))) {
-            \Artesaos\SEOTools\Facades\SEOTools::metatags()->addMeta('robots', 'noindex, follow');
+            \Artesaos\SEOTools\Facades\SEOTools::metatags()->setRobots('noindex, follow');
         }
 
         return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts', 'activeLocationIds', 'selectedCategory'));

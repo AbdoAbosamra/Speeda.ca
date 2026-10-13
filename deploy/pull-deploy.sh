@@ -152,6 +152,18 @@ if [ "$RUN_MIGRATIONS" = "true" ]; then
   fi
 fi
 
+# Never go live on an out-of-date schema. Migrations also stamp the send-once
+# email flags of existing accounts (e.g. client_welcome_email_sent_at); code
+# running without them would e-mail every existing client again on their next
+# login. A status check that cannot even run is treated as a failure too.
+MIGRATION_STATUS="$("$PHP_BIN" artisan migrate:status --no-ansi 2>&1)" \
+  || { echo "[deploy] could not read migration status — not cutting over" >&2; exit 1; }
+PENDING_LEFT="$(printf '%s\n' "$MIGRATION_STATUS" | grep -ci pending || true)"
+if [ "${PENDING_LEFT:-0}" -gt 0 ]; then
+  echo "[deploy] $PENDING_LEFT migration(s) pending. Re-run with RUN_MIGRATIONS=true — not cutting over." >&2
+  exit 1
+fi
+
 log "Regenerating sitemap with production URLs"
 "$PHP_BIN" artisan seo:generate-sitemap --ansi >/dev/null
 

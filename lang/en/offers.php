@@ -26,7 +26,7 @@ return [
 
     // Offers page
     'page_title' => 'Local Offers',
-    'meta_title' => 'Local Offers & Exclusive Deals | :app_name',
+    'meta_title' => 'Local Offers & Exclusive Deals',
     'meta_description' => 'Exclusive deals from trusted local service providers on SPEEDA. Message the provider on WhatsApp to get the offer.',
     'hero_subtitle' => 'Exclusive deals from trusted local providers. Message them on WhatsApp to get the offer.',
     'contact_to_publish' => 'Contact us to publish your offer',

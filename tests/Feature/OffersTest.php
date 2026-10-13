@@ -635,6 +635,6 @@ class OffersTest extends TestCase
         $this->actingAs($this->admin)->get(route('admin.dashboard'))->assertOk()
             ->assertSee(route('admin.offers.index'), false)
             ->assertSee(route('admin.offers.comments'), false)
-            ->assertSee('Offers overview');
+            ->assertSee('Offers Overview');
     }
 }

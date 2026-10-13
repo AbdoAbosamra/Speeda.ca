@@ -45,15 +45,21 @@ class CategorySeoBuilder extends BaseSeoBuilder
 
     protected function buildFallback(): SeoData
     {
-        $canonicalUrl = request()->routeIs('categories')
-            ? route('categories')
-            : route('service-providers.index');
+        // Two different pages share this fallback: the category grid and the
+        // full provider list. Each gets its own title and route-built URLs.
+        $route = request()->routeIs('categories') ? 'categories' : 'service-providers.index';
+        $isCategories = $route === 'categories';
+
+        $hreflangs = [];
+        foreach (array_keys(config('app.supported_locales', ['en' => [], 'ar' => [], 'fr' => []])) as $locale) {
+            $hreflangs[$locale] = route($route, ['lang' => $locale]);
+        }
 
         return new SeoData(
-            title: __('seo.categories_all') . ' | ' . config('app.name'),
-            description: __('seo.categories_description'),
-            canonical: $canonicalUrl,
-            hreflangs: $this->getHreflangs()
+            title: __($isCategories ? 'seo.categories_all' : 'seo.providers_all') . ' | ' . config('app.name'),
+            description: __($isCategories ? 'seo.categories_description' : 'seo.providers_description'),
+            canonical: route($route),
+            hreflangs: $hreflangs
         );
     }
 }

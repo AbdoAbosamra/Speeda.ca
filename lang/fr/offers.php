@@ -26,7 +26,7 @@ return [
 
     // Offers page
     'page_title' => 'Offres locales',
-    'meta_title' => 'Offres locales et promotions exclusives | :app_name',
+    'meta_title' => 'Offres locales et promotions exclusives',
     'meta_description' => 'Des offres exclusives de prestataires locaux de confiance sur SPEEDA. Écrivez au prestataire sur WhatsApp pour en profiter.',
     'hero_subtitle' => 'Des offres exclusives de prestataires locaux de confiance. Écrivez-leur sur WhatsApp pour en profiter.',
     'contact_to_publish' => 'Contactez-nous pour publier votre offre',

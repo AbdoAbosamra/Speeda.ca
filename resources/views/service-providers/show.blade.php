@@ -4,6 +4,34 @@
     @vite(['resources/css/provider-profile.css'])
 @endpush
 
+{{-- Structured data: the provider as a local business, with its SPEEDA rating
+     once it has reviews (SPEEDA is the third party hosting them). --}}
+@push('json-ld')
+    @php
+        $ldBusiness = array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'LocalBusiness',
+            '@id' => route('service-providers.show', $serviceProvider) . '#business',
+            'name' => $serviceProvider->localized_company_name ?: ($serviceProvider->company_name ?: $serviceProvider->user?->name),
+            'url' => route('service-providers.show', $serviceProvider),
+            'image' => url($serviceProvider->display_image_url),
+            'address' => $serviceProvider->location?->city ? array_filter([
+                '@type' => 'PostalAddress',
+                'addressLocality' => $serviceProvider->location->city,
+                'addressCountry' => ['canada' => 'CA', 'egypt' => 'EG'][strtolower((string) $serviceProvider->location->country)] ?? null,
+            ]) : null,
+            'aggregateRating' => ($reviewStats['total_count'] ?? 0) > 0 && ($reviewStats['average_rating'] ?? 0) > 0 ? [
+                '@type' => 'AggregateRating',
+                'ratingValue' => $reviewStats['average_rating'],
+                'reviewCount' => $reviewStats['total_count'],
+                'bestRating' => 5,
+                'worstRating' => 1,
+            ] : null,
+        ]);
+    @endphp
+    <script type="application/ld+json">{!! \App\Support\SafeJsonLd::encode($ldBusiness) !!}</script>
+@endpush
+
 @push('styles')
     <style>
         .photo-consent-note {

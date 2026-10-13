@@ -9,9 +9,11 @@ class SearchSeoBuilder extends BaseSeoBuilder
 {
     public function build(?object $model = null): SeoData
     {
-        $query = Request::input('search');
-        $category = Request::input('category');
-        $city = Request::input('city');
+        // Visitor input: plain text, bounded, never markup in the <title>.
+        $clean = fn ($v) => \Illuminate\Support\Str::limit(trim(strip_tags(is_string($v) ? $v : '')), 60);
+        $query = $clean(Request::input('search'));
+        $category = $clean(Request::input('category'));
+        $city = $clean(Request::input('city'));
 
         $titleParts = [];
         if ($query) $titleParts[] = '"' . $query . '"';

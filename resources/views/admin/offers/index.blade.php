@@ -7,7 +7,7 @@
     $statusLabels = ['live' => 'Live', 'scheduled' => 'Scheduled', 'expired' => 'Expired', 'draft' => 'Draft'];
     $canReorder = ! $status && $search === '';
 @endphp
-<div class="admin-cms-page ao-page" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<div class="admin-cms-page ao-page" dir="ltr">
     <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
         <x-admin.header
             eyebrow="Content"

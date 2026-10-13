@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@section('head')
-    @include('seo.meta', ['seo' => $seo ?? null])
-@endsection
-
 @section('content')
     <section class="py-8 py-lg-12 bg-light">
         <div class="container">

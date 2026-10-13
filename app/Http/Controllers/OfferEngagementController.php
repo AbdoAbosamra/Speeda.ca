@@ -163,7 +163,7 @@ class OfferEngagementController extends Controller
 
     public function favorites(Request $request): View
     {
-        \Artesaos\SEOTools\Facades\SEOTools::metatags()->addMeta('robots', 'noindex, nofollow');
+        \Artesaos\SEOTools\Facades\SEOTools::metatags()->setRobots('noindex, nofollow');
         $user = $request->user();
         abort_unless($user && $user->isClient(), 403, __('offers.favorites_clients_only'));
 

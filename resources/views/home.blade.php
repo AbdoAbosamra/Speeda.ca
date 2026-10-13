@@ -247,22 +247,22 @@
 @section('content')
     @php
         $staticCategories = [
-            ['name' => __('categories.plumbing'), 'icon' => 'faucet'],
-            ['name' => __('categories.real_estate_agents'), 'icon' => 'home'],
-            ['name' => __('categories.hvac_services'), 'icon' => 'wind'],
-            ['name' => __('categories.electrical_services'), 'icon' => 'bolt'],
-            ['name' => __('categories.appliance_repair'), 'icon' => 'tools'],
-            ['name' => __('categories.insurance_brokers'), 'icon' => 'file-contract'],
-            ['name' => __('categories.driving_lessons_schools'), 'icon' => 'car'],
-            ['name' => __('categories.car_mechanics'), 'icon' => 'wrench'],
-            ['name' => __('categories.moving_services'), 'icon' => 'truck-moving'],
-            ['name' => __('categories.roadside_assistance'), 'icon' => 'car-battery'],
-            ['name' => __('categories.handyman_services'), 'icon' => 'hammer'],
-            ['name' => __('categories.landscaping_gardening'), 'icon' => 'leaf'],
-            ['name' => __('categories.auto_body_repair'), 'icon' => 'car-side'],
-            ['name' => __('categories.tire_balancing_wheel_alignment'), 'icon' => 'compact-disc'],
-            ['name' => __('categories.car_dealers'), 'icon' => 'car-rear'],
-            ['name' => __('categories.general_construction'), 'icon' => 'building'],
+            ['name' => __('categories.plumbing'), 'icon' => 'faucet', 'slug' => 'plumbing'],
+            ['name' => __('categories.real_estate_agents'), 'icon' => 'home', 'slug' => 'real-estate-agents'],
+            ['name' => __('categories.hvac_services'), 'icon' => 'wind', 'slug' => 'hvac-services'],
+            ['name' => __('categories.electrical_services'), 'icon' => 'bolt', 'slug' => 'electrical-services'],
+            ['name' => __('categories.appliance_repair'), 'icon' => 'tools', 'slug' => 'appliance-repair'],
+            ['name' => __('categories.insurance_brokers'), 'icon' => 'file-contract', 'slug' => 'insurance-brokers'],
+            ['name' => __('categories.driving_lessons_schools'), 'icon' => 'car', 'slug' => 'driving-lessons-schools'],
+            ['name' => __('categories.car_mechanics'), 'icon' => 'wrench', 'slug' => 'car-mechanics'],
+            ['name' => __('categories.moving_services'), 'icon' => 'truck-moving', 'slug' => 'moving-services'],
+            ['name' => __('categories.roadside_assistance'), 'icon' => 'car-battery', 'slug' => 'roadside-assistance'],
+            ['name' => __('categories.handyman_services'), 'icon' => 'hammer', 'slug' => 'handyman-services'],
+            ['name' => __('categories.landscaping_gardening'), 'icon' => 'leaf', 'slug' => 'landscaping-gardening'],
+            ['name' => __('categories.auto_body_repair'), 'icon' => 'car-side', 'slug' => 'auto-body-repair'],
+            ['name' => __('categories.tire_balancing_wheel_alignment'), 'icon' => 'compact-disc', 'slug' => 'tire-balancing-wheel-alignment'],
+            ['name' => __('categories.car_dealers'), 'icon' => 'car-rear', 'slug' => 'car-dealers'],
+            ['name' => __('categories.general_construction'), 'icon' => 'building', 'slug' => 'renovation-construction'],
         ];
 
         $featuredProviders = collect($featuredProviders ?? $topProviders ?? [])->take(12);
@@ -346,9 +346,11 @@
                             <div class="home-hero-visual fade-in-up" style="position: relative; z-index: 1;">
                                 <div class="home-hero-orb home-hero-orb-primary"></div>
                                 <div class="home-hero-orb home-hero-orb-secondary"></div>
-                                <img src="{{ asset('images/hero-banner.jpeg') }}" alt="{{ __('home.banner_alt') }}"
+                                <img src="{{ asset('images/hero-banner-1280.webp') }}" alt="{{ __('home.banner_alt') }}"
                                     class="img-fluid home-hero-image hero-banner-custom" loading="eager"
-                                    fetchpriority="high">
+                                    fetchpriority="high" decoding="async" width="1280" height="714"
+                                    srcset="{{ asset('images/hero-banner-640.webp') }} 640w, {{ asset('images/hero-banner-1280.webp') }} 1280w"
+                                    sizes="(max-width: 1199px) 100vw, 50vw">
                             </div>
                         </div>
                     </div>
@@ -425,7 +427,7 @@
                                     <a href="{{ route('service-providers.show', $provider) }}" class="premium-provider-card-link">
                                         <article class="premium-provider-card home-provider-card">
                                             <div class="premium-provider-img">
-                                                <img src="{{ $provider->profile_image_url }}"
+                                                <img src="{{ $provider->profile_image_url }}" onerror="this.onerror=null;this.src='{{ asset('images/user.png') }}';"
                                                     alt="{{ $provider->user->name ?? __('home.view_profile') }}" loading="lazy"
                                                     class="w-100 h-100 object-fit-cover provider-img">
                                             </div>
@@ -495,6 +497,11 @@
             </section>
         @endif
 
+        {{-- Admin-managed Local Offers, directly above Explore Services. --}}
+        @if(isset($homeOffers) && $homeOffers->isNotEmpty())
+            @include('partials.offers.home-section')
+        @endif
+
         <section class="home-section">
             <div class="container">
                 <div class="home-shell home-section-panel fade-in-up">
@@ -509,22 +516,22 @@
                     </div>
 
                     <div class="premium-category-slider-wrapper" id="categorySlider">
-                        <button class="slider-nav-btn prev" aria-label="Previous" onclick="document.getElementById('categorySliderTrack').scrollBy({left: -300, behavior: 'smooth'})">
+                        <button class="slider-nav-btn prev" aria-label="{{ __('pagination.previous') }}" onclick="document.getElementById('categorySliderTrack').scrollBy({left: document.documentElement.dir === 'rtl' ? 300 : -300, behavior: 'smooth'})">
                             <i class="fas fa-chevron-left"></i>
                         </button>
 
                         <div class="premium-category-slider-track" id="categorySliderTrack">
                             @foreach($staticCategories as $subcat)
-                                <article class="home-category-card">
+                                <a href="{{ route('service-providers.index', ['category' => $subcat['slug']]) }}" class="home-category-card text-decoration-none" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
                                     <div class="premium-subcat-icon">
                                         <i class="fas fa-{{ $subcat['icon'] }}"></i>
                                     </div>
                                     <h3 class="premium-subcat-title">{{ $subcat['name'] }}</h3>
-                                </article>
+                                </a>
                             @endforeach
                         </div>
 
-                        <button class="slider-nav-btn next" aria-label="Next" onclick="document.getElementById('categorySliderTrack').scrollBy({left: 300, behavior: 'smooth'})">
+                        <button class="slider-nav-btn next" aria-label="{{ __('pagination.next') }}" onclick="document.getElementById('categorySliderTrack').scrollBy({left: document.documentElement.dir === 'rtl' ? -300 : 300, behavior: 'smooth'})">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -552,12 +559,15 @@
                                 @endfor
                             </div>
 
-                            <p class="home-testimonial-text">{{ $testimonial->testimonial_text }}</p>
+                            <p class="home-testimonial-text" id="testimonial-{{ $testimonial->id }}">{{ $testimonial->testimonial_text }}</p>
+                            <button type="button" class="btn btn-link p-0 align-self-start" data-expand-testimonial
+                                aria-controls="testimonial-{{ $testimonial->id }}" aria-expanded="false"
+                                data-more="{{ __('readiness.read_more') }}" data-less="{{ __('readiness.read_less') }}" hidden>{{ __('readiness.read_more') }}</button>
 
                             <footer class="home-testimonial-author">
                                 @if($testimonial->display_photo)
                                     <img class="home-testimonial-avatar"
-                                         src="{{ $testimonial->display_photo }}"
+                                         src="{{ $testimonial->display_photo }}" onerror="this.onerror=null;this.src='{{ asset('images/user.png') }}';"
                                          alt="{{ $testimonial->display_name }}"
                                          width="52" height="52" loading="lazy">
                                 @else
@@ -671,7 +681,10 @@
                 /* Long unbroken strings must wrap instead of widening the card. */
                 overflow-wrap: anywhere;
                 word-break: break-word;
-                /* Keep every card the same height regardless of quote length. */
+            }
+
+            .home-testimonial-text.is-collapsed {
+                /* Clamp only after the expansion control is available. */
                 display: -webkit-box;
                 -webkit-line-clamp: 6;
                 -webkit-box-orient: vertical;
@@ -743,7 +756,9 @@
         <section class="home-section">
             <div class="container">
                 <div class="home-shell coverage-map-card fade-in-up">
-                    <img src="{{ asset('images/speeda-coverage-map.png') }}"
+                    <img src="{{ asset('images/speeda-coverage-map-1280.webp') }}"
+                        srcset="{{ asset('images/speeda-coverage-map-640.webp') }} 640w, {{ asset('images/speeda-coverage-map-1280.webp') }} 1280w"
+                        sizes="(max-width: 768px) 100vw, 1200px" width="1280" height="714" decoding="async"
                         alt="Speeda service coverage map for Ottawa, Gatineau, Montreal, Laval, and Toronto GTA"
                         loading="lazy">
                 </div>

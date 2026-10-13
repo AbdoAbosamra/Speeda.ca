@@ -83,6 +83,11 @@
                             alt="{{ $serviceProvider->localized_company_name ?? $serviceProvider->user->name }}"
                             class="profile-image" loading="lazy" id="profileImagePreview"
                             onerror="this.onerror=null;this.src='{{ $serviceProvider->default_image_url }}';">
+                        @if(($providerOffers ?? collect())->isNotEmpty())
+                            <a href="#offers" class="so-avatar-flag" onclick="event.stopPropagation()">
+                                <i class="fas fa-tag" aria-hidden="true"></i> {{ $providerOffers->first()->badgeLabel() }}
+                            </a>
+                        @endif
                         {{-- Camera overlay for owner --}}
                         @if(auth()->check() && auth()->id() === $serviceProvider->user_id)
                             <div id="imageOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:50%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;cursor:pointer;">
@@ -150,34 +155,16 @@
 
                         {{-- Mobile-only WhatsApp Connect Button (Under Photo & Languages) --}}
                         @if(!auth()->check() || auth()->id() !== $serviceProvider->user_id)
-                            @php
-                                $mobileWhatsappNumber = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
-                                $mobileWhatsappNumber = preg_replace('/[^0-9+]/', '', (string) $mobileWhatsappNumber);
-                                if (!empty($mobileWhatsappNumber)) {
-                                    if (!str_starts_with($mobileWhatsappNumber, '+')) {
-                                        if (str_starts_with($mobileWhatsappNumber, '1') && strlen($mobileWhatsappNumber) == 11) {
-                                            $mobileWhatsappNumber = '+' . $mobileWhatsappNumber;
-                                        } elseif (str_starts_with($mobileWhatsappNumber, '0')) {
-                                            $mobileWhatsappNumber = '+20' . ltrim($mobileWhatsappNumber, '0');
-                                        } else {
-                                            $mobileWhatsappNumber = '+20' . $mobileWhatsappNumber;
-                                        }
-                                    }
-                                    $mobileWhatsappClean = str_replace('+', '', $mobileWhatsappNumber);
-                                } else {
-                                    $mobileWhatsappClean = '';
-                                }
-                            @endphp
-
-                            @if(!empty($mobileWhatsappClean))
+                            @php $waUrl = $serviceProvider->whatsappContactUrl(); @endphp
+                            @if($waUrl)
                                 <div class="d-lg-none mb-3">
-                                    <button
-                                        type="button"
-                                        onclick="revealContactInfo('{{ $mobileWhatsappClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
+                                    {{-- A real link: opens WhatsApp even when scripts or popups are blocked. --}}
+                                    <a href="{{ $waUrl }}" target="_blank" rel="noopener"
+                                        onclick="revealContactInfo(@js($serviceProvider->whatsappDisplay()), @js((string) $serviceProvider->address))"
                                         class="btn w-100 d-inline-flex align-items-center justify-content-center"
                                         style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 1.5rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); font-size: 1rem;">
                                         <i class="fab fa-whatsapp me-2 fs-5"></i> {{ __('service_provider.contact_whatsapp') }}
-                                    </button>
+                                    </a>
                                 </div>
                             @endif
                         @endif
@@ -916,6 +903,9 @@
                             </div>
                         @endif
 
+                        {{-- Admin-managed Local Offers for this provider --}}
+                        @include('partials.offers.provider-offers', ['offers' => $providerOffers ?? collect()])
+
                         <!-- Business Description -->
                         <div class="mb-4">
                             <h4 class="fw-bold text-primary mb-3">
@@ -1159,7 +1149,7 @@
 
                         <!-- WhatsApp Number (Hidden until button click) -->
                         @php
-                            $whatsappDisplay = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
+                            $whatsappDisplay = (string) ($serviceProvider->whatsappDisplay() ?? $serviceProvider->whatsappRawNumber());
                             if ($isContactRevealed) {
                                 // Show full number if already revealed
                                 $displayWhatsapp = $whatsappDisplay;
@@ -1285,43 +1275,19 @@
 
                     <!-- Quick Action Buttons -->
                     <div class="p-4 bg-light">
-                        @php
-                            $whatsappNumber = $serviceProvider->whatsapp_number ?? $serviceProvider->phone;
-                            // Clean number - remove all non-digit and non-plus characters
-                            $whatsappNumber = preg_replace('/[^0-9+]/', '', $whatsappNumber);
-
-                            // Ensure number starts with +
-                            if (!str_starts_with($whatsappNumber, '+')) {
-                                // Check if it's a Canadian number (starts with 1) or Egyptian (starts with 0 or direct digits)
-                                if (str_starts_with($whatsappNumber, '1') && strlen($whatsappNumber) == 11) {
-                                    // Canadian number
-                                    $whatsappNumber = '+' . $whatsappNumber;
-                                } elseif (str_starts_with($whatsappNumber, '0')) {
-                                    // Egyptian number starting with 0
-                                    $whatsappNumber = '+20' . ltrim($whatsappNumber, '0');
-                                } else {
-                                    // Assume Egyptian if no country code
-                                    $whatsappNumber = '+20' . $whatsappNumber;
-                                }
-                            }
-
-                            // Clean version for API (no +)
-                            $whatsappNumberClean = str_replace('+', '', $whatsappNumber);
-                        @endphp
-
-                        @if(!empty($whatsappNumberClean))
-                            {{-- WhatsApp Button (tracks analytics then opens WhatsApp).
-                                 The only one on the page: a second copy used to sit
-                                 near the top for phones, but this card stacks under
-                                 the profile below lg, so both rendered and the same
-                                 green button appeared twice on every non-desktop
-                                 width. This one shows at every width instead. --}}
-                            <button
-                                onclick="revealContactInfo('{{ $whatsappNumberClean }}', '{{ $serviceProvider->whatsapp_number ?? $serviceProvider->phone }}', '{{ $serviceProvider->address ?? '' }}')"
+                        @php $waUrl = $serviceProvider->whatsappContactUrl(); @endphp
+                        @if($waUrl)
+                            {{-- WhatsApp button: a real link built on the server (number
+                                 normalised to the international format, message
+                                 pre-filled), so it opens WhatsApp even when popups or
+                                 scripts are blocked. The click also records the lead
+                                 and reveals the contact details on the page. --}}
+                            <a href="{{ $waUrl }}" target="_blank" rel="noopener"
+                                onclick="revealContactInfo(@js($serviceProvider->whatsappDisplay()), @js((string) $serviceProvider->address))"
                                 class="btn w-100 mb-3 d-inline-flex align-items-center justify-content-center"
                                 style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
                                 <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
-                            </button>
+                            </a>
                         @endif
 
                         <a href="mailto:{{ $serviceProvider->user->email }}" class="btn btn-outline-primary w-100"
@@ -1729,104 +1695,38 @@
             @endif
         });
 
-        // Track WhatsApp click (internal analytics) + reveal contact (privacy) + open WhatsApp
-        async function revealContactInfo(whatsappClean, whatsappDisplay, address) {
-
-            // Store reveal in SESSION (server-side) instead of localStorage
-            // This ensures only the user who clicked can see the info
+        // Runs when a WhatsApp link is clicked. The link itself opens WhatsApp
+        // (its href is built on the server), so nothing here can stop the
+        // chat from opening: this only records the lead and reveals the
+        // contact details that were masked on the page.
+        function revealContactInfo(whatsappDisplay, address) {
             const providerId = {{ $serviceProvider->id }};
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-            // Internal analytics: click_whatsapp (dedupe is intentionally not applied to clicks)
-            let analyticsPromise = Promise.resolve();
             if (csrfToken) {
-                analyticsPromise = fetch(`/service-providers/${providerId}/analytics/click`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
+                const headers = { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken };
+                // keepalive lets the request finish after the tab switches to WhatsApp.
+                fetch(`/service-providers/${providerId}/analytics/click`, {
+                    method: 'POST', headers, keepalive: true,
                     body: JSON.stringify({ action_type: 'click_whatsapp', source_page: 'provider_profile' }),
-                    keepalive: true,
+                }).catch(() => {});
+                fetch(`/service-providers/${providerId}/reveal-contact`, {
+                    method: 'POST', headers, keepalive: true, body: JSON.stringify({}),
                 }).catch(() => {});
             }
 
-            // Store reveal in session via AJAX request
-            if (csrfToken) {
-                fetch(`/service-providers/${providerId}/reveal-contact`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({})
-                }).catch(err => console.error('Failed to store reveal:', err));
-            }
-
-            // Reveal WhatsApp number
             const whatsappElement = document.getElementById('whatsappNumber');
-            if (whatsappElement) {
+            if (whatsappElement && whatsappDisplay) {
                 whatsappElement.textContent = whatsappDisplay;
                 whatsappElement.classList.remove('text-muted');
                 whatsappElement.classList.add('text-success', 'fw-bold');
             }
 
-            // Reveal address
             const addressElement = document.getElementById('addressText');
             if (addressElement && address) {
                 addressElement.textContent = address;
                 addressElement.classList.add('text-primary', 'fw-bold');
             }
-
-            // Prepare WhatsApp message
-            const businessName = {!! json_encode($serviceProvider->company_name ?? $serviceProvider->user->name) !!};
-            const whatsappMessage = {!! json_encode(__("service_provider.whatsapp_message")) !!};
-            const businessLabel = {!! json_encode(__("service_provider.business_name")) !!};
-
-            // Validate that we have required data
-            if (!businessName || !whatsappMessage) {
-                console.error('WhatsApp Error: Missing required data', {
-                    businessName: businessName,
-                    whatsappMessage: whatsappMessage
-                });
-                alert('{{ __("general.error") }}: Cannot send WhatsApp message. Missing information.');
-                return;
-            }
-
-            const message = whatsappMessage + '\n' + businessLabel + ': ' + businessName;
-
-            // Encode message for URL
-            const encodedMessage = encodeURIComponent(message);
-
-            // Create WhatsApp URL with message
-            // Use api.whatsapp.com for better compatibility with WhatsApp Desktop and Web
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappClean}&text=${encodedMessage}`;
-
-            // Debug: Log the URL (you can remove this later)
-            console.log('WhatsApp URL:', whatsappUrl);
-            console.log('WhatsApp phone:', whatsappClean);
-            console.log('Message:', message);
-
-            // Attempt analytics write before redirecting (timeout keeps UX snappy)
-            try {
-                await Promise.race([
-                    analyticsPromise,
-                    new Promise((resolve) => setTimeout(resolve, 150)),
-                ]);
-            } catch (e) {
-                // Ignore analytics errors: user action must still proceed.
-            }
-
-            // Open WhatsApp after a short delay
-            setTimeout(function () {
-                // Try to open in new window
-                const newWindow = window.open(whatsappUrl, '_blank');
-
-                // Fallback: If popup blocked, try opening in same window
-                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                    window.location.href = whatsappUrl;
-                }
-            }, 0);
         }
 
         // ========== PROFILE EDIT FORM VALIDATION & UX ENHANCEMENTS ==========

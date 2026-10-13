@@ -585,21 +585,25 @@ class ServiceProvider extends Model implements HasMedia
     protected function calculatedRating(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                // If we have active reviews loaded, calculate from them
+            get: function ($stored) {
+                // Reviews already in memory are the freshest source and cost nothing.
                 if ($this->relationLoaded('activeReviews')) {
                     $activeReviews = $this->activeReviews;
-                } else {
-                    // Otherwise query directly (one query, not N+1)
-                    $activeReviews = $this->activeReviews()->get();
+
+                    return $activeReviews->isEmpty() ? null : round($activeReviews->avg('rating'), 1);
                 }
 
-                if ($activeReviews->isEmpty()) {
-                    return null;
+                // The column is kept in sync by ReviewObserver::recalculateRating().
+                // Reading it avoids one reviews query per card on every listing
+                // page (this accessor shadows the column of the same name).
+                if (array_key_exists('calculated_rating', $this->attributes)) {
+                    return (float) $stored > 0 ? round((float) $stored, 1) : null;
                 }
 
-                $average = $activeReviews->avg('rating');
-                return round($average, 1);
+                // Column not selected on this query: fall back to one lookup.
+                $average = $this->activeReviews()->avg('rating');
+
+                return $average ? round((float) $average, 1) : null;
             }
         );
     }
@@ -696,5 +700,67 @@ class ServiceProvider extends Model implements HasMedia
     public function providerEmailLogs(): HasMany
     {
         return $this->hasMany(ProviderEmailLog::class);
+    }
+
+    /* =====================================================================
+     |  WHATSAPP
+     |  Every WhatsApp button for this provider goes through these, so the
+     |  profile, the listing and the offers all dial the same number.
+     * ===================================================================== */
+
+    /**
+     * The number to chat on: the WhatsApp number, else the phone.
+     */
+    public function whatsappRawNumber(): ?string
+    {
+        return filled($this->whatsapp_number) ? $this->whatsapp_number : ($this->phone ?: null);
+    }
+
+    public function whatsappDigits(): ?string
+    {
+        return \App\Support\WhatsApp::digits($this->whatsappRawNumber());
+    }
+
+    public function whatsappDisplay(): ?string
+    {
+        return \App\Support\WhatsApp::display($this->whatsappRawNumber());
+    }
+
+    /**
+     * The visitor's opening message: who they are writing to and where they
+     * found them, with the profile link so the provider can see it too.
+     */
+    public function whatsappContactMessage(): string
+    {
+        return __('service_provider.whatsapp_message', [
+            'business' => $this->localized_company_name ?: ($this->company_name ?: ($this->user?->name ?: config('app.name'))),
+            'url' => route('service-providers.show', $this->id),
+        ]);
+    }
+
+    public function whatsappContactUrl(): ?string
+    {
+        return \App\Support\WhatsApp::url($this->whatsappRawNumber(), $this->whatsappContactMessage());
+    }
+
+    /**
+     * Admin-managed offers attributed to this provider.
+     */
+    public function offers(): HasMany
+    {
+        return $this->hasMany(Offer::class);
+    }
+
+    /**
+     * Offers a visitor may see right now, in the admin's display order.
+     */
+    public function liveOffers(): HasMany
+    {
+        return $this->hasMany(Offer::class)
+            ->where('offers.is_active', true)
+            ->where(fn ($q) => $q->whereNull('starts_at')->orWhereDate('starts_at', '<=', now()->toDateString()))
+            ->where(fn ($q) => $q->whereNull('ends_at')->orWhereDate('ends_at', '>=', now()->toDateString()))
+            ->orderBy('sort_order')
+            ->orderByDesc('id');
     }
 }

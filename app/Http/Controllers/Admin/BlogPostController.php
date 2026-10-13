@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Support\AdminHtml;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Location;
@@ -246,9 +247,11 @@ class BlogPostController extends Controller
         $titleEn = trim($validated['title_en']);
         $titleAr = trim($validated['title_ar']);
         $titleFr = trim($validated['title_fr']);
-        $contentEn = trim($validated['content_en']);
-        $contentAr = trim($validated['content_ar']);
-        $contentFr = trim($validated['content_fr']);
+        // The body is rendered unescaped on the public blog, so active content
+        // is stripped on the server no matter what the editor sent.
+        $contentEn = AdminHtml::clean($validated['content_en']);
+        $contentAr = AdminHtml::clean($validated['content_ar']);
+        $contentFr = AdminHtml::clean($validated['content_fr']);
         $excerptEn = $validated['excerpt_en'] ?: Str::limit(strip_tags($contentEn), 180);
         $excerptAr = $validated['excerpt_ar'] ?: Str::limit(strip_tags($contentAr), 180);
         $excerptFr = $validated['excerpt_fr'] ?: Str::limit(strip_tags($contentFr), 180);

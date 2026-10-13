@@ -3,6 +3,9 @@
 namespace App\Services\Admin;
 
 use App\Models\Comment;
+use App\Models\Offer;
+use App\Models\OfferComment;
+use App\Models\OfferEvent;
 use App\Models\Post;
 use App\Models\Review;
 use App\Models\ServiceProvider;
@@ -40,6 +43,7 @@ class AdminDashboardService
         return [
             'action_center' => $this->actionCenter(),
             'kpis' => $this->kpis(),
+            'offers' => $this->offerMetrics(),
             'funnel' => $this->leadFunnel(),
             'visitor_trend' => $this->visitorTrend(14),
             'profile_health' => $this->profileHealth(),
@@ -52,6 +56,22 @@ class AdminDashboardService
     }
 
     /* ===================== ACTION CENTER ===================== */
+
+    public function offerMetrics(): array
+    {
+        return Cache::remember('admin_dash_offers', self::ACTION_TTL, function () {
+            $events = OfferEvent::where('created_at', '>=', now()->subDays(30))
+                ->selectRaw('event, COUNT(*) AS total')->groupBy('event')->pluck('total', 'event');
+
+            return [
+                'live' => Offer::live()->count(),
+                'ending_soon' => Offer::live()->whereBetween('ends_at', [today()->toDateString(), today()->addDays(7)->toDateString()])->count(),
+                'pending_comments' => OfferComment::where('status', OfferComment::STATUS_PENDING)->count(),
+                'views' => (int) ($events[OfferEvent::VIEW] ?? 0),
+                'clicks' => (int) ($events[OfferEvent::CLAIM] ?? 0),
+            ];
+        });
+    }
 
     /**
      * Items that need an admin decision now, with deep links.

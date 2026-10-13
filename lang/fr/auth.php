@@ -3,6 +3,7 @@
 return [
   'failed' => 'Ces identifiants ne correspondent pas à nos enregistrements.',
   'password' => 'Mot de passe',
+  'password_incorrect' => 'Le mot de passe fourni est incorrect.',
   'throttle' => 'Trop de tentatives de connexion. Veuillez réessayer dans :seconds secondes.',
   'login_required' => 'Veuillez entrer votre email ou numéro de téléphone',
   'password_required' => 'Le mot de passe est requis',

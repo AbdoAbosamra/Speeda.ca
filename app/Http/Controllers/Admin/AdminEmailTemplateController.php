@@ -53,7 +53,7 @@ class AdminEmailTemplateController extends Controller
 
         return view('admin.email_templates.index', [
             'templates' => $templates,
-            'groups' => ['provider' => 'Provider onboarding journey', 'client' => 'Client engagement'],
+            'groups' => ['provider' => 'Service provider emails', 'client' => 'Client emails'],
         ]);
     }
 
@@ -209,24 +209,13 @@ class AdminEmailTemplateController extends Controller
 
     private function previewStats(string $key): array
     {
-        return $key === 'photo'
-            ? [
-                ['value' => '3x', 'label' => 'More Views'],
-                ['value' => '2x', 'label' => 'More Leads'],
-                ['value' => '30s', 'label' => 'To Complete'],
-            ]
-            : [];
+        return [];
     }
 
     private function previewProgress(string $key): array
     {
         $steps = [
             'welcome' => [0, 'Step 0 of 5 complete (0%)'],
-            'photo' => [0, 'Step 0 of 5 complete (0%)'],
-            'services' => [20, 'Step 1 of 5 complete (20%)'],
-            'bio' => [40, 'Step 2 of 5 complete (40%)'],
-            'experience' => [60, 'Step 3 of 5 complete (60%)'],
-            'gallery' => [80, 'Step 4 of 5 complete (80%)'],
         ];
 
         if (!isset($steps[$key])) {

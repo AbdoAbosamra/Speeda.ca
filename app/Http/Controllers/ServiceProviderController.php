@@ -35,12 +35,17 @@ class ServiceProviderController extends Controller
             return redirect()->route('service-providers.index', $redirectParams)->setStatusCode(301);
         }
 
+        // Resolve category if requested
+        $selectedCategory = null;
+        if ($request->filled('category')) {
+            $selectedCategory = Category::resolveFilterValue($request->input('category'));
+        }
+
         // Apply SEO
         if ($request->filled('search') || $request->filled('city')) {
             $seoService->apply('search');
-        } elseif ($request->filled('category')) {
-            $cat = Category::resolveFilterValue($request->input('category'));
-            $seoService->apply('category', $cat);
+        } elseif ($selectedCategory) {
+            $seoService->apply('category', $selectedCategory);
         } else {
             $seoService->apply('category');
         }
@@ -48,7 +53,7 @@ class ServiceProviderController extends Controller
         // Eager-load Spatie media to avoid N+1 queries in provider cards.
         // PERFORMANCE: Use withExists for endorsement check to avoid N+1 in view loop
         // PERFORMANCE: Use cached calculated_rating column instead of live subquery
-        $query = ServiceProvider::with(['user', 'category.parent.parent', 'location', 'media'])
+        $query = ServiceProvider::with(['user', 'category.parent.parent', 'location', 'media', 'liveOffers'])
             ->withCount(['activeReviews as reviews_count', 'endorsements as endorsements_count'])
             ->when(auth()->check() && auth()->user()->isClient(), function ($q) {
                 // PERFORMANCE: Preload whether current user has endorsed each provider (avoids N+1)
@@ -157,65 +162,12 @@ class ServiceProviderController extends Controller
         // Get list of revealed contacts from session
         $revealedContacts = session('revealed_contacts', []);
 
-        return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts', 'activeLocationIds'));
-    }
-
-    /**
-     * Display the authenticated service provider's own profile with edit capabilities
-     */
-    public function profile()
-    {
-        try {
-            // Get the authenticated user's service provider record
-            $serviceProvider = auth()->user()->serviceProvider;
-
-            if (!$serviceProvider) {
-                ErrorHelper::flashNotification(__('service_provider.no_profile_found'), 'error');
-                return redirect()->route('dashboard');
-            }
-
-            // Eager load relationships
-            $serviceProvider->loadMissing(['user', 'category.parent.parent', 'location']);
-
-            // PERFORMANCE: Use cached locations and categories from Redis (24h TTL)
-            $locations = app(LocationCacheService::class)->getAllLocations();
-            $categories = app(CategoryCacheService::class)->getTerminalCategories();
-
-            // Check if user is owner (always true for this route)
-            $isOwner = true;
-
-            return view('service-providers.profile', compact(
-                'serviceProvider',
-                'locations',
-                'categories',
-                'isOwner'
-            ));
-        } catch (\Exception $e) {
-            $error = ErrorHelper::handle($e);
-            ErrorHelper::flashNotification($error['message'], $error['type']);
-            return redirect()->route('dashboard');
+        // Protect against Soft 404: if a search or filter yields 0 results, tell search engines noindex, follow
+        if ($serviceProviders->isEmpty() && ($request->filled('search') || $request->filled('category') || $request->filled('location') || $request->filled('city'))) {
+            \Artesaos\SEOTools\Facades\SEOTools::metatags()->addMeta('robots', 'noindex, follow');
         }
-    }
 
-    /**
-     * Show the form for editing the specified service provider profile
-     */
-    public function edit(ServiceProvider $serviceProvider)
-    {
-        try {
-            // Authorization check
-            if (!auth()->check() || auth()->id() !== $serviceProvider->user_id) {
-                ErrorHelper::flashNotification(__('service_provider.unauthorized_access'), 'error');
-                return redirect()->route('service-providers.index');
-            }
-
-            // Redirect to profile route which handles editing
-            return redirect()->route('service-providers.profile');
-        } catch (\Exception $e) {
-            $error = ErrorHelper::handle($e);
-            ErrorHelper::flashNotification($error['message'], $error['type']);
-            return redirect()->route('dashboard');
-        }
+        return view('service-providers.index', compact('serviceProviders', 'categories', 'locationClusters', 'revealedContacts', 'activeLocationIds', 'selectedCategory'));
     }
 
     public function show(Request $request, ServiceProvider $serviceProvider, \App\Domain\SEO\Services\SeoMetaService $seoService)
@@ -237,21 +189,24 @@ class ServiceProviderController extends Controller
                 }
             }
 
-            // Increment views only for real visitors, not owners or admins monitoring the site.
+            // Increment views only for real visitors, not owners, admins
+            // monitoring the site, or search-engine crawlers (which would
+            // otherwise inflate every provider's view count and dilute the
+            // WhatsApp conversion rate built on it).
             $isAdmin = auth()->check() && auth()->user()->isAdmin();
             $isOwner = auth()->check() && auth()->id() === $serviceProvider->user_id;
+            $isBot = \App\Support\DeviceType::fromUserAgent($request->userAgent()) === \App\Support\DeviceType::BOT;
 
-            if (!$isAdmin && !$isOwner) {
+            // The public view counter follows the analytics row: one view per
+            // visitor per 24h (session fingerprint), so reloading the page no
+            // longer inflates the number shown on profiles and listing cards.
+            // PRIVACY: No IP address stored
+            if (!$isAdmin && !$isOwner && !$isBot
+                && app(TrackProviderViewAction::class)->execute($serviceProvider->id)) {
                 DB::table('service_providers')
                     ->where('id', $serviceProvider->id)
                     ->increment('views');
-                $serviceProvider->refresh(); // Reload to get updated views count
-
-                // Internal analytics (spam-protected by session fingerprint within 24h)
-                // PRIVACY: No IP address stored
-                app(TrackProviderViewAction::class)->execute(
-                    $serviceProvider->id
-                );
+                $serviceProvider->forceFill(['views' => (int) $serviceProvider->views + 1])->syncOriginalAttribute('views');
             }
 
             // === STEP 1: Calculate review statistics FIRST (before eager loading) ===
@@ -358,7 +313,7 @@ class ServiceProviderController extends Controller
             $categories = app(CategoryCacheService::class)->getTerminalCategories();
 
             // Format phone number for WhatsApp
-            $formattedNumber = preg_replace('/[^0-9]/', '', $serviceProvider->whatsapp_number ?? $serviceProvider->phone ?? '');
+            $formattedNumber = (string) $serviceProvider->whatsappDigits();
 
             // Check if this user has revealed this provider's contact
             $isContactRevealed = session()->has('revealed_contacts') &&
@@ -394,7 +349,11 @@ class ServiceProviderController extends Controller
                 // Silently ignore CAPI errors
             }
 
+            // Admin-managed offers currently live for this provider.
+            $providerOffers = $serviceProvider->liveOffers()->withCardRelations()->get();
+
             return view('service-providers.show', compact(
+                'providerOffers',
                 'serviceProvider',
                 'reviews',
                 'reviewStats',

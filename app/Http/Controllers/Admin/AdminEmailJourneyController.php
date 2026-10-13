@@ -38,16 +38,7 @@ class AdminEmailJourneyController extends Controller
             ->withQueryString();
 
         // Email type labels
-        $emailTypeLabels = [
-            'welcome'       => '🎉 Welcome',
-            'photo'         => '📸 Profile Photo',
-            'services'      => '🛠️ Services',
-            'bio'           => '📝 Description',
-            'experience'    => '📅 Experience',
-            'gallery'       => '🖼️ Gallery',
-            'complete'      => '🏆 Complete',
-            'reviews'       => '⭐ Reviews',
-        ];
+        $emailTypeLabels = self::typeLabels();
 
         return view('admin.email_journey.index', compact('stats', 'providers', 'emailTypeLabels'));
     }
@@ -62,16 +53,7 @@ class AdminEmailJourneyController extends Controller
 
         $timeline = $this->journeyService->getProviderEmailTimeline($serviceProvider);
 
-        $emailTypeLabels = [
-            'welcome'       => '🎉 Welcome',
-            'photo'         => '📸 Profile Photo',
-            'services'      => '🛠️ Services',
-            'bio'           => '📝 Description',
-            'experience'    => '📅 Experience',
-            'gallery'       => '🖼️ Gallery',
-            'complete'      => '🏆 Complete',
-            'reviews'       => '⭐ Reviews',
-        ];
+        $emailTypeLabels = self::typeLabels();
 
         return view('admin.email_journey.show', compact('serviceProvider', 'timeline', 'emailTypeLabels'));
     }
@@ -93,12 +75,6 @@ class AdminEmailJourneyController extends Controller
 
         $view = match ($type) {
             'welcome'       => 'emails.provider.welcome',
-            'photo'         => 'emails.provider.add-photo',
-            'services'      => 'emails.provider.add-services',
-            'bio'           => 'emails.provider.write-description',
-            'experience'    => 'emails.provider.add-experience',
-            'gallery'       => 'emails.provider.showcase-work',
-            'complete'      => 'emails.provider.profile-complete',
             'reviews'       => 'emails.provider.build-reputation',
             default         => abort(404, "Unknown email type: {$type}"),
         };
@@ -126,7 +102,7 @@ class AdminEmailJourneyController extends Controller
     public function sendTest(Request $request, ServiceProvider $serviceProvider)
     {
         $validated = $request->validate([
-            'expected_type' => 'required|in:welcome,photo,services,bio,experience,gallery,complete,reviews',
+            'expected_type' => 'required|in:welcome,reviews',
         ]);
 
         $serviceProvider->load('user');
@@ -160,5 +136,23 @@ class AdminEmailJourneyController extends Controller
         return redirect()
             ->route('admin.email_journey.show', $serviceProvider)
             ->with('success', "✅ \"{$sent}\" email sent to {$serviceProvider->user?->email}.");
+    }
+
+    /**
+     * Labels for the timeline. Retired steps keep a label so providers'
+     * past emails still read correctly; they are never sent again.
+     */
+    public static function typeLabels(): array
+    {
+        return [
+            'welcome'    => '🎉 Welcome',
+            'reviews'    => '⭐ Reviews',
+            'photo'      => '📸 Profile Photo (retired)',
+            'services'   => '🛠️ Services (retired)',
+            'bio'        => '📝 Description (retired)',
+            'experience' => '📅 Experience (retired)',
+            'gallery'    => '🖼️ Gallery (retired)',
+            'complete'   => '🏆 Complete (retired)',
+        ];
     }
 }

@@ -76,4 +76,10 @@ return [
     'new' => 'nouveau',
     'main_navigation' => 'Navigation principale',
     'category' => 'Catégorie',
+    'my_account' => 'Mon compte',
+    'company' => 'Entreprise',
+    'page_not_found' => 'Page introuvable',
+    'page_not_found_desc' => 'La page que vous cherchez n’existe pas, a été supprimée ou le lien a expiré.',
+    'page_gone' => 'Cette page a été supprimée',
+    'page_gone_desc' => 'Cette page, ce profil ou ce service a été supprimé définitivement et n’est plus disponible.',
 ];

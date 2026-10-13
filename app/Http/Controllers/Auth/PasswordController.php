@@ -15,10 +15,12 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        // Manually validate current password to control error key
-        if (!Hash::check($request->current_password, $request->user()->password)) {
+        // Manually validate current password to control error key. A
+        // Google-only account has none yet, so this is where it sets one.
+        if (! $request->user()->isGoogleOnly()
+            && ! Hash::check((string) $request->current_password, (string) $request->user()->password)) {
             return back()->withErrors([
-                'current_password' => ['The password is incorrect.'],
+                'current_password' => [__('auth.password_incorrect')],
             ], 'updatePassword');
         }
 

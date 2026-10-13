@@ -19,4 +19,11 @@ return [
     'delete_account_confirmation' => 'Une fois votre compte supprime, toutes ses ressources et donnees seront definitivement effacees. Entrez votre mot de passe pour confirmer la suppression.',
     'delete_account_modal_title' => 'Etes-vous sur de vouloir supprimer votre compte ?',
     'cancel' => 'Annuler',
+    'account_title' => 'Mon compte',
+    'account_subtitle' => 'Gérez votre nom, votre e-mail, votre mot de passe et votre compte.',
+    'set_password' => 'Définir un mot de passe',
+    'set_password_help' => 'Vous vous connectez avec Google. Ajoutez un mot de passe si vous voulez aussi vous connecter avec votre e-mail.',
+    'delete_confirm_email' => 'Saisissez votre adresse e-mail (:email) pour confirmer.',
+    'delete_confirm_email_mismatch' => "L'adresse e-mail ne correspond pas à votre compte.",
+    'admin_delete_blocked' => 'Les comptes administrateur se gèrent depuis le tableau de bord.',
 ];

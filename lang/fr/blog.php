@@ -19,4 +19,5 @@ return [
     'by_author' => 'Par :name',
     'reading_time' => ':minutes min de lecture',
     'latest_posts' => 'Derniers articles',
+    'blog' => 'Blog',
 ];

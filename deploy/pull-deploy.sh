@@ -128,8 +128,6 @@ log "Building release caches"
 "$PHP_BIN" artisan route:cache --ansi >/dev/null
 "$PHP_BIN" artisan view:cache --ansi >/dev/null
 
-log "Regenerating sitemap with production URLs"
-"$PHP_BIN" artisan seo:generate-sitemap --ansi >/dev/null
 
 # -------------------------------------------------------------- 4. VERIFY ---
 log "Verifying release"
@@ -153,6 +151,9 @@ if [ "$RUN_MIGRATIONS" = "true" ]; then
     log "No pending migrations"
   fi
 fi
+
+log "Regenerating sitemap with production URLs"
+"$PHP_BIN" artisan seo:generate-sitemap --ansi >/dev/null
 
 # ----------------------------------------------------------------- 6. HOLD ---
 if [ -f "$DEPLOY_ROOT/HOLD_SWITCH" ]; then

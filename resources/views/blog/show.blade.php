@@ -88,7 +88,8 @@
                             @endphp
                             <div class="blog-content" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" style="font-size: 1.05rem; line-height: 1.8; color: #495057;">
                                 @if($bodyIsHtml)
-                                    {!! $articleBody !!}
+                                    {{-- Cleaned again on output: posts saved before the server-side cleaner existed. --}}
+                                    {!! \App\Support\AdminHtml::clean($articleBody) !!}
                                 @else
                                     {!! nl2br(e($articleBody)) !!}
                                 @endif

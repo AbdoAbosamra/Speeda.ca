@@ -88,10 +88,14 @@ class LocationCacheService
             self::CACHE_KEY_ALL,
         ];
 
+        // supported_locales is keyed by code ('en' => [...details]); iterating
+        // its values concatenated an array into the key, which threw before a
+        // single entry was forgotten and left city lists stale after edits.
         $locales = config('app.supported_locales', ['en', 'ar', 'fr']);
+        $localeCodes = is_array($locales) && ! array_is_list($locales) ? array_keys($locales) : (array) $locales;
 
         foreach ($baseKeys as $baseKey) {
-            foreach ($locales as $locale) {
+            foreach ($localeCodes as $locale) {
                 $key = $baseKey . '_' . $locale;
                 try {
                     // Try Redis first if available

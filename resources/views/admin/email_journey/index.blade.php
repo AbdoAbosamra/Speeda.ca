@@ -246,9 +246,9 @@
                 $welcomeCount = $stats['by_type']['welcome'] ?? 0;
             @endphp
             <div class="ej-stat-card">
-                <span class="ej-stat-icon">📊</span>
-                <span class="ej-stat-number">{{ $totalByType > 0 ? number_format(($stats['by_type']['complete'] ?? 0) / max($welcomeCount,1) * 100, 0) : 0 }}%</span>
-                <span class="ej-stat-label">Journey Completion Rate</span>
+                <span class="ej-stat-icon">⭐</span>
+                <span class="ej-stat-number">{{ number_format($stats['by_type']['reviews'] ?? 0) }}</span>
+                <span class="ej-stat-label">Reviews emails sent</span>
             </div>
         </div>
 
@@ -260,6 +260,8 @@
                     @php $maxCount = max(1, max(array_values($stats['by_type']) ?: [1])); @endphp
                     @foreach($emailTypeLabels as $type => $label)
                         @php $count = $stats['by_type'][$type] ?? 0; @endphp
+                        {{-- Retired steps only appear while they still have history to show. --}}
+                        @continue(in_array($type, \App\Services\ProviderEmailJourneyService::RETIRED_TYPES, true) && $count === 0)
                         <div class="ej-type-row">
                             <span class="ej-type-label">{{ $label }}</span>
                             <div class="ej-type-bar-bg">
@@ -277,13 +279,6 @@
                 <div class="ej-preview-grid">
                     @foreach([
                         ['type'=>'welcome','icon'=>'🎉','name'=>'Welcome'],
-                        ['type'=>'photo','icon'=>'📸','name'=>'Add Photo'],
-                        ['type'=>'services','icon'=>'🛠️','name'=>'Add Services'],
-                        ['type'=>'bio','icon'=>'📝','name'=>'Write Bio'],
-                        ['type'=>'experience','icon'=>'📅','name'=>'Experience'],
-                        ['type'=>'gallery','icon'=>'🖼️','name'=>'Gallery'],
-                        ['type'=>'service_areas','icon'=>'🌍','name'=>'Service Areas'],
-                        ['type'=>'complete','icon'=>'🏆','name'=>'Complete!'],
                         ['type'=>'reviews','icon'=>'⭐','name'=>'Reviews'],
                     ] as $email)
                         <a href="{{ route('admin.email_journey.preview', $email['type']) }}"

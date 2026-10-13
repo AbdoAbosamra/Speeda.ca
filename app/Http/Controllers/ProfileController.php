@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,14 +28,9 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$request->user()->id],
-        ]);
-
-        $request->user()->fill($validated);
+        $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
@@ -49,14 +46,25 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        // Manually validate password to control error key
-        if (!\Illuminate\Support\Facades\Hash::check($request->password, $request->user()->password)) {
-            return back()->withErrors([
-                'password' => ['The password is incorrect.'],
-            ], 'userDeletion');
+        $user = $request->user();
+
+        // Admin accounts are removed from the dashboard, where the "never
+        // delete the last admin" guard lives — not from this self-service page.
+        if ($user->isAdmin()) {
+            return back()->withErrors(['password' => [__('profile.admin_delete_blocked')]], 'userDeletion');
         }
 
-        $user = $request->user();
+        // A Google-only account has no password to type, so it confirms by
+        // typing its own email address instead.
+        if ($user->isGoogleOnly()) {
+            if (mb_strtolower(trim((string) $request->input('confirm_email'))) !== mb_strtolower($user->email)) {
+                return back()->withErrors(['confirm_email' => [__('profile.delete_confirm_email_mismatch')]], 'userDeletion');
+            }
+        } elseif (! Hash::check((string) $request->password, $user->password)) {
+            return back()->withErrors([
+                'password' => [__('auth.password_incorrect')],
+            ], 'userDeletion');
+        }
 
         Auth::logout();
 

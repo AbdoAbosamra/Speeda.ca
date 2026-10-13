@@ -272,4 +272,5 @@ return [
     'electric_hybrid_car_service' => 'Service Voiture Électrique & Hybride',
     'locksmith_services' => 'Services de Serrurier',
     'house_cleaning' => 'Nettoyage de Maison',
+    'categories' => 'Catégories',
 ];

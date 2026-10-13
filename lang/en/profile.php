@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'profile_information' => 'Profile Information',
@@ -19,4 +19,11 @@ return [
     'delete_account_confirmation' => 'Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
     'delete_account_modal_title' => 'Are you sure you want to delete your account?',
     'cancel' => 'Cancel',
+    'account_title' => 'My account',
+    'account_subtitle' => 'Manage your name, email, password and account.',
+    'set_password' => 'Set a password',
+    'set_password_help' => 'You sign in with Google. Add a password if you also want to sign in with your email.',
+    'delete_confirm_email' => 'Type your email address (:email) to confirm.',
+    'delete_confirm_email_mismatch' => 'The email address does not match your account.',
+    'admin_delete_blocked' => 'Admin accounts are managed from the admin dashboard.',
 ];

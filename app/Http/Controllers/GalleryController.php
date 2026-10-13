@@ -14,7 +14,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * AJAX gallery controller for per-image management.
  *
  * All three methods return JSON and are consumed by the Alpine.js
- * gallery grid component in provider/gallery/_grid.blade.php.
+ * inline gallery widget in service-providers/show.blade.php.
  *
  * Maximum 4 images per provider is enforced on store().
  */

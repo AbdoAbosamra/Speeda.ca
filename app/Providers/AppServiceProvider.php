@@ -50,6 +50,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('offer-comments', function (Request $request) {
+            $ip = hash('sha256', (string) $request->ip());
+            $limits = [
+                \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by('offer-minute:'.$ip),
+                \Illuminate\Cache\RateLimiting\Limit::perDay(20)->by('offer-day:'.$ip),
+            ];
+            if ($request->user()) {
+                $limits[] = \Illuminate\Cache\RateLimiting\Limit::perDay(20)->by('offer-user:'.$request->user()->id);
+            }
+
+            return $limits;
+        });
+
         Password::defaults(function () {
             return Password::min(8);
         });
@@ -66,7 +79,7 @@ class AppServiceProvider extends ServiceProvider
 
         // PERFORMANCE: Prevent lazy loading in development/staging to catch N+1 queries
         // CRITICAL: This is NOT enabled in production to avoid breaking the live site
-        Model::preventLazyLoading(app()->environment(['local', 'staging']));
+        Model::preventLazyLoading(app()->environment(['local', 'staging', 'testing']));
 
         Paginator::defaultView('components.pagination.default');
         Paginator::defaultSimpleView('components.pagination.default');

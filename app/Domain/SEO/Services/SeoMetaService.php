@@ -48,7 +48,9 @@ class SeoMetaService
 
     protected function injectIntoSeoTools(SeoData $data): void
     {
-        SEOTools::setTitle($data->title);
+        // Builders already end the title with "| Speeda"; without false the
+        // package appends its default again ("… | Speeda - Speeda").
+        SEOTools::setTitle($data->title, false);
         if ($data->description) {
             SEOTools::setDescription($data->description);
         }

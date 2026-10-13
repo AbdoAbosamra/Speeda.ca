@@ -272,4 +272,5 @@ return [
     'electric_hybrid_car_service' => 'خدمات السيارات الكهربائية والهجينة',
     'locksmith_services' => 'خدمات الأقفال والمفاتيح',
     'house_cleaning' => 'تنظيف المنازل',
+    'categories' => 'الفئات',
 ];

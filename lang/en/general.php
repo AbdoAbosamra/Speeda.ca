@@ -76,4 +76,10 @@ return [
     'new' => 'new',
     'main_navigation' => 'Main Navigation',
     'category' => 'Category',
+    'my_account' => 'My Account',
+    'company' => 'Company',
+    'page_not_found' => 'Page not found',
+    'page_not_found_desc' => 'The page you are looking for does not exist, was removed, or the link has expired.',
+    'page_gone' => 'This page has been removed',
+    'page_gone_desc' => 'This page, profile or service was removed permanently and is no longer available.',
 ];

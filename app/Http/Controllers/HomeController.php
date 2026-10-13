@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Domain\SEO\Services\SeoMetaService;
 use App\Models\Category;
 use App\Models\HomeVideo;
+use App\Models\Offer;
+use App\Models\OfferSection;
 use App\Models\ServiceProvider;
 use App\Models\Review;
 use App\Models\Endorsement;
@@ -95,6 +97,12 @@ class HomeController extends Controller
         // a playable video, in which case the home view renders nothing.
         $homeVideo = HomeVideo::forHomePage();
 
-        return view('home', compact('categories', 'locationClusters', 'providerStats', 'featuredProviders', 'latestBlogPosts', 'siteTestimonials', 'homeVideo'));
+        // Admin-managed Local Offers carousel — empty unless the section is on
+        // and at least one featured offer is live, so the block disappears.
+        $offerSection = OfferSection::current();
+        $homeOffers = Offer::forHomePage($offerSection);
+        $offerLiveCount = $homeOffers->isNotEmpty() ? Offer::live()->count() : 0;
+
+        return view('home', compact('categories', 'locationClusters', 'providerStats', 'featuredProviders', 'latestBlogPosts', 'siteTestimonials', 'homeVideo', 'offerSection', 'homeOffers', 'offerLiveCount'));
     }
 }

@@ -2,14 +2,8 @@
 
 namespace App\Services;
 
-use App\Mail\Provider\AddExperienceEmail;
-use App\Mail\Provider\AddProfilePhotoEmail;
-use App\Mail\Provider\AddServicesEmail;
 use App\Mail\Provider\BuildReputationEmail;
-use App\Mail\Provider\ProfileCompleteEmail;
-use App\Mail\Provider\ShowcaseWorkEmail;
 use App\Mail\Provider\WelcomeEmail;
-use App\Mail\Provider\WriteDescriptionEmail;
 use App\Models\ProviderEmailLog;
 use App\Models\ServiceProvider;
 use Illuminate\Support\Facades\DB;
@@ -24,8 +18,11 @@ use Illuminate\Support\Facades\Mail;
  * should receive based on their current profile state, then sends it
  * and records the outcome in provider_email_logs.
  *
- * Email sequence (each step unlocks only after the previous is complete):
- *  welcome → photo → services → bio → experience → gallery → complete → reviews
+ * Provider emails now: the welcome email at registration, then one
+ * "build your reputation" email (with up to 3 reminders) once the profile is
+ * complete and still has no reviews. The profile-step reminders (photo,
+ * services, description, experience, gallery, profile complete) were retired;
+ * their old log rows stay for history and are never resent.
  */
 class ProviderEmailJourneyService
 {
@@ -34,13 +31,16 @@ class ProviderEmailJourneyService
     // ---------------------------------------------------------------------------
 
     public const EMAIL_WELCOME       = 'welcome';
-    public const EMAIL_PHOTO         = 'photo';
-    public const EMAIL_SERVICES      = 'services';
-    public const EMAIL_BIO           = 'bio';
-    public const EMAIL_EXPERIENCE    = 'experience';
-    public const EMAIL_GALLERY       = 'gallery';
-    public const EMAIL_COMPLETE      = 'complete';
     public const EMAIL_REVIEWS       = 'reviews';
+
+    /** The emails this service can still send. */
+    public const ACTIVE_TYPES = [self::EMAIL_WELCOME, self::EMAIL_REVIEWS];
+
+    /** Retired onboarding steps: kept only to label old log rows. */
+    public const RETIRED_TYPES = ['photo', 'services', 'bio', 'experience', 'gallery', 'complete'];
+
+    /** Days after the welcome email before the reviews email may go out. */
+    private const REVIEWS_AFTER_WELCOME_DAYS = 3;
 
     /**
      * Maximum resend attempts per email type (beyond the initial send).
@@ -48,12 +48,6 @@ class ProviderEmailJourneyService
      */
     private const MAX_ATTEMPTS = [
         self::EMAIL_WELCOME       => 1,   // Never resend – only sent once
-        self::EMAIL_PHOTO         => 3,   // 1 initial + 2 resends
-        self::EMAIL_SERVICES      => 3,
-        self::EMAIL_BIO           => 3,
-        self::EMAIL_EXPERIENCE    => 3,
-        self::EMAIL_GALLERY       => 3,
-        self::EMAIL_COMPLETE      => 1,   // Never resend – celebration email
         self::EMAIL_REVIEWS       => 4,   // 1 initial + 3 resends
     ];
 
@@ -63,11 +57,6 @@ class ProviderEmailJourneyService
      * The value is the number of DAYS to wait before the NEXT send.
      */
     private const RESEND_DAYS = [
-        self::EMAIL_PHOTO         => [1 => 5, 2 => 7, 3 => 14],
-        self::EMAIL_SERVICES      => [1 => 5, 2 => 7, 3 => 10],
-        self::EMAIL_BIO           => [1 => 5, 2 => 7, 3 => 10],
-        self::EMAIL_EXPERIENCE    => [1 => 5, 2 => 7, 3 => 10],
-        self::EMAIL_GALLERY       => [1 => 5, 2 => 10, 3 => 14],
         self::EMAIL_REVIEWS       => [1 => 3, 2 => 7, 3 => 14, 4 => 21],
     ];
 
@@ -168,61 +157,38 @@ class ProviderEmailJourneyService
                 ->keyBy('email_type');
         }
 
-        // Step 1 – Profile photo
-        if (!$this->hasProfilePhoto($provider)) {
-            if (!$this->emailSent($logs, self::EMAIL_PHOTO)) {
-                return self::EMAIL_PHOTO;
-            }
-            return null; // Waiting for resend or max attempts reached
-        }
-
-        // Step 2 – Services
-        if (!$this->hasServices($provider)) {
-            if (!$this->emailSent($logs, self::EMAIL_SERVICES)) {
-                return self::EMAIL_SERVICES;
-            }
+        // Each provider gets the reviews email at most once (plus its
+        // scheduled reminders, handled by findDueResend).
+        if ($this->emailSent($logs, self::EMAIL_REVIEWS)) {
             return null;
         }
 
-        // Step 3 – Business description (bio)
-        if (!$this->hasBio($provider)) {
-            if (!$this->emailSent($logs, self::EMAIL_BIO)) {
-                return self::EMAIL_BIO;
-            }
+        // Only providers who joined through the welcome email, and not on
+        // their first days: there must be something to review first.
+        $welcomeSentAt = ($logs[self::EMAIL_WELCOME] ?? null)?->sent_at;
+        if (! $welcomeSentAt || $welcomeSentAt->diffInDays(now()) < self::REVIEWS_AFTER_WELCOME_DAYS) {
             return null;
         }
 
-        // Step 4 – Years of experience
-        if (!$this->hasExperience($provider)) {
-            if (!$this->emailSent($logs, self::EMAIL_EXPERIENCE)) {
-                return self::EMAIL_EXPERIENCE;
-            }
+        // Asking for reviews only makes sense once the profile is complete.
+        if (! $this->isProfileComplete($provider)) {
             return null;
         }
 
-        // Step 5 – Gallery photos
-        if (!$this->hasGallery($provider)) {
-            if (!$this->emailSent($logs, self::EMAIL_GALLERY)) {
-                return self::EMAIL_GALLERY;
-            }
+        if ($provider->activeReviews()->count() > 0) {
             return null;
         }
 
-        // Step 6 – Profile complete celebration
-        if (!$this->emailSent($logs, self::EMAIL_COMPLETE)) {
-            return self::EMAIL_COMPLETE;
-        }
+        return self::EMAIL_REVIEWS;
+    }
 
-        // Step 7 – Reviews (send 3 days after the complete email)
-        $completeSentAt = $logs[self::EMAIL_COMPLETE]?->sent_at;
-        $reviewsReady   = $completeSentAt && $completeSentAt->diffInDays(now()) >= 3;
-        $hasReviews     = $provider->activeReviews()->count() > 0;
-
-        if (!$hasReviews && $reviewsReady && !$this->emailSent($logs, self::EMAIL_REVIEWS)) {
-            return self::EMAIL_REVIEWS;
-        }
-
-        return null; // 🎉 All done
+    public function isProfileComplete(ServiceProvider $provider): bool
+    {
+        return $this->hasProfilePhoto($provider)
+            && $this->hasServices($provider)
+            && $this->hasBio($provider)
+            && $this->hasExperience($provider)
+            && $this->hasGallery($provider);
     }
 
     // ---------------------------------------------------------------------------
@@ -286,6 +252,11 @@ class ProviderEmailJourneyService
     private function findDueResend(ServiceProvider $provider, $logs): ?string
     {
         foreach ($logs as $type => $log) {
+            // Retired emails are never sent again, whatever their old schedule says.
+            if (! in_array($type, self::ACTIVE_TYPES, true)) {
+                continue;
+            }
+
             // Skip if the step is already complete
             if ($log->completed_at !== null) {
                 continue;
@@ -297,7 +268,7 @@ class ProviderEmailJourneyService
             }
 
             // Check if the resend time has arrived
-            if ($log->next_send_at->isPast() || $log->next_send_at->isNow()) {
+            if ($log->next_send_at->lessThanOrEqualTo(now())) {
                 // Verify the step is STILL incomplete
                 if ($this->isStepStillIncomplete($provider, $type)) {
                     return $type;
@@ -314,11 +285,6 @@ class ProviderEmailJourneyService
     private function isStepStillIncomplete(ServiceProvider $provider, string $emailType): bool
     {
         return match ($emailType) {
-            self::EMAIL_PHOTO         => !$this->hasProfilePhoto($provider),
-            self::EMAIL_SERVICES      => !$this->hasServices($provider),
-            self::EMAIL_BIO           => !$this->hasBio($provider),
-            self::EMAIL_EXPERIENCE    => !$this->hasExperience($provider),
-            self::EMAIL_GALLERY       => !$this->hasGallery($provider),
             self::EMAIL_REVIEWS       => $provider->activeReviews()->count() === 0,
             default                   => false,
         };
@@ -397,7 +363,7 @@ class ProviderEmailJourneyService
             }
 
             // Mark completion emails as auto-completed
-            if (in_array($type, [self::EMAIL_WELCOME, self::EMAIL_COMPLETE])) {
+            if ($type === self::EMAIL_WELCOME) {
                 ProviderEmailLog::where('service_provider_id', $provider->id)
                     ->where('email_type', $type)
                     ->update(['completed_at' => now()]);
@@ -445,29 +411,10 @@ class ProviderEmailJourneyService
     {
         $baseUrl = route('service-providers.show', $provider->id);
 
-        // Map each email type to the anchor id of the matching edit section.
-        $anchors = [
-            self::EMAIL_PHOTO         => '#edit-photo',
-            self::EMAIL_SERVICES      => '#edit-services',
-            self::EMAIL_BIO           => '#edit-basic-info',
-            self::EMAIL_EXPERIENCE    => '#edit-basic-info',
-            self::EMAIL_GALLERY       => '#edit-gallery',
-            self::EMAIL_REVIEWS       => '#reviews',
-        ];
-
-        $anchor = $anchors[$type] ?? '';
-        $dashboardUrl = $baseUrl . $anchor;
-
         return match ($type) {
             self::EMAIL_WELCOME       => new WelcomeEmail($provider, $baseUrl),
-            self::EMAIL_PHOTO         => new AddProfilePhotoEmail($provider, $dashboardUrl),
-            self::EMAIL_SERVICES      => new AddServicesEmail($provider, $dashboardUrl),
-            self::EMAIL_BIO           => new WriteDescriptionEmail($provider, $dashboardUrl),
-            self::EMAIL_EXPERIENCE    => new AddExperienceEmail($provider, $dashboardUrl),
-            self::EMAIL_GALLERY       => new ShowcaseWorkEmail($provider, $dashboardUrl),
-            self::EMAIL_COMPLETE      => new ProfileCompleteEmail($provider, $baseUrl),
-            self::EMAIL_REVIEWS       => new BuildReputationEmail($provider, $dashboardUrl),
-            default                   => throw new \InvalidArgumentException("Unknown email type: {$type}"),
+            self::EMAIL_REVIEWS       => new BuildReputationEmail($provider, $baseUrl . '#reviews'),
+            default                   => throw new \InvalidArgumentException("Email type no longer sent: {$type}"),
         };
     }
 
@@ -493,7 +440,8 @@ class ProviderEmailJourneyService
             ->limit(20)
             ->get();
 
-        $pendingResends = ProviderEmailLog::whereNotNull('next_send_at')
+        $pendingResends = ProviderEmailLog::whereIn('email_type', self::ACTIVE_TYPES)
+            ->whereNotNull('next_send_at')
             ->where('next_send_at', '<=', now()->addDays(1))
             ->whereNull('completed_at')
             ->count();

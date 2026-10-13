@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'profile_information' => 'معلومات الملف الشخصي',
@@ -19,4 +19,11 @@ return [
     'delete_account_confirmation' => 'بعد حذف حسابك سيتم حذف جميع بياناتك بشكل دائم. يرجى إدخال كلمة المرور للتأكيد.',
     'delete_account_modal_title' => 'هل أنت متأكد أنك تريد حذف حسابك؟',
     'cancel' => 'إلغاء',
+    'account_title' => 'حسابي',
+    'account_subtitle' => 'إدارة الاسم والبريد الإلكتروني وكلمة المرور والحساب.',
+    'set_password' => 'تعيين كلمة مرور',
+    'set_password_help' => 'أنت تسجّل الدخول عبر Google. أضف كلمة مرور إذا أردت تسجيل الدخول ببريدك الإلكتروني أيضًا.',
+    'delete_confirm_email' => 'اكتب بريدك الإلكتروني (:email) للتأكيد.',
+    'delete_confirm_email_mismatch' => 'البريد الإلكتروني لا يطابق حسابك.',
+    'admin_delete_blocked' => 'حسابات الأدمن تُدار من لوحة التحكم.',
 ];

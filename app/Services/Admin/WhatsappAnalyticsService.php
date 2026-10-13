@@ -119,13 +119,33 @@ class WhatsappAnalyticsService
     }
 
     /**
+     * Hour of day (0–23) as SQL. MySQL in production; SQLite in the tests.
+     */
+    private function hourExpr(): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "CAST(strftime('%H', created_at) AS INTEGER)"
+            : 'HOUR(created_at)';
+    }
+
+    /**
+     * Day of week with MySQL's numbering (1 = Sunday … 7 = Saturday).
+     */
+    private function dayOfWeekExpr(): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "(CAST(strftime('%w', created_at) AS INTEGER) + 1)"
+            : 'DAYOFWEEK(created_at)';
+    }
+
+    /**
      * Clicks by hour of day (0–23).
      */
     public function clicksByHour(array $filters): array
     {
         $rows = $this->clickQuery($filters)
-            ->selectRaw('HOUR(created_at) as h, COUNT(*) as c')
-            ->groupByRaw('HOUR(created_at)')
+            ->selectRaw($this->hourExpr() . ' as h, COUNT(*) as c')
+            ->groupByRaw($this->hourExpr())
             ->pluck('c', 'h');
 
         $labels = [];
@@ -144,8 +164,8 @@ class WhatsappAnalyticsService
     public function clicksByDayOfWeek(array $filters): array
     {
         $rows = $this->clickQuery($filters)
-            ->selectRaw('DAYOFWEEK(created_at) as dow, COUNT(*) as c')
-            ->groupByRaw('DAYOFWEEK(created_at)')
+            ->selectRaw($this->dayOfWeekExpr() . ' as dow, COUNT(*) as c')
+            ->groupByRaw($this->dayOfWeekExpr())
             ->pluck('c', 'dow');
 
         $order = [2 => 'Mon', 3 => 'Tue', 4 => 'Wed', 5 => 'Thu', 6 => 'Fri', 7 => 'Sat', 1 => 'Sun'];

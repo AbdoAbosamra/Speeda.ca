@@ -106,13 +106,13 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect()->back()->with('error', 'The uploaded file is too large. Please select a smaller image (max '.ini_get('upload_max_filesize').').');
         });
 
-        // Handle model not found exceptions
+        // Handle model not found exceptions (Must return 404 to avoid Soft 404s in search engines)
         $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'The requested resource was not found.'], 404);
             }
 
-            return redirect()->back()->with('error', 'The requested resource was not found.');
+            abort(404, 'The requested resource was not found.');
         });
 
         // Handle general exceptions with user-friendly messages

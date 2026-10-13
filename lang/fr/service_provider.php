@@ -94,7 +94,11 @@ return [
   'top_rated' => 'Les mieux notés',
   'profile_views' => 'Vues du profil',
   'views_label' => 'vues',
-  'whatsapp_message' => 'Bonjour, je vous contacte via la plateforme Speeda.',
+  'whatsapp_message' => "Bonjour :business 👋
+
+J’ai trouvé votre profil sur SPEEDA et j’aimerais en savoir plus sur vos services.
+
+Votre profil SPEEDA : :url",
   'contact_whatsapp' => 'Contacter via WhatsApp',
   'no_description' => 'Aucune description disponible',
   'working_hours' => 'Heures de travail',
@@ -280,4 +284,8 @@ Complétez votre profil maintenant.',
     'photo_consent_proof_view' => 'Voir',
     'gallery_full' => 'Vous pouvez ajouter au maximum :max images à la galerie.',
     'gallery_image_added' => 'Image ajoutée à la galerie avec succès.',
+    'browse_providers' => 'Parcourir les prestataires',
+    'join_as_provider' => 'Devenir prestataire',
+    'no_providers_in_category' => 'Aucun prestataire trouvé dans :category',
+    'be_first_provider_message' => 'Nous développons notre réseau dans cette catégorie. Vous êtes prestataire ? Rejoignez Speeda dès aujourd’hui et touchez des clients locaux.',
 ];

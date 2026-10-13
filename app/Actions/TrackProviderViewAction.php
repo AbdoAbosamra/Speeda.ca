@@ -28,6 +28,10 @@ class TrackProviderViewAction
             return false;
         }
 
+        if (\App\Support\DeviceType::fromUserAgent(request()->userAgent()) === \App\Support\DeviceType::BOT) {
+            return false;
+        }
+
         $sessionHash = $this->generateSessionHash();
 
         if (empty($sessionHash)) {

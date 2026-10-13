@@ -172,11 +172,11 @@ class AdminProviderActivityMonitorService
 
         $events = $eventsQuery->paginate($perPage)->withQueryString();
 
-        $summary = (clone $eventsQuery)->selectRaw('
-                SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as profile_views,
-                SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as whatsapp_clicks,
+        $summary = (clone $eventsQuery)->selectRaw("
+                SUM(CASE WHEN action_type = 'view' THEN 1 ELSE 0 END) as profile_views,
+                SUM(CASE WHEN action_type = 'click_whatsapp' THEN 1 ELSE 0 END) as whatsapp_clicks,
                 MAX(created_at) as last_activity_at
-            ')->first();
+            ")->first();
 
         return [
             'provider' => $provider,
@@ -190,13 +190,12 @@ class AdminProviderActivityMonitorService
         $serviceProviderMorphType = (new ServiceProvider())->getMorphClass();
 
         $analyticsAgg = DB::table('analytics')
-            ->selectRaw('
+            ->selectRaw("
                 provider_id,
-                SUM(CASE WHEN action_type = "view" THEN 1 ELSE 0 END) as profile_views,
-                SUM(CASE WHEN action_type = "click_whatsapp" THEN 1 ELSE 0 END) as whatsapp_clicks,
-                MAX(created_at) as last_activity_at,
-                SUBSTRING_INDEX(GROUP_CONCAT(action_type ORDER BY created_at DESC, id DESC), ",", 1) as last_action_type
-            ')
+                SUM(CASE WHEN action_type = 'view' THEN 1 ELSE 0 END) as profile_views,
+                SUM(CASE WHEN action_type = 'click_whatsapp' THEN 1 ELSE 0 END) as whatsapp_clicks,
+                MAX(created_at) as last_activity_at
+            ")
             ->tap(fn($q) => AdminAnalyticsExclusion::apply($q))
             ->groupBy('provider_id');
 
@@ -209,13 +208,24 @@ class AdminProviderActivityMonitorService
             ->where('model_type', $serviceProviderMorphType)
             ->groupBy('model_id');
 
+        // Most recent event per provider. A correlated lookup on the
+        // (provider_id, created_at) index replaces GROUP_CONCAT over every
+        // event a provider ever had, which grew with traffic and only ran on MySQL.
+        $lastAction = DB::table('analytics as la')
+            ->select('la.action_type')
+            ->whereColumn('la.provider_id', 'sp.id')
+            ->tap(fn ($q) => AdminAnalyticsExclusion::apply($q, 'la.user_id'))
+            ->orderByDesc('la.created_at')
+            ->orderByDesc('la.id')
+            ->limit(1);
+
         return DB::table('service_providers as sp')
             ->leftJoin('users as u', 'sp.user_id', '=', 'u.id')
             ->leftJoin('categories as c', 'sp.category_id', '=', 'c.id')
             ->leftJoin('locations as l', 'sp.location_id', '=', 'l.id')
             ->leftJoinSub($analyticsAgg, 'a', 'sp.id', '=', 'a.provider_id')
             ->leftJoinSub($galleryAgg, 'g', 'sp.id', '=', 'g.provider_id')
-            ->selectRaw('
+            ->selectRaw("
                 sp.id,
                 sp.user_id,
                 sp.company_name,
@@ -239,13 +249,13 @@ class AdminProviderActivityMonitorService
                 COALESCE(a.profile_views, 0) as profile_views,
                 COALESCE(a.whatsapp_clicks, 0) as whatsapp_clicks,
                 a.last_activity_at,
-                a.last_action_type,
                 COALESCE(g.gallery_count, 0) as gallery_count,
-                CASE WHEN sp.profile_image IS NOT NULL AND sp.profile_image <> "" THEN 1 ELSE 0 END as has_profile_photo,
-                CASE WHEN sp.bio IS NOT NULL AND sp.bio <> "" THEN 1 ELSE 0 END as has_description,
-                CASE WHEN sp.address IS NOT NULL AND sp.address <> "" THEN 1 ELSE 0 END as has_address,
+                CASE WHEN sp.profile_image IS NOT NULL AND sp.profile_image <> '' THEN 1 ELSE 0 END as has_profile_photo,
+                CASE WHEN sp.bio IS NOT NULL AND sp.bio <> '' THEN 1 ELSE 0 END as has_description,
+                CASE WHEN sp.address IS NOT NULL AND sp.address <> '' THEN 1 ELSE 0 END as has_address,
                 CASE WHEN sp.experience_years IS NOT NULL AND sp.experience_years > 0 THEN 1 ELSE 0 END as has_experience,
-                CASE WHEN sp.services_offered IS NOT NULL AND sp.services_offered <> "" AND sp.services_offered <> "[]" THEN 1 ELSE 0 END as has_services
-            ');
+                CASE WHEN sp.services_offered IS NOT NULL AND sp.services_offered <> '' AND sp.services_offered <> '[]' THEN 1 ELSE 0 END as has_services
+            ")
+            ->selectSub($lastAction, 'last_action_type');
     }
 }

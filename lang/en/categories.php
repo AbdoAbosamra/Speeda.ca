@@ -274,4 +274,5 @@ return [
     // General
     'others_desc' => 'Other services not listed',
     'find_trusted_in_city' => 'Find trusted professionals in :city',
+    'categories' => 'Categories',
 ];

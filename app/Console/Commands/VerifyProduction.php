@@ -24,6 +24,9 @@ class VerifyProduction extends Command
         if (! config('session.encrypt')) {
             $failures[] = 'SESSION_ENCRYPT must be true';
         }
+        if (! config('session.secure')) {
+            $failures[] = 'SESSION_SECURE_COOKIE must be true on an HTTPS site';
+        }
         if (! str_starts_with((string) config('app.url'), 'https://') || in_array(parse_url(config('app.url'), PHP_URL_HOST), ['localhost', '127.0.0.1', '::1'])) {
             $failures[] = 'APP_URL must be a public HTTPS URL';
         }

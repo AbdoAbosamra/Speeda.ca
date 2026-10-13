@@ -9,6 +9,7 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProviderAnalyticsExportController;
 use App\Http\Controllers\ProviderDashboardController;
@@ -51,6 +52,37 @@ Route::view('/help-center', 'Static.help-center')->name('help-center');
 Route::view('/legal-affairs', 'Static.legal-affairs')->name('legal-affairs');
 Route::view('/about-us', 'about-us')->name('about-us');
 
+// ==================== LOCAL OFFERS - PUBLIC ====================
+Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
+Route::post('/offers/track', [OfferController::class, 'track'])
+    ->middleware('throttle:60,1')
+    ->name('offers.track');
+// Likes and comments are open to everyone (comments wait for admin approval);
+// favorites belong to client accounts.
+Route::get('/my-favorites', [\App\Http\Controllers\OfferEngagementController::class, 'favorites'])
+    ->middleware('auth')
+    ->name('offers.favorites');
+Route::post('/offers/{slug}/like', [\App\Http\Controllers\OfferEngagementController::class, 'like'])
+    ->middleware('throttle:30,1')
+    ->where('slug', '[a-z0-9-]+')
+    ->name('offers.like');
+Route::post('/offers/{slug}/comments', [\App\Http\Controllers\OfferEngagementController::class, 'comment'])
+    ->middleware('throttle:offer-comments')
+    ->where('slug', '[a-z0-9-]+')
+    ->name('offers.comment');
+Route::post('/offers/{slug}/favorite', [\App\Http\Controllers\OfferEngagementController::class, 'favorite'])
+    ->middleware('throttle:30,1')
+    ->where('slug', '[a-z0-9-]+')
+    ->name('offers.favorite');
+Route::get('/offers/{slug}', [OfferController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('offers.show');
+// "Get this offer on WhatsApp": counts the click and opens the chat.
+Route::get('/offers/{slug}/whatsapp', [OfferController::class, 'go'])
+    ->middleware('throttle:30,1')
+    ->where('slug', '[a-z0-9-]+')
+    ->name('offers.go');
+
 // ==================== SERVICE PROVIDERS - PUBLIC ====================
 Route::get('/service-providers', [ServiceProviderController::class, 'index'])
     ->name('service-providers.index');
@@ -85,8 +117,9 @@ Route::middleware(['auth'])->get('/dashboard', function () {
 // ==================== USER PROFILE ROUTES ====================
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile', [ProfileController::class, 'update'])->middleware('throttle:20,1')->name('profile.update');
+    // Asks for the account password: limited so it cannot be guessed.
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->middleware('throttle:6,1')->name('profile.destroy');
 });
 
 Route::middleware(['auth'])->prefix('service-providers')->group(function () {
@@ -139,6 +172,7 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
 
     // Handle profile image upload
     Route::post('/profile/image-upload', [ServiceProviderController::class, 'uploadProfileImage'])
+        ->middleware('throttle:20,1')
         ->name('service-providers.profile.image-upload');
 
     // Dismiss engagement popup
@@ -160,7 +194,7 @@ Route::get('/reviews/{review}', [ReviewController::class, 'show'])
 // Authenticated client routes - create/edit/delete reviews
 Route::get('/reviews/create/{serviceProvider}', [ReviewController::class, 'create'])
     ->name('reviews.create');
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:20,1'])->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
@@ -168,7 +202,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ==================== RATINGS ROUTES ====================
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:30,1'])->group(function () {
     Route::post('/service-providers/{serviceProvider}/rate', [RatingController::class, 'store'])
         ->name('ratings.store');
     Route::get('/service-providers/{serviceProvider}/my-rating', [RatingController::class, 'getUserRating'])
@@ -176,7 +210,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // ==================== ENDORSEMENTS ROUTES ====================
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'throttle:30,1'])->group(function () {
     Route::post('/service-providers/{serviceProvider}/endorse', [EndorsementController::class, 'toggle'])
         ->name('endorsements.toggle');
 });
@@ -186,7 +220,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
 
 // Authenticated routes - create/edit/delete/flag comments
-Route::middleware(['auth'])->prefix('comments')->name('comments.')->group(function () {
+Route::middleware(['auth', 'throttle:30,1'])->prefix('comments')->name('comments.')->group(function () {
     Route::get('/create', [CommentController::class, 'create'])->name('create');
     Route::post('/', [CommentController::class, 'store'])->name('store');
     Route::get('/{comment}/edit', [CommentController::class, 'edit'])->name('edit');
@@ -339,6 +373,30 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
         ->name('home_video.update');
     Route::delete('/home-video/file', [App\Http\Controllers\Admin\AdminHomeVideoController::class, 'destroyVideo'])->name('home_video.destroy_file');
     Route::delete('/home-video/poster', [App\Http\Controllers\Admin\AdminHomeVideoController::class, 'destroyPoster'])->name('home_video.destroy_poster');
+
+    // Local Offers (home section settings, offers, statistics, claim codes)
+    Route::get('/offers', [App\Http\Controllers\Admin\AdminOfferController::class, 'index'])->name('offers.index');
+    Route::put('/offers/section', [App\Http\Controllers\Admin\AdminOfferController::class, 'updateSection'])->name('offers.section');
+    Route::post('/offers/bulk', [App\Http\Controllers\Admin\AdminOfferController::class, 'bulk'])->name('offers.bulk');
+    Route::post('/offers/reorder', [App\Http\Controllers\Admin\AdminOfferController::class, 'reorder'])->name('offers.reorder');
+    Route::get('/offers/analytics', [App\Http\Controllers\Admin\AdminOfferAnalyticsController::class, 'index'])->name('offers.analytics');
+    Route::get('/offers/comments', [App\Http\Controllers\Admin\AdminOfferCommentController::class, 'index'])->name('offers.comments');
+    Route::post('/offers/comments/bulk', [App\Http\Controllers\Admin\AdminOfferCommentController::class, 'bulk'])->name('offers.comments.bulk');
+    Route::patch('/offers/comments/{comment}/approve', [App\Http\Controllers\Admin\AdminOfferCommentController::class, 'approve'])->name('offers.comments.approve');
+    Route::patch('/offers/comments/{comment}/reject', [App\Http\Controllers\Admin\AdminOfferCommentController::class, 'reject'])->name('offers.comments.reject');
+    Route::delete('/offers/comments/{comment}', [App\Http\Controllers\Admin\AdminOfferCommentController::class, 'destroy'])->name('offers.comments.destroy');
+    Route::get('/offers/create', [App\Http\Controllers\Admin\AdminOfferController::class, 'create'])->name('offers.create');
+    Route::post('/offers', [App\Http\Controllers\Admin\AdminOfferController::class, 'store'])
+        ->middleware('handle.large.uploads')
+        ->name('offers.store');
+    Route::get('/offers/{offer}/edit', [App\Http\Controllers\Admin\AdminOfferController::class, 'edit'])->name('offers.edit');
+    Route::match(['put', 'post'], '/offers/{offer}', [App\Http\Controllers\Admin\AdminOfferController::class, 'update'])
+        ->middleware('handle.large.uploads')
+        ->name('offers.update');
+    Route::post('/offers/{offer}/duplicate', [App\Http\Controllers\Admin\AdminOfferController::class, 'duplicate'])->name('offers.duplicate');
+    Route::patch('/offers/{offer}/toggle', [App\Http\Controllers\Admin\AdminOfferController::class, 'toggle'])->name('offers.toggle');
+    Route::patch('/offers/{offer}/feature', [App\Http\Controllers\Admin\AdminOfferController::class, 'feature'])->name('offers.feature');
+    Route::delete('/offers/{offer}', [App\Http\Controllers\Admin\AdminOfferController::class, 'destroy'])->name('offers.destroy');
 
     // Notifications Management
     Route::post('/notifications/bulk', [App\Http\Controllers\Admin\AdminNotificationController::class, 'bulk'])->name('notifications.bulk');

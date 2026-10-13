@@ -1,3 +1,4 @@
+@import "./navigation.css";
 @import "./foundation/design-tokens.css";
 @import "./components/ui-primitives.css";
 
@@ -3734,3 +3735,9 @@ footer a:hover {
         display: none;
     }
 }
+
+/* Offer trust and directional navigation. */
+.so-trust { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 14px; padding: 1rem; font-size: .875rem; overflow-wrap: anywhere; }
+.so-trust li + li { margin-block-start: .5rem; }
+[dir="rtl"] .slider-nav-btn i, [dir="rtl"] .so-btn .fa-arrow-right, [dir="rtl"] .admin-command-arrow { transform: rotate(180deg); }
+.so-card a:focus-visible, .sp-btn:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }

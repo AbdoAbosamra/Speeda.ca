@@ -47,6 +47,7 @@ class AdminController extends Controller
         'admin_dashboard_summary',
         'admin_dash_action_center',
         'admin_dash_kpis',
+        'admin_dash_offers',
         'admin_dash_funnel',
         'admin_dash_visitor_trend_14',
         'admin_dash_profile_health',

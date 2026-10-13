@@ -168,6 +168,14 @@ class User extends Authenticatable
         return $this->google_id !== null && blank($this->password);
     }
 
+    /**
+     * Offers this client saved. Favorites are a client-only feature.
+     */
+    public function favoriteOffers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Offer::class, 'offer_favorites')->withPivot('created_at');
+    }
+
     public function isServiceProvider(): bool
     {
         return $this->role === 'service_provider';

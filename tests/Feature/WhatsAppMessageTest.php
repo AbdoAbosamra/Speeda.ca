@@ -70,12 +70,14 @@ class WhatsAppMessageTest extends TestCase
         $response = $this->get(route('service-providers.show', $this->serviceProvider->id));
 
         $response->assertStatus(200);
-
-        // Check that company_name is passed to JavaScript
         $response->assertSee($this->serviceProvider->company_name);
 
-        // Check that the WhatsApp message template is present
-        $response->assertSee(__('service_provider.whatsapp_message'));
+        // The pre-filled message names the business and links back to the profile.
+        $url = $this->serviceProvider->fresh()->whatsappContactUrl();
+        $text = rawurldecode(substr($url, strpos($url, '?text=') + 6));
+        $this->assertStringContainsString($this->serviceProvider->company_name, $text);
+        $this->assertStringContainsString(route('service-providers.show', $this->serviceProvider->id), $text);
+        $response->assertSee(e($url), false);
     }
 
     #[Test]
@@ -124,8 +126,9 @@ class WhatsAppMessageTest extends TestCase
 
         $response->assertStatus(200);
 
-        // Check that api.whatsapp.com URL structure is present
-        $response->assertSee('api.whatsapp.com/send', false);
+        // A real link to WhatsApp's click-to-chat with the international number.
+        $digits = preg_replace('/\D/', '', $this->serviceProvider->whatsapp_number);
+        $response->assertSee('href="https://wa.me/' . $digits . '?text=', false);
     }
 
     #[Test]
@@ -199,24 +202,25 @@ class WhatsAppMessageTest extends TestCase
         $response = $this->get(route('service-providers.show', $this->serviceProvider->id));
 
         $response->assertStatus(200);
-        // Check that English translation is in the page source (in JavaScript)
-        $response->assertSee('Hello, I am contacting you through the Speeda platform', false);
+        $response->assertSee(rawurlencode('I found your profile on SPEEDA'), false);
     }
 
     #[Test]
     public function test_whatsapp_message_in_arabic()
     {
-        // Check that Arabic translation exists
-        $translation = __('service_provider.whatsapp_message', [], 'ar');
-        $this->assertEquals('مرحبًا، أتواصل معك عبر منصة سبيدا.', $translation);
+        $translation = __('service_provider.whatsapp_message', ['business' => 'X', 'url' => 'U'], 'ar');
+        $this->assertStringContainsString('سبيدا', $translation);
+        $this->assertStringContainsString('X', $translation);
+        $this->assertStringContainsString('U', $translation);
     }
 
     #[Test]
     public function test_whatsapp_message_in_french()
     {
-        // Check that French translation exists
-        $translation = __('service_provider.whatsapp_message', [], 'fr');
-        $this->assertEquals('Bonjour, je vous contacte via la plateforme Speeda.', $translation);
+        $translation = __('service_provider.whatsapp_message', ['business' => 'X', 'url' => 'U'], 'fr');
+        $this->assertStringContainsString('SPEEDA', $translation);
+        $this->assertStringContainsString('X', $translation);
+        $this->assertStringContainsString('U', $translation);
     }
 
     #[Test]
@@ -278,15 +282,11 @@ class WhatsAppMessageTest extends TestCase
     #[Test]
     public function test_whatsapp_error_handling_when_translations_missing()
     {
-        // Temporarily remove translation
-        $originalMessage = __('service_provider.whatsapp_message');
-
         $response = $this->get(route('service-providers.show', $this->serviceProvider->id));
 
         $response->assertStatus(200);
-
-        // Should still have error handling in JavaScript
-        $response->assertSee('console.error');
+        // The link works without JavaScript: the URL is built on the server.
+        $response->assertSee('href="https://wa.me/', false);
     }
 
     #[Test]
@@ -296,7 +296,7 @@ class WhatsAppMessageTest extends TestCase
             'user_id' => User::factory()->create(['role' => 'service_provider']),
             'category_id' => $this->category->id,
             'location_id' => $this->location->id,
-            'company_name' => 'Company & Sons', // Contains special character
+            'company_name' => 'Company & Sons',
             'phone' => '6138649118',
             'whatsapp_number' => '+16138649118',
         ]);
@@ -304,7 +304,48 @@ class WhatsAppMessageTest extends TestCase
         $response = $this->get(route('service-providers.show', $sp->id));
 
         $response->assertStatus(200);
-        // Should handle URL encoding
-        $response->assertSee('encodeURIComponent');
+        // "&" is percent-encoded inside the message, so it cannot cut the URL short.
+        $response->assertSee('Company%20%26%20Sons', false);
+    }
+
+    #[Test]
+    public function test_numbers_without_country_code_dial_canada_not_egypt()
+    {
+        $sp = ServiceProvider::factory()->create([
+            'user_id' => User::factory()->create(['role' => 'service_provider']),
+            'category_id' => $this->category->id,
+            'location_id' => $this->location->id,
+            'company_name' => 'Local Co',
+            'phone' => '613-864-9118',
+            'whatsapp_number' => null,
+        ]);
+
+        $response = $this->get(route('service-providers.show', $sp->id));
+
+        $response->assertSee('href="https://wa.me/16138649118?text=', false);
+        $response->assertDontSee('wa.me/206138649118', false);
+    }
+
+    #[Test]
+    public function test_number_normalisation_covers_every_stored_shape()
+    {
+        $cases = [
+            '+16138649118' => '16138649118',
+            '+1 (613) 864-9118' => '16138649118',
+            '6138649118' => '16138649118',
+            '613.864.9118' => '16138649118',
+            '16138649118' => '16138649118',
+            '0016138649118' => '16138649118',
+            '+201289121218' => '201289121218',
+            '01289121218' => '201289121218',
+            '' => null,
+            '123' => null,
+        ];
+
+        foreach ($cases as $raw => $expected) {
+            $this->assertSame($expected, \App\Support\WhatsApp::digits((string) $raw), "Number: {$raw}");
+        }
+
+        $this->assertSame('+1 (613) 864-9118', \App\Support\WhatsApp::display('6138649118'));
     }
 }

@@ -19,6 +19,7 @@
         'admin.comments' => ['Comments', 'admin.comments'],
         'admin.testimonials' => ['Testimonials', 'admin.testimonials.index'],
         'admin.home_video' => ['Home Video', 'admin.home_video.edit'],
+        'admin.offers' => ['Offers', 'admin.offers.index'],
         'admin.notifications' => ['Notifications', 'admin.notifications.index'],
         'admin.broadcasts' => ['Email All Providers', 'admin.broadcasts.index'],
         'admin.email_journey' => ['Email Journey', 'admin.email_journey.index'],
@@ -69,6 +70,11 @@
             ['label' => 'Comments', 'icon' => 'fa-comments', 'route' => 'admin.comments', 'active' => 'admin.comments*'],
             ['label' => 'Testimonials', 'icon' => 'fa-quote-right', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials*'],
             ['label' => 'Home Video', 'icon' => 'fa-circle-play', 'route' => 'admin.home_video.edit', 'active' => 'admin.home_video*'],
+            ['label' => 'Offers', 'icon' => 'fa-tags', 'route' => 'admin.offers.index', 'active' => 'admin.offers.index|admin.offers.create|admin.offers.edit'],
+            ['label' => 'Offer Analytics', 'icon' => 'fa-chart-line', 'route' => 'admin.offers.analytics', 'active' => 'admin.offers.analytics'],
+            ['label' => 'Offer Comments', 'icon' => 'fa-comments', 'route' => 'admin.offers.comments', 'active' => 'admin.offers.comments',
+                // Comments wait here until approved, so the queue size is worth seeing from anywhere.
+                'badge' => \Illuminate\Support\Facades\Cache::remember('admin_pending_offer_comments', 60, fn () => \Illuminate\Support\Facades\Schema::hasTable('offer_comments') ? \App\Models\OfferComment::pending()->count() : 0)],
             ['label' => 'Blogs', 'icon' => 'fa-newspaper', 'route' => 'admin.blog.posts.index', 'active' => 'admin.blog.posts*'],
             ['label' => 'Legal Pages', 'icon' => 'fa-scale-balanced', 'route' => 'admin.legal-pages.index', 'active' => 'admin.legal-pages*'],
             ['label' => 'Categories', 'icon' => 'fa-folder-tree', 'route' => 'admin.categories', 'active' => 'admin.categories*'],
@@ -102,9 +108,12 @@
                     <div class="admin-menu-group">
                         @foreach($items as $item)
                             @if(Route::has($item['route']))
-                                <a href="{{ route($item['route']) }}" class="admin-menu-item {{ request()->routeIs($item['active']) ? 'active' : '' }}">
+                                <a href="{{ route($item['route']) }}" class="admin-menu-item {{ request()->routeIs(...explode('|', $item['active'])) ? 'active' : '' }}">
                                     <i class="fas {{ $item['icon'] }}"></i>
                                     <span>{{ $item['label'] }}</span>
+                                    @if(! empty($item['badge']))
+                                        <span class="ms-auto badge rounded-pill bg-danger" title="Waiting for review">{{ $item['badge'] }}</span>
+                                    @endif
                                 </a>
                             @endif
                         @endforeach

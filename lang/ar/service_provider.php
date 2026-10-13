@@ -94,7 +94,11 @@ return [
   'top_rated' => 'الأعلى تقييمًا',
   'profile_views' => 'مشاهدات الملف',
   'views_label' => 'مشاهدات',
-  'whatsapp_message' => 'مرحبًا، أتواصل معك عبر منصة سبيدا.',
+  'whatsapp_message' => "مرحبًا :business 👋
+
+وجدت ملفكم على منصة سبيدا (SPEEDA) وأرغب في الاستفسار عن خدماتكم.
+
+ملفكم على سبيدا: :url",
   'contact_whatsapp' => 'تواصل عبر واتساب',
   'no_description' => 'لا يوجد وصف متاح',
   'working_hours' => 'ساعات العمل',
@@ -280,4 +284,8 @@ return [
     'photo_consent_proof_view' => 'عرض',
     'gallery_full' => 'يمكنك رفع :max صور بحد أقصى في المعرض.',
     'gallery_image_added' => 'تمت إضافة الصورة إلى المعرض بنجاح.',
+    'browse_providers' => 'تصفح مقدمي الخدمات',
+    'join_as_provider' => 'انضم كمقدم خدمة',
+    'no_providers_in_category' => 'لا يوجد مقدمو خدمات في :category',
+    'be_first_provider_message' => 'نعمل على توسيع شبكتنا في هذه الفئة. هل أنت مقدم خدمة؟ انضم إلى سبيدا اليوم وتواصل مع العملاء المحليين.',
 ];

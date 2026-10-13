@@ -31,4 +31,15 @@ return [
     |
     */
     'email' => env('OWNER_EMAIL', 'abdo.abosamra80@gmail.com'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | SPEEDA WhatsApp for offers
+    |--------------------------------------------------------------------------
+    |
+    | Where "Contact us to publish your offer" opens a WhatsApp chat. Any
+    | readable format works; the link builder normalises it.
+    |
+    */
+    'offers_whatsapp' => env('SPEEDA_OFFERS_WHATSAPP', '+16138649118'),
 ];

@@ -30,7 +30,7 @@
 @endphp
 
 @section('content')
-    <div class="admin-dashboard-page" dir="ltr">
+    <div class="admin-dashboard-page" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
         <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
 
             {{-- Hero --}}
@@ -419,6 +419,20 @@
                 </div>
             </section>
 
+            <section class="admin-section-block" aria-labelledby="offer-overview-title">
+                <h2 id="offer-overview-title" class="admin-section-title mb-3">{{ __('readiness.offer_overview') }}</h2>
+                <div class="dash-action-grid">
+                    @foreach(['live' => 'live_offers', 'ending_soon' => 'ending_soon', 'pending_comments' => 'pending_comments', 'views' => 'offer_views', 'clicks' => 'offer_clicks'] as $key => $label)
+                        <a class="dash-action-card" href="{{ $key === 'pending_comments' ? route('admin.offers.comments', ['status' => 'pending']) : route('admin.offers.analytics') }}">
+                            <div class="dash-action-body">
+                                <strong class="dash-action-count">{{ number_format($dashboard['offers'][$key] ?? 0) }}</strong>
+                                <span class="dash-action-label">{{ __('readiness.'.$label) }}</span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+
             {{-- ===================== QUICK ACCESS ===================== --}}
             <section class="admin-section-block">
                 <div class="admin-section-heading">
@@ -428,6 +442,24 @@
                     </div>
                 </div>
                 <div class="admin-command-grid">
+                    <a href="{{ route('admin.offers.index') }}" class="admin-command-card">
+                        <span class="admin-command-icon admin-command-blue"><i class="fas fa-tags"></i></span>
+                        <div class="admin-command-content"><h3>{{ __('readiness.manage_offers') }}</h3><p>{{ __('readiness.manage_offers_hint') }}</p></div>
+                        <i class="fas fa-arrow-right admin-command-arrow"></i>
+                    </a>
+                    <a href="{{ route('admin.offers.comments', ['status' => 'pending']) }}" class="admin-command-card">
+                        <span class="admin-command-icon admin-command-amber"><i class="fas fa-comments"></i></span>
+                        <div class="admin-command-content"><h3>{{ __('readiness.offer_comments') }}</h3><p>{{ __('readiness.offer_comments_hint', ['count' => $dashboard['offers']['pending_comments'] ?? 0]) }}</p></div>
+                        <i class="fas fa-arrow-right admin-command-arrow"></i>
+                    </a>
+                    <a href="{{ route('admin.categories') }}" class="admin-command-card">
+                        <span class="admin-command-icon admin-command-blue"><i class="fas fa-layer-group"></i></span>
+                        <div class="admin-command-content"><h3>{{ __('admin.categories') }}</h3></div>
+                    </a>
+                    <a href="{{ route('admin.notifications.index') }}" class="admin-command-card">
+                        <span class="admin-command-icon admin-command-blue"><i class="fas fa-bell"></i></span>
+                        <div class="admin-command-content"><h3>{{ __('admin.notifications') }}</h3></div>
+                    </a>
                     <a href="{{ route('admin.users') }}" class="admin-command-card">
                         <span class="admin-command-icon admin-command-blue"><i class="fas fa-users-cog"></i></span>
                         <div class="admin-command-content"><h3>Manage Users</h3><p>Accounts, roles, status, access.</p></div>

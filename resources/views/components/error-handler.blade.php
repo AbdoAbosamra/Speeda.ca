@@ -98,7 +98,7 @@ Features:
 @endif
 
 {{-- Validation Errors Summary --}}
-@if($errors->any())
+@if(isset($errors) && $errors->any())
     <div class="validation-errors-container mb-4" role="alert">
         <div class="validation-error-box">
             <div class="error-icon-wrapper">

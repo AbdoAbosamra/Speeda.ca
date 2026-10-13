@@ -49,12 +49,6 @@ class EmailUnsubscribeTest extends TestCase
     {
         return [
             'welcome' => [\App\Mail\Provider\WelcomeEmail::class],
-            'photo' => [\App\Mail\Provider\AddProfilePhotoEmail::class],
-            'services' => [\App\Mail\Provider\AddServicesEmail::class],
-            'bio' => [\App\Mail\Provider\WriteDescriptionEmail::class],
-            'experience' => [\App\Mail\Provider\AddExperienceEmail::class],
-            'gallery' => [\App\Mail\Provider\ShowcaseWorkEmail::class],
-            'profile complete' => [\App\Mail\Provider\ProfileCompleteEmail::class],
             'build reputation' => [\App\Mail\Provider\BuildReputationEmail::class],
             'first review received' => [\App\Mail\Provider\FirstReviewReceivedEmail::class],
             'fifth review received' => [\App\Mail\Provider\FifthReviewReceivedEmail::class],

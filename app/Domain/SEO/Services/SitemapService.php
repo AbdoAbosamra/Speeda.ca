@@ -4,6 +4,7 @@ namespace App\Domain\SEO\Services;
 
 use App\Models\Category;
 use App\Models\Location;
+use App\Models\Offer;
 use App\Models\Post;
 use App\Models\ServiceProvider;
 use Illuminate\Support\Facades\URL as UrlFacade;
@@ -44,78 +45,98 @@ class SitemapService
 
         try {
             $sitemap = Sitemap::create();
-            $locales = array_keys(config('app.supported_locales', ['en' => []]));
+            $locales = array_keys(config('app.supported_locales', ['en' => [], 'ar' => [], 'fr' => []]));
             $urlCount = 0;
 
-            // 1. Home Pages
-            foreach ($locales as $locale) {
-                $sitemap->add($this->createUrl(route('home'), $locale, 1.0, $locales));
-                $urlCount++;
+            // 1. Homepage (Canonical)
+            $sitemap->add($this->createCanonicalEntry(route('home'), 1.0, Url::CHANGE_FREQUENCY_DAILY, $locales));
+            $urlCount++;
+
+            // 2. Core Public Static Pages (Canonical 200 OK)
+            $staticRoutes = [
+                ['name' => 'categories', 'priority' => 0.9, 'freq' => Url::CHANGE_FREQUENCY_WEEKLY],
+                ['name' => 'service-providers.index', 'priority' => 0.9, 'freq' => Url::CHANGE_FREQUENCY_DAILY],
+                ['name' => 'blogs.index', 'priority' => 0.8, 'freq' => Url::CHANGE_FREQUENCY_DAILY],
+                ['name' => 'offers.index', 'priority' => 0.8, 'freq' => Url::CHANGE_FREQUENCY_DAILY],
+                ['name' => 'about-us', 'priority' => 0.7, 'freq' => Url::CHANGE_FREQUENCY_MONTHLY],
+                ['name' => 'help-center', 'priority' => 0.6, 'freq' => Url::CHANGE_FREQUENCY_MONTHLY],
+                ['name' => 'legal-affairs', 'priority' => 0.5, 'freq' => Url::CHANGE_FREQUENCY_MONTHLY],
+                ['name' => 'privacy-policy', 'priority' => 0.4, 'freq' => Url::CHANGE_FREQUENCY_YEARLY],
+                ['name' => 'terms-of-service', 'priority' => 0.4, 'freq' => Url::CHANGE_FREQUENCY_YEARLY],
+            ];
+
+            foreach ($staticRoutes as $routeInfo) {
+                if (\Illuminate\Support\Facades\Route::has($routeInfo['name'])) {
+                    $sitemap->add($this->createCanonicalEntry(
+                        route($routeInfo['name']),
+                        $routeInfo['priority'],
+                        $routeInfo['freq'],
+                        $locales
+                    ));
+                    $urlCount++;
+                }
             }
 
-            // 2. Categories
-            Category::where('is_active', true)->chunk(100, function ($categories) use ($sitemap, $locales, &$urlCount) {
-                foreach ($categories as $category) {
-                    foreach ($locales as $locale) {
-                        $sitemap->add($this->createUrl(
+            // 3. Active Categories with actual providers (Prevents Soft 404 / Thin Content)
+            Category::where('is_active', true)
+                ->where(function ($query) {
+                    $query->whereHas('serviceProviders', fn ($q) => $q->publiclyVisible())
+                          ->orWhereHas('children.serviceProviders', fn ($q) => $q->publiclyVisible());
+                })
+                ->chunk(100, function ($categories) use ($sitemap, $locales, &$urlCount) {
+                    foreach ($categories as $category) {
+                        $sitemap->add($this->createCanonicalEntry(
                             route('service-providers.index', ['category' => $category->slug]),
-                            $locale,
                             0.8,
-                            $locales
+                            Url::CHANGE_FREQUENCY_WEEKLY,
+                            $locales,
+                            $category->updated_at
                         ));
                         $urlCount++;
                     }
-                }
-            });
+                });
 
-            // 3. Service Providers
-            // Deactivated profiles must not be advertised in the sitemap.
-            ServiceProvider::publiclyVisible()->chunk(100, function ($providers) use ($sitemap, $locales, &$urlCount) {
-                foreach ($providers as $provider) {
-                    foreach ($locales as $locale) {
-                        $sitemap->add($this->createUrl(
+            // 4. Publicly Visible Service Providers (Active owner & active listing)
+            ServiceProvider::publiclyVisible()
+                ->with(['user'])
+                ->chunk(100, function ($providers) use ($sitemap, $locales, &$urlCount) {
+                    foreach ($providers as $provider) {
+                        $sitemap->add($this->createCanonicalEntry(
                             route('service-providers.show', $provider),
-                            $locale,
                             0.7,
-                            $locales
+                            Url::CHANGE_FREQUENCY_WEEKLY,
+                            $locales,
+                            $provider->updated_at
                         ));
                         $urlCount++;
                     }
-                }
-            });
+                });
 
-            // 4. Locations
-            Location::where('is_active', true)->chunk(100, function ($locations) use ($sitemap, $locales, &$urlCount) {
-                foreach ($locations as $location) {
-                    foreach ($locales as $locale) {
-                        $sitemap->add($this->createUrl(
-                            route('service-providers.index', ['location' => $location->id]),
-                            $locale,
-                            0.6,
-                            $locales
-                        ));
-                        $urlCount++;
-                    }
-                }
-            });
-
-            // 5. Blog pages
-            foreach ($locales as $locale) {
-                $sitemap->add($this->createUrl(route('blogs.index'), $locale, 0.8, $locales));
-                $urlCount++;
-            }
-
+            // 5. Published Blog Posts
             Post::query()->published()->chunk(100, function ($posts) use ($sitemap, $locales, &$urlCount) {
                 foreach ($posts as $post) {
-                    foreach ($locales as $locale) {
-                        $sitemap->add($this->createUrl(
-                            route('blogs.show', $post),
-                            $locale,
-                            0.7,
-                            $locales
-                        ));
-                        $urlCount++;
-                    }
+                    $sitemap->add($this->createCanonicalEntry(
+                        route('blogs.show', $post),
+                        0.7,
+                        Url::CHANGE_FREQUENCY_MONTHLY,
+                        $locales,
+                        $post->updated_at
+                    ));
+                    $urlCount++;
+                }
+            });
+
+            // 6. Live Local Offers (drafts, scheduled and ended offers are left out)
+            Offer::live()->chunk(100, function ($offers) use ($sitemap, $locales, &$urlCount) {
+                foreach ($offers as $offer) {
+                    $sitemap->add($this->createCanonicalEntry(
+                        route('offers.show', $offer->slug),
+                        0.7,
+                        Url::CHANGE_FREQUENCY_DAILY,
+                        $locales,
+                        $offer->updated_at
+                    ));
+                    $urlCount++;
                 }
             });
 
@@ -123,35 +144,39 @@ class SitemapService
 
             return $urlCount;
         } finally {
-            // Restore the original URL generator state so that other parts of
-            // the application are not affected if this runs in a long-lived
-            // process (e.g. queue worker).
+            // Restore the original URL generator state
             UrlFacade::swap($originalGenerator);
         }
     }
 
     /**
-     * Build a single <url> tag with hreflang alternates for every supported locale.
+     * Build a single canonical <url> tag with hreflang alternates for every supported locale.
      */
-    protected function createUrl(string $baseUrl, string $locale, float $priority, array $locales): Url
-    {
-        $separator = str_contains($baseUrl, '?') ? '&' : '?';
-        $urlWithLang = $baseUrl . $separator . 'lang=' . $locale;
-
-        $tag = Url::create($urlWithLang)
+    protected function createCanonicalEntry(
+        string $canonicalUrl,
+        float $priority,
+        string $changeFrequency,
+        array $locales,
+        ?\DateTimeInterface $lastModified = null
+    ): Url {
+        $tag = Url::create($canonicalUrl)
             ->setPriority($priority)
-            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY);
+            ->setChangeFrequency($changeFrequency);
 
-        // Add hreflang alternates for each supported locale.
+        if ($lastModified) {
+            $tag->setLastModificationDate($lastModified);
+        }
+
+        $separator = str_contains($canonicalUrl, '?') ? '&' : '?';
+
+        // Add hreflang alternates for multilingual crawling
         foreach ($locales as $altLocale) {
-            $altUrl = $baseUrl . $separator . 'lang=' . $altLocale;
+            $altUrl = $canonicalUrl . $separator . 'lang=' . $altLocale;
             $tag->addAlternate($altUrl, $altLocale);
         }
 
-        // x-default points to the English version as the fallback for
-        // users whose language is not explicitly supported.
-        $defaultUrl = $baseUrl . $separator . 'lang=en';
-        $tag->addAlternate($defaultUrl, 'x-default');
+        // x-default points to the canonical base URL
+        $tag->addAlternate($canonicalUrl, 'x-default');
 
         return $tag;
     }

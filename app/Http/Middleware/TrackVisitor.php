@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Visitor;
+use App\Support\DeviceType;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,8 +18,7 @@ class TrackVisitor
     {
         $response = $next($request);
 
-        // Only track GET requests to avoid counting form submissions
-        if ($request->isMethod('get')) {
+        if ($this->isPageView($request, $response)) {
             try {
                 $this->recordVisitor($request);
             } catch (\Exception $e) {
@@ -30,6 +30,30 @@ class TrackVisitor
         }
 
         return $response;
+    }
+
+    /**
+     * A person opening a page: a successful GET for HTML. Form posts,
+     * background fetches (notification polling, offer impressions), error
+     * pages from scanners and search-engine crawlers are not visitors and
+     * only inflated the numbers while adding a write per request.
+     */
+    protected function isPageView(Request $request, Response $response): bool
+    {
+        if (! $request->isMethod('get') || $request->ajax() || $request->expectsJson() || $request->prefetch()) {
+            return false;
+        }
+
+        if ($response->getStatusCode() !== 200) {
+            return false;
+        }
+
+        $contentType = (string) $response->headers->get('Content-Type');
+        if ($contentType !== '' && ! str_contains($contentType, 'text/html')) {
+            return false;
+        }
+
+        return DeviceType::fromUserAgent($request->userAgent()) !== DeviceType::BOT;
     }
 
     /**

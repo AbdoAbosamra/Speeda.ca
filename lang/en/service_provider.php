@@ -94,7 +94,11 @@ return [
     'top_rated' => 'Top Rated',
     'profile_views' => 'Profile Views',
     'views_label' => 'views',
-    'whatsapp_message' => 'Hello, I am contacting you through the Speeda platform.',
+    'whatsapp_message' => "Hi :business 👋
+
+I found your profile on SPEEDA and I'd like to ask about your services.
+
+Your SPEEDA profile: :url",
     'contact_whatsapp' => 'Contact via WhatsApp',
     'no_description' => 'No description available',
     'working_hours' => 'Working Hours',
@@ -289,4 +293,8 @@ return [
     'photo_consent_proof_view' => 'View',
     'gallery_full' => 'You can upload up to :max gallery images.',
     'gallery_image_added' => 'Gallery image added successfully.',
+    'browse_providers' => 'Browse providers',
+    'join_as_provider' => 'Join as a provider',
+    'no_providers_in_category' => 'No providers found in :category',
+    'be_first_provider_message' => 'We are expanding our network in this category. Are you a service provider? Join Speeda today and reach local clients.',
 ];

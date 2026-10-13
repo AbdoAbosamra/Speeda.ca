@@ -138,8 +138,12 @@ class AuditRegressionTest extends TestCase
     {
         $this->artisan('deploy:verify')->assertFailed();
         $this->app->instance('env', 'production');
-        config(['app.debug' => false, 'app.url' => 'https://speeda.ca', 'session.encrypt' => true, 'view.compiled' => base_path('bootstrap/cache/views')]);
+        config(['app.debug' => false, 'app.url' => 'https://speeda.ca', 'session.encrypt' => true, 'session.secure' => true, 'view.compiled' => base_path('bootstrap/cache/views')]);
         $this->artisan('deploy:verify')->assertSuccessful();
+
+        // A session cookie that may travel over plain HTTP blocks the release.
+        config(['session.secure' => false]);
+        $this->artisan('deploy:verify')->assertFailed();
     }
 
     public function test_category_initialization_is_portable_and_preserves_existing_catalog(): void

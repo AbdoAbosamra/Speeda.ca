@@ -19,4 +19,5 @@ return [
     'by_author' => 'بواسطة :name',
     'reading_time' => ':minutes دقيقة قراءة',
     'latest_posts' => 'أحدث المقالات',
+    'blog' => 'المدونة',
 ];

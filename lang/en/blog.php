@@ -19,4 +19,5 @@ return [
     'by_author' => 'By :name',
     'reading_time' => ':minutes min read',
     'latest_posts' => 'Latest Posts',
+    'blog' => 'Blog',
 ];

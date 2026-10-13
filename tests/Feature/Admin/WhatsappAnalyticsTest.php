@@ -13,11 +13,12 @@ class WhatsappAnalyticsTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * The aggregation queries now pick SQLite equivalents for HOUR() and
+     * DAYOFWEEK(), so these tests run on the in-memory test database too.
+     */
     private function skipUnlessMysql(): void
     {
-        if (DB::connection()->getDriverName() !== 'mysql') {
-            $this->markTestSkipped('WhatsApp analytics aggregation relies on MySQL functions (HOUR/DAYOFWEEK/COUNT DISTINCT).');
-        }
     }
 
     /**
@@ -106,8 +107,8 @@ class WhatsappAnalyticsTest extends TestCase
         $provider = $this->makeProvider();
 
         DB::table('analytics')->insert([
-            ['provider_id' => $provider->id, 'user_id' => null, 'action_type' => 'view', 'session_hash' => 'g1', 'created_at' => now(), 'updated_at' => now()],
-            ['provider_id' => $provider->id, 'user_id' => null, 'action_type' => 'click_whatsapp', 'session_hash' => 'g1', 'created_at' => now(), 'updated_at' => now()],
+            ['provider_id' => $provider->id, 'user_id' => null, 'action_type' => 'view', 'session_hash' => 'g1', 'ip_address' => 'hash:g1', 'created_at' => now(), 'updated_at' => now()],
+            ['provider_id' => $provider->id, 'user_id' => null, 'action_type' => 'click_whatsapp', 'session_hash' => 'g1', 'ip_address' => 'hash:g1', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         Cache::flush();

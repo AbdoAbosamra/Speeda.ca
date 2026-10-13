@@ -106,28 +106,33 @@ class NewAdminFeaturesSmokeTest extends TestCase
     {
         Mail::fake();
 
-        $this->put(route('admin.email_templates.update', 'photo'), [
+        $default = EmailTemplate::defaults()['reviews'];
+
+        $this->put(route('admin.email_templates.update', 'reviews'), [
             'subject' => 'Custom subject {{ provider_name }}',
             'headline' => 'Custom headline',
             'is_active' => 1,
-        ])->assertRedirect(route('admin.email_templates.edit', 'photo'));
+        ])->assertRedirect(route('admin.email_templates.edit', 'reviews'));
 
-        $this->assertDatabaseHas('email_templates', ['key' => 'photo', 'is_active' => true]);
+        $this->assertDatabaseHas('email_templates', ['key' => 'reviews', 'is_active' => true]);
 
-        $resolved = EmailTemplate::resolve('photo', ['provider_name' => 'ACME']);
+        $resolved = EmailTemplate::resolve('reviews', ['provider_name' => 'ACME']);
         $this->assertSame('Custom subject ACME', $resolved['subject']);
         $this->assertSame('Custom headline', $resolved['headline']);
 
-        // Cheap woof check for the badge default staying else
-        $this->assertSame('Step 1 of 5', $resolved['badge']);
+        // Fields left out of the override keep their default.
+        $this->assertSame($default['badge'], $resolved['badge']);
 
         // Reset restores the built-in default
-        $this->delete(route('admin.email_templates.reset', 'photo'))
-            ->assertRedirect(route('admin.email_templates.edit', 'photo'));
+        $this->delete(route('admin.email_templates.reset', 'reviews'))
+            ->assertRedirect(route('admin.email_templates.edit', 'reviews'));
 
-        $this->assertDatabaseMissing('email_templates', ['key' => 'photo']);
-        $resolved = EmailTemplate::resolve('photo');
-        $this->assertSame('📸 One Photo Can Change Everything – Add Yours Today', $resolved['subject']);
+        $this->assertDatabaseMissing('email_templates', ['key' => 'reviews']);
+        $resolved = EmailTemplate::resolve('reviews');
+        $this->assertSame($default['subject'], $resolved['subject']);
+
+        // Retired onboarding templates are gone from the editor.
+        $this->get(route('admin.email_templates.edit', 'photo'))->assertNotFound();
     }
 
     public function test_email_template_rejects_unknown_placeholder(): void
@@ -143,9 +148,11 @@ class NewAdminFeaturesSmokeTest extends TestCase
         $provider = $this->makeProvider();
         $provider->user->update(['role' => 'service_provider', 'is_active' => true]);
 
-        foreach (['welcome', 'photo', 'services', 'bio', 'experience', 'gallery', 'complete', 'reviews'] as $type) {
+        foreach (['welcome', 'reviews'] as $type) {
             $this->get(route('admin.email_journey.preview', $type))->assertOk();
         }
+
+        $this->get(route('admin.email_journey.preview', 'photo'))->assertNotFound();
     }
 
     /* ------------------------------------------------------------------ */
@@ -167,7 +174,7 @@ class NewAdminFeaturesSmokeTest extends TestCase
         $provider = $this->makeProvider();
 
         $this->post(route('admin.email_journey.send_test', $provider->id), [
-            'expected_type' => 'reviews', // certainly not the actual next email
+            'expected_type' => 'reviews', // a fresh provider has no reviews email due
         ])->assertRedirect(route('admin.email_journey.show', $provider->id))
           ->assertSessionHas('warning');
 
@@ -183,7 +190,7 @@ class NewAdminFeaturesSmokeTest extends TestCase
         // Dry run never touches provider_email_logs, even when an email is due.
         $this->assertSame(0, ProviderEmailLog::count(), 'Dry run must not persist a log row.');
         if ($sent !== null) {
-            $this->assertContains($sent, ['photo', 'services', 'bio', 'experience', 'gallery', 'complete', 'reviews']);
+            $this->assertSame('reviews', $sent);
         }
 
         $stats = $svc->getAdminStats();

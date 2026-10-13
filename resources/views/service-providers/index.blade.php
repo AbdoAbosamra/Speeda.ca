@@ -4,6 +4,8 @@
     @vite(['resources/css/providers.css'])
 @endpush
 
+@include('partials.offers.styles')
+
 @section('content')
     <div class="container page-shell">
         <!-- قسم الهيرو المحسّن -->
@@ -11,11 +13,32 @@
             <div class="hero-content">
                 <div class="hero-header">
                     <div class="hero-text">
-                        <p class="text-uppercase text-primary fw-semibold mb-2">
-                            <i class="fas fa-compass me-2"></i>{{ __('service_provider.discover_providers') }}
-                        </p>
-                        <h1 class="mb-2">{{ __('service_provider.service_providers') }}</h1>
-                        <p class="hero-subtitle">{{ __('service_provider.browse_providers_description') }}</p>
+                        @if(isset($selectedCategory) && $selectedCategory)
+                            <nav aria-label="breadcrumb" class="mb-2">
+                                <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
+                                    <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>{{ __('general.home') }}</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ route('categories') }}" class="text-decoration-none text-muted">{{ __('categories.categories') }}</a></li>
+                                    <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">{{ $selectedCategory->translated_name }}</li>
+                                </ol>
+                            </nav>
+                            <h1 class="mb-2">{{ $selectedCategory->translated_name }}</h1>
+                            <p class="hero-subtitle">{{ $selectedCategory->description ?: __('seo.category_description', ['name' => $selectedCategory->translated_name]) }}</p>
+                            @if(isset($selectedCategory->children) && $selectedCategory->children->isNotEmpty())
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    @foreach($selectedCategory->children as $childCat)
+                                        <a href="{{ route('service-providers.index', ['category' => $childCat->slug]) }}" class="badge bg-light text-dark border text-decoration-none py-2 px-3 rounded-pill hover-shadow">
+                                            <i class="fas fa-tag text-primary me-1"></i>{{ $childCat->translated_name }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        @else
+                            <p class="text-uppercase text-primary fw-semibold mb-2">
+                                <i class="fas fa-compass me-2"></i>{{ __('service_provider.discover_providers') }}
+                            </p>
+                            <h1 class="mb-2">{{ __('service_provider.service_providers') }}</h1>
+                            <p class="hero-subtitle">{{ __('service_provider.browse_providers_description') }}</p>
+                        @endif
                     </div>
                     <a href="{{ route('home') }}" class="btn-back">
                         <i class="fas fa-arrow-left"></i>
@@ -91,6 +114,12 @@
                             </div>
 
                             <div class="provider-info">
+                                @if($provider->relationLoaded('liveOffers') && $provider->liveOffers->isNotEmpty())
+                                    @php $listingOffer = $provider->liveOffers->first(); @endphp
+                                    <a href="{{ route('offers.show', ['slug' => $listingOffer->slug, 'src' => 'listing']) }}" class="so-list-flag so-list-flag--corner text-decoration-none">
+                                        <i class="fas fa-tag" aria-hidden="true"></i> {{ $listingOffer->badgeLabel() }}
+                                    </a>
+                                @endif
                                 <h3>{{ $provider->localized_company_name ?? $provider->user->name }}</h3>
                                 @if($provider->isSiteDeveloper())
                                     <x-developer-badge size="sm" class="mb-1" />
@@ -233,15 +262,20 @@
                 <!-- حالة عدم وجود نتائج محسّنة -->
                 <x-public.empty-state
                     icon="fas fa-users"
-                    title="{{ __('service_provider.no_providers_found') }}"
-                    description="{{ __('service_provider.no_providers_description') }}"
+                    title="{{ isset($selectedCategory) && $selectedCategory ? __('service_provider.no_providers_in_category', ['category' => $selectedCategory->translated_name]) : __('service_provider.no_providers_found') }}"
+                    description="{{ isset($selectedCategory) && $selectedCategory ? __('service_provider.be_first_provider_message') : __('service_provider.no_providers_description') }}"
                 >
                     <x-slot:actions>
-                        <x-ui.button type="button" icon="fas fa-redo" class="btn-primary" onclick="resetFilters()">
+                        @if(auth()->guest())
+                            <x-ui.button :href="route('register')" icon="fas fa-user-plus" class="btn-primary">
+                                {{ __('service_provider.join_as_provider') }}
+                            </x-ui.button>
+                        @endif
+                        <x-ui.button type="button" icon="fas fa-redo" variant="secondary" onclick="resetFilters()">
                             {{ __('service_provider.reset_filters') }}
                         </x-ui.button>
-                        <x-ui.button :href="route('home')" variant="secondary" icon="fas fa-home" class="btn-back">
-                            Return Home
+                        <x-ui.button :href="route('categories')" variant="outline" icon="fas fa-th-large">
+                            {{ __('categories.categories') }}
                         </x-ui.button>
                     </x-slot:actions>
 

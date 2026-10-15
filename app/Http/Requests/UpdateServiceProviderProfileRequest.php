@@ -175,6 +175,7 @@ class UpdateServiceProviderProfileRequest extends FormRequest
             'gallery_images' => [
                 'nullable',
                 'array',
+                'max:' . \App\Models\ServiceProvider::MAX_GALLERY_IMAGES,
             ],
             'gallery_images.*' => [
                 'nullable',

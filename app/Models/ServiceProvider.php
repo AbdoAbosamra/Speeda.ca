@@ -36,6 +36,12 @@ class ServiceProvider extends Model implements HasMedia
     use InteractsWithMedia;
 
     /**
+     * Most images a provider's gallery may hold. Enforced on every path that
+     * adds to it: the AJAX gallery widget, the profile form and the admin edit.
+     */
+    public const MAX_GALLERY_IMAGES = 4;
+
+    /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [

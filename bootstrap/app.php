@@ -7,7 +7,6 @@ use App\Http\Middleware\TrackVisitor;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Auth;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -70,28 +69,31 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json(['message' => 'Unauthenticated.'], 401);
             }
 
-            return redirect()->route('login')->with('error', 'Please log in to continue.');
+            return redirect()->route('login')->with('error', __('errors.unauthorized'));
         });
 
-        // Handle authorization exceptions
-        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, $request) {
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'This action is unauthorized.'], 403);
+        // Laravel converts AuthorizationException, ModelNotFoundException and
+        // TokenMismatchException into HttpExceptions (403 / 404 / 419) BEFORE
+        // render callbacks run, so callbacks typed on those classes never fire.
+        // A 403 and a 404 are left to the branded errors/*.blade.php pages; an
+        // expired CSRF token is matched by its status code instead.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, $request) {
+            if ($e->getStatusCode() !== 419) {
+                return null;
             }
 
-            return redirect()->back()->with('error', 'You are not authorized to perform this action.');
-        });
-
-        // Handle CSRF token exceptions with friendly messages
-        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
             if ($request->expectsJson()) {
                 return response()->json([
-                    'message' => 'Your session has expired. Please refresh the page and try again.',
+                    'message' => __('errors.csrf_token_expired'),
                     'csrf_token' => csrf_token(),
                 ], 419);
             }
 
-            return redirect()->back()->with('error', 'Your session has expired. Please refresh the page and try again.');
+            // A form submitted after the session timed out: send the person
+            // back to it with what they typed, minus anything secret.
+            return redirect()->back()
+                ->withInput($request->except(['password', 'password_confirmation', 'current_password', '_token']))
+                ->with('error', __('errors.csrf_token_expired'));
         });
 
         // Handle PostTooLargeException with user-friendly messages
@@ -104,15 +106,6 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return redirect()->back()->with('error', 'The uploaded file is too large. Please select a smaller image (max '.ini_get('upload_max_filesize').').');
-        });
-
-        // Handle model not found exceptions (Must return 404 to avoid Soft 404s in search engines)
-        $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'The requested resource was not found.'], 404);
-            }
-
-            abort(404, 'The requested resource was not found.');
         });
 
         // Handle general exceptions with user-friendly messages
@@ -135,20 +128,29 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            // Log the error for debugging
-            \Illuminate\Support\Facades\Log::error('Application error: '.$e->getMessage(), [
-                'exception' => $e,
-                'url' => $request->url(),
-                'user' => Auth::id(),
-            ]);
+            // Logging is not done here: Laravel reports the exception on its
+            // own (with the user id), and rendering it a second time only
+            // doubled every entry in the log.
 
             if ($request->expectsJson()) {
                 return response()->json([
-                    'message' => 'An unexpected error occurred. Please try again later.',
+                    'message' => __('errors.server_error'),
                     'error_code' => 'INTERNAL_ERROR',
                 ], 500);
             }
 
-            return redirect()->back()->with('error', 'An unexpected error occurred. Please try again later.');
+            // A page that failed to load gets a real 500 page. Redirecting it
+            // "back" sent visitors from Google straight back to Google (back()
+            // follows the Referer), looped when the failing page was the one
+            // they came from, and hid every failure from uptime monitoring
+            // behind a 302.
+            if ($request->isMethod('GET') || $request->isMethod('HEAD')) {
+                return null;
+            }
+
+            // A failed form submission returns to the form with its input.
+            return redirect()->back()
+                ->withInput($request->except(['password', 'password_confirmation', 'current_password', '_token']))
+                ->with('error', __('errors.server_error'));
         });
     })->create();

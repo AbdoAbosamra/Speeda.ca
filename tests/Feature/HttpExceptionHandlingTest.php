@@ -107,18 +107,85 @@ class HttpExceptionHandlingTest extends TestCase
         $this->get('/login')->assertStatus(302);
     }
 
-    public function test_a_genuine_unexpected_error_still_gets_the_friendly_response(): void
+    public function test_a_page_that_fails_to_load_answers_500_not_a_redirect(): void
     {
         Route::get('/__boom', fn () => throw new \RuntimeException('kaboom'))
             ->middleware('web');
 
-        // Not an HttpException, so the catch-all still owns it: a redirect for
-        // browsers, and a 500 with a generic message for API clients.
-        $this->get('/__boom')->assertStatus(302);
+        // Redirecting a failed GET "back" sent visitors from Google back to
+        // Google (back() follows the Referer) and looped on the homepage.
+        $this->withHeader('Referer', 'https://www.google.com/search?q=speeda')
+            ->get('/__boom')
+            ->assertStatus(500)
+            ->assertSee(__('errors.page_500_title'))
+            ->assertDontSee('kaboom');
 
         $this->getJson('/__boom')
             ->assertStatus(500)
             ->assertJson(['error_code' => 'INTERNAL_ERROR'])
             ->assertJsonMissing(['message' => 'kaboom']);
+    }
+
+    public function test_a_failed_form_submission_returns_to_the_form_without_secrets(): void
+    {
+        Route::post('/__boom-form', fn () => throw new \RuntimeException('kaboom'))
+            ->middleware('web');
+
+        $this->from('/register')
+            ->post('/__boom-form', ['name' => 'Sara', 'password' => 'secret-pass-123'])
+            ->assertRedirect('/register')
+            ->assertSessionHas('error', __('errors.server_error'))
+            ->assertSessionHasInput('name', 'Sara')
+            ->assertSessionMissing('_old_input.password');
+    }
+
+    /* ================================================================== */
+    /*  Expired session (419), throttling (429), forbidden (403)           */
+    /* ================================================================== */
+
+    public function test_an_expired_form_goes_back_with_its_input_and_a_message(): void
+    {
+        // The test kernel skips CSRF checks, so raise what VerifyCsrfToken
+        // raises. Laravel turns it into a 419 before any render callback.
+        Route::post('/__expired', fn () => throw new \Illuminate\Session\TokenMismatchException())
+            ->middleware('web');
+
+        $this->from('/register')
+            ->post('/__expired', ['email' => 'sara@example.com', 'password' => 'secret-pass-123'])
+            ->assertRedirect('/register')
+            ->assertSessionHas('error', __('errors.csrf_token_expired'))
+            ->assertSessionHasInput('email', 'sara@example.com')
+            ->assertSessionMissing('_old_input.password');
+    }
+
+    public function test_an_expired_ajax_request_gets_419_json_with_a_fresh_token(): void
+    {
+        Route::post('/__expired', fn () => throw new \Illuminate\Session\TokenMismatchException())
+            ->middleware('web');
+
+        $this->postJson('/__expired')
+            ->assertStatus(419)
+            ->assertJsonStructure(['message', 'csrf_token']);
+    }
+
+    public function test_too_many_requests_shows_the_branded_429_page(): void
+    {
+        Route::get('/__limited', fn () => 'ok')->middleware(['web', 'throttle:1,1']);
+
+        $this->get('/__limited')->assertOk();
+
+        $this->get('/__limited')
+            ->assertStatus(429)
+            ->assertSee(__('errors.page_429_title'));
+    }
+
+    public function test_the_403_page_is_branded_and_translated(): void
+    {
+        $client = User::factory()->create(['role' => 'client', 'is_active' => true]);
+
+        $this->actingAs($client)
+            ->get(route('admin.dashboard').'?lang=ar')
+            ->assertStatus(403)
+            ->assertSee(trans('errors.page_403_title', [], 'ar'));
     }
 }

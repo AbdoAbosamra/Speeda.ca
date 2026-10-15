@@ -20,7 +20,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class GalleryController extends Controller
 {
-    private const MAX_GALLERY_IMAGES = 4;
     private const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
     private const ALLOWED_MIMES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
@@ -33,10 +32,10 @@ class GalleryController extends Controller
 
         // Enforce 4-image limit
         $currentCount = $serviceProvider->getMedia('gallery')->count();
-        if ($currentCount >= self::MAX_GALLERY_IMAGES) {
+        if ($currentCount >= ServiceProvider::MAX_GALLERY_IMAGES) {
             return response()->json([
                 'success' => false,
-                'message' => __('service_provider.gallery_full', ['max' => self::MAX_GALLERY_IMAGES]),
+                'message' => __('service_provider.gallery_full', ['max' => ServiceProvider::MAX_GALLERY_IMAGES]),
             ], 422);
         }
 
@@ -64,7 +63,7 @@ class GalleryController extends Controller
                 'message' => __('service_provider.gallery_image_added'),
                 'media'   => $this->mediaPayload($serviceProvider, $media),
                 'count'   => $serviceProvider->media()->where('collection_name', 'gallery')->count(),
-                'max'     => self::MAX_GALLERY_IMAGES,
+                'max'     => ServiceProvider::MAX_GALLERY_IMAGES,
             ]);
         } catch (\Throwable $e) {
             Log::error('Gallery store failed', [
@@ -147,7 +146,7 @@ class GalleryController extends Controller
                 'success' => true,
                 'message' => __('service_provider.gallery_image_deleted'),
                 'count'   => $serviceProvider->media()->where('collection_name', 'gallery')->count(),
-                'max'     => self::MAX_GALLERY_IMAGES,
+                'max'     => ServiceProvider::MAX_GALLERY_IMAGES,
             ]);
         } catch (\Throwable $e) {
             Log::error('Gallery delete failed', [

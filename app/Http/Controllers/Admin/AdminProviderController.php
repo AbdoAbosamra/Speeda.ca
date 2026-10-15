@@ -101,7 +101,6 @@ class AdminProviderController extends Controller
         return true;
     }
 
-    private const MAX_GALLERY_IMAGES = 4;
 
     public function edit(ServiceProvider $serviceProvider): View
     {
@@ -117,7 +116,7 @@ class AdminProviderController extends Controller
             'filterableLocations' => $filterableLocations,
             'serviceAreaIds' => $serviceProvider->locations->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'galleryMedia' => $galleryMedia,
-            'galleryMax' => self::MAX_GALLERY_IMAGES,
+            'galleryMax' => ServiceProvider::MAX_GALLERY_IMAGES,
             'languageOptions' => [
                 'ar' => __('service_provider.arabic'),
                 'en' => __('service_provider.english'),
@@ -309,7 +308,7 @@ class AdminProviderController extends Controller
                 }
 
                 if ($request->hasFile('gallery_images')) {
-                    $remainingSlots = self::MAX_GALLERY_IMAGES - $serviceProvider->getMedia('gallery')->count();
+                    $remainingSlots = ServiceProvider::MAX_GALLERY_IMAGES - $serviceProvider->getMedia('gallery')->count();
                     $files = collect($request->file('gallery_images', []))
                         ->filter()
                         ->take(max(0, $remainingSlots));

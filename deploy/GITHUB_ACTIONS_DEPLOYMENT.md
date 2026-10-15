@@ -116,6 +116,21 @@ The 404 probe is not cosmetic. A catch-all exception handler once turned every
 404 into a 302 to the homepage, and `pull-deploy.sh` asserts real 404 semantics
 after cutover specifically so that class of regression rolls itself back.
 
+### Real visitor IPs
+
+CloudPanel's front nginx proxies to an internal one, so PHP sees `127.0.0.1`.
+`config/trustedproxy.php` trusts that loopback hop so `request()->ip()` is the
+visitor's address. Without it every guest shares one rate-limit bucket and the
+visitor analytics count one person. Check it once after a deploy:
+
+```bash
+# Distinct visitor hashes recorded today: should be well above 1 on a live site.
+php artisan tinker --execute="echo App\Models\Visitor::whereDate('visited_at', today())->distinct('ip_hash')->count('ip_hash');"
+```
+
+If the site is put behind Cloudflare, add Cloudflare's ranges to
+`TRUSTED_PROXIES` (or restore the IP in nginx with `real_ip_header`).
+
 ## Rollback
 
 ```bash

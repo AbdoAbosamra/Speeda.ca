@@ -555,6 +555,12 @@ class ServiceProviderController extends Controller
                     $files = $request->file('gallery_images', []);
 
                     if (is_array($files)) {
+                        // Same cap the AJAX gallery widget enforces; without it a
+                        // hand-made request could grow the gallery without limit.
+                        $remainingSlots = ServiceProvider::MAX_GALLERY_IMAGES
+                            - $serviceProvider->getMedia('gallery')->count();
+                        $files = array_slice(array_filter($files), 0, max(0, $remainingSlots));
+
                         foreach ($files as $file) {
                             $serviceProvider->addMedia($file)->toMediaCollection('gallery');
                         }

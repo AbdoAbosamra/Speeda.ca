@@ -140,6 +140,3 @@ resources/views/             Blade; admin/, service-providers/, offers/, seo/, e
 - `Booking`, `ServicePackage`, `Portfolio` and the `saved_providers` table
   have models or relations but no routes or UI.
 - `tests/Browser/*` (Dusk) does not run, because Dusk is not installed.
-- `AdminController` is large and covers dashboard, categories, users,
-  locations and cache. Splitting it into focused controllers is in progress, so
-  check `routes/web.php` for the current owner of an admin route.

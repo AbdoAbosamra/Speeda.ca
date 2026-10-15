@@ -287,8 +287,7 @@ php artisan migrate
 
 ## 📚 Related Documentation
 
-- [SETUP_GUIDE.md](../../SETUP_GUIDE.md) - Complete setup instructions
-- [GIT_IMAGES_EXPLAINED.md](../../GIT_IMAGES_EXPLAINED.md) - Why images aren't in Git
+- [docs/README.md](../../docs/README.md) - Setup, running, tests and uploads
 - [README.md](../../README.md) - Project overview
 
 ## 🎓 For Developers

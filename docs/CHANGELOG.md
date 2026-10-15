@@ -15,7 +15,9 @@ In progress in the working tree, not yet committed:
 - Branded error pages for 403, 419, 429 and 500.
 - A provider gallery holds at most 4 images
   (`ServiceProvider::MAX_GALLERY_IMAGES`), enforced on every upload path.
-- `AdminController` is being split into focused admin controllers.
+- `AdminController` split into `AdminDashboardController`, `AdminCategoryController`,
+  `AdminUserController`, `AdminLocationController` and `AdminMaintenanceController`
+  (same routes and behaviour).
 - Docs consolidated into `docs/`. Old reports moved to `_Project_Docs/archive/`.
 
 ## 2026-10-13: Local Offers, security and SEO pass

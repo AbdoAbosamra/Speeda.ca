@@ -97,7 +97,7 @@ class UndoController extends Controller
                         }
 
                         // A trashed record is also deactivated on the way out
-                        // (see AdminController::deleteUser), so bring it back live.
+                        // (see AdminUserController::deleteUser), so bring it back live.
                         if (Schema::hasColumn($model->getTable(), 'is_active')) {
                             $model->update(['is_active' => true]);
                         }

@@ -18,7 +18,11 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceProviderAnalyticsController;
 use App\Http\Controllers\ServiceProviderController;
 use App\Http\Controllers\Admin\AdminCommentController;
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminLocationController;
+use App\Http\Controllers\Admin\AdminMaintenanceController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\LegalPageController as AdminLegalPageController;
 use App\Http\Controllers\Admin\AdminReviewController;
@@ -265,7 +269,7 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
     Route::post('/undo/{log}', [App\Http\Controllers\Admin\UndoController::class, 'undo'])->name('undo');
 
     // Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
 
     // Blog CMS
     // Trash routes are declared before the resource so blog/posts/trash is not
@@ -284,33 +288,33 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
         ->names('legal-pages');
 
     // Categories Management (using IDs, no slugs)
-    Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
-    Route::post('/categories/bulk', [AdminController::class, 'bulkCategories'])->name('categories.bulk');
-    Route::post('/categories', [AdminController::class, 'storeCategory'])->name('categories.store');
-    Route::get('/categories/{category}/edit', [AdminController::class, 'editCategory'])->name('categories.edit');
-    Route::patch('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
-    Route::delete('/categories/{category}', [AdminController::class, 'deleteCategory'])->name('categories.destroy');
-    Route::patch('/categories/{category}/toggle', [AdminController::class, 'toggleCategoryStatus'])->name('categories.toggle');
+    Route::get('/categories', [AdminCategoryController::class, 'categories'])->name('categories');
+    Route::post('/categories/bulk', [AdminCategoryController::class, 'bulkCategories'])->name('categories.bulk');
+    Route::post('/categories', [AdminCategoryController::class, 'storeCategory'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'editCategory'])->name('categories.edit');
+    Route::patch('/categories/{category}', [AdminCategoryController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'deleteCategory'])->name('categories.destroy');
+    Route::patch('/categories/{category}/toggle', [AdminCategoryController::class, 'toggleCategoryStatus'])->name('categories.toggle');
 
     // Users Management
-    Route::get('/users', [AdminController::class, 'users'])->name('users');
-    Route::post('/users/bulk', [AdminController::class, 'bulkUsers'])->name('users.bulk');
-    Route::get('/users/trash', [AdminController::class, 'usersTrash'])->name('users.trash');
-    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
-    Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
-    Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleUserStatus'])->name('users.toggle');
-    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
-    Route::post('/users/{id}/restore', [AdminController::class, 'restoreUser'])->name('users.restore');
-    Route::delete('/users/{id}/force', [AdminController::class, 'forceDeleteUser'])->name('users.force_delete');
+    Route::get('/users', [AdminUserController::class, 'users'])->name('users');
+    Route::post('/users/bulk', [AdminUserController::class, 'bulkUsers'])->name('users.bulk');
+    Route::get('/users/trash', [AdminUserController::class, 'usersTrash'])->name('users.trash');
+    Route::get('/users/{user}/edit', [AdminUserController::class, 'editUser'])->name('users.edit');
+    Route::patch('/users/{user}', [AdminUserController::class, 'updateUser'])->name('users.update');
+    Route::patch('/users/{user}/toggle', [AdminUserController::class, 'toggleUserStatus'])->name('users.toggle');
+    Route::delete('/users/{user}', [AdminUserController::class, 'deleteUser'])->name('users.delete');
+    Route::post('/users/{id}/restore', [AdminUserController::class, 'restoreUser'])->name('users.restore');
+    Route::delete('/users/{id}/force', [AdminUserController::class, 'forceDeleteUser'])->name('users.force_delete');
 
     // Locations
-    Route::get('/locations', [AdminController::class, 'locations'])->name('locations');
-    Route::post('/locations/bulk', [AdminController::class, 'bulkLocations'])->name('locations.bulk');
-    Route::post('/locations', [AdminController::class, 'storeLocation'])->name('locations.store');
-    Route::put('/locations/{location}', [AdminController::class, 'updateLocation'])->name('locations.update');
-    Route::delete('/locations/{location}', [AdminController::class, 'deleteLocation'])->name('locations.delete');
-    Route::patch('/locations/{location}/deactivate', [AdminController::class, 'deactivateLocation'])->name('locations.deactivate');
-    Route::patch('/locations/{location}/activate', [AdminController::class, 'activateLocation'])->name('locations.activate');
+    Route::get('/locations', [AdminLocationController::class, 'locations'])->name('locations');
+    Route::post('/locations/bulk', [AdminLocationController::class, 'bulkLocations'])->name('locations.bulk');
+    Route::post('/locations', [AdminLocationController::class, 'storeLocation'])->name('locations.store');
+    Route::put('/locations/{location}', [AdminLocationController::class, 'updateLocation'])->name('locations.update');
+    Route::delete('/locations/{location}', [AdminLocationController::class, 'deleteLocation'])->name('locations.delete');
+    Route::patch('/locations/{location}/deactivate', [AdminLocationController::class, 'deactivateLocation'])->name('locations.deactivate');
+    Route::patch('/locations/{location}/activate', [AdminLocationController::class, 'activateLocation'])->name('locations.activate');
 
     // Visitor Analytics (Read-only)
     Route::get('/visitors', [VisitorAnalyticsController::class, 'index'])->name('visitors');
@@ -335,7 +339,7 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
     Route::get('/whatsapp-analytics', [App\Http\Controllers\Admin\WhatsappAnalyticsController::class, 'index'])->name('whatsapp_analytics.index');
 
     // Utility - Clear caches to ensure admin changes reflect immediately
-    Route::post('/clear-cache', [AdminController::class, 'clearCache'])->name('clear-cache');
+    Route::post('/clear-cache', [AdminMaintenanceController::class, 'clearCache'])->name('clear-cache');
 
     // Reviews Management (Admin approval workflow)
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews');

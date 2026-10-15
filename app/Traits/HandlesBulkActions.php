@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Log;
  *     skip with a reason and the rest continue.
  *  4. The admin always gets an honest count of what actually happened.
  *
- * A controller can serve several resources (AdminController handles users,
- * categories and locations), hence the $resource argument threaded through.
+ * A controller can serve several resources, hence the $resource argument
+ * threaded through (it also tags the bulk-action log entry).
  */
 trait HandlesBulkActions
 {

@@ -12,9 +12,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Likes (anyone), comments (anyone, shown only after admin approval),
- * favorites (client accounts only), and the "publish your offer" WhatsApp
- * contact.
+ * Favorites (client accounts only), comment moderation, and the "publish
+ * your offer" WhatsApp contact. Public likes and comments are paused.
  */
 class OfferEngagementTest extends TestCase
 {
@@ -60,6 +59,7 @@ class OfferEngagementTest extends TestCase
     /*  Likes                                                              */
     /* ------------------------------------------------------------------ */
 
+    /* Temporarily disabled with the public offer like routes and UI.
     public function test_a_guest_can_like_and_unlike(): void
     {
         $this->postJson(route('offers.like', $this->offer->slug))
@@ -82,19 +82,59 @@ class OfferEngagementTest extends TestCase
         $this->actingAs($this->client)->get(route('offers.show', $this->offer->slug))->assertSee(__('offers.liked'));
     }
 
-    public function test_ended_offers_cannot_be_liked_or_commented(): void
+    */
+
+    public function test_offers_cannot_be_liked_or_commented_while_paused(): void
     {
+        $this->postJson('/offers/'.$this->offer->slug.'/like')->assertNotFound();
+        $this->postJson('/offers/'.$this->offer->slug.'/comments', ['author_name' => 'Sam', 'body' => 'Hello there'])->assertNotFound();
+
         $this->offer->update(['ends_at' => now()->subDays(2)->toDateString()]);
 
-        $this->postJson(route('offers.like', $this->offer->slug))->assertStatus(410);
-        $this->postJson(route('offers.comment', $this->offer->slug), ['author_name' => 'Sam', 'body' => 'Hello there'])->assertStatus(410);
+        $this->postJson('/offers/'.$this->offer->slug.'/like')->assertNotFound();
+        $this->postJson('/offers/'.$this->offer->slug.'/comments', ['author_name' => 'Sam', 'body' => 'Hello there'])->assertNotFound();
+        $this->assertSame(0, OfferLike::count());
         $this->assertSame(0, OfferComment::count());
+    }
+
+    public function test_paused_offer_engagement_is_hidden_and_existing_data_is_preserved(): void
+    {
+        $like = OfferLike::create(['offer_id' => $this->offer->id, 'user_id' => $this->client->id]);
+        $comment = OfferComment::create([
+            'offer_id' => $this->offer->id,
+            'author_name' => 'Existing visitor',
+            'body' => 'Previously approved offer comment.',
+            'status' => OfferComment::STATUS_APPROVED,
+            'locale' => 'en',
+        ]);
+        $this->offer->forceFill(['likes_count' => 1, 'comments_count' => 1])->save();
+
+        foreach ([null, $this->client, $this->offer->serviceProvider->user] as $viewer) {
+            if ($viewer) {
+                $this->actingAs($viewer);
+            }
+
+            $this->get(route('offers.show', $this->offer->slug))->assertOk()
+                ->assertDontSee('data-so-like', false)
+                ->assertDontSee('data-like-count', false)
+                ->assertDontSee('data-so-comment', false)
+                ->assertDontSee('id="comments"', false)
+                ->assertDontSee($comment->body);
+            $this->get(route('offers.index'))->assertOk()
+                ->assertDontSee('class="so-meta-likes"', false);
+        }
+
+        $this->assertModelExists($like);
+        $this->assertModelExists($comment);
+        $this->assertSame(1, $this->offer->fresh()->likes_count);
+        $this->assertSame(1, $this->offer->fresh()->comments_count);
     }
 
     /* ------------------------------------------------------------------ */
     /*  Comments                                                           */
     /* ------------------------------------------------------------------ */
 
+    /* Temporarily disabled with the public offer comment routes and UI.
     public function test_a_guest_comment_waits_for_approval_before_it_appears(): void
     {
         $this->postJson(route('offers.comment', $this->offer->slug), [
@@ -143,6 +183,8 @@ class OfferEngagementTest extends TestCase
         $this->assertSame($this->client->id, $comment->user_id);
         $this->assertStringNotContainsString('<script>', $comment->body);
     }
+
+    */
 
     public function test_admin_can_bulk_moderate(): void
     {
@@ -213,10 +255,13 @@ class OfferEngagementTest extends TestCase
 
         $this->get(route('offers.index'))->assertOk()
             ->assertSee($expected, false)
-            ->assertSee('+1 (613) 864-9118')
+            ->assertSee(__('offers.contact_to_publish_hint'))
             ->assertDontSee('m.me/', false);
 
-        $this->get(route('offers.show', $this->offer->slug))->assertSee($expected, false);
+        // The hero is a button only; the number stays in the offer page's publish box.
+        $this->get(route('offers.show', $this->offer->slug))
+            ->assertSee($expected, false)
+            ->assertSee('+1 (613) 864-9118');
 
         $url = WhatsApp::contactSpeedaUrl();
         $this->assertStringContainsString('publish an offer on SPEEDA', rawurldecode($url));
@@ -230,6 +275,7 @@ class OfferEngagementTest extends TestCase
         $this->assertStringStartsWith('https://wa.me/16135550199?text=', $url);
     }
 
+    /* Temporarily disabled with the public offer comment routes and UI.
     public function test_image_event_handlers_are_removed_before_comment_approval(): void
     {
         $this->postJson(route('offers.comment', $this->offer->slug), [
@@ -263,6 +309,8 @@ class OfferEngagementTest extends TestCase
             ->assertTooManyRequests();
         $this->assertSame(20, OfferComment::count());
     }
+
+    */
 
     public function test_favorites_navigation_exists_and_hidden_offers_are_not_disclosed(): void
     {

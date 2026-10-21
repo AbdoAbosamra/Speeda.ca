@@ -61,6 +61,10 @@
 @endpush
 
 @section('content')
+    @php
+        $locationHidden = $serviceProvider->location && ! $serviceProvider->location->is_active;
+        $canSeeLocation = ! $locationHidden || (auth()->check() && auth()->id() === $serviceProvider->user_id);
+    @endphp
     {{-- Notification Card --}}
     @include('components.notification-card')
 
@@ -188,7 +192,7 @@
                                 <div class="d-lg-none mb-3">
                                     {{-- A real link: opens WhatsApp even when scripts or popups are blocked. --}}
                                     <a href="{{ $waUrl }}" target="_blank" rel="noopener"
-                                        onclick="revealContactInfo(@js($serviceProvider->whatsappDisplay()), @js((string) $serviceProvider->address))"
+                                        onclick="revealContactInfo(@js($serviceProvider->whatsappDisplay()))"
                                         class="btn w-100 d-inline-flex align-items-center justify-content-center"
                                         style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 1.5rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); font-size: 1rem;">
                                         <i class="fab fa-whatsapp me-2 fs-5"></i> {{ __('service_provider.contact_whatsapp') }}
@@ -478,14 +482,14 @@
                                                     <span class="input-group-text bg-light border-end-0">
                                                         <i class="fas fa-location-dot text-danger"></i>
                                                     </span>
-                                                    <input type="text" name="address" id="addressInput"
+                                                    <input type="text" name="address" id="addressInput" autocomplete="street-address" maxlength="500"
                                                         class="form-control form-control-lg border-start-0"
                                                         value="{{ old('address', $serviceProvider->address) }}"
                                                         placeholder="{{ __('general.example') }}: {{ __('general.address_placeholder') }}">
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-info-circle text-info me-1"></i>
-                                                    {{ __('service_provider.address_english_only_hint') }}
+                                                    {{ __('service_provider.address_map_hint') }}
                                                 </small>
                                                 @error('address')
                                                     <small class="text-danger d-block mt-1"><i
@@ -603,24 +607,21 @@
                                             </div>
 
 
-                                            {{-- Gallery: AJAX per-image management (Inline Alpine Widget) --}}
+                                            {{-- Existing gallery images only; new uploads and replacements are closed. --}}
                                             @php
                                                 $galleryMedia = $serviceProvider->getMedia('gallery');
                                                 $isOwner = auth()->check() && auth()->id() === $serviceProvider->user_id;
-                                                $maxImages = 4;
                                             @endphp
 
-                                            @if($isOwner || $galleryMedia->count() > 0)
-                                            <div class="mb-4" id="edit-gallery"
+                                            @if($galleryMedia->isNotEmpty())
+                                            <div class="mb-4" id="edit-gallery" x-show="images.length > 0"
                                                  x-data="galleryManager({
                                                      providerId: {{ $serviceProvider->id }},
                                                      images: {{ Js::from($galleryMedia->map(fn ($m) => [
                                                          'id' => $m->id,
                                                          'thumb_url' => $serviceProvider->getMediaPublicUrl($m, $m->hasGeneratedConversion('gallery_thumb') ? 'gallery_thumb' : null) ?? $m->getUrl(),
                                                      ])->values()) }},
-                                                     max: {{ $maxImages }},
                                                      isOwner: {{ $isOwner ? 'true' : 'false' }},
-                                                     storeUrl: '{{ route('provider.gallery.store', $serviceProvider->id) }}',
                                                      csrfToken: '{{ csrf_token() }}'
                                                  })">
 
@@ -629,11 +630,6 @@
                                                         <i class="fas fa-images text-primary me-1"></i>
                                                         {{ __('service_provider.gallery_upload_title') ?? 'Gallery' }}
                                                     </label>
-                                                    <span class="badge bg-primary text-white" x-text="images.length + ' / ' + max + ' photos'"></span>
-                                                </div>
-
-                                                <div x-show="images.length >= max" class="text-secondary small mb-3">
-                                                    <i class="fas fa-info-circle me-1"></i> Maximum 4 photos reached.
                                                 </div>
 
                                                 {{-- Inline Flash Errors --}}
@@ -683,9 +679,6 @@
                                                                      class="position-absolute top-0 start-0 w-100 h-100"
                                                                      style="background: rgba(0,0,0,0.55); z-index: 2; display: none;">
                                                                     <div class="w-100 h-100 d-flex align-items-center justify-content-center gap-2">
-                                                                        <button type="button" class="btn btn-outline-light rounded-circle border-0" @click="startReplace(img)" title="Replace" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent;">
-                                                                            <i class="fas fa-pencil-alt"></i>
-                                                                        </button>
                                                                         <button type="button" class="btn btn-outline-light rounded-circle border-0" @click="confirmId = img.id" title="Delete" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent;">
                                                                             <i class="fas fa-trash-alt"></i>
                                                                         </button>
@@ -695,35 +688,8 @@
                                                         </div>
                                                     </template>
 
-                                                    {{-- Upload Previews during add --}}
-                                                    <template x-for="(preview, index) in addPreviews" :key="'preview-'+index">
-                                                        <div class="col">
-                                                            <div class="gallery-cell position-relative overflow-hidden" style="aspect-ratio: 1/1; border-radius: 12px; border: 1px solid #e1e5eb;">
-                                                                <img :src="preview" class="w-100 h-100 object-fit-cover" style="opacity: 0.6;">
-                                                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                                                    <div class="spinner-border text-primary" role="status"></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </template>
-
-                                                    {{-- Add Placeholders (to fill up to 4 cells) --}}
-                                                    <template x-if="isOwner && (images.length + addPreviews.length) < max">
-                                                        <template x-for="i in (max - images.length - addPreviews.length)" :key="'placeholder-'+i">
-                                                            <div class="col">
-                                                                <div @click="$refs.galleryAddInput.click()"
-                                                                     class="gallery-cell position-relative d-flex bg-light align-items-center justify-content-center"
-                                                                     style="aspect-ratio: 1/1; border-radius: 12px; border: 2px dashed #cbd5e1; cursor: pointer; transition: all 0.2s;">
-                                                                    <i class="fas fa-plus text-secondary fa-2x opacity-50"></i>
-                                                                </div>
-                                                            </div>
-                                                        </template>
-                                                    </template>
                                                 </div>
 
-                                                {{-- Hidden Inputs --}}
-                                                <input type="file" x-ref="galleryAddInput" class="d-none" accept="image/jpeg,image/png,image/webp" @change="handleAddFile">
-                                                <input type="file" x-ref="galleryReplaceInput" class="d-none" accept="image/jpeg,image/png,image/webp" @change="handleReplaceFile">
                                             </div>
 
                                             <script>
@@ -731,130 +697,13 @@
                                                     Alpine.data('galleryManager', (config) => ({
                                                         providerId: config.providerId,
                                                         images: config.images,
-                                                        max: config.max,
                                                         isOwner: config.isOwner,
-                                                        storeUrl: config.storeUrl,
                                                         csrfToken: config.csrfToken,
 
                                                         hoverId: null,
                                                         confirmId: null,
                                                         uploadingId: null,
-                                                        pendingReplaceImg: null,
-                                                        addPreviews: [],
                                                         errorMessage: '',
-
-                                                        startReplace(img) {
-                                                            this.pendingReplaceImg = img;
-                                                            this.$refs.galleryReplaceInput.value = '';
-                                                            this.$refs.galleryReplaceInput.click();
-                                                        },
-
-                                                        validateFile(file) {
-                                                            const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-                                                            if (!allowed.includes(file.type)) {
-                                                                this.errorMessage = 'Please select a JPG, PNG, or WebP image.';
-                                                                return false;
-                                                            }
-                                                            if (file.size > 10 * 1024 * 1024) {
-                                                                this.errorMessage = 'File is too large. Maximum size is 10MB.';
-                                                                return false;
-                                                            }
-                                                            return true;
-                                                        },
-
-                                                        async handleAddFile(e) {
-                                                            const file = e.target.files[0];
-                                                            if (!file) return;
-                                                            if (!this.validateFile(file)) return;
-                                                            this.errorMessage = '';
-
-                                                            // Generate Preview
-                                                            const reader = new FileReader();
-                                                            reader.onload = (e) => {
-                                                                this.addPreviews.push(e.target.result);
-                                                                // Call upload immediately after preview loads
-                                                                this.uploadNewImage(file, e.target.result);
-                                                            };
-                                                            reader.readAsDataURL(file);
-                                                        },
-
-                                                        async uploadNewImage(file, previewData) {
-                                                            const formData = new FormData();
-                                                            formData.append('gallery_image', file);
-
-                                                            try {
-                                                                const res = await fetch(this.storeUrl, {
-                                                                    method: 'POST',
-                                                                    body: formData,
-                                                                    headers: {
-                                                                        'X-CSRF-TOKEN': this.csrfToken,
-                                                                        'Accept': 'application/json'
-                                                                    }
-                                                                });
-                                                                const data = await res.json();
-                                                                if (data.success) {
-                                                                    this.images.push(data.media);
-                                                                } else {
-                                                                    this.errorMessage = data.message || 'Upload failed.';
-                                                                }
-                                                            } catch (err) {
-                                                                this.errorMessage = 'Network error during upload.';
-                                                            } finally {
-                                                                // Remove this specific preview slot
-                                                                this.addPreviews = this.addPreviews.filter(p => p !== previewData);
-                                                                this.$refs.galleryAddInput.value = '';
-                                                            }
-                                                        },
-
-                                                        async handleReplaceFile(e) {
-                                                            const file = e.target.files[0];
-                                                            if (!file || !this.pendingReplaceImg) return;
-                                                            if (!this.validateFile(file)) return;
-                                                            this.errorMessage = '';
-
-                                                            this.uploadingId = this.pendingReplaceImg.id;
-
-                                                            // Preview immediately
-                                                            const reader = new FileReader();
-                                                            reader.onload = (ev) => {
-                                                                const idx = this.images.findIndex(i => i.id === this.pendingReplaceImg.id);
-                                                                if(idx !== -1) this.images[idx].thumb_url = ev.target.result;
-                                                            };
-                                                            reader.readAsDataURL(file);
-
-                                                            const formData = new FormData();
-                                                            formData.append('gallery_image', file);
-                                                            const updateUrl = `/service-providers/profile/${this.providerId}/gallery/${this.pendingReplaceImg.id}/replace`;
-
-                                                            try {
-                                                                const res = await fetch(updateUrl, {
-                                                                    method: 'POST',
-                                                                    body: formData,
-                                                                    headers: {
-                                                                        'X-CSRF-TOKEN': this.csrfToken,
-                                                                        'Accept': 'application/json'
-                                                                    }
-                                                                });
-                                                                const data = await res.json();
-                                                                if (data.success) {
-                                                                    // Update image details from server
-                                                                    const idx = this.images.findIndex(i => i.id === this.pendingReplaceImg.id);
-                                                                    if(idx !== -1) {
-                                                                        this.images[idx].id = data.media.id;
-                                                                        this.images[idx].thumb_url = data.media.thumb_url;
-                                                                    }
-                                                                } else {
-                                                                    this.errorMessage = data.message || 'Replace failed.';
-                                                                }
-                                                            } catch (err) {
-                                                                this.errorMessage = 'Network error during replace.';
-                                                            } finally {
-                                                                this.uploadingId = null;
-                                                                this.pendingReplaceImg = null;
-                                                                this.$refs.galleryReplaceInput.value = '';
-                                                                this.hoverId = null;
-                                                            }
-                                                        },
 
                                                         async executeDelete(img) {
                                                             this.uploadingId = img.id;
@@ -927,7 +776,6 @@
                                     </div>
                                 </form>
 
-                                {{-- Old per-image management replaced by AJAX gallery grid above --}}
                             </div>
                         @endif
 
@@ -941,6 +789,10 @@
                             </h4>
                             <p class="fs-6">{{ $serviceProvider->localized_bio ?? __('service_provider.no_description') }}</p>
                         </div>
+
+                        @if(filled($serviceProvider->address) && $canSeeLocation)
+                            @include('partials.service-providers.location-card')
+                        @endif
 
                         @if($galleryImages->count() > 0)
                             {{-- @change 2026-04-12 TASK-1 | Added read-only public gallery section with Alpine lightbox | Let visitors browse provider gallery without edit actions | risk:LOW --}}
@@ -1004,13 +856,6 @@
                                         </div>
                                     </div>
                                 </template>
-                            </div>
-                        @else
-                            {{-- Empty state for gallery --}}
-                            <div class="mb-4 text-center py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 16px;">
-                                <i class="fas fa-images fa-3x text-muted mb-3 opacity-50"></i>
-                                <h5 class="text-muted mb-2">{{ __('service_provider.no_gallery_images') }}</h5>
-                                <p class="text-muted small mb-0">{{ __('service_provider.no_gallery_hint') }}</p>
                             </div>
                         @endif
 
@@ -1210,13 +1055,6 @@
                         </div>
 
                         <!-- Location -->
-                        @php
-                            // Private-location providers (inactive primary location) hide their real
-                            // location/address from everyone except the owner; visitors just see that
-                            // the provider is available in all areas.
-                            $locationHidden = $serviceProvider->location && ! $serviceProvider->location->is_active;
-                            $canSeeLocation = ! $locationHidden || (auth()->check() && auth()->id() === $serviceProvider->user_id);
-                        @endphp
                         <div class="contact-item">
                             <div class="d-flex align-items-center">
                                 <div class="contact-icon location-icon">
@@ -1234,37 +1072,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Address (Hidden numbers until WhatsApp button clicked) -->
-                        @if($serviceProvider->address && $canSeeLocation)
-                            <div class="contact-item">
-                                <div class="d-flex align-items-center">
-                                    <div class="contact-icon"
-                                        style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
-                                        <i class="fas fa-map-pin"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1 fw-bold">{{ __('general.address') }}</h6>
-                                        @php
-                                            if ($isContactRevealed) {
-                                                // Show full address if already revealed
-                                                $displayAddress = $serviceProvider->address;
-                                                $addressClass = 'text-primary fw-bold';
-                                            } else {
-                                                // Hide all numbers in address
-                                                $displayAddress = preg_replace('/\d/', '*', $serviceProvider->address);
-                                                $addressClass = '';
-                                            }
-                                        @endphp
-                                        <p class="mb-0 small {{ $addressClass }}" id="addressText">{{ $displayAddress }}</p>
-                                        @if(!$isContactRevealed)
-                                            <small class="text-muted" style="font-size: 0.7rem;"><i
-                                                    class="fas fa-lock me-1"></i>{{ __('service_provider.address_reveal_hint') }}</small>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
 
                         <!-- Email -->
                         <div class="contact-item">
@@ -1311,7 +1118,7 @@
                                  scripts are blocked. The click also records the lead
                                  and reveals the contact details on the page. --}}
                             <a href="{{ $waUrl }}" target="_blank" rel="noopener"
-                                onclick="revealContactInfo(@js($serviceProvider->whatsappDisplay()), @js((string) $serviceProvider->address))"
+                                onclick="revealContactInfo(@js($serviceProvider->whatsappDisplay()))"
                                 class="btn w-100 mb-3 d-inline-flex align-items-center justify-content-center"
                                 style="background: linear-gradient(135deg, #25D366, #128C7E); border: none; border-radius: 50px; padding: 0.75rem 2rem; font-weight: 600; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);">
                                 <i class="fab fa-whatsapp me-2"></i> {{ __('service_provider.contact_whatsapp') }}
@@ -1537,31 +1344,6 @@
             }
         }
 
-        function validateMultipleFilesSize(input, maxSizeMB) {
-            if (!input.files || input.files.length === 0) {
-                return true;
-            }
-
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-
-            for (const file of input.files) {
-                const fileSize = file.size / 1024 / 1024; // Convert to MB
-                if (fileSize > maxSizeMB) {
-                    alert(`{{ __('service_provider.file_too_large_gallery') }} (${file.name}) (${fileSize.toFixed(2)}MB). {{ __('service_provider.max_allowed') }}: ${maxSizeMB}MB`);
-                    input.value = '';
-                    return false;
-                }
-
-                if (!allowedTypes.includes(file.type)) {
-                    alert(`{{ __('service_provider.gallery_upload_invalid_type') }}`);
-                    input.value = '';
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
             // Image Modal
             const imageModal = document.getElementById('imageModal');
@@ -1598,22 +1380,6 @@
                 setTimeout(() => {
                     toastContainer.setAttribute('x-show', 'false');
                 }, 3000);
-            }
-
-            // English-only Address Validation
-            const addressInput = document.getElementById('addressInput');
-            if (addressInput) {
-                addressInput.addEventListener('input', function() {
-                    const originalValue = this.value;
-                    const newValue = originalValue.replace(/[^a-zA-Z0-9\s\-_.,#&'\/\@]/g, '');
-
-                    if (originalValue !== newValue) {
-                        this.value = newValue;
-                        if(typeof window.showToast === 'function'){
-                            window.showToast('{{ __("service_provider.address_english_only_hint") }}', 'error');
-                        }
-                    }
-                });
             }
 
             // Click-to-change Profile Image
@@ -1727,7 +1493,7 @@
         // (its href is built on the server), so nothing here can stop the
         // chat from opening: this only records the lead and reveals the
         // contact details that were masked on the page.
-        function revealContactInfo(whatsappDisplay, address) {
+        function revealContactInfo(whatsappDisplay) {
             const providerId = {{ $serviceProvider->id }};
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
@@ -1750,11 +1516,6 @@
                 whatsappElement.classList.add('text-success', 'fw-bold');
             }
 
-            const addressElement = document.getElementById('addressText');
-            if (addressElement && address) {
-                addressElement.textContent = address;
-                addressElement.classList.add('text-primary', 'fw-bold');
-            }
         }
 
         // ========== PROFILE EDIT FORM VALIDATION & UX ENHANCEMENTS ==========

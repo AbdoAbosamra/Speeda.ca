@@ -171,19 +171,9 @@ class UpdateServiceProviderProfileRequest extends FormRequest
                 'max:2048', // 2MB max (matching PHP upload_max_filesize)
             ],
 
-            // Provider gallery (Spatie Media Library)
-            'gallery_images' => [
-                'nullable',
-                'array',
-                'max:' . \App\Models\ServiceProvider::MAX_GALLERY_IMAGES,
-            ],
-            'gallery_images.*' => [
-                'nullable',
-                'file',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:10240', // 10MB
-            ],
+            // Existing gallery images remain visible; providers cannot upload new ones.
+            'gallery_images' => ['prohibited'],
+            'gallery_image' => ['prohibited'],
             'languages' => [
                 'nullable',
                 'array'

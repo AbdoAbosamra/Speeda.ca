@@ -104,6 +104,12 @@
     .so-btn-ghost:hover { background: var(--so-blue-line); color: var(--so-blue-dk) !important; }
     .so-btn-wa { background: #16a34a; color: #fff !important; box-shadow: 0 10px 22px -12px rgba(22, 163, 74, .8); }
     .so-btn-wa:hover { background: #15803d; color: #fff !important; }
+    .so-btn-share {
+        width: 100%; min-height: 52px; font-size: 1rem; font-weight: 700;
+        background: #fff; color: var(--so-blue) !important; border: 2px solid var(--so-blue-line);
+    }
+    .so-btn-share:hover { background: var(--so-blue-soft); border-color: var(--so-blue); transform: translateY(-1px); }
+    .so-btn-share i { font-size: 1.1rem; }
     .so-btn[disabled] { opacity: .6; cursor: progress; }
     .so-card .so-btn { margin-top: auto; width: 100%; position: relative; z-index: 2; }
     .so-card .so-btn i { transition: transform .2s; }
@@ -163,17 +169,54 @@
     .so-hero .so-crumb { font-size: .85rem; opacity: .8; margin-bottom: .6rem; }
     .so-hero .so-crumb a { color: #fff !important; text-decoration: none; }
     .so-hero-deco { position: absolute; inset-inline-end: -10px; top: -30px; font-size: 15rem; opacity: .1; transform: rotate(-12deg); pointer-events: none; }
+    /* "Publish your offer" — a wide WhatsApp-green pill: icon bubble, two-line
+       label, arrow; a light sweep crosses it on hover. */
+    .so-hero-actions { position: relative; margin-top: 1.5rem; }
     .so-hero-contact {
-        position: relative; margin-top: 1.25rem; min-height: 48px; max-width: 100%;
-        background: #facc15; color: var(--so-ink) !important; font-weight: 700;
-        box-shadow: 0 8px 20px -10px rgba(15, 23, 42, .45);
+        position: relative; overflow: hidden; isolation: isolate;
+        display: flex; align-items: center; gap: 14px;
+        width: min(100%, 480px); padding: 10px 22px 10px 10px; border-radius: 999px;
+        background: linear-gradient(135deg, #25d366 0%, #1aa851 48%, #128c7e 100%);
+        color: #fff !important; text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, .35);
+        box-shadow: 0 14px 30px -12px rgba(7, 94, 84, .85), inset 0 1px 0 rgba(255, 255, 255, .35);
+        transition: transform .25s var(--so-ease), box-shadow .25s var(--so-ease);
     }
-    .so-hero-contact:hover { background: #fde047; color: var(--so-ink) !important; box-shadow: 0 10px 24px -10px rgba(15, 23, 42, .5); }
+    [dir="rtl"] .so-hero-contact { padding: 10px 10px 10px 22px; }
+    .so-hero-contact::after {
+        content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+        background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .28) 50%, transparent 70%);
+        transform: translateX(-120%); transition: transform .7s var(--so-ease);
+    }
+    .so-hero-contact:hover { transform: translateY(-2px); box-shadow: 0 20px 38px -14px rgba(7, 94, 84, .95), inset 0 1px 0 rgba(255, 255, 255, .35); }
+    .so-hero-contact:hover::after { transform: translateX(120%); }
     .so-hero-contact:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
-    .so-hero-actions { position: relative; display: flex; align-items: center; gap: 6px 16px; flex-wrap: wrap; margin-top: 1.25rem; }
-    .so-hero-actions .so-hero-contact { margin-top: 0; }
-    .so-hero-number { font-weight: 600; font-size: .95rem; opacity: .92; }
-    @media (max-width: 575.98px) { .so-hero-contact { width: 100%; padding-inline: 12px; } }
+    .so-hero-contact-icon {
+        position: relative; flex: none; width: 52px; height: 52px; border-radius: 50%;
+        display: grid; place-items: center; background: #fff; color: #1aa851; font-size: 1.75rem;
+        box-shadow: 0 4px 12px -4px rgba(7, 94, 84, .6);
+    }
+    .so-hero-contact-icon::before {
+        content: ""; position: absolute; inset: -5px; border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, .7); animation: so-wa-ring 2.4s ease-out infinite;
+    }
+    @keyframes so-wa-ring { 0% { transform: scale(.9); opacity: .9; } 80%, 100% { transform: scale(1.25); opacity: 0; } }
+    .so-hero-contact-text { flex: 1; min-width: 0; display: grid; gap: 2px; line-height: 1.25; text-shadow: 0 1px 1px rgba(7, 60, 50, .35); }
+    .so-hero-contact-text b { font-size: 1.08rem; font-weight: 800; letter-spacing: -.01em; }
+    .so-hero-contact-text small { font-size: .82rem; font-weight: 500; opacity: .95; }
+    .so-hero-contact-arrow { flex: none; font-size: 1.05rem; transition: transform .25s var(--so-ease); }
+    .so-hero-contact:hover .so-hero-contact-arrow { transform: translateX(4px); }
+    [dir="rtl"] .so-hero-contact-arrow { transform: scaleX(-1); }
+    [dir="rtl"] .so-hero-contact:hover .so-hero-contact-arrow { transform: scaleX(-1) translateX(4px); }
+    @media (max-width: 575.98px) {
+        .so-hero-contact { width: 100%; gap: 12px; }
+        .so-hero-contact-icon { width: 46px; height: 46px; font-size: 1.5rem; }
+        .so-hero-contact-text b { font-size: 1rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .so-hero-contact, .so-hero-contact::after, .so-hero-contact-arrow { transition: none; }
+        .so-hero-contact-icon::before { animation: none; opacity: 0; }
+    }
     .so-strip-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-size: 1.15rem; font-weight: 700; color: var(--so-ink); margin: 0 0 .85rem; }
     .so-strip-title small { font-size: .85rem; font-weight: 500; color: var(--so-muted); }
     .so-soon { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }

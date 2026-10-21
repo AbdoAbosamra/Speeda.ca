@@ -26,8 +26,43 @@ function enableTestimonials() {
     });
 }
 
+function enableProviderAddressCopy() {
+    const button = document.querySelector('[data-copy-provider-address]');
+    const address = document.getElementById('provider-public-address');
+    if (!button || !address) return;
+
+    const label = button.querySelector('[data-copy-label]');
+    const originalLabel = label.textContent;
+    const status = document.querySelector('[data-address-copy-status]');
+    const fallback = document.getElementById('provider-address-fallback');
+    let resetTimer;
+    button.hidden = false;
+
+    button.addEventListener('click', async () => {
+        clearTimeout(resetTimer);
+        try {
+            await navigator.clipboard.writeText(address.textContent.trim());
+            label.textContent = button.dataset.copied;
+            status.textContent = button.dataset.copied;
+            fallback.hidden = true;
+            resetTimer = setTimeout(() => {
+                label.textContent = originalLabel;
+                status.textContent = '';
+            }, 3000);
+        } catch {
+            label.textContent = originalLabel;
+            fallback.hidden = false;
+            fallback.focus();
+            fallback.select();
+            status.textContent = button.dataset.copyFallback;
+        }
+    });
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', enableTestimonials, { once: true });
+    document.addEventListener('DOMContentLoaded', enableProviderAddressCopy, { once: true });
 } else {
     enableTestimonials();
+    enableProviderAddressCopy();
 }

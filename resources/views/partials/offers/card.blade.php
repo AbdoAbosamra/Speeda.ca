@@ -41,10 +41,12 @@
         <h3 class="so-card-title"><a href="{{ $url }}">{{ $offer->localized_title }}</a></h3>
         <p class="so-card-text">{{ $offer->localized_summary }}</p>
         <div class="so-meta">
+            {{-- Temporarily disabled: offer like count.
             @if($offer->likes_count > 0)
                 <span class="so-meta-likes"><i class="fas fa-heart" aria-hidden="true"></i>{{ $offer->likes_count }}</span>
                 <span class="so-sep" aria-hidden="true"></span>
             @endif
+            --}}
             @if($offer->providerCity())
                 <span><i class="fas fa-location-dot" aria-hidden="true"></i>{{ $offer->providerCity() }}</span>
                 <span class="so-sep" aria-hidden="true"></span>

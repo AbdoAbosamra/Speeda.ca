@@ -399,13 +399,6 @@
             </div>
         </section>
 
-        {{-- Admin-managed video. $homeVideo is null unless the section is
-             switched on AND has something playable, so the whole block —
-             markup, styles and script — simply does not exist otherwise. --}}
-        @if($homeVideo)
-            @include('partials.home-video', ['homeVideo' => $homeVideo])
-        @endif
-
         @if($featuredProviders->isNotEmpty())
             <section class="home-section">
                 <div class="container">
@@ -535,6 +528,25 @@
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- Admin-managed video. $homeVideo is null unless the section is
+             switched on AND has something playable, so the whole block —
+             markup, styles and script — simply does not exist otherwise. --}}
+        @if($homeVideo)
+            @include('partials.home-video', ['homeVideo' => $homeVideo])
+        @endif
+
+        <section class="home-section">
+            <div class="container">
+                <div class="home-shell coverage-map-card fade-in-up">
+                    <img src="{{ asset('images/speeda-coverage-map-1280.webp') }}"
+                        srcset="{{ asset('images/speeda-coverage-map-640.webp') }} 640w, {{ asset('images/speeda-coverage-map-1280.webp') }} 1280w"
+                        sizes="(max-width: 768px) 100vw, 1200px" width="1280" height="714" decoding="async"
+                        alt="Speeda service coverage map for Ottawa, Gatineau, Montreal, Laval, and Toronto GTA"
+                        loading="lazy">
                 </div>
             </div>
         </section>
@@ -752,18 +764,6 @@
             }
         </style>
         @endpush
-
-        <section class="home-section">
-            <div class="container">
-                <div class="home-shell coverage-map-card fade-in-up">
-                    <img src="{{ asset('images/speeda-coverage-map-1280.webp') }}"
-                        srcset="{{ asset('images/speeda-coverage-map-640.webp') }} 640w, {{ asset('images/speeda-coverage-map-1280.webp') }} 1280w"
-                        sizes="(max-width: 768px) 100vw, 1200px" width="1280" height="714" decoding="async"
-                        alt="Speeda service coverage map for Ottawa, Gatineau, Montreal, Laval, and Toronto GTA"
-                        loading="lazy">
-                </div>
-            </div>
-        </section>
 
         <section class="home-section home-section-muted">
             <div class="container">

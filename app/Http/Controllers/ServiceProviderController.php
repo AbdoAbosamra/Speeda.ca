@@ -462,7 +462,9 @@ class ServiceProviderController extends Controller
                 'experience_years' => $validated['experience_years'] ?? $serviceProvider->experience_years,
                 'phone' => $validated['phone'] ?? $serviceProvider->phone, // Use validated phone as-is (preserves DB format)
                 'whatsapp_number' => isset($validated['whatsapp_number']) ? preg_replace('/[^0-9+]/', '', $validated['whatsapp_number']) : null,
-                'address' => isset($validated['address']) ? trim($validated['address']) : $serviceProvider->address,
+                'address' => array_key_exists('address', $validated)
+                    ? (filled($validated['address']) ? trim($validated['address']) : null)
+                    : $serviceProvider->address,
                 'location_id' => $validated['location_id'] ?? $serviceProvider->location_id,
                 'languages' => $validated['languages'] ?? [],
             ];
@@ -546,40 +548,7 @@ class ServiceProviderController extends Controller
             // Commit the transaction
             DB::commit();
 
-            // Provider gallery upload:
-            // - Stored by Spatie media library
-            // - Conversions are generated on save
-            // - Images are additive; each one can also be replaced/deleted individually
-            try {
-                if ($request->hasFile('gallery_images')) {
-                    $files = $request->file('gallery_images', []);
-
-                    if (is_array($files)) {
-                        // Same cap the AJAX gallery widget enforces; without it a
-                        // hand-made request could grow the gallery without limit.
-                        $remainingSlots = ServiceProvider::MAX_GALLERY_IMAGES
-                            - $serviceProvider->getMedia('gallery')->count();
-                        $files = array_slice(array_filter($files), 0, max(0, $remainingSlots));
-
-                        foreach ($files as $file) {
-                            $serviceProvider->addMedia($file)->toMediaCollection('gallery');
-                        }
-                    }
-
-                    // Ensure completion percent is updated after gallery changes.
-                    app(CalculateProfileCompletionAction::class)->execute($serviceProvider);
-                }
-            } catch (\Throwable $galleryError) {
-                Log::error('Gallery upload failed', [
-                    'user_id' => auth()->id(),
-                    'sp_id' => $serviceProvider->id,
-                    'error' => $galleryError->getMessage(),
-                ]);
-                ErrorHelper::flashNotification(
-                    __('service_provider.gallery_upload_failed'),
-                    'error'
-                );
-            }
+            // Gallery uploads are closed. Profile edits leave existing media untouched.
 
             ErrorHelper::flashNotification(
                 __('service_provider.profile_updated_successfully'),

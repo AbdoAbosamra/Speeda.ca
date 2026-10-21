@@ -61,11 +61,11 @@ Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
 Route::post('/offers/track', [OfferController::class, 'track'])
     ->middleware('throttle:60,1')
     ->name('offers.track');
-// Likes and comments are open to everyone (comments wait for admin approval);
-// favorites belong to client accounts.
+// Favorites belong to client accounts.
 Route::get('/my-favorites', [\App\Http\Controllers\OfferEngagementController::class, 'favorites'])
     ->middleware('auth')
     ->name('offers.favorites');
+/* Temporarily disabled: offer likes and comments. Keep the routes for later.
 Route::post('/offers/{slug}/like', [\App\Http\Controllers\OfferEngagementController::class, 'like'])
     ->middleware('throttle:30,1')
     ->where('slug', '[a-z0-9-]+')
@@ -74,6 +74,7 @@ Route::post('/offers/{slug}/comments', [\App\Http\Controllers\OfferEngagementCon
     ->middleware('throttle:offer-comments')
     ->where('slug', '[a-z0-9-]+')
     ->name('offers.comment');
+*/
 Route::post('/offers/{slug}/favorite', [\App\Http\Controllers\OfferEngagementController::class, 'favorite'])
     ->middleware('throttle:30,1')
     ->where('slug', '[a-z0-9-]+')
@@ -157,6 +158,7 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
         ->middleware('throttle:20,1')
         ->name('service-providers.profile.gallery.delete');
 
+    /* Provider gallery uploads are closed; keep existing images and deletion available.
     Route::patch('/profile/{serviceProvider}/gallery/{media}', [ServiceProviderController::class, 'replaceGalleryImage'])
         ->middleware('throttle:20,1')
         ->name('service-providers.profile.gallery.replace');
@@ -169,6 +171,7 @@ Route::middleware(['auth'])->prefix('service-providers')->group(function () {
     Route::post('/profile/{serviceProvider}/gallery/{media}/replace', [GalleryController::class, 'update'])
         ->middleware('throttle:20,1')
         ->name('provider.gallery.update');
+    */
 
     Route::delete('/profile/{serviceProvider}/gallery/{media}/ajax', [GalleryController::class, 'destroy'])
         ->middleware('throttle:20,1')

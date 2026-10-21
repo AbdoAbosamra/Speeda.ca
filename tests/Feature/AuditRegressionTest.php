@@ -29,24 +29,17 @@ class AuditRegressionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_gallery_upload_generates_webp_images_and_replacement_keeps_other_images(): void
+    public function test_existing_gallery_images_keep_their_webp_conversions(): void
     {
         Storage::fake('public');
         $provider = ServiceProvider::factory()->create();
-        $this->actingAs($provider->user);
-        $response = $this->postJson(route('provider.gallery.store', $provider), [
-            'gallery_image' => UploadedFile::fake()->image('first.jpg', 800, 400),
-        ])->assertOk()->assertJsonPath('success', true)->assertJsonPath('count', 1);
-        $old = $provider->fresh()->getFirstMedia('gallery');
-        $this->assertTrue($old->hasGeneratedConversion('gallery_thumb'));
-        $this->assertTrue($old->hasGeneratedConversion('gallery_large'));
-        Storage::disk('public')->assertExists($old->getPathRelativeToRoot('gallery_thumb'));
-        $this->assertStringEndsWith('.webp', $response->json('media.thumb_url'));
-        $this->postJson(route('provider.gallery.update', [$provider, $old->id]), [
-            'gallery_image' => UploadedFile::fake()->image('second.png', 500, 500),
-        ])->assertOk()->assertJsonPath('success', true);
-        $this->assertDatabaseMissing('media', ['id' => $old->id]);
-        $this->assertCount(1, $provider->fresh()->getMedia('gallery'));
+        $media = $provider->addMedia(UploadedFile::fake()->image('existing.jpg', 800, 400))
+            ->toMediaCollection('gallery');
+
+        $this->assertTrue($media->hasGeneratedConversion('gallery_thumb'));
+        $this->assertTrue($media->hasGeneratedConversion('gallery_large'));
+        Storage::disk('public')->assertExists($media->getPathRelativeToRoot('gallery_thumb'));
+        $this->assertStringEndsWith('.webp', $provider->getMediaPublicUrl($media, 'gallery_thumb'));
     }
 
     public function test_failed_replacement_never_returns_or_deletes_the_existing_image(): void

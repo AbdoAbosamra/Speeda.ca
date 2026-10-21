@@ -86,16 +86,19 @@ class OfferController extends Controller
 
         $reviewCount = $offer->serviceProvider?->activeReviews()->count() ?? 0;
 
-        // Engagement: what this visitor already did, and the approved comments.
+        // Engagement: whether this client has saved the offer.
         $viewer = Auth::user();
+        /* Temporarily disabled: offer likes.
         $viewerLiked = \App\Models\OfferLike::where('offer_id', $offer->id)
             ->when($viewer,
                 fn ($q) => $q->where('user_id', $viewer->id),
                 fn ($q) => $q->whereNull('user_id')->where('session_hash', $this->tracker->sessionHash()))
             ->exists();
+        */
         $viewerSaved = $viewer && $viewer->isClient()
             && $viewer->favoriteOffers()->whereKey($offer->id)->exists();
-        $comments = $offer->approvedComments()->take(30)->get();
+        // Temporarily disabled: offer comments.
+        // $comments = $offer->approvedComments()->take(30)->get();
 
         $this->seo->applyPage(
             $offer->localized_title . ' · ' . $offer->providerName(),
@@ -115,9 +118,9 @@ class OfferController extends Controller
             'similar' => $similar,
             'reviewCount' => $reviewCount,
             'source' => OfferEvent::normalizeSource($request->query('src')),
-            'viewerLiked' => $viewerLiked,
+            // 'viewerLiked' => $viewerLiked, // Offer likes are temporarily disabled.
             'viewerSaved' => $viewerSaved,
-            'comments' => $comments,
+            // 'comments' => $comments, // Offer comments are temporarily disabled.
         ]);
     }
 

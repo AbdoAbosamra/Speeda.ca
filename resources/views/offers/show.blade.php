@@ -69,8 +69,10 @@
                     <p class="so-lead">{{ $offer->localized_summary }}</p>
                 @endif
 
-                {{-- Like (anyone), save (client accounts) and jump to comments. --}}
+                {{-- Offer likes and comments are temporarily disabled; keep their code for later. --}}
+                @if(! auth()->check() || auth()->user()->isClient())
                 <div class="so-engage" id="engage">
+                    {{-- Temporarily disabled: offer likes.
                     @if($isLive)
                         <form method="POST" action="{{ route('offers.like', $offer->slug) }}" class="m-0" data-so-like>
                             @csrf
@@ -82,6 +84,7 @@
                         </form>
                     @endif
                     <span class="so-fine" data-like-count>{{ trans_choice('offers.likes_count', $offer->likes_count, ['count' => $offer->likes_count]) }}</span>
+                    --}}
 
                     @if(! auth()->check() || auth()->user()->isClient())
                         <form method="POST" action="{{ route('offers.favorite', $offer->slug) }}" class="m-0 ms-auto" data-so-favorite>
@@ -95,12 +98,15 @@
                         </form>
                     @endif
 
+                    {{-- Temporarily disabled: link to offer comments.
                     <a href="#comments" class="so-pill so-pill--link {{ (! auth()->check() || auth()->user()->isClient()) ? '' : 'ms-auto' }}">
                         <i class="far fa-comment" aria-hidden="true"></i>
                         <span>{{ trans_choice('offers.comments_count', $comments->count(), ['count' => $comments->count()]) }}</span>
                     </a>
+                    --}}
                 </div>
                 <p class="so-fine text-danger mb-0" data-engage-error role="alert" hidden></p>
+                @endif
             </div>
 
             @if($offer->localized_details)
@@ -121,7 +127,7 @@
                 </div>
             @endif
 
-            {{-- Approved comments only; new ones wait for the admin. --}}
+            {{-- Temporarily disabled: approved offer comments and the submission form.
             <section class="so-panel so-comments" id="comments" aria-labelledby="so-comments-title">
                 <h2 class="so-comments-title" id="so-comments-title">
                     <i class="far fa-comments" aria-hidden="true"></i> {{ __('offers.comments_title') }}
@@ -151,7 +157,7 @@
                     <form method="POST" action="{{ route('offers.comment', $offer->slug) }}" class="so-comment-form" data-so-comment novalidate>
                         @csrf
                         <input type="hidden" name="source" value="{{ $source }}">
-                        {{-- Honeypot: hidden from people, filled in by bots. --}}
+                        <!-- Honeypot: hidden from people, filled in by bots. -->
                         <div class="so-hp" aria-hidden="true">
                             <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
                         </div>
@@ -180,6 +186,7 @@
                     <p class="so-fine mb-0">{{ __('offers.comment_closed') }}</p>
                 @endif
             </section>
+            --}}
         </div>
 
         <aside class="so-side">
@@ -212,6 +219,19 @@
                         @if($cta === \App\Models\Offer::CTA_WHATSAPP)<i class="fab fa-whatsapp fs-5" aria-hidden="true"></i>@else<i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>@endif
                         <span>{{ $claimLabel }}</span>
                     </a>
+                @endif
+
+                <button type="button" class="so-btn so-btn-share" id="so-share" data-copied="{{ __('offers.link_copied') }}">
+                    <i class="fas fa-share-nodes" aria-hidden="true"></i>
+                    <span>{{ __('offers.share_offer') }}</span>
+                </button>
+                <p id="so-share-status" class="so-fine mb-0" role="status" aria-live="polite"></p>
+                <div id="so-share-fallback" hidden>
+                    <label for="so-share-url" class="so-fine">{{ __('readiness.copy_manually') }}</label>
+                    <input id="so-share-url" class="form-control" type="text" readonly dir="ltr">
+                </div>
+
+                @if($isLive || $isAdmin)
                     {{-- Plain text: the green box below already carries the trust message. --}}
                     <p class="so-fine mb-0">
                         <i class="fas fa-circle-info" aria-hidden="true"></i>
@@ -223,19 +243,9 @@
                     @include('partials.offers.trust')
                 @endif
 
-                <div class="d-flex gap-3 flex-wrap so-fine">
-                    @if($offer->ends_at)
-                        <span><i class="far fa-calendar" aria-hidden="true"></i> {{ __('offers.valid_until', ['date' => \App\Models\Offer::localDate($offer->ends_at)]) }}</span>
-                    @endif
-                    <button type="button" class="btn btn-link p-0 so-fine text-decoration-none" id="so-share" data-copied="{{ __('offers.link_copied') }}">
-                        <i class="fas fa-share-nodes" aria-hidden="true"></i> {{ __('offers.share') }}
-                    </button>
-                </div>
-                <p id="so-share-status" class="so-fine mb-0" role="status" aria-live="polite"></p>
-                <div id="so-share-fallback" hidden>
-                    <label for="so-share-url" class="so-fine">{{ __('readiness.copy_manually') }}</label>
-                    <input id="so-share-url" class="form-control" type="text" readonly dir="ltr">
-                </div>
+                @if($offer->ends_at)
+                    <p class="so-fine mb-0"><i class="far fa-calendar" aria-hidden="true"></i> {{ __('offers.valid_until', ['date' => \App\Models\Offer::localDate($offer->ends_at)]) }}</p>
+                @endif
             </div>
 
             @if($provider)
@@ -311,7 +321,7 @@
         setInterval(tick, 1000);
     }
 
-    // Like / save: answered as JSON so the page updates in place; a guest
+    // Save: answered as JSON so the page updates in place; a guest
     // pressing save is sent to log in, then back to this offer.
     const engageError = document.querySelector('[data-engage-error]');
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
@@ -335,6 +345,7 @@
         engageError.hidden = false;
     };
 
+    {{-- Temporarily disabled: offer like handler.
     const likeForm = document.querySelector('[data-so-like]');
     if (likeForm) {
         likeForm.addEventListener('submit', function (e) {
@@ -351,6 +362,8 @@
         });
     }
 
+    --}}
+
     const favForm = document.querySelector('[data-so-favorite]');
     if (favForm) {
         favForm.addEventListener('submit', function (e) {
@@ -366,6 +379,7 @@
         });
     }
 
+    {{-- Temporarily disabled: offer comment handler.
     // Comments: the thank-you replaces the form; nothing appears until approved.
     const commentForm = document.querySelector('[data-so-comment]');
     if (commentForm) {
@@ -396,6 +410,8 @@
             });
         });
     }
+
+    --}}
 
     const share = document.getElementById('so-share');
     if (share) {

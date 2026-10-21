@@ -288,4 +288,13 @@ return [
     'join_as_provider' => 'انضم كمقدم خدمة',
     'no_providers_in_category' => 'لا يوجد مقدمو خدمات في :category',
     'be_first_provider_message' => 'نعمل على توسيع شبكتنا في هذه الفئة. هل أنت مقدم خدمة؟ انضم إلى سبيدا اليوم وتواصل مع العملاء المحليين.',
+    'address_map_hint' => 'اكتب رقم المبنى والشارع والمدينة. سيظهر العنوان على بروفايلك العام مع خريطة للوصول إليك.',
+    'map_eyebrow' => 'العنوان والموقع',
+    'map_title' => 'هنا تلاقينا',
+    'map_directions' => 'الاتجاهات',
+    'map_copy_address' => 'نسخ العنوان',
+    'map_address_copied' => 'تم نسخ العنوان',
+    'map_copy_fallback' => 'حدّد العنوان وانسخه يدويًا.',
+    'map_larger' => 'افتح خريطة أكبر',
+    'map_frame_title' => 'موقع :name على الخريطة',
 ];

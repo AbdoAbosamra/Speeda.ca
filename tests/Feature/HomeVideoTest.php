@@ -167,6 +167,21 @@ class HomeVideoTest extends TestCase
             ->assertSee('A minute on how it works.');
     }
 
+    public function test_the_video_sits_after_explore_and_above_the_coverage_map(): void
+    {
+        HomeVideo::create([
+            'is_active' => true,
+            'source_type' => HomeVideo::SOURCE_EMBED,
+            'video_url' => self::YT,
+        ]);
+
+        $this->get(route('home'))->assertOk()->assertSeeInOrder([
+            __('home.explore_services'),
+            'home-video-section',
+            'coverage-map-card',
+        ], false);
+    }
+
     public function test_the_iframe_is_not_in_the_markup_until_the_visitor_presses_play(): void
     {
         HomeVideo::create([

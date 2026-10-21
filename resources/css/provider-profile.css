@@ -259,6 +259,253 @@ body {
     background: linear-gradient(135deg, #4cc9f0, #4361ee);
 }
 
+/* Public address and interactive map. Logical spacing also supports RTL. */
+.provider-place {
+    --place-ink: #182b4d;
+    --place-blue: #3858d6;
+    margin-block: 1.75rem 2rem;
+    overflow: hidden;
+    border: 1px solid #e1e8f3;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 8px 28px #263d7010;
+    scroll-margin-top: 100px;
+}
+
+.provider-place__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 24px 24px 0;
+}
+
+.provider-place__heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.provider-place__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 52px;
+    height: 52px;
+    border: 1px solid #dce5ff;
+    border-radius: 17px;
+    color: var(--place-blue);
+    background: linear-gradient(145deg, #eff3ff, #f5f9ff);
+    font-size: 23px;
+}
+
+.provider-place__eyebrow {
+    margin: 0 0 5px;
+    color: #60708e;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+}
+
+.provider-place h2 {
+    margin: 0;
+    color: var(--place-ink);
+    font-size: clamp(21px, 2.3vw, 25px);
+    font-weight: 750;
+    letter-spacing: -.025em;
+    line-height: 1.25;
+}
+
+.provider-place__city {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+    padding: 7px 12px;
+    border: 1px solid #d6eae3;
+    border-radius: 30px;
+    background: #f2faf6;
+    color: #33755d;
+    font-size: 12px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.provider-place__city > span {
+    flex: 0 0 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3f9975;
+    box-shadow: 0 0 0 3px #e2f2e9;
+}
+
+.provider-place__details {
+    padding: 20px 24px 22px;
+}
+
+.provider-place address {
+    margin: 0 0 18px;
+    color: #4d5d76;
+    font-size: 15px;
+    font-style: normal;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.provider-place__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.provider-place__actions a,
+.provider-place__actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 43px;
+    padding: 10px 17px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.4;
+    text-decoration: none;
+    transition: background .2s, box-shadow .2s;
+}
+
+.provider-place__directions {
+    color: #fff;
+    background: var(--place-blue);
+    box-shadow: 0 4px 10px #3858d620;
+}
+
+.provider-place__directions:hover {
+    color: #fff;
+    background: #2947bb;
+    box-shadow: 0 5px 14px #3858d635;
+}
+
+.provider-place__actions .provider-place__copy {
+    border-color: #e3e8f1;
+    color: #4e5f7a;
+    background: #fff;
+}
+
+.provider-place__copy:hover {
+    background: #f4f6fb;
+}
+
+.provider-place__actions [hidden],
+.provider-place__fallback[hidden] {
+    display: none;
+}
+
+.provider-place a:focus-visible,
+.provider-place button:focus-visible,
+.provider-place__fallback:focus-visible {
+    outline: 3px solid #a6b9ff;
+    outline-offset: 3px;
+}
+
+.provider-place__status {
+    margin: 10px 0 0;
+    color: #33755d;
+    font-size: 12px;
+}
+
+.provider-place__status:empty {
+    display: none;
+}
+
+.provider-place__fallback {
+    width: 100%;
+    margin-block-start: 10px;
+    padding: 10px 12px;
+    border: 1px solid #d4ddeb;
+    border-radius: 10px;
+    font: inherit;
+}
+
+.provider-place__map {
+    height: 320px;
+    margin-inline: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 17px;
+    background: #eff3f2;
+}
+
+.provider-place__map iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.provider-place__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 15px 24px 18px;
+    color: #728099;
+    font-size: 11px;
+}
+
+.provider-place__footer > span,
+.provider-place__footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.provider-place__footer a {
+    color: var(--place-blue);
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.provider-place__footer a:hover {
+    text-decoration: underline;
+}
+
+[dir="rtl"] .provider-place__eyebrow {
+    letter-spacing: 0;
+}
+
+@media (max-width: 575.98px) {
+    .provider-place {
+        border-radius: 20px;
+    }
+
+    .provider-place__header {
+        padding: 20px 18px 0;
+    }
+
+    .provider-place__details {
+        padding: 17px 18px 20px;
+    }
+
+    .provider-place__city {
+        font-size: 11px;
+    }
+
+    .provider-place__map {
+        height: 270px;
+        margin-inline: 8px;
+        border-radius: 13px;
+    }
+
+    .provider-place__footer {
+        padding-inline: 18px;
+    }
+}
+
 /* Premium WhatsApp Country Badge */
 .whatsapp-country-badge {
     display: inline-flex;

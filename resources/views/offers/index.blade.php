@@ -14,11 +14,14 @@
         <p>{{ __('offers.hero_subtitle') }}</p>
         @if($speedaWa = \App\Support\WhatsApp::contactSpeedaUrl())
             <div class="so-hero-actions">
-                <a class="so-btn so-hero-contact" href="{{ $speedaWa }}" target="_blank" rel="noopener">
-                    <i class="fab fa-whatsapp" aria-hidden="true"></i>
-                    <span>{{ __('offers.contact_to_publish') }}</span>
+                <a class="so-hero-contact" href="{{ $speedaWa }}" target="_blank" rel="noopener">
+                    <span class="so-hero-contact-icon" aria-hidden="true"><i class="fab fa-whatsapp"></i></span>
+                    <span class="so-hero-contact-text">
+                        <b>{{ __('offers.contact_to_publish') }}</b>
+                        <small>{{ __('offers.contact_to_publish_hint') }}</small>
+                    </span>
+                    <i class="fas fa-arrow-right so-hero-contact-arrow" aria-hidden="true"></i>
                 </a>
-                <bdi class="so-hero-number" dir="ltr">{{ \App\Support\WhatsApp::display(\App\Support\WhatsApp::speedaNumber()) }}</bdi>
             </div>
         @endif
     </header>

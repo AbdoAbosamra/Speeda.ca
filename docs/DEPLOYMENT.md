@@ -112,9 +112,11 @@ What the script does, in order:
 7. Runs `seo:generate-sitemap` against production data.
 8. If `HOLD_SWITCH` exists, stops with the release prepared.
 9. Swaps `speeda_live` with `ln -sfn` + `mv -Tf` and runs `queue:restart`.
-10. Health checks: `https://speeda.ca/up` must return 200 (5 tries), and an
-    unknown path must return a real 404. **If either fails, the script rolls
-    back to the previous release automatically.**
+10. Health checks: `https://speeda.ca/up` must return 200 (5 tries), an
+    unknown path must return a real 404, and the homepage must return 200
+    (it exercises the database, layout and compiled views of the new
+    release). **If any of them fails, the script rolls back to the previous
+    release automatically.**
 11. Prunes old releases, never the active one. A pruning failure cannot undo
     a healthy deploy.
 
@@ -125,6 +127,119 @@ rollback restores code only, not the schema. So every migration must be
 backward-compatible: new tables, new nullable columns, looser constraints.
 Dropping or renaming a column the old code still reads needs a separate
 planned window.
+
+## Production release checklist
+
+Follow this for every release. It is built so that a deploy **never sends an
+email by itself** and the site never goes down. Run everything on the server
+as `speeda`. `<sha>` is the full commit hash from the CI run summary.
+
+### Why a deploy cannot re-send email
+
+- **Send-once flags.** Every automatic email is guarded in the database: the
+  client welcome and review-milestone emails by `*_email_sent_at` columns, the
+  provider journey by `provider_email_logs`, broadcasts by one
+  `provider_broadcast_recipients` row per provider.
+- **Migrations before cutover.** The script refuses to switch while any
+  migration is pending. That is what back-fills the flags for existing
+  accounts.
+- **Old accounts are never welcomed.** Even if a flag were ever missing, a
+  client account older than 3 days is stamped as handled instead of being
+  emailed on login.
+- **Broadcasts are at-most-once.** A recipient row is claimed (`sending`)
+  before the mail server is contacted. A job that dies mid-send is closed
+  as failed, not retried, so a provider can miss a broadcast but never get it
+  twice.
+- **SMTP timeout.** `MAIL_TIMEOUT` (default 20s) is shorter than the
+  worker's job timeout, so a slow mail server fails the send cleanly instead
+  of the worker killing a job that may already have delivered.
+
+What a deploy does **not** control, and the checks below cover: emails that
+were already waiting in the `jobs` table, and a second scheduler still running
+from an old directory.
+
+### 1. Pre-flight (read-only, changes nothing)
+
+Do not deploy between 09:50 and 10:15 (provider journey emails run at 10:00)
+or between 02:50 and 03:15 (sitemap at 03:00).
+
+```bash
+cd /home/speeda/htdocs/speeda_live
+
+# What is live now. Note it: this is your rollback target.
+readlink -f /home/speeda/htdocs/speeda_live
+
+# Only speeda_live may run the scheduler and the queue. Any line that points at
+# the old speeda.ca directory runs OLD code against the same database: remove it.
+crontab -l
+
+# Emails already waiting to go out (sent by the worker whether or not you
+# deploy), failed jobs, unfinished broadcasts and the visitor-IP spread.
+# Read-only. Look at it BEFORE the deploy, not after.
+php artisan ops:preflight
+```
+
+If `jobs` holds old emails nobody should receive anymore, stop and decide
+before deploying. Never run `queue:retry all` without looking at
+`failed_jobs` first.
+
+### 2. Update the deploy script on the server
+
+The server runs its own copy of `pull-deploy.sh`. Refresh it from the exact
+commit you are about to deploy:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AbdoAbosamra/Speeda.ca/<sha>/deploy/pull-deploy.sh \
+  -o /home/speeda/deploy/pull-deploy.sh.new \
+  && bash -n /home/speeda/deploy/pull-deploy.sh.new \
+  && mv /home/speeda/deploy/pull-deploy.sh.new /home/speeda/deploy/pull-deploy.sh \
+  && chmod +x /home/speeda/deploy/pull-deploy.sh
+```
+
+### 3. Prepare the release without going live
+
+```bash
+touch /home/speeda/deploy/HOLD_SWITCH
+RUN_MIGRATIONS=true /home/speeda/deploy/pull-deploy.sh <sha>
+```
+
+This builds and verifies the release, takes and checks a database backup if
+migrations are pending, and runs them. The live site keeps serving the old
+release, which is safe because migrations are backward-compatible (see the
+migration rule above). The log ends with `Release ready: <path>`.
+
+Preview the next scheduled journey run with the new code. `--dry-run` writes
+nothing and sends nothing:
+
+```bash
+php <path-from-the-log>/artisan providers:send-journey-emails --dry-run | tail -n 15
+```
+
+Expect only a handful of `WOULD SEND` lines (providers who have become due).
+If you see a large number, stop and investigate before going live.
+
+### 4. Go live
+
+```bash
+rm /home/speeda/deploy/HOLD_SWITCH
+/home/speeda/deploy/pull-deploy.sh <sha>
+```
+
+The log must end with `Deployed <sha> with no downtime`. If a health check
+fails, the script has already rolled back on its own.
+
+### 5. After going live
+
+```bash
+readlink -f /home/speeda/htdocs/speeda_live                                        # new release
+curl -s -o /dev/null -w '%{http_code}\n' https://speeda.ca/                        # 200
+tail -n 50 "$(ls -t /home/speeda/deploy/shared/storage/logs/laravel*.log | head -1)"   # no new errors
+php /home/speeda/htdocs/speeda_live/artisan ops:preflight                           # queued jobs should not jump
+```
+
+Then open the site as a visitor, log in as a client and as a provider, and
+open the admin dashboard. The first time `TRUSTED_PROXIES` ships, run the
+real-visitor-IP check in [OPERATIONS.md](OPERATIONS.md#trusted-proxies).
 
 ## Verifying a deploy
 

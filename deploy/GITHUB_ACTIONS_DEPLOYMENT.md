@@ -124,8 +124,9 @@ visitor's address. Without it every guest shares one rate-limit bucket and the
 visitor analytics count one person. Check it once after a deploy:
 
 ```bash
-# Distinct visitor hashes recorded today: should be well above 1 on a live site.
-php artisan tinker --execute="echo App\Models\Visitor::whereDate('visited_at', today())->distinct('ip_hash')->count('ip_hash');"
+# Prints page views and distinct IPs for the last 24h, and warns if every
+# visitor shares one address.
+php artisan ops:preflight
 ```
 
 If the site is put behind Cloudflare, add Cloudflare's ranges to

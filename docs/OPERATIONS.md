@@ -63,11 +63,11 @@ balancer, add its ranges to `TRUSTED_PROXIES`, or restore the IP in nginx with
 `set_real_ip_from` / `real_ip_header`. Do not use `*`.
 
 **Check after a deploy.** Tinker is a dev dependency and is not installed on
-the server, so check in SQL instead:
+the server. `ops:preflight` is read-only: it prints the last 24h of page views
+and distinct IPs, and warns when every visitor shares one address.
 
-```sql
--- distinct visitor hashes today; on a live site this should be well above 1
-SELECT COUNT(DISTINCT ip_hash) FROM visitors WHERE DATE(visited_at) = CURDATE();
+```bash
+php artisan ops:preflight
 ```
 
 ## Backups
@@ -125,6 +125,7 @@ gunzip -c /home/speeda/deploy/backups/<file>.sql.gz | mysql -u <user> -p speedad
 | Sitemap is stale | `php artisan seo:generate-sitemap` |
 | Google sign-in "redirect_uri_mismatch" | `php artisan speeda:google-check` |
 | Is the config still production-safe? | `php artisan deploy:verify` |
+| What emails are waiting, failed or half-sent? (read-only) | `php artisan ops:preflight` |
 | Stop the next deploy from going live | `touch /home/speeda/deploy/HOLD_SWITCH` |
 
 ## Security notes for operators

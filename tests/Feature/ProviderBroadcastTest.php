@@ -460,4 +460,68 @@ class ProviderBroadcastTest extends TestCase
                 && str_contains($html, 'signature=');
         });
     }
+
+    /* ================================================================== */
+    /*  At-most-once delivery                                              */
+    /* ================================================================== */
+
+    private function pendingRecipient(): ProviderBroadcastRecipient
+    {
+        $provider = $this->makeProvider();
+        $broadcast = $this->draft(['status' => ProviderBroadcast::STATUS_SENDING]);
+
+        return ProviderBroadcastRecipient::create([
+            'provider_broadcast_id' => $broadcast->id,
+            'service_provider_id' => $provider->id,
+            'email' => $provider->user->email,
+            'name' => 'Test Provider',
+            'status' => ProviderBroadcastRecipient::STATUS_PENDING,
+        ]);
+    }
+
+    public function test_a_job_cut_off_mid_send_is_never_mailed_again(): void
+    {
+        Mail::fake();
+        $recipient = $this->pendingRecipient();
+
+        // What a worker killed after claiming the row (timeout, deploy
+        // restart) leaves behind: the message may already be delivered.
+        $recipient->claimForSending();
+
+        $job = new SendProviderBroadcastEmail($recipient->id);
+        $job->handle(app(ProviderBroadcastService::class));
+        $job->failed(new \RuntimeException('worker timed out'));
+
+        Mail::assertNothingSent();
+        $this->assertSame(ProviderBroadcastRecipient::STATUS_FAILED, $recipient->fresh()->status);
+        $this->assertSame(ProviderBroadcast::STATUS_SENT, $recipient->broadcast->fresh()->status);
+    }
+
+    public function test_running_the_same_job_twice_sends_one_email(): void
+    {
+        Mail::fake();
+        $recipient = $this->pendingRecipient();
+
+        (new SendProviderBroadcastEmail($recipient->id))->handle(app(ProviderBroadcastService::class));
+        (new SendProviderBroadcastEmail($recipient->id))->handle(app(ProviderBroadcastService::class));
+
+        Mail::assertSent(BroadcastEmail::class, 1);
+        $this->assertSame(ProviderBroadcastRecipient::STATUS_SENT, $recipient->fresh()->status);
+    }
+
+    public function test_a_refused_send_is_handed_back_for_a_retry(): void
+    {
+        $recipient = $this->pendingRecipient();
+        Mail::shouldReceive('to')->andThrow(new \RuntimeException('SMTP 421 try again later'));
+
+        try {
+            (new SendProviderBroadcastEmail($recipient->id))->handle(app(ProviderBroadcastService::class));
+            $this->fail('The first attempt should rethrow so the queue retries it.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('SMTP 421 try again later', $e->getMessage());
+        }
+
+        // Nothing was accepted by the server, so the row is free to retry.
+        $this->assertSame(ProviderBroadcastRecipient::STATUS_PENDING, $recipient->fresh()->status);
+    }
 }

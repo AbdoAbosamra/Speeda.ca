@@ -126,4 +126,25 @@ class EmailSendOnceTest extends TestCase
         $migration->up();
         $this->assertEquals($stamp, $oldClient->fresh()->client_welcome_email_sent_at);
     }
+
+    public function test_an_existing_client_with_no_flag_is_not_welcomed_on_login(): void
+    {
+        Mail::fake();
+
+        // The state a release produces if it goes live before its migration
+        // back-fills the flag: an old account with no "welcome sent" stamp.
+        $oldClient = User::factory()->create([
+            'role' => 'client',
+            'is_active' => true,
+            'client_welcome_email_sent_at' => null,
+        ]);
+        $oldClient->forceFill(['created_at' => now()->subMonths(4)])->saveQuietly();
+
+        $this->post('/login', ['email' => $oldClient->email, 'password' => 'password']);
+        app(UserEngagementEmailService::class)->sendClientWelcomeEmail($oldClient->fresh());
+
+        Mail::assertNotQueued(WelcomeClientEmail::class);
+        // Stamped, so the check never has to run for this account again.
+        $this->assertNotNull($oldClient->fresh()->client_welcome_email_sent_at);
+    }
 }

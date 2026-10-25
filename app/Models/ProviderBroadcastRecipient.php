@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProviderBroadcastRecipient extends Model
 {
     public const STATUS_PENDING = 'pending';
+    /** Claimed by a job that is talking to the mail server right now. */
+    public const STATUS_SENDING = 'sending';
     public const STATUS_SENT = 'sent';
     public const STATUS_FAILED = 'failed';
 
@@ -46,6 +48,46 @@ class ProviderBroadcastRecipient extends Model
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_PENDING);
+    }
+
+    /**
+     * Atomically move a pending row to "sending". Only the caller that wins
+     * this update may talk to the mail server, so the same row can never be
+     * mailed twice, whatever happens to the job afterwards.
+     */
+    public function claimForSending(): bool
+    {
+        return static::whereKey($this->getKey())
+            ->where('status', self::STATUS_PENDING)
+            ->update(['status' => self::STATUS_SENDING, 'updated_at' => now()]) === 1;
+    }
+
+    /**
+     * Put a claimed row back in the queue after a send that failed before the
+     * mail server accepted anything, so the next attempt may try again.
+     */
+    public function releaseClaim(): void
+    {
+        static::whereKey($this->getKey())
+            ->where('status', self::STATUS_SENDING)
+            ->update(['status' => self::STATUS_PENDING, 'updated_at' => now()]);
+    }
+
+    /**
+     * Close a row whose send was interrupted (worker killed, timeout, deploy
+     * restart) after it was claimed. Whether the mail server accepted the
+     * message is unknown, so it is recorded as failed and NOT retried: a
+     * possibly missed email is better than a possibly duplicated one.
+     */
+    public function closeInterruptedSend(): void
+    {
+        static::whereKey($this->getKey())
+            ->where('status', self::STATUS_SENDING)
+            ->update([
+                'status' => self::STATUS_FAILED,
+                'error' => 'Delivery interrupted mid-send; not retried to avoid a duplicate email.',
+                'updated_at' => now(),
+            ]);
     }
 
     public function markSent(): void

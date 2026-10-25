@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\Mail;
  */
 class UserEngagementEmailService
 {
+    /** Only accounts created within this many days are sent the welcome email. */
+    private const WELCOME_WINDOW_DAYS = 3;
+
     /** Client milestones: approved-review count => flag column on users table. */
     private const CLIENT_MILESTONES = [
         1 => 'first_review_email_sent_at',
@@ -57,6 +60,16 @@ class UserEngagementEmailService
             ->update(['client_welcome_email_sent_at' => now()]);
 
         if ($updated === 0) {
+            return;
+        }
+
+        // A welcome belongs to a new account. An older account reaching this
+        // point means its send-once flag was never stamped (a release went
+        // live before its migration ran, or a restored backup), so record it
+        // as handled instead of greeting a long-standing client on login.
+        if ($user->created_at && $user->created_at->lt(now()->subDays(self::WELCOME_WINDOW_DAYS))) {
+            Log::info('Client welcome email skipped for an existing account', ['user_id' => $user->id]);
+
             return;
         }
 

@@ -73,6 +73,12 @@ class VerifyProduction extends Command
             ));
         }
 
+        // Not blocking, but worth seeing on every deploy: with these values
+        // emails are silently never delivered.
+        if (in_array(config('mail.default'), ['log', 'array'], true)) {
+            $this->warn('MAIL_MAILER is "'.config('mail.default').'": no email will actually be delivered.');
+        }
+
         if (! is_writable(storage_path('app/public'))) {
             $failures[] = 'storage/app/public must be writable (uploads land here)';
         }

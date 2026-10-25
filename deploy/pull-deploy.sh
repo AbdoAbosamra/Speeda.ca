@@ -203,6 +203,13 @@ nf="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "${HEALTH_URL%/up}/__
 [ "$nf" = "404" ] || { echo "[deploy] expected 404 for unknown route, got $nf" >&2; exit 1; }
 log "404 semantics verified"
 
+# /up only proves PHP boots. The homepage exercises the database, the layout,
+# translations and the compiled views of the new release, which is where a bad
+# release actually breaks. A failure here rolls back like any other.
+home="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${HEALTH_URL%/up}/" || true)"
+[ "$home" = "200" ] || { echo "[deploy] homepage answered $home, expected 200" >&2; exit 1; }
+log "homepage verified"
+
 # ---------------------------------------------------------------- 9. PRUNE ---
 # Past this point the new release is LIVE and has passed both health probes, so
 # nothing below may be allowed to fail the script.

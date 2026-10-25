@@ -101,6 +101,8 @@
                                         @if($recipient->error)
                                             <div class="text-muted small">{{ Str::limit($recipient->error, 120) }}</div>
                                         @endif
+                                    @elseif($recipient->status === \App\Models\ProviderBroadcastRecipient::STATUS_SENDING)
+                                        <span class="badge bg-info text-dark">Sending</span>
                                     @else
                                         <span class="badge bg-secondary">Pending</span>
                                     @endif

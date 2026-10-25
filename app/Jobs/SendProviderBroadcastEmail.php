@@ -38,7 +38,21 @@ class SendProviderBroadcastEmail implements ShouldQueue
         $recipient = ProviderBroadcastRecipient::with(['broadcast', 'serviceProvider.user'])
             ->find($this->recipientId);
 
-        if (!$recipient || $recipient->status !== ProviderBroadcastRecipient::STATUS_PENDING) {
+        if (!$recipient) {
+            return;
+        }
+
+        // Still "sending" when a job starts means an earlier attempt was cut
+        // off mid-send (worker killed, timeout, deploy restart). The message
+        // may already be in the inbox, so close the row instead of mailing again.
+        if ($recipient->status === ProviderBroadcastRecipient::STATUS_SENDING) {
+            $recipient->closeInterruptedSend();
+            $recipient->broadcast?->refreshProgress();
+
+            return;
+        }
+
+        if ($recipient->status !== ProviderBroadcastRecipient::STATUS_PENDING) {
             return;
         }
 
@@ -63,6 +77,11 @@ class SendProviderBroadcastEmail implements ShouldQueue
             return;
         }
 
+        // Only the job that wins this claim may contact the mail server.
+        if (! $recipient->claimForSending()) {
+            return;
+        }
+
         try {
             Mail::to($recipient->email, $recipient->name)->send(new BroadcastEmail(
                 broadcast: $broadcast,
@@ -70,12 +89,13 @@ class SendProviderBroadcastEmail implements ShouldQueue
                 dashboardUrl: $service->dashboardUrl($provider),
                 unsubscribeUrl: $service->unsubscribeUrl($user),
             ));
-
-            $recipient->markSent();
         } catch (Throwable $e) {
-            // Let the queue retry first; only record a terminal failure once
-            // the attempts are exhausted.
+            // The mail server refused or could not be reached, so nothing was
+            // delivered: hand the row back and let the queue retry. Only record
+            // a terminal failure once the attempts are exhausted.
             if ($this->attempts() < $this->tries) {
+                $recipient->releaseClaim();
+
                 throw $e;
             }
 
@@ -86,7 +106,16 @@ class SendProviderBroadcastEmail implements ShouldQueue
                 'recipient_id' => $recipient->id,
                 'error' => $e->getMessage(),
             ]);
+
+            $broadcast->refreshProgress();
+
+            return;
         }
+
+        // Outside the try on purpose: the email is already delivered, so a
+        // failure while recording it must never release the claim and send
+        // it again. The row stays "sending" and is closed on the next attempt.
+        $recipient->markSent();
 
         $broadcast->refreshProgress();
     }
@@ -100,11 +129,18 @@ class SendProviderBroadcastEmail implements ShouldQueue
     {
         $recipient = ProviderBroadcastRecipient::with('broadcast')->find($this->recipientId);
 
-        if (!$recipient || $recipient->status !== ProviderBroadcastRecipient::STATUS_PENDING) {
+        if (!$recipient) {
             return;
         }
 
-        $recipient->markFailed($e?->getMessage() ?: 'Job failed without an exception message.');
+        if ($recipient->status === ProviderBroadcastRecipient::STATUS_SENDING) {
+            $recipient->closeInterruptedSend();
+        } elseif ($recipient->status === ProviderBroadcastRecipient::STATUS_PENDING) {
+            $recipient->markFailed($e?->getMessage() ?: 'Job failed without an exception message.');
+        } else {
+            return;
+        }
+
         $recipient->broadcast?->refreshProgress();
     }
 }

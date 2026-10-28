@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Notifications\Auth\PasswordChangedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -31,6 +32,12 @@ class PasswordController extends Controller
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
+
+        // Mailed to the account's own address so a change the owner did not
+        // make is noticed. Locale is pinned now because the email is queued.
+        $request->user()->notify(
+            (new PasswordChangedNotification(now()))->locale(app()->getLocale())
+        );
 
         return back()->with('status', 'password-updated');
     }

@@ -81,6 +81,11 @@ return [
     'reset_password_email_expire' => 'This link expires in :count minutes and can only be used once.',
     'reset_password_email_ignore' => 'If you did not request this, you can safely ignore this email or contact :email.',
     'reset_password_email_salutation' => 'Speeda Support',
+    'password_changed_email_subject' => 'Your Speeda password was changed',
+    'password_changed_email_intro' => 'The password for your Speeda account (:email) was changed on :time.',
+    'password_changed_email_if_you' => 'If you made this change, there is nothing else to do.',
+    'password_changed_email_if_not' => 'If you did not change it, reset your password right away:',
+    'password_changed_email_contact' => 'Need help? Contact us at :email.',
     'verify_email_instructions' => 'Before continuing, please verify your email address by clicking on the link we just emailed to you.',
     'verification_link_sent' => 'A fresh verification link has been sent to your email address.',
 

@@ -64,6 +64,8 @@
             ['label' => 'Users Trash', 'icon' => 'fa-trash-can', 'route' => 'admin.users.trash', 'active' => 'admin.users.trash'],
             ['label' => 'Providers', 'icon' => 'fa-briefcase', 'route' => 'admin.provider_activity_monitor.index', 'active' => 'admin.provider_activity_monitor*|admin.providers*'],
             ['label' => 'Login Activity', 'icon' => 'fa-right-to-bracket', 'route' => 'admin.login_activity.index', 'active' => 'admin.login_activity*'],
+            // The account page holds the change-password form; admins have no other link to it.
+            ['label' => 'Change Password', 'icon' => 'fa-key', 'route' => 'profile.edit', 'active' => 'profile.edit'],
         ],
         'Content & Moderation' => [
             ['label' => 'Reviews', 'icon' => 'fa-star', 'route' => 'admin.reviews', 'active' => 'admin.reviews*'],

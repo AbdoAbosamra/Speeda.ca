@@ -99,6 +99,8 @@
     </section>
 
     {{-- ============ DELETE ============ --}}
+    {{-- ProfileController::destroy refuses admins, so the form would only ever fail for them. --}}
+    @unless($user->isAdmin())
     <section class="card border-danger-subtle shadow-sm rounded-4" aria-labelledby="delete-title" x-data="{ open: {{ $errors->userDeletion->isNotEmpty() ? 'true' : 'false' }} }">
         <div class="card-body p-4">
             <h2 class="h5 fw-bold text-danger mb-1" id="delete-title">{{ __('profile.delete_account') }}</h2>
@@ -131,5 +133,6 @@
             </form>
         </div>
     </section>
+    @endunless
 </div>
 @endsection

@@ -27,7 +27,7 @@ return [
     |
     | The email of the service-provider account that belongs to the site's
     | developer. This account gets a special "Site Developer" badge on its card
-    | and profile. Keep in sync with database/seeders/OwnerProviderSeeder.php.
+    | and profile. This setting does not create or restore an account.
     |
     */
     'email' => env('OWNER_EMAIL', 'abdo.abosamra80@gmail.com'),

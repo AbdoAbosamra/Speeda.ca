@@ -17,6 +17,12 @@
     ], '', '&', PHP_QUERY_RFC3986);
 @endphp
 
+<details class="provider-location-disclosure" data-provider-location>
+    <summary class="provider-location-toggle">
+        <i class="fas fa-map-location-dot" aria-hidden="true"></i>
+        <span>{{ __('service_provider.map_show_details') }}</span>
+        <i class="fas fa-chevron-down provider-location-toggle__chevron" aria-hidden="true"></i>
+    </summary>
 <section class="provider-place" id="provider-location" aria-labelledby="provider-location-title">
     <div class="provider-place__header">
         <div class="provider-place__heading">
@@ -54,7 +60,7 @@
     </div>
 
     <div class="provider-place__map">
-        <iframe src="{{ $mapEmbedUrl }}"
+        <iframe data-map-src="{{ $mapEmbedUrl }}"
             title="{{ __('service_provider.map_frame_title', ['name' => $serviceProvider->company_name ?: $serviceProvider->user->name]) }}"
             width="640" height="320" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
     </div>
@@ -65,3 +71,4 @@
         </a>
     </div>
 </section>
+</details>

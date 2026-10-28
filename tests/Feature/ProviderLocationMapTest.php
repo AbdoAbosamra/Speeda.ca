@@ -41,7 +41,8 @@ class ProviderLocationMapTest extends TestCase
         $xpath = new \DOMXPath($document);
         $frame = $xpath->query('//section[@id="provider-location"]//iframe')->item(0);
         $this->assertNotNull($frame, 'The public location card must contain an embedded map.');
-        $url = parse_url($frame->getAttribute('src'));
+        $this->assertFalse($frame->hasAttribute('src'), 'The map must not load before the visitor opens the address.');
+        $url = parse_url($frame->getAttribute('data-map-src'));
         $this->assertSame('https', $url['scheme']);
         $this->assertSame('maps.google.com', $url['host']);
         parse_str($url['query'], $parameters);
@@ -49,7 +50,7 @@ class ProviderLocationMapTest extends TestCase
         return $parameters;
     }
 
-    public function test_visitors_see_the_full_address_and_map_without_revealing_contact_details(): void
+    public function test_address_details_start_collapsed_and_the_map_waits_for_the_visitor(): void
     {
         $provider = $this->provider();
 
@@ -60,6 +61,19 @@ class ProviderLocationMapTest extends TestCase
             ->assertSee('https://www.google.com/maps/dir/?api=1&amp;destination='.rawurlencode($provider->address), false)
             ->assertSee('loading="lazy"', false)
             ->assertDontSee('id="addressText"', false);
+
+        $document = new \DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        $document->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        $xpath = new \DOMXPath($document);
+        $disclosure = $xpath->query('//details[@data-provider-location]')->item(0);
+        $this->assertNotNull($disclosure);
+        $this->assertFalse($disclosure->hasAttribute('open'));
+        $this->assertSame(1, $xpath->query('./summary', $disclosure)->length);
+        $this->assertSame(1, $xpath->query('.//address[@id="provider-public-address"]', $disclosure)->length);
+        $this->assertSame(1, $xpath->query('.//iframe[@data-map-src]', $disclosure)->length);
 
         $parameters = $this->mapParameters($response->getContent());
         $this->assertSame($provider->address, $parameters['q']);

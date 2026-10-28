@@ -26,6 +26,20 @@ function enableTestimonials() {
     });
 }
 
+function enableProviderLocationDisclosure() {
+    document.querySelectorAll('[data-provider-location]').forEach((details) => {
+        const loadMap = () => {
+            if (!details.open) return;
+            const frame = details.querySelector('iframe[data-map-src]');
+            if (frame && !frame.hasAttribute('src')) {
+                frame.src = frame.dataset.mapSrc;
+            }
+        };
+        details.addEventListener('toggle', loadMap);
+        loadMap();
+    });
+}
+
 function enableProviderAddressCopy() {
     const button = document.querySelector('[data-copy-provider-address]');
     const address = document.getElementById('provider-public-address');
@@ -62,7 +76,9 @@ function enableProviderAddressCopy() {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', enableTestimonials, { once: true });
     document.addEventListener('DOMContentLoaded', enableProviderAddressCopy, { once: true });
+    document.addEventListener('DOMContentLoaded', enableProviderLocationDisclosure, { once: true });
 } else {
     enableTestimonials();
     enableProviderAddressCopy();
+    enableProviderLocationDisclosure();
 }

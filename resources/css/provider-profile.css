@@ -259,6 +259,50 @@ body {
     background: linear-gradient(135deg, #4cc9f0, #4361ee);
 }
 
+/* Address details stay collapsed until the visitor opens them. */
+.provider-location-disclosure {
+    margin-block: 1.75rem 2rem;
+}
+
+.provider-location-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding-block: 8px;
+    color: #2947bb;
+    font-weight: 650;
+    cursor: pointer;
+    list-style: none;
+}
+
+.provider-location-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.provider-location-toggle:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.provider-location-toggle:focus-visible {
+    outline: 3px solid #a6b9ff;
+    outline-offset: 4px;
+    border-radius: 6px;
+}
+
+.provider-location-toggle__chevron {
+    font-size: 11px;
+}
+
+.provider-location-disclosure[open] .provider-location-toggle__chevron {
+    transform: rotate(180deg);
+}
+
+.provider-location-disclosure > .provider-place {
+    margin-block: 12px 0;
+}
+
 /* Public address and interactive map. Logical spacing also supports RTL. */
 .provider-place {
     --place-ink: #182b4d;
@@ -377,14 +421,18 @@ body {
     transition: background .2s, box-shadow .2s;
 }
 
-.provider-place__directions {
-    color: #fff;
+.provider-place .provider-place__directions,
+.provider-place .provider-place__directions:link,
+.provider-place .provider-place__directions:visited {
+    color: #fff !important;
     background: var(--place-blue);
     box-shadow: 0 4px 10px #3858d620;
 }
 
-.provider-place__directions:hover {
-    color: #fff;
+.provider-place .provider-place__directions:hover,
+.provider-place .provider-place__directions:focus-visible,
+.provider-place .provider-place__directions:active {
+    color: #fff !important;
     background: #2947bb;
     box-shadow: 0 5px 14px #3858d635;
 }

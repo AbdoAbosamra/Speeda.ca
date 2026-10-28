@@ -75,8 +75,13 @@
         <env name="APP_URL" value="http://localhost:8000"/>
 
         <!-- Database Configuration -->
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!-- force="true": CI exports its own DB_DATABASE for the migrate step,
+             and tests/TestCase.php refuses anything but SQLite :memory:. -->
+        <!-- Laravel reads $_SERVER before $_ENV, so both are pinned. -->
+        <server name="DB_CONNECTION" value="sqlite" force="true"/>
+        <server name="DB_DATABASE" value=":memory:" force="true"/>
+        <env name="DB_CONNECTION" value="sqlite" force="true"/>
+        <env name="DB_DATABASE" value=":memory:" force="true"/>
 
         <!-- Alternative MySQL test database -->
         <!-- <env name="DB_CONNECTION" value="mysql"/> -->

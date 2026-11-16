@@ -28,3 +28,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 .aider*
+
+# Local-only scratch scripts and demo account notes; never deployed.
+/_Dev_Tools/

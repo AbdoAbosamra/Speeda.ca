@@ -39,12 +39,11 @@ class HomeController extends Controller
             ];
         });
 
-        // "Discover our providers" — random selection of complete profiles.
-        // Requirements:
-        //   1. Profile must be at least 80% complete (photo + 2 of 3 other fields)
-        //   2. Provider must be publicly visible (active + user active)
-        //   3. Must have a profile image
-        //   4. Random order so the homepage feels fresh on every visit
+        // "Discover our providers" — publicly visible providers with a photo,
+        // 100% complete profiles (photo + experience + description) first,
+        // random within each completion level so the homepage feels fresh.
+        // Topping up with the strongest partial profiles keeps the marquee
+        // full while few providers are complete yet.
         $featuredProviders = ServiceProvider::query()
             ->with(['user', 'category', 'location', 'media'])
             ->withCount([
@@ -54,32 +53,12 @@ class HomeController extends Controller
                 },
             ])
             ->publiclyVisible()
-            ->where('profile_completion_percent', '>=', 80)
             ->whereNotNull('profile_image')
             ->where('profile_image', '!=', '')
+            ->orderByDesc('profile_completion_percent')
             ->inRandomOrder()
             ->take(12)
             ->get();
-
-        // Fallback: if there aren't enough complete profiles yet, still populate
-        // the homepage marquee with the strongest available profiles so the
-        // section never disappears.
-        if ($featuredProviders->isEmpty()) {
-            $featuredProviders = ServiceProvider::query()
-                ->with(['user', 'category', 'location', 'media'])
-                ->withCount([
-                    'endorsements',
-                    'reviews' => function ($query) {
-                        $query->where('is_active', 1);
-                    },
-                ])
-                ->publiclyVisible()
-                ->whereNotNull('profile_image')
-                ->where('profile_image', '!=', '')
-                ->inRandomOrder()
-                ->take(12)
-                ->get();
-        }
 
         // Latest Blogs (Cache for 1 hour)
         $latestBlogPosts = Cache::remember('home_latest_blog_posts', 3600, function () {

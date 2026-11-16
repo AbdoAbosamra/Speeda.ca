@@ -28,7 +28,6 @@
     };
     $claimLabel = match ($cta) {
         \App\Models\Offer::CTA_WHATSAPP => __('offers.claim_whatsapp'),
-        \App\Models\Offer::CTA_URL => __('offers.claim_url'),
         default => __('offers.claim_profile'),
     };
 @endphp
@@ -43,7 +42,7 @@
     @if($isAdmin && $status !== \App\Models\Offer::STATUS_LIVE)
         <div class="so-notice so-notice--warn mb-3">
             <i class="fas fa-eye" aria-hidden="true"></i>
-            <span>{{ __('offers.not_live_preview', ['status' => $status]) }}
+            <span>{{ __('offers.not_live_preview', ['status' => \App\Models\Offer::adminStatusLabel($status)]) }}
                 <a href="{{ route('admin.offers.edit', $offer) }}">Edit offer</a></span>
         </div>
     @endif
@@ -275,7 +274,6 @@
                 </div>
             @endif
 
-            @include('partials.offers.publish-cta')
         </aside>
     </div>
 

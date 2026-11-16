@@ -141,7 +141,7 @@
                             <span class="admin-stat-label">Total Reviews</span>
                         </div>
                         <strong class="admin-stat-value">{{ number_format($kpis['reviews_total'] ?? ($stats['totalReviews'] ?? 0)) }}</strong>
-                        <span class="admin-stat-foot">{{ $ac['items'][0]['count'] ?? ($stats['pendingReviews'] ?? 0) }} pending moderation</span>
+                        <span class="admin-stat-foot">{{ collect($ac['items'])->firstWhere('key', 'pending_reviews')['count'] ?? ($stats['pendingReviews'] ?? 0) }} pending moderation</span>
                     </article>
 
                     <article class="admin-stat-card">
@@ -316,6 +316,26 @@
                                 <div class="dash-health-track"><div class="dash-health-fill dash-h-bad" style="width: {{ round((($health['incomplete'] ?? 0) / $hTotal) * 100) }}%;"></div></div>
                                 <span class="dash-health-val">{{ number_format($health['incomplete'] ?? 0) }}</span>
                             </div>
+                        </div>
+                        @php $hItems = $health['items'] ?? []; @endphp
+                        <div class="dash-health-items">
+                            <div class="dash-health-items-head">100% = photo + years of experience + description</div>
+                            @foreach([
+                                'photo' => ['Profile photo', 'fa-image', 'missing_photo'],
+                                'experience' => ['Years of experience', 'fa-award', 'missing_experience'],
+                                'bio' => ['Description', 'fa-align-left', 'missing_bio'],
+                            ] as $key => [$label, $icon, $issue])
+                                @php
+                                    $have = (int) ($hItems[$key] ?? 0);
+                                    $lack = max(0, ($health['total'] ?? 0) - $have);
+                                @endphp
+                                <a class="dash-health-item" href="{{ route('admin.provider_activity_monitor.index', ['issue' => $issue]) }}">
+                                    <i class="fas {{ $icon }}"></i>
+                                    <span class="dash-health-item-lbl">{{ $label }}</span>
+                                    <span class="dash-health-item-have">{{ round(($have / $hTotal) * 100) }}% have it</span>
+                                    <span class="dash-health-item-lack">{{ number_format($lack) }} missing</span>
+                                </a>
+                            @endforeach
                         </div>
                     </div>
 
@@ -584,6 +604,14 @@
         .dash-h-mid{background:linear-gradient(90deg,#fbbf24,#d97706);}
         .dash-h-bad{background:linear-gradient(90deg,#f87171,#dc2626);}
         .dash-health-val{font-size:.85rem;font-weight:700;color:#334155;text-align:right;}
+        .dash-health-items{margin-top:1rem;padding-top:.9rem;border-top:1px dashed #e2e8f0;display:flex;flex-direction:column;gap:.45rem;}
+        .dash-health-items-head{font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.15rem;}
+        .dash-health-item{display:grid;grid-template-columns:20px 1fr auto auto;align-items:center;gap:.6rem;padding:.4rem .55rem;border-radius:10px;text-decoration:none;color:#334155;font-size:.82rem;}
+        .dash-health-item:hover{background:#f8fafc;color:#0f172a;}
+        .dash-health-item i{color:#6366f1;text-align:center;}
+        .dash-health-item-lbl{font-weight:600;}
+        .dash-health-item-have{color:#047857;font-weight:600;}
+        .dash-health-item-lack{color:#b45309;font-weight:700;min-width:80px;text-align:end;}
         .dash-health-foot{margin-top:1rem;padding-top:.9rem;border-top:1px dashed #e2e8f0;font-size:.82rem;color:#92400e;}
         .dash-health-foot i{color:#d97706;margin-inline-end:.3rem;}
         /* WhatsApp snapshot */

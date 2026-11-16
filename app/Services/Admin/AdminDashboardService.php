@@ -84,8 +84,14 @@ class AdminDashboardService
             $flaggedComments = Comment::flagged()->count();
 
             $incompleteProfiles = ServiceProvider::where('profile_completion_percent', '<', 100)->count();
+            $pendingOffers = Offer::where('review_status', Offer::STATUS_PENDING)->count();
 
             $items = [
+                [
+                    'key' => 'pending_offers', 'label' => 'Provider offers awaiting approval',
+                    'count' => $pendingOffers, 'route' => route('admin.offers.index', ['status' => Offer::STATUS_PENDING]),
+                    'icon' => 'fa-tags', 'tone' => 'amber',
+                ],
                 [
                     'key' => 'pending_reviews', 'label' => 'Reviews awaiting approval',
                     'count' => $pendingReviews, 'route' => route('admin.reviews', ['status' => 'pending']),
@@ -233,12 +239,25 @@ class AdminDashboardService
             $partial = DB::table('service_providers')->whereBetween('profile_completion_percent', [1, 99])->count();
             $empty = DB::table('service_providers')->where('profile_completion_percent', '<=', 0)->count();
 
+            // How many providers have each of the three items that make 100%.
+            $items = ServiceProvider::completionItemSql();
+            $done = DB::table('service_providers')->selectRaw(
+                "SUM(CASE WHEN {$items['photo']} THEN 1 ELSE 0 END) as photo,
+                 SUM(CASE WHEN {$items['experience']} THEN 1 ELSE 0 END) as experience,
+                 SUM(CASE WHEN {$items['bio']} THEN 1 ELSE 0 END) as bio"
+            )->first();
+
             return [
                 'total' => $total,
                 'complete' => $complete,
                 'partial' => $partial,
                 'incomplete' => $empty,
                 'complete_pct' => $this->rate($complete, $total),
+                'items' => [
+                    'photo' => (int) ($done->photo ?? 0),
+                    'experience' => (int) ($done->experience ?? 0),
+                    'bio' => (int) ($done->bio ?? 0),
+                ],
             ];
         });
     }

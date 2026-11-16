@@ -41,6 +41,67 @@ class ServiceProvider extends Model implements HasMedia
      */
     public const MAX_GALLERY_IMAGES = 4;
 
+    /** The bio every new provider starts with; it does not count as written. */
+    public const PLACEHOLDER_BIO = 'Service provider profile. Please complete your details.';
+
+    /**
+     * The three things that make a profile 100% complete: a profile photo,
+     * years of experience and a description. The same three gate offer
+     * submission, so the progress bar and the offer flow can never disagree.
+     *
+     * @return array{photo: bool, experience: bool, bio: bool}
+     */
+    public function profileCompletionChecklist(): array
+    {
+        $bio = trim((string) $this->bio);
+
+        return [
+            'photo' => filled($this->profile_image) && Storage::disk('public')->exists($this->profile_image),
+            // 0 is a real answer (a newcomer), only an empty field is missing.
+            'experience' => $this->experience_years !== null && $this->experience_years !== '',
+            'bio' => $bio !== '' && $bio !== self::PLACEHOLDER_BIO,
+        ];
+    }
+
+    /**
+     * The checklist as SQL conditions (true when the item is done), for admin
+     * counts and filters over many providers. The photo condition cannot see
+     * the disk, so a row whose file has gone missing still counts as having one
+     * here while its stored percent (computed by the model) does not.
+     *
+     * @return array{photo: string, experience: string, bio: string}
+     */
+    public static function completionItemSql(string $table = 'service_providers'): array
+    {
+        $placeholder = str_replace("'", "''", self::PLACEHOLDER_BIO);
+
+        return [
+            'photo' => "({$table}.profile_image IS NOT NULL AND {$table}.profile_image <> '')",
+            'experience' => "({$table}.experience_years IS NOT NULL)",
+            'bio' => "({$table}.bio IS NOT NULL AND TRIM({$table}.bio) <> '' AND TRIM({$table}.bio) <> '{$placeholder}')",
+        ];
+    }
+
+    /** 0, 33, 67 or 100 — each checklist item is worth a third. */
+    public function profileCompletionPercent(): int
+    {
+        $checks = $this->profileCompletionChecklist();
+
+        return (int) round(100 * count(array_filter($checks)) / count($checks));
+    }
+
+    /** Labels of the checklist items still missing, also checked on offer POST. */
+    public function missingOfferProfileFields(): array
+    {
+        $labels = [
+            'photo' => __('offer_submission.profile_photo'),
+            'experience' => __('offer_submission.experience'),
+            'bio' => __('offer_submission.description'),
+        ];
+
+        return array_values(array_intersect_key($labels, array_filter($this->profileCompletionChecklist(), fn ($done) => ! $done)));
+    }
+
     /**
      * The attributes that are mass assignable.
      */

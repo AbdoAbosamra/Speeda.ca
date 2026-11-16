@@ -182,13 +182,14 @@ class ProviderEmailJourneyService
         return self::EMAIL_REVIEWS;
     }
 
+    /**
+     * Complete = 100%: profile photo, years of experience and a description
+     * (ServiceProvider::profileCompletionChecklist), the same rule as the
+     * progress bar and the offer flow.
+     */
     public function isProfileComplete(ServiceProvider $provider): bool
     {
-        return $this->hasProfilePhoto($provider)
-            && $this->hasServices($provider)
-            && $this->hasBio($provider)
-            && $this->hasExperience($provider)
-            && $this->hasGallery($provider);
+        return ! in_array(false, $provider->profileCompletionChecklist(), true);
     }
 
     // ---------------------------------------------------------------------------
@@ -197,34 +198,17 @@ class ProviderEmailJourneyService
 
     public function hasProfilePhoto(ServiceProvider $provider): bool
     {
-        return filled($provider->profile_image);
-    }
-
-    public function hasServices(ServiceProvider $provider): bool
-    {
-        if (is_array($provider->services_offered)) {
-            return count(array_filter($provider->services_offered)) > 0;
-        }
-        return filled($provider->services_offered) && $provider->services_offered !== '[]';
+        return $provider->profileCompletionChecklist()['photo'];
     }
 
     public function hasBio(ServiceProvider $provider): bool
     {
-        $bio = trim((string) $provider->bio);
-        if (empty($bio)) return false;
-        // Treat the default placeholder bio as missing
-        if ($bio === 'Service provider profile. Please complete your details.') return false;
-        return strlen($bio) >= 30;
+        return $provider->profileCompletionChecklist()['bio'];
     }
 
     public function hasExperience(ServiceProvider $provider): bool
     {
-        return filled($provider->experience_years) && (int) $provider->experience_years > 0;
-    }
-
-    public function hasGallery(ServiceProvider $provider): bool
-    {
-        return $provider->getMedia('gallery')->count() > 0;
+        return $provider->profileCompletionChecklist()['experience'];
     }
 
     /**
@@ -232,12 +216,12 @@ class ProviderEmailJourneyService
      */
     public function getCompletionSnapshot(ServiceProvider $provider): array
     {
+        $checks = $provider->profileCompletionChecklist();
+
         return [
-            'has_photo'         => $this->hasProfilePhoto($provider),
-            'has_services'      => $this->hasServices($provider),
-            'has_bio'           => $this->hasBio($provider),
-            'has_experience'    => $this->hasExperience($provider),
-            'has_gallery'       => $this->hasGallery($provider),
+            'has_photo'         => $checks['photo'],
+            'has_bio'           => $checks['bio'],
+            'has_experience'    => $checks['experience'],
             'has_reviews'       => $provider->activeReviews()->count() > 0,
         ];
     }

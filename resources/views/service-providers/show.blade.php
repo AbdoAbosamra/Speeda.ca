@@ -61,6 +61,7 @@
 @endpush
 
 @section('content')
+@include('offers.profile-requirements')
     @php
         $locationHidden = $serviceProvider->location && ! $serviceProvider->location->is_active;
         $canSeeLocation = ! $locationHidden || (auth()->check() && auth()->id() === $serviceProvider->user_id);
@@ -214,6 +215,7 @@
                                 <div class="progress" style="height: 10px; border-radius: 5px;" id="completionProgressBar">
                                     <div class="progress-bar" role="progressbar" style="width: {{ $pct }}%; background: linear-gradient(90deg, @if($pct >= 80) #10b981,#059669 @elseif($pct >= 50) #f59e0b,#d97706 @else #ef4444,#dc2626 @endif); border-radius: 5px; transition: width 0.6s ease;" aria-valuenow="{{ $pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
+                                <x-profile-completion-checklist :provider="$serviceProvider" :linkable="true" />
                             </div>
 
 
@@ -263,7 +265,7 @@
                                                     <i class="fas fa-align-left text-primary me-1"></i>
                                                     {{ __('general.description') }}
                                                 </label>
-                                                <textarea name="bio" class="form-control form-control-lg" rows="5"
+                                                <textarea name="bio" id="bioInput" class="form-control form-control-lg" rows="5"
                                                     placeholder="{{ __('service_provider.description_hint') }}"
                                                     style="resize: vertical; min-height: 120px;">{{ old('bio', $serviceProvider->bio) }}</textarea>
                                                 <small class="text-muted">
@@ -1470,6 +1472,14 @@
                                     }
                                     progressBar.style.background = newBg;
                                     percentBadge.className = newBadgeClass;
+                                }
+                                const photoItem = document.querySelector('[data-completion-item="photo"]');
+                                if (photoItem && photoItem.classList.contains('is-missing')) {
+                                    photoItem.classList.replace('is-missing', 'is-done');
+                                    const link = photoItem.querySelector('.sp-checklist-link');
+                                    if (link) link.replaceWith(...link.childNodes);
+                                    const icon = photoItem.querySelector('.sp-checklist-state');
+                                    if (icon) icon.classList.replace('fa-circle-plus', 'fa-circle-check');
                                 }
                             }
                         } else {

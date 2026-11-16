@@ -144,10 +144,8 @@
             <div class="ej-checklist-grid">
                 @foreach([
                     ['label'=>'Profile Photo','done'=>$timeline['snapshot']['has_photo'],'emoji'=>'📸'],
-                    ['label'=>'Services Selected','done'=>$timeline['snapshot']['has_services'],'emoji'=>'🛠️'],
-                    ['label'=>'Business Bio','done'=>$timeline['snapshot']['has_bio'],'emoji'=>'📝'],
                     ['label'=>'Years of Experience','done'=>$timeline['snapshot']['has_experience'],'emoji'=>'📅'],
-                    ['label'=>'Gallery Photos','done'=>$timeline['snapshot']['has_gallery'],'emoji'=>'🖼️'],
+                    ['label'=>'Description','done'=>$timeline['snapshot']['has_bio'],'emoji'=>'📝'],
                     ['label'=>'Customer Reviews','done'=>$timeline['snapshot']['has_reviews'],'emoji'=>'⭐'],
                 ] as $item)
                     <div class="ej-check-card {{ $item['done'] ? 'is-done' : '' }}">

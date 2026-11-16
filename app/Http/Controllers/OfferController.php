@@ -61,7 +61,7 @@ class OfferController extends Controller
 
         // Drafts and scheduled offers do not exist for visitors yet. Expired
         // offers keep their page so shared links land on something useful.
-        if (! $isAdmin && (in_array($status, [Offer::STATUS_DRAFT, Offer::STATUS_SCHEDULED], true) || ! $providerVisible)) {
+        if (! $isAdmin && (in_array($status, [Offer::STATUS_PENDING, Offer::STATUS_REJECTED, Offer::STATUS_DRAFT, Offer::STATUS_SCHEDULED], true) || ! $providerVisible)) {
             abort(404);
         }
 

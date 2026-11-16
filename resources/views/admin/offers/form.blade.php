@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
-@section('title', $offer->exists ? 'Edit offer' : 'New offer')
+@section('title', ($providerMode ?? false) ? __($offer->exists ? 'offer_submission.edit' : 'offer_submission.create') : ($offer->exists ? 'Edit offer' : 'New offer'))
 
 @section('content')
 @php
+    $providerMode = $providerMode ?? false;
     $locales = ['en' => 'English', 'ar' => 'العربية', 'fr' => 'Français'];
     $val = fn (string $field) => old($field, $offer->{$field});
     $dateVal = fn (string $field) => old($field, $offer->{$field}?->format('Y-m-d'));
@@ -25,6 +26,8 @@
     }
     $config = [
         'providers' => $providers,
+        'reviewStatus' => $offer->review_status,
+        'providerMode' => $providerMode,
         'badges' => $badgeTemplates,
         'state' => [
             'provider' => (string) $val('service_provider_id'),
@@ -36,8 +39,9 @@
             'starts' => $dateVal('starts_at'),
             'ends' => $dateVal('ends_at'),
             'active' => (bool) old('is_active', $offer->is_active),
-            'featured' => (bool) old('is_featured', $offer->is_featured),
-            'cta' => $val('cta_type'),
+            // A submission waiting for approval is offered for the home page by default.
+            'featured' => (bool) old('is_featured', (! $providerMode && $offer->exists && $offer->awaitsApproval()) ? true : $offer->is_featured),
+            'cta' => in_array($val('cta_type'), [\App\Models\Offer::CTA_WHATSAPP, \App\Models\Offer::CTA_PROFILE], true) ? $val('cta_type') : \App\Models\Offer::CTA_WHATSAPP,
             'image' => $offer->image_url,
             'today' => now()->toDateString(),
         ],
@@ -45,37 +49,55 @@
     $firstErrorLocale = collect(array_keys($locales))->first(fn ($l) => $errors->hasAny(["title_$l", "summary_$l", "details_$l", "terms_$l", "badge_text_$l"])) ?? 'en';
 @endphp
 
-<div class="admin-cms-page ao-page" dir="ltr">
+<div class="admin-cms-page ao-page" dir="{{ $providerMode && app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
     <div class="container-fluid px-4 px-xl-5 py-4 py-lg-5">
         <x-admin.header
             eyebrow="Local Offers"
-            :title="$offer->exists ? 'Edit offer' : 'New offer'"
-            :subtitle="$offer->exists ? $offer->title_en . ' · ' . $offer->providerName() : 'Pick the provider, write the deal, choose the dates. The preview on the right shows exactly what visitors will see.'"
+            :title="$providerMode ? __($offer->exists ? 'offer_submission.edit' : 'offer_submission.create') : ($offer->exists ? 'Edit offer' : 'New offer')"
+            :subtitle="$providerMode ? __('offer_submission.form_intro') : ($offer->exists ? $offer->title_en : 'Pick the provider, write the deal, choose the dates.')"
         >
             <x-slot:actions>
-                <a href="{{ route('admin.offers.index') }}" class="admin-btn admin-btn-secondary"><i class="fas fa-arrow-left"></i><span>All offers</span></a>
-                @if($offer->exists)
+                <a href="{{ $providerMode ? route('provider.offers.index') : route('admin.offers.index') }}" class="admin-btn admin-btn-secondary"><i class="fas fa-arrow-left"></i><span>{{ $providerMode ? __('offer_submission.my_offers') : 'All offers' }}</span></a>
+                @if($offer->exists && ! $providerMode)
                     <a href="{{ route('offers.show', $offer->slug) }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary"><i class="fas fa-arrow-up-right-from-square"></i><span>Open page</span></a>
                     <a href="{{ route('admin.offers.analytics', ['offer_id' => $offer->id, 'range' => '90']) }}" class="admin-btn admin-btn-secondary"><i class="fas fa-chart-line"></i><span>Statistics</span></a>
                 @endif
             </x-slot:actions>
         </x-admin.header>
 
+        @if($providerMode)
+            @if($offer->exists && $offer->review_status === \App\Models\Offer::STATUS_REJECTED && $offer->rejection_reason)
+                <div class="alert alert-danger"><strong>{{ __('offer_submission.rejection_reason') }}:</strong> {{ $offer->rejection_reason }}<br><small>{{ __('offer_submission.fix_and_resubmit') }}</small></div>
+            @endif
+            <div class="ao-status ao-status--empty"><i class="fas fa-clock"></i><span>{{ __('offer_submission.review_notice') }}</span></div>
+        @elseif($offer->exists && $offer->awaitsApproval())
+            @include('admin.offers.partials.review')
+        @endif
+
         @if($errors->any())
-            <div class="ao-status ao-status--empty"><i class="fas fa-triangle-exclamation"></i><span>Please fix the highlighted fields ({{ $errors->count() }}).</span></div>
+            <div class="ao-status ao-status--empty"><i class="fas fa-triangle-exclamation"></i><span>{{ __('offer_submission.editor_fix_fields') }} ({{ $errors->count() }})</span></div>
         @endif
 
         <form method="POST" enctype="multipart/form-data"
-              action="{{ $offer->exists ? route('admin.offers.update', $offer) : route('admin.offers.store') }}"
-              x-data="offerForm(@js($config))" class="ao-editor" novalidate>
+              action="{{ $providerMode ? ($offer->exists ? route('provider.offers.update', $offer) : route('provider.offers.store')) : ($offer->exists ? route('admin.offers.update', $offer) : route('admin.offers.store')) }}"
+              id="offer-editor" x-data="offerForm(@js($config))" class="ao-editor" novalidate @pageshow.window="submitting = false" @submit="if (submitting) { $event.preventDefault(); } else { submitting = true; }">
             @csrf
+            @if($providerMode && ! $offer->exists)
+                <input type="hidden" name="submission_token" value="{{ old('submission_token', $submissionToken) }}">
+                @error('submission_token')<div class="alert alert-danger">{{ $message }}</div>@enderror
+            @endif
             @if($offer->exists) @method('PUT') @endif
 
             <div class="ao-editor-main">
                 {{-- ============ 1. PROVIDER ============ --}}
                 <section class="ao-card ao-sec">
-                    <h3><span>1</span> Provider</h3>
+                    <h3><span>1</span> {{ __('offer_submission.editor_provider') }}</h3>
                     <div class="ao-field">
+                        @if($providerMode)
+                            <input type="hidden" name="service_provider_id" value="{{ $offer->service_provider_id }}">
+                            <strong>{{ $providers->first()['name'] }}</strong>
+                            <p class="ao-hint mb-0">{{ __('offer_submission.your_profile') }}</p>
+                        @else
                         <label for="provider_search">Service provider</label>
                         <input type="search" id="provider_search" class="form-control" placeholder="Type to filter providers…" x-model="providerQuery" autocomplete="off">
                         <select name="service_provider_id" id="service_provider_id" class="form-select" size="6" x-model="s.provider" required>
@@ -83,6 +105,7 @@
                                 <option :value="String(p.id)" :selected="String(p.id) === String(s.provider)" x-text="p.name + (p.category ? ' — ' + p.category : '') + (p.city ? ', ' + p.city : '') + (p.visible ? '' : '  (profile hidden)')"></option>
                             </template>
                         </select>
+                        @endif
                         @error('service_provider_id')<span class="ao-error">{{ $message }}</span>@enderror
                         <template x-if="provider() && !provider().has_whatsapp">
                             <span class="ao-inline-warn"><i class="fas fa-triangle-exclamation"></i> This provider has no WhatsApp number. The button will send visitors to the profile instead.</span>
@@ -95,7 +118,7 @@
 
                 {{-- ============ 2. DEAL ============ --}}
                 <section class="ao-card ao-sec">
-                    <h3><span>2</span> The deal</h3>
+                    <h3><span>2</span> {{ __('offer_submission.editor_deal') }}</h3>
                     <div class="ao-types" role="radiogroup" aria-label="Deal type">
                         @foreach(['percent' => ['%', 'Percent off'], 'fixed' => ['$', 'Amount off'], 'free' => ['FREE', 'Something free'], 'custom' => ['Aa', 'Custom label']] as $type => [$glyph, $label])
                             <label class="ao-type" :class="s.type === '{{ $type }}' && 'is-on'">
@@ -126,7 +149,7 @@
 
                 {{-- ============ 3. TEXT ============ --}}
                 <section class="ao-card ao-sec">
-                    <h3><span>3</span> Text</h3>
+                    <h3><span>3</span> {{ __('offer_submission.editor_text') }}</h3>
                     <div class="ao-lang-tabs" role="tablist">
                         @foreach($locales as $code => $label)
                             <button type="button" role="tab" :aria-selected="lang === '{{ $code }}'" :class="lang === '{{ $code }}' && 'is-on'" @click="lang = '{{ $code }}'; previewLang = '{{ $code }}'">
@@ -138,20 +161,20 @@
                     @foreach($locales as $code => $label)
                         <div class="ao-lang-panel" x-show="lang === '{{ $code }}'" @if($code !== $firstErrorLocale) x-cloak @endif dir="{{ $code === 'ar' ? 'rtl' : 'ltr' }}">
                             <div class="ao-field">
-                                <label for="title_{{ $code }}">Title @if($code === 'en')<span class="text-danger">*</span>@endif</label>
+                                <label for="title_{{ $code }}">{{ __('offer_submission.editor_title') }} @if($code === 'en')<span class="text-danger">*</span>@endif</label>
                                 <input type="text" maxlength="120" name="title_{{ $code }}" id="title_{{ $code }}" class="form-control" x-model="s.title.{{ $code }}"
                                        placeholder="{{ $code === 'en' ? 'New Student Special' : ($code === 'ar' ? 'اختياري: يظهر الإنجليزي لو فاضي' : 'Optionnel') }}">
                                 <span class="ao-hint" x-text="(s.title.{{ $code }} || '').length + ' / 120'"></span>
                                 @error('title_' . $code)<span class="ao-error">{{ $message }}</span>@enderror
                             </div>
                             <div class="ao-field">
-                                <label for="summary_{{ $code }}">Short description (on the card) @if($code === 'en')<span class="text-danger">*</span>@endif</label>
+                                <label for="summary_{{ $code }}">{{ __('offer_submission.editor_summary') }} @if($code === 'en')<span class="text-danger">*</span>@endif</label>
                                 <textarea maxlength="200" rows="2" name="summary_{{ $code }}" id="summary_{{ $code }}" class="form-control" x-model="s.summary.{{ $code }}"></textarea>
                                 <span class="ao-hint" x-text="(s.summary.{{ $code }} || '').length + ' / 200 · two lines show on the card'"></span>
                                 @error('summary_' . $code)<span class="ao-error">{{ $message }}</span>@enderror
                             </div>
                             <div class="ao-field">
-                                <label for="details_{{ $code }}">Full details (offer page)</label>
+                                <label for="details_{{ $code }}">{{ __('offer_submission.editor_details') }}</label>
                                 <textarea maxlength="5000" rows="4" name="details_{{ $code }}" id="details_{{ $code }}" class="form-control">{{ $val('details_' . $code) }}</textarea>
                                 @error('details_' . $code)<span class="ao-error">{{ $message }}</span>@enderror
                             </div>
@@ -162,12 +185,12 @@
                             </div>
                         </div>
                     @endforeach
-                    <p class="ao-hint mb-0">English is required. Arabic and French are optional: when empty, visitors see the English text.</p>
+                    <p class="ao-hint mb-0">{{ __('offer_submission.editor_language_hint') }}</p>
                 </section>
 
                 {{-- ============ 4. IMAGE ============ --}}
                 <section class="ao-card ao-sec">
-                    <h3><span>4</span> Cover image</h3>
+                    <h3><span>4</span> {{ __('offer_submission.editor_cover') }}</h3>
                     <div class="ao-image-row">
                         <div class="ao-image-preview so-scope">
                             <template x-if="imagePreview && !removeImage"><img :src="imagePreview" alt=""></template>
@@ -176,9 +199,9 @@
                             </template>
                         </div>
                         <div class="ao-field flex-grow-1">
-                            <label for="image">Upload a photo</label>
+                            <label for="image">{{ __('offer_submission.editor_upload') }}</label>
                             <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/webp" class="form-control" @change="pickImage($event)">
-                            <span class="ao-hint">JPG, PNG or WebP, up to 5 MB. A wide photo (about 1200×750) looks best; it is resized and converted to WebP automatically. Without an image, the card shows the category icon on a colour.</span>
+                            <span class="ao-hint">{{ __('offer_submission.editor_image_hint') }}</span>
                             @error('image')<span class="ao-error">{{ $message }}</span>@enderror
                             @if($offer->image_path)
                                 <label class="ao-check"><input type="checkbox" name="remove_image" value="1" x-model="removeImage"> Remove the current image</label>
@@ -189,16 +212,16 @@
 
                 {{-- ============ 5. SCHEDULE ============ --}}
                 <section class="ao-card ao-sec">
-                    <h3><span>5</span> Dates</h3>
+                    <h3><span>5</span> {{ __('offer_submission.editor_dates') }}</h3>
                     <div class="two" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.9rem">
                         <div class="ao-field">
-                            <label for="starts_at">Starts</label>
+                            <label for="starts_at">{{ __('offer_submission.editor_starts') }}</label>
                             <input type="date" name="starts_at" id="starts_at" class="form-control" x-model="s.starts">
                             <span class="ao-hint">Empty = starts now.</span>
                             @error('starts_at')<span class="ao-error">{{ $message }}</span>@enderror
                         </div>
                         <div class="ao-field">
-                            <label for="ends_at">Ends (last day included)</label>
+                            <label for="ends_at">{{ __('offer_submission.editor_ends') }}</label>
                             <input type="date" name="ends_at" id="ends_at" class="form-control" x-model="s.ends">
                             <span class="ao-hint">Empty = no end date.</span>
                             @error('ends_at')<span class="ao-error">{{ $message }}</span>@enderror
@@ -208,9 +231,9 @@
 
                 {{-- ============ 6. BUTTON ============ --}}
                 <section class="ao-card ao-sec">
-                    <h3><span>6</span> What the button does</h3>
+                    <h3><span>6</span> {{ __('offer_submission.editor_button') }}</h3>
                     <p class="ao-hint mb-0">No codes and no limits: anyone can use the offer as many times as they like.</p>
-                    <div class="ao-types ao-types-3">
+                    <div class="ao-types ao-types-2">
                         <label class="ao-type" :class="s.cta === 'whatsapp' && 'is-on'">
                             <input type="radio" name="cta_type" value="whatsapp" x-model="s.cta" class="visually-hidden">
                             <b><i class="fab fa-whatsapp"></i></b>Opens WhatsApp with a message about this offer
@@ -219,15 +242,6 @@
                             <input type="radio" name="cta_type" value="profile" x-model="s.cta" class="visually-hidden">
                             <b><i class="fas fa-id-card"></i></b>Goes to the provider profile
                         </label>
-                        <label class="ao-type" :class="s.cta === 'url' && 'is-on'">
-                            <input type="radio" name="cta_type" value="url" x-model="s.cta" class="visually-hidden">
-                            <b><i class="fas fa-link"></i></b>Opens a link
-                        </label>
-                    </div>
-                    <div class="ao-field" x-show="s.cta === 'url'" x-cloak>
-                        <label for="cta_url">Link</label>
-                        <input type="url" name="cta_url" id="cta_url" class="form-control" value="{{ $val('cta_url') }}" placeholder="https://">
-                        @error('cta_url')<span class="ao-error">{{ $message }}</span>@enderror
                     </div>
                     <div class="ao-wa-sample" x-show="s.cta === 'whatsapp'">
                         <span class="ao-label">Message the provider receives</span>
@@ -235,14 +249,19 @@
                     </div>
                 </section>
 
+                @unless($providerMode)
                 {{-- ============ 7. PLACEMENT ============ --}}
                 <section class="ao-card ao-sec">
                     <h3><span>7</span> Visibility</h3>
+                    @if($offer->awaitsApproval())
+                        <p class="ao-hint"><i class="fas fa-circle-info"></i> Not public yet. <strong>Save and approve</strong> (top of the page) switches it on.</p>
+                    @else
                     <label class="ao-switch-row">
                         <input type="hidden" name="is_active" value="0">
                         <span class="ao-switch"><input type="checkbox" name="is_active" value="1" x-model="s.active"><span></span></span>
                         <span><strong>Active</strong><small>Off = draft, invisible everywhere.</small></span>
                     </label>
+                    @endif
                     <label class="ao-switch-row">
                         <input type="hidden" name="is_featured" value="0">
                         <span class="ao-switch"><input type="checkbox" name="is_featured" value="1" x-model="s.featured"><span></span></span>
@@ -280,13 +299,14 @@
                         </div>
                     </details>
                 </section>
+                @endunless
             </div>
 
             {{-- ============ PREVIEW + SAVE ============ --}}
             <aside class="ao-editor-side">
                 <div class="ao-card">
                     <div class="ao-side-head">
-                        <strong>Live preview</strong>
+                        <strong>{{ __('offer_submission.editor_preview') }}</strong>
                         <div class="ao-seg" role="group" aria-label="Preview language">
                             <template x-for="l in ['en','ar','fr']" :key="l">
                                 <button type="button" :class="previewLang === l && 'is-on'" @click="previewLang = l" x-text="l.toUpperCase()"></button>
@@ -339,12 +359,12 @@
                         <li class="is-optional" :class="(s.title.ar || '').trim() && 'ok'"><i></i>Arabic translation (optional)</li>
                         <li class="is-optional" :class="(s.title.fr || '').trim() && 'ok'"><i></i>French translation (optional)</li>
                     </ul>
-                    <button type="submit" class="admin-btn admin-btn-primary text-white w-100 justify-content-center">
-                        <i class="fas fa-save"></i><span>{{ $offer->exists ? 'Save changes' : 'Create offer' }}</span>
+                    <button type="submit" :disabled="submitting" class="admin-btn admin-btn-primary text-white w-100 justify-content-center">
+                        <i class="fas fa-save"></i><span>{{ $providerMode ? __($offer->exists ? 'offer_submission.resubmit' : 'offer_submission.submit') : ($offer->exists ? 'Save changes' : 'Create offer') }}</span>
                     </button>
                 </div>
 
-                @if($offer->exists)
+                @if($offer->exists && ! $providerMode)
                     <div class="ao-card ao-sec">
                         <strong>All-time results</strong>
                         <div class="ao-mini-stats">
@@ -359,7 +379,7 @@
             </aside>
         </form>
 
-        @if($offer->exists)
+        @if($offer->exists && ! $providerMode)
             <div class="d-flex gap-2 flex-wrap mt-3">
                 <form method="POST" action="{{ route('admin.offers.duplicate', $offer) }}">
                     @csrf
@@ -388,7 +408,9 @@
     .ao-sec h3 span { width: 24px; height: 24px; border-radius: 7px; background: #eff6ff; color: #2563eb; display: grid; place-items: center; font-size: .78rem; }
     .ao-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; }
     .ao-types-3 { grid-template-columns: repeat(3, 1fr); }
-    @media (max-width: 640px) { .ao-types, .ao-types-3 { grid-template-columns: repeat(2, 1fr); } }
+    .ao-types-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 640px) { .ao-types, .ao-types-3, .ao-types-2 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .ao-types-2 { grid-template-columns: 1fr; } }
     .ao-type { border: 1.5px solid #e2e8f0; border-radius: 13px; padding: .7rem .5rem; text-align: center; cursor: pointer; font-weight: 600; font-size: .82rem; color: #475569; display: grid; gap: .2rem; transition: border-color .2s, background .2s; }
     .ao-type b { font-size: 1.15rem; font-weight: 800; color: #0f172a; }
     .ao-type.is-on { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
@@ -430,6 +452,7 @@
 <script>
 function offerForm(config) {
     return {
+        submitting: false,
         providers: config.providers,
         badges: config.badges,
         s: config.state,
@@ -475,14 +498,18 @@ function offerForm(config) {
         },
         datesOk() { return !this.s.starts || !this.s.ends || this.s.ends >= this.s.starts; },
         status() {
+            if (config.providerMode || config.reviewStatus === 'pending') return 'pending';
+            if (config.reviewStatus === 'rejected') return 'rejected';
             if (!this.s.active) return 'draft';
             if (this.s.starts && this.s.starts > this.s.today) return 'scheduled';
             if (this.s.ends && this.s.ends < this.s.today) return 'expired';
             return 'live';
         },
-        statusLabel() { return { live: 'Live', scheduled: 'Scheduled', expired: 'Expired', draft: 'Draft' }[this.status()]; },
+        statusLabel() { return { pending: @js(__('offer_submission.pending')), rejected: @js(__('offer_submission.rejected')), live: 'Live', scheduled: 'Scheduled', expired: 'Expired', draft: 'Draft' }[this.status()]; },
         statusText() {
             const st = this.status();
+            if (st === 'pending') return config.providerMode ? @js(__('offer_submission.review_notice')) : 'Waiting for your approval. Visitors cannot see it yet.';
+            if (st === 'rejected') return 'Rejected. Visitors cannot see it. You can still save and approve it.';
             if (st === 'draft') return 'Invisible to visitors until you switch it on.';
             if (st === 'scheduled') return 'Appears automatically on ' + this.s.starts + '.';
             if (st === 'expired') return 'The end date has passed, so visitors will not see it.';

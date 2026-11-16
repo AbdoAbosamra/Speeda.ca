@@ -3,21 +3,12 @@
 @php
     $completion = (int) ($provider->profile_completion_percent ?? 0);
 
-    // Identify missing fields (Unified logic from banner)
+    // The same three items as the stored percent (ServiceProvider::profileCompletionChecklist).
+    $checks = $provider->profileCompletionChecklist();
     $missingFields = [];
-    $missingPhoto = blank($provider->profile_image);
-    $missingExperience = !filled($provider->experience_years) || (int) $provider->experience_years <= 0;
-    $missingAddress = blank($provider->address);
-
-    $servicesComplete = is_array($provider->services_offered)
-        ? count(array_filter($provider->services_offered)) > 0
-        : filled($provider->services_offered);
-    $missingServices = !$servicesComplete;
-
-    if ($missingPhoto) $missingFields[] = ['icon' => 'fa-image', 'label' => __('service_provider.completion_field_profile_photo'), 'id' => 'profileImageInput'];
-    if ($missingExperience) $missingFields[] = ['icon' => 'fa-calendar-alt', 'label' => __('service_provider.completion_field_experience_years'), 'id' => 'experienceYearsInput'];
-    if ($missingAddress) $missingFields[] = ['icon' => 'fa-map-pin', 'label' => __('service_provider.completion_field_address'), 'id' => 'addressInput'];
-    if ($missingServices) $missingFields[] = ['icon' => 'fa-concierge-bell', 'label' => __('service_provider.completion_missing_services_offered'), 'id' => 'servicesInput'];
+    if (! $checks['photo']) $missingFields[] = ['icon' => 'fa-image', 'label' => __('service_provider.completion_field_profile_photo'), 'id' => 'edit-photo'];
+    if (! $checks['experience']) $missingFields[] = ['icon' => 'fa-calendar-alt', 'label' => __('service_provider.completion_field_experience_years'), 'id' => 'experienceYearsInput'];
+    if (! $checks['bio']) $missingFields[] = ['icon' => 'fa-align-left', 'label' => __('service_provider.completion_field_description'), 'id' => 'bioInput'];
 
     // Modal Visibility: Show if < 100% AND not dismissed in current session
     $isDismissed = session()->get('profile_completion_popup_dismissed', false);
@@ -135,6 +126,7 @@
 
                 const el = document.getElementById(ids[0]);
                 if (el) {
+                    if (el.id === 'bioInput' || el.id === 'experienceYearsInput') el.focus({ preventScroll: true });
                     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     el.classList.add('sp-completion-highlight');
                     setTimeout(() => el.classList.remove('sp-completion-highlight'), 3000);

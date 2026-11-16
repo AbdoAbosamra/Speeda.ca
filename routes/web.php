@@ -57,6 +57,13 @@ Route::view('/legal-affairs', 'Static.legal-affairs')->name('legal-affairs');
 Route::view('/about-us', 'about-us')->name('about-us');
 
 // ==================== LOCAL OFFERS - PUBLIC ====================
+Route::get('/offers/create', [\App\Http\Controllers\ProviderOfferController::class, 'create'])->name('provider.offers.create');
+Route::post('/offers', [\App\Http\Controllers\ProviderOfferController::class, 'store'])->middleware(['auth', 'throttle:5,1'])->name('provider.offers.store');
+Route::get('/my-offers', [\App\Http\Controllers\ProviderOfferController::class, 'index'])->middleware('auth')->name('provider.offers.index');
+Route::get('/my-offers/{offer}/edit', [\App\Http\Controllers\ProviderOfferController::class, 'edit'])->middleware('auth')->name('provider.offers.edit');
+Route::match(['put', 'post'], '/my-offers/{offer}', [\App\Http\Controllers\ProviderOfferController::class, 'update'])->middleware(['auth', 'throttle:10,1'])->name('provider.offers.update');
+Route::get('/provider/register', [\App\Http\Controllers\ProviderEnrollmentController::class, 'create'])->middleware('auth')->name('provider.enroll');
+Route::post('/provider/register', [\App\Http\Controllers\ProviderEnrollmentController::class, 'store'])->middleware(['auth', 'throttle:5,1'])->name('provider.enroll.store');
 Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
 Route::post('/offers/track', [OfferController::class, 'track'])
     ->middleware('throttle:60,1')
@@ -382,6 +389,7 @@ Route::middleware(['auth', 'admin', 'admin.locale', 'throttle:120,1'])->prefix('
     Route::delete('/home-video/poster', [App\Http\Controllers\Admin\AdminHomeVideoController::class, 'destroyPoster'])->name('home_video.destroy_poster');
 
     // Local Offers (home section settings, offers, statistics, claim codes)
+    Route::patch('/offers/{offer}/review', [App\Http\Controllers\Admin\AdminOfferController::class, 'review'])->name('offers.review');
     Route::get('/offers', [App\Http\Controllers\Admin\AdminOfferController::class, 'index'])->name('offers.index');
     Route::put('/offers/section', [App\Http\Controllers\Admin\AdminOfferController::class, 'updateSection'])->name('offers.section');
     Route::post('/offers/bulk', [App\Http\Controllers\Admin\AdminOfferController::class, 'bulk'])->name('offers.bulk');

@@ -17,6 +17,16 @@ use Illuminate\Support\Str;
  */
 class AuthService
 {
+    public function enrollProvider(User $user, array $data): void
+    {
+        DB::transaction(function () use ($user, $data) {
+            $locked = User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            abort_unless(in_array($locked->role, ['client', 'service_provider'], true) && ! $locked->serviceProvider, 403);
+            $locked->update(['role' => 'service_provider', 'name' => $data['name']]);
+            $this->setupServiceProvider($locked, $data);
+        });
+    }
+
     /**
      * Register a new user with role-specific setup
      */
@@ -37,7 +47,9 @@ class AuthService
                 'email' => $user->email
             ]);
 
-            return $user;
+            // Hydrate database defaults (including is_active) before this user
+            // is passed to the authentication guard after registration.
+            return $user->refresh();
         });
     }
 

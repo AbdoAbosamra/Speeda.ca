@@ -44,26 +44,16 @@ class AdminProviderActivityMonitorService
 
         // Apply issue filter
         if ($request && $issue = $request->input('issue')) {
+            $items = ServiceProvider::completionItemSql('sp');
             switch ($issue) {
                 case 'missing_photo':
-                    $query->where(function ($q) {
-                        $q->whereNull('sp.profile_image')->orWhere('sp.profile_image', '');
-                    });
+                    $query->whereRaw('NOT '.$items['photo']);
                     break;
-                case 'missing_gallery':
-                    $query->whereRaw('COALESCE(g.gallery_count, 0) < 4');
+                case 'missing_experience':
+                    $query->whereRaw('NOT '.$items['experience']);
                     break;
-                case 'missing_services':
-                    $query->where(function ($q) {
-                        $q->whereNull('sp.services_offered')
-                            ->orWhere('sp.services_offered', '')
-                            ->orWhere('sp.services_offered', '[]');
-                    });
-                    break;
-                case 'missing_address':
-                    $query->where(function ($q) {
-                        $q->whereNull('sp.address')->orWhere('sp.address', '');
-                    });
+                case 'missing_bio':
+                    $query->whereRaw('NOT '.$items['bio']);
                     break;
             }
         }
@@ -152,7 +142,8 @@ class AdminProviderActivityMonitorService
             'needs_work' => $rows->where('profile_completion_percent', '<', 100)->count(),
             'no_activity' => $rows->whereNull('last_activity_at')->count(),
             'missing_photo' => $rows->where('has_profile_photo', 0)->count(),
-            'missing_gallery' => $rows->filter(fn ($row) => (int) $row->gallery_count < 4)->count(),
+            'missing_experience' => $rows->where('has_experience', 0)->count(),
+            'missing_bio' => $rows->where('has_description', 0)->count(),
             'total_views' => $totalViews,
             'total_clicks' => $totalClicks,
             'conversion_rate' => $totalViews > 0 ? round(($totalClicks / $totalViews) * 100, 1) : 0,
@@ -188,6 +179,7 @@ class AdminProviderActivityMonitorService
     private function baseProviderActivityQuery()
     {
         $serviceProviderMorphType = (new ServiceProvider())->getMorphClass();
+        $items = ServiceProvider::completionItemSql('sp');
 
         $analyticsAgg = DB::table('analytics')
             ->selectRaw("
@@ -250,11 +242,9 @@ class AdminProviderActivityMonitorService
                 COALESCE(a.whatsapp_clicks, 0) as whatsapp_clicks,
                 a.last_activity_at,
                 COALESCE(g.gallery_count, 0) as gallery_count,
-                CASE WHEN sp.profile_image IS NOT NULL AND sp.profile_image <> '' THEN 1 ELSE 0 END as has_profile_photo,
-                CASE WHEN sp.bio IS NOT NULL AND sp.bio <> '' THEN 1 ELSE 0 END as has_description,
-                CASE WHEN sp.address IS NOT NULL AND sp.address <> '' THEN 1 ELSE 0 END as has_address,
-                CASE WHEN sp.experience_years IS NOT NULL AND sp.experience_years > 0 THEN 1 ELSE 0 END as has_experience,
-                CASE WHEN sp.services_offered IS NOT NULL AND sp.services_offered <> '' AND sp.services_offered <> '[]' THEN 1 ELSE 0 END as has_services
+                CASE WHEN {$items['photo']} THEN 1 ELSE 0 END as has_profile_photo,
+                CASE WHEN {$items['bio']} THEN 1 ELSE 0 END as has_description,
+                CASE WHEN {$items['experience']} THEN 1 ELSE 0 END as has_experience
             ")
             ->selectSub($lastAction, 'last_action_type');
     }

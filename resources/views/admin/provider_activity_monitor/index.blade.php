@@ -57,13 +57,13 @@
                         <span>No Activity Yet</span>
                     </div>
                 </article>
-                <article class="pam-summary-card">
-                    <span class="pam-summary-icon pam-tone-amber"><i class="fas fa-images"></i></span>
+                <a href="{{ route('admin.provider_activity_monitor.index', ['completion_status' => 'complete']) }}" class="pam-summary-card">
+                    <span class="pam-summary-icon pam-tone-green"><i class="fas fa-circle-check"></i></span>
                     <div>
-                        <strong>{{ number_format($summary['missing_gallery']) }}</strong>
-                        <span>Gallery Below 4</span>
+                        <strong>{{ number_format($summary['complete']) }}</strong>
+                        <span>Complete Profiles</span>
                     </div>
-                </article>
+                </a>
                 <article class="pam-summary-card">
                     <span class="pam-summary-icon pam-tone-teal"><i class="fab fa-whatsapp"></i></span>
                     <div>
@@ -91,10 +91,15 @@
                         <span>No Photo</span>
                         <strong>{{ number_format($summary['missing_photo']) }}</strong>
                     </a>
-                    <a href="{{ route('admin.provider_activity_monitor.index', ['issue' => 'missing_gallery']) }}" class="pam-issue-chip">
-                        <i class="fas fa-images"></i>
-                        <span>Gallery Gap</span>
-                        <strong>{{ number_format($summary['missing_gallery']) }}</strong>
+                    <a href="{{ route('admin.provider_activity_monitor.index', ['issue' => 'missing_experience']) }}" class="pam-issue-chip">
+                        <i class="fas fa-award"></i>
+                        <span>No Experience</span>
+                        <strong>{{ number_format($summary['missing_experience']) }}</strong>
+                    </a>
+                    <a href="{{ route('admin.provider_activity_monitor.index', ['issue' => 'missing_bio']) }}" class="pam-issue-chip">
+                        <i class="fas fa-align-left"></i>
+                        <span>No Description</span>
+                        <strong>{{ number_format($summary['missing_bio']) }}</strong>
                     </a>
                     <a href="{{ route('admin.provider_activity_monitor.index', ['activity' => 'never']) }}" class="pam-issue-chip">
                         <i class="fas fa-clock"></i>
@@ -129,9 +134,8 @@
                         <select name="issue">
                             <option value="">Any issue</option>
                             <option value="missing_photo" @selected(request('issue') === 'missing_photo')>No profile photo</option>
-                            <option value="missing_gallery" @selected(request('issue') === 'missing_gallery')>Gallery below 4</option>
-                            <option value="missing_services" @selected(request('issue') === 'missing_services')>No services</option>
-                            <option value="missing_address" @selected(request('issue') === 'missing_address')>No address</option>
+                            <option value="missing_experience" @selected(request('issue') === 'missing_experience')>No years of experience</option>
+                            <option value="missing_bio" @selected(request('issue') === 'missing_bio')>No description</option>
                         </select>
                     </label>
 
@@ -215,14 +219,13 @@
                         @forelse($providers as $p)
                             @php
                                 $completion = max(0, min(100, (int) ($p->profile_completion_percent ?? 0)));
-                                $galleryCount = (int) ($p->gallery_count ?? 0);
                                 $views = (int) ($p->profile_views ?? 0);
                                 $clicks = (int) ($p->whatsapp_clicks ?? 0);
                                 $conversion = $views > 0 ? round(($clicks / $views) * 100, 1) : 0;
                                 $hasPhoto = (bool) $p->has_profile_photo;
-                                $hasServices = (bool) $p->has_services;
-                                $hasAddress = (bool) $p->has_address;
                                 $hasExperience = (bool) $p->has_experience;
+                                $hasBio = (bool) $p->has_description;
+                                $itemsDone = (int) $hasPhoto + (int) $hasExperience + (int) $hasBio;
                                 $ownerActive = (bool) $p->owner_is_active;
                                 $name = $p->company_name ?: ('Provider #' . $p->id);
                                 $initial = strtoupper(mb_substr($name, 0, 1));
@@ -237,10 +240,8 @@
                                 $completionTone = $completion >= 100 ? 'good' : ($completion >= 60 ? 'warn' : 'bad');
                                 $missing = [];
                                 if (!$hasPhoto) $missing[] = ['label' => 'Photo', 'tone' => 'bad'];
-                                if ($galleryCount < 4) $missing[] = ['label' => "Gallery {$galleryCount}/4", 'tone' => 'warn'];
-                                if (!$hasServices) $missing[] = ['label' => 'Services', 'tone' => 'bad'];
-                                if (!$hasAddress) $missing[] = ['label' => 'Address', 'tone' => 'warn'];
                                 if (!$hasExperience) $missing[] = ['label' => 'Experience', 'tone' => 'warn'];
+                                if (!$hasBio) $missing[] = ['label' => 'Description', 'tone' => 'warn'];
                             @endphp
                             <tr>
                                 <td><x-admin.bulk-checkbox :value="$p->id" /></td>
@@ -269,7 +270,7 @@
                                         <div class="pam-health-track">
                                             <span class="pam-health-fill pam-health-fill-{{ $completionTone }}" style="width: {{ $completion }}%;"></span>
                                         </div>
-                                        <small>{{ $galleryCount }}/4 gallery images</small>
+                                        <small>{{ $itemsDone }}/3 items · photo, experience, description</small>
                                     </div>
                                 </td>
                                 <td>

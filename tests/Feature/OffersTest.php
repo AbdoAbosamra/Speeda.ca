@@ -141,16 +141,21 @@ class OffersTest extends TestCase
         $this->get(route('home'))->assertOk()->assertDontSee('id="local-offers"', false);
     }
 
-    public function test_home_section_shows_featured_live_offers_above_explore_services(): void
+    public function test_home_section_shows_featured_live_offers_below_explore_services(): void
     {
         $this->makeOffer(['title_en' => 'Visible Deal']);
 
         $html = $this->get(route('home'))->assertOk()->assertSee('id="local-offers"', false)->assertSee('Visible Deal')->getContent();
 
-        $this->assertLessThan(
-            strpos($html, __('home.explore_services')),
+        $this->assertGreaterThan(
+            strpos($html, 'id="categorySlider"'),
             strpos($html, 'id="local-offers"'),
-            'The offers section must come before Explore Services.'
+            'The offers section must come after Explore Services.'
+        );
+        $this->assertLessThan(
+            strpos($html, 'class="home-shell coverage-map-card'),
+            strpos($html, 'id="local-offers"'),
+            'The offers section must come before the coverage map.'
         );
     }
 
@@ -451,8 +456,8 @@ class OffersTest extends TestCase
             ->assertSessionHasErrors(['badge_text_en']);
 
         $this->actingAs($this->admin)
-            ->post(route('admin.offers.store'), $this->validPayload(['cta_type' => 'url', 'cta_url' => 'javascript:alert(1)']))
-            ->assertSessionHasErrors(['cta_url']);
+            ->post(route('admin.offers.store'), $this->validPayload(['cta_type' => 'url']))
+            ->assertSessionHasErrors(['cta_type']);
 
         $this->assertSame(0, Offer::count());
     }

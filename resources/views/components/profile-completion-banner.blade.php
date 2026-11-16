@@ -6,36 +6,13 @@
 
 @if($completion < 100)
     @php
-        $missing = [];
-
-        if (blank($provider->profile_image)) {
-            $missing[] = __('service_provider.completion_missing_profile_photo');
-        }
-
-        if (!filled($provider->experience_years) || (int) $provider->experience_years <= 0) {
-            $missing[] = __('service_provider.completion_missing_experience_years');
-        }
-
-        if (blank($provider->address)) {
-            $missing[] = __('service_provider.completion_missing_address');
-        }
-
-        // Secondary fields (still contribute to the score)
-        if (blank($provider->bio)) {
-            $missing[] = __('service_provider.completion_missing_description');
-        }
-
-        $galleryCount = $provider->getMedia('gallery')->count();
-        if ($galleryCount < 4) {
-            $missing[] = __('service_provider.completion_missing_gallery');
-        }
-
-        $servicesComplete = is_array($provider->services_offered)
-            ? count(array_filter($provider->services_offered)) > 0
-            : filled($provider->services_offered);
-        if (!$servicesComplete) {
-            $missing[] = __('service_provider.completion_missing_services_offered');
-        }
+        // Same three items as the stored percent (ServiceProvider::profileCompletionChecklist).
+        $checks = $provider->profileCompletionChecklist();
+        $missing = array_values(array_filter([
+            $checks['photo'] ? null : __('service_provider.completion_missing_profile_photo'),
+            $checks['experience'] ? null : __('service_provider.completion_missing_experience_years'),
+            $checks['bio'] ? null : __('service_provider.completion_missing_description'),
+        ]));
     @endphp
 
     <div class="alert alert-warning border-0 shadow-sm {{ $compact ? 'py-2' : '' }}" style="border-radius:16px;">

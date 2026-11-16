@@ -18,7 +18,7 @@ Artisan::command('providers:backfill-profile-completion', function () {
     $count = 0;
 
     ServiceProvider::query()
-        ->select(['id', 'profile_image', 'bio', 'experience_years', 'address', 'services_offered'])
+        ->select(['id', 'profile_image', 'bio', 'experience_years', 'profile_completion_percent'])
         ->chunkById(100, function ($providers) use ($action, &$count) {
         foreach ($providers as $provider) {
             $action->execute($provider);

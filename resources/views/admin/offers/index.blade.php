@@ -4,7 +4,7 @@
 
 @section('content')
 @php
-    $statusLabels = ['live' => 'Live', 'scheduled' => 'Scheduled', 'expired' => 'Expired', 'draft' => 'Draft'];
+    $statusLabels = \Illuminate\Support\Arr::only(\App\Models\Offer::ADMIN_STATUS_LABELS, \App\Models\Offer::STATUSES);
     $canReorder = ! $status && $search === '';
 @endphp
 <div class="admin-cms-page ao-page" dir="ltr">
@@ -52,8 +52,13 @@
             </a>
         @endif
 
+        @if($counts['pending'] > 0)
+            <a class="ao-status ao-status--empty text-decoration-none" href="{{ route('admin.offers.index', ['status' => 'pending']) }}">
+                <i class="fas fa-clock"></i><span><strong>{{ $counts['pending'] }}</strong> provider submissions await review. Please review within 24 hours.</span>
+            </a>
+        @endif
         <div class="ao-metrics">
-            @foreach(['live' => ['fa-bolt', 'green'], 'scheduled' => ['fa-clock', 'blue'], 'expired' => ['fa-hourglass-end', 'slate'], 'draft' => ['fa-pen-ruler', 'amber']] as $key => [$icon, $tone])
+            @foreach(['pending' => ['fa-clock', 'amber'], 'rejected' => ['fa-ban', 'rose'], 'live' => ['fa-bolt', 'green'], 'scheduled' => ['fa-clock', 'blue'], 'expired' => ['fa-hourglass-end', 'slate'], 'draft' => ['fa-pen-ruler', 'amber']] as $key => [$icon, $tone])
                 <a href="{{ route('admin.offers.index', ['status' => $key]) }}" class="ao-metric ao-tone-{{ $tone }} {{ $status === $key ? 'is-active' : '' }}">
                     <span><i class="fas {{ $icon }}"></i> {{ $statusLabels[$key] }}</span>
                     <strong>{{ $counts[$key] }}</strong>
@@ -195,7 +200,9 @@
                                     <small class="text-danger fw-bold d-block">{{ $days === 0 ? 'Last day' : $days . ' days left' }}</small>
                                 @endif
                             </td>
-                            <td><span class="ao-pill ao-pill--{{ $st }}">{{ $statusLabels[$st] }}</span></td>
+                            <td><span class="ao-pill ao-pill--{{ $st }}">{{ $statusLabels[$st] }}</span>
+                                @if($st === 'pending')<small class="d-block {{ $offer->submitted_at?->copy()->addHours(24)->isPast() ? 'text-danger' : 'text-muted' }}">Review by {{ $offer->submitted_at?->copy()->addHours(24)->format('M j, H:i') }}</small>@endif
+                            </td>
                             <td>
                                 <form method="POST" action="{{ route('admin.offers.feature', $offer) }}">
                                     @csrf @method('PATCH')

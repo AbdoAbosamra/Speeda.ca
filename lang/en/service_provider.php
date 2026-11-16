@@ -224,6 +224,7 @@ Your SPEEDA profile: :url",
     'completion_field_profile_photo' => 'Profile photo',
     'completion_field_experience_years' => 'Years of experience',
     'completion_field_address' => 'Address',
+    'completion_field_description' => 'Description (about you)',
 
     // Provider dashboard analytics
     'dashboard_title' => 'Provider Dashboard',

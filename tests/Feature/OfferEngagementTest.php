@@ -258,10 +258,12 @@ class OfferEngagementTest extends TestCase
             ->assertSee(__('offers.contact_to_publish_hint'))
             ->assertDontSee('m.me/', false);
 
-        // The hero is a button only; the number stays in the offer page's publish box.
-        $this->get(route('offers.show', $this->offer->slug))
-            ->assertSee($expected, false)
-            ->assertSee('+1 (613) 864-9118');
+        // The offer page has no "Are you a service provider?" box any more:
+        // visitors there came for this offer, not to publish their own.
+        $this->get(route('offers.show', $this->offer->slug))->assertOk()
+            ->assertDontSee($expected, false)
+            ->assertDontSee('+1 (613) 864-9118')
+            ->assertDontSee('so-publish', false);
 
         $url = WhatsApp::contactSpeedaUrl();
         $this->assertStringContainsString('publish an offer on SPEEDA', rawurldecode($url));

@@ -72,7 +72,9 @@
             ['label' => 'Comments', 'icon' => 'fa-comments', 'route' => 'admin.comments', 'active' => 'admin.comments*'],
             ['label' => 'Testimonials', 'icon' => 'fa-quote-right', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials*'],
             ['label' => 'Home Video', 'icon' => 'fa-circle-play', 'route' => 'admin.home_video.edit', 'active' => 'admin.home_video*'],
-            ['label' => 'Offers', 'icon' => 'fa-tags', 'route' => 'admin.offers.index', 'active' => 'admin.offers.index|admin.offers.create|admin.offers.edit'],
+            ['label' => 'Offers', 'icon' => 'fa-tags', 'route' => 'admin.offers.index', 'active' => 'admin.offers.index|admin.offers.create|admin.offers.edit',
+                // Provider submissions waiting for approval.
+                'badge' => \Illuminate\Support\Facades\Cache::remember('admin_pending_offers', 60, fn () => \Illuminate\Support\Facades\Schema::hasColumn('offers', 'review_status') ? \App\Models\Offer::where('review_status', \App\Models\Offer::STATUS_PENDING)->count() : 0)],
             ['label' => 'Offer Analytics', 'icon' => 'fa-chart-line', 'route' => 'admin.offers.analytics', 'active' => 'admin.offers.analytics'],
             ['label' => 'Offer Comments', 'icon' => 'fa-comments', 'route' => 'admin.offers.comments', 'active' => 'admin.offers.comments',
                 // Comments wait here until approved, so the queue size is worth seeing from anywhere.

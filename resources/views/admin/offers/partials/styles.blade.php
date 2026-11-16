@@ -2,6 +2,8 @@
 @once
 @push('styles')
 <style>
+    .ao-pill--pending { background: #fef3c7; color: #92400e; }
+    .ao-pill--rejected { background: #fee2e2; color: #991b1b; }
     .ao-page { --ao-line: #e6ecf3; --ao-muted: #64748b; --ao-ink: #0f172a; }
     .ao-hint { font-size: .84rem; color: var(--ao-muted); }
     .ao-error { color: #b91c1c; font-size: .8rem; font-weight: 600; }

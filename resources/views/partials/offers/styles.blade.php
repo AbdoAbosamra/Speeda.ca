@@ -169,13 +169,58 @@
     .so-hero .so-crumb { font-size: .85rem; opacity: .8; margin-bottom: .6rem; }
     .so-hero .so-crumb a { color: #fff !important; text-decoration: none; }
     .so-hero-deco { position: absolute; inset-inline-end: -10px; top: -30px; font-size: 15rem; opacity: .1; transform: rotate(-12deg); pointer-events: none; }
-    /* "Publish your offer" — a wide WhatsApp-green pill: icon bubble, two-line
-       label, arrow; a light sweep crosses it on hover. */
-    .so-hero-actions { position: relative; margin-top: 1.5rem; }
+    /* "Publish your offer" & "Create your own ad" hero CTA pills */
+    .so-hero-actions {
+        position: relative;
+        margin-top: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: stretch;
+    }
+    .so-hero-create {
+        position: relative; overflow: hidden; isolation: isolate;
+        display: flex; align-items: center; gap: 14px;
+        flex: 1 1 340px; max-width: 460px; min-width: 0;
+        padding: 10px 22px 10px 10px; border-radius: 999px;
+        background: #ffffff;
+        color: #0f172a !important; text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, .9);
+        box-shadow: 0 14px 30px -12px rgba(15, 23, 42, .35), inset 0 1px 0 rgba(255, 255, 255, .9);
+        transition: transform .25s var(--so-ease), box-shadow .25s var(--so-ease);
+    }
+    [dir="rtl"] .so-hero-create { padding: 10px 10px 10px 22px; }
+    .so-hero-create::after {
+        content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+        background: linear-gradient(110deg, transparent 30%, rgba(37, 99, 235, .08) 50%, transparent 70%);
+        transform: translateX(-120%); transition: transform .7s var(--so-ease);
+    }
+    .so-hero-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 38px -14px rgba(15, 23, 42, .45), inset 0 1px 0 #fff;
+    }
+    .so-hero-create:hover::after { transform: translateX(120%); }
+    .so-hero-create:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+    .so-hero-create-icon {
+        position: relative; flex: none; width: 52px; height: 52px; border-radius: 50%;
+        display: grid; place-items: center;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #ffffff; font-size: 1.35rem;
+        box-shadow: 0 6px 16px -4px rgba(37, 99, 235, .5);
+    }
+    .so-hero-create-text { flex: 1; min-width: 0; display: grid; gap: 2px; line-height: 1.25; }
+    .so-hero-create-text b { font-size: 1.08rem; font-weight: 800; letter-spacing: -.01em; color: #0f172a; }
+    .so-hero-create-text small { font-size: .82rem; font-weight: 500; color: #64748b; }
+    .so-hero-create-arrow { flex: none; font-size: 1.05rem; color: #2563eb; transition: transform .25s var(--so-ease); }
+    .so-hero-create:hover .so-hero-create-arrow { transform: translateX(4px); }
+    [dir="rtl"] .so-hero-create-arrow { transform: scaleX(-1); }
+    [dir="rtl"] .so-hero-create:hover .so-hero-create-arrow { transform: scaleX(-1) translateX(4px); }
+
     .so-hero-contact {
         position: relative; overflow: hidden; isolation: isolate;
         display: flex; align-items: center; gap: 14px;
-        width: min(100%, 480px); padding: 10px 22px 10px 10px; border-radius: 999px;
+        flex: 1 1 340px; max-width: 480px; min-width: 0;
+        padding: 10px 22px 10px 10px; border-radius: 999px;
         background: linear-gradient(135deg, #25d366 0%, #1aa851 48%, #128c7e 100%);
         color: #fff !important; text-decoration: none;
         border: 1px solid rgba(255, 255, 255, .35);
@@ -208,12 +253,29 @@
     .so-hero-contact:hover .so-hero-contact-arrow { transform: translateX(4px); }
     [dir="rtl"] .so-hero-contact-arrow { transform: scaleX(-1); }
     [dir="rtl"] .so-hero-contact:hover .so-hero-contact-arrow { transform: scaleX(-1) translateX(4px); }
+
+    .so-hero-my-offers {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 18px; border-radius: 999px;
+        background: rgba(255, 255, 255, .16); color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, .32);
+        font-size: .88rem; font-weight: 600; text-decoration: none;
+        backdrop-filter: blur(8px);
+        transition: background .2s, transform .2s;
+    }
+    .so-hero-my-offers:hover {
+        background: rgba(255, 255, 255, .28); transform: translateY(-1px);
+    }
+
     @media (max-width: 575.98px) {
-        .so-hero-contact { width: 100%; gap: 12px; }
+        .so-hero-create, .so-hero-contact { width: 100%; max-width: 100%; gap: 12px; }
+        .so-hero-create-icon { width: 46px; height: 46px; font-size: 1.2rem; }
+        .so-hero-create-text b { font-size: 1rem; }
         .so-hero-contact-icon { width: 46px; height: 46px; font-size: 1.5rem; }
         .so-hero-contact-text b { font-size: 1rem; }
     }
     @media (prefers-reduced-motion: reduce) {
+        .so-hero-create, .so-hero-create::after, .so-hero-create-arrow,
         .so-hero-contact, .so-hero-contact::after, .so-hero-contact-arrow { transition: none; }
         .so-hero-contact-icon::before { animation: none; opacity: 0; }
     }
@@ -303,14 +365,6 @@
        Arabic (RTL) pages a 10,000px sideways scroll. */
     .so-hp { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
     .so-notice--ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-    .so-publish {
-        display: grid; grid-template-columns: auto 1fr; gap: 10px 12px; align-items: center;
-        background: linear-gradient(135deg, #ecfdf5, #fff); border: 1px solid #bbf7d0; border-radius: 18px; padding: 16px;
-    }
-    .so-publish-icon { width: 44px; height: 44px; border-radius: 12px; background: #16a34a; color: #fff; display: grid; place-items: center; font-size: 1.4rem; }
-    .so-publish-text b { color: var(--so-ink); }
-    .so-publish-text p { margin: 2px 0 0; font-size: .85rem; color: var(--so-muted); line-height: 1.5; }
-    .so-publish .so-btn { grid-column: 1 / -1; }
 
     /* ---------- Provider profile block ---------- */
     .so-profile-offers {

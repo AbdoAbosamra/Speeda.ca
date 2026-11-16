@@ -11,7 +11,6 @@
         'similar' => 'Related offers', 'share' => 'Shared link', 'direct' => 'Direct / other', 'unknown' => 'Unknown',
     ];
     $localeLabels = ['en' => 'English', 'ar' => 'Arabic', 'fr' => 'French', 'unknown' => 'Unknown'];
-    $statusLabels = ['live' => 'Live', 'scheduled' => 'Scheduled', 'expired' => 'Expired', 'draft' => 'Draft', 'deleted' => 'Deleted'];
     $n = fn ($v) => number_format((float) $v);
     $baseQuery = array_filter([
         'range' => $f['range'],
@@ -310,7 +309,7 @@
                                     <div class="admin-table-title">{{ $o->title_en }}</div>
                                     <div class="admin-table-subtitle">{{ $o->providerName() }} · <span class="ao-deal ao-deal--{{ $o->deal_type }}" style="font-size:.68rem;padding:.1rem .4rem">{{ $o->badgeLabel('en') }}</span></div>
                                 </td>
-                                <td><span class="ao-pill ao-pill--{{ $row['status'] }}">{{ $statusLabels[$row['status']] }}</span></td>
+                                <td><span class="ao-pill ao-pill--{{ $row['status'] }}">{{ \App\Models\Offer::adminStatusLabel($row['status']) }}</span></td>
                                 <td class="text-end">{{ $n($row['impressions']) }}</td>
                                 <td class="text-end">{{ $n($row['views']) }}</td>
                                 <td class="text-end">{{ $n($row['unique_viewers']) }}</td>

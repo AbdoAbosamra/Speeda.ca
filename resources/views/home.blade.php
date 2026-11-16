@@ -490,11 +490,6 @@
             </section>
         @endif
 
-        {{-- Admin-managed Local Offers, directly above Explore Services. --}}
-        @if(isset($homeOffers) && $homeOffers->isNotEmpty())
-            @include('partials.offers.home-section')
-        @endif
-
         <section class="home-section">
             <div class="container">
                 <div class="home-shell home-section-panel fade-in-up">
@@ -531,6 +526,11 @@
                 </div>
             </div>
         </section>
+
+        {{-- Local Offers (ads), directly below Explore Services. --}}
+        @if(isset($homeOffers) && $homeOffers->isNotEmpty())
+            @include('partials.offers.home-section')
+        @endif
 
         {{-- Admin-managed video. $homeVideo is null unless the section is
              switched on AND has something playable, so the whole block —

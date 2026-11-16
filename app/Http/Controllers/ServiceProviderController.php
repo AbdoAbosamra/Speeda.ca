@@ -555,6 +555,11 @@ class ServiceProviderController extends Controller
                 'success'
             );
 
+            if ($request->session()->get('offer_profile_completion') && ! $serviceProvider->fresh()->missingOfferProfileFields()) {
+                $request->session()->forget('offer_profile_completion');
+                return redirect()->route('provider.offers.create')->with('success', __('service_provider.profile_updated_successfully'));
+            }
+
             return redirect()->route('service-providers.show', $serviceProvider->id)
                 ->with('success', __('service_provider.profile_updated_successfully'));
 

@@ -12,8 +12,18 @@
         </nav>
         <h1>{{ __('offers.page_title') }}</h1>
         <p>{{ __('offers.hero_subtitle') }}</p>
-        @if($speedaWa = \App\Support\WhatsApp::contactSpeedaUrl())
-            <div class="so-hero-actions">
+
+        <div class="so-hero-actions">
+            <a class="so-hero-create" href="{{ route('provider.offers.create') }}">
+                <span class="so-hero-create-icon" aria-hidden="true"><i class="fas fa-plus"></i></span>
+                <span class="so-hero-create-text">
+                    <b>{{ __('offer_submission.create') }}</b>
+                    <small>{{ __('offer_submission.create_hint') }}</small>
+                </span>
+                <i class="fas fa-arrow-right so-hero-create-arrow" aria-hidden="true"></i>
+            </a>
+
+            @if($speedaWa = \App\Support\WhatsApp::contactSpeedaUrl())
                 <a class="so-hero-contact" href="{{ $speedaWa }}" target="_blank" rel="noopener">
                     <span class="so-hero-contact-icon" aria-hidden="true"><i class="fab fa-whatsapp"></i></span>
                     <span class="so-hero-contact-text">
@@ -21,6 +31,14 @@
                         <small>{{ __('offers.contact_to_publish_hint') }}</small>
                     </span>
                     <i class="fas fa-arrow-right so-hero-contact-arrow" aria-hidden="true"></i>
+                </a>
+            @endif
+        </div>
+
+        @if(auth()->user()?->role === 'service_provider')
+            <div class="mt-3">
+                <a class="so-hero-my-offers" href="{{ route('provider.offers.index') }}">
+                    <i class="fas fa-layer-group" aria-hidden="true"></i> {{ __('offer_submission.my_offers') }}
                 </a>
             </div>
         @endif

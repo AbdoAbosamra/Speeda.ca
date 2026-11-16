@@ -74,6 +74,10 @@ class RegisteredUserController extends Controller
             // Silently ignore CAPI errors
         }
 
+        if ($request->session()->get('url.intended') === route('provider.offers.create')) {
+            return redirect()->intended($redirectPath)->with('success', __('auth.registration_success'));
+        }
+
         return redirect($redirectPath)->with('success', __('auth.registration_success'));
     }
 }

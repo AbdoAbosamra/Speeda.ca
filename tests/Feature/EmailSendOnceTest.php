@@ -90,6 +90,35 @@ class EmailSendOnceTest extends TestCase
         Mail::assertQueued(BuildReputationEmail::class, 1);
     }
 
+    public function test_photo_experience_and_description_are_enough_for_the_reviews_email(): void
+    {
+        Mail::fake();
+        \Illuminate\Support\Facades\Storage::fake('public');
+        \Illuminate\Support\Facades\Storage::disk('public')->put('profiles/me.jpg', 'photo');
+        $provider = $this->provider();
+        ProviderEmailLog::create([
+            'service_provider_id' => $provider->id,
+            'email_type' => 'welcome',
+            'attempt_number' => 1,
+            'sent_at' => now()->subDays(10),
+            'completed_at' => now()->subDays(10),
+        ]);
+        $svc = app(ProviderEmailJourneyService::class);
+
+        // Two of the three items: not complete yet, so no email.
+        $provider->update(['profile_image' => 'profiles/me.jpg', 'experience_years' => 3, 'bio' => ServiceProvider::PLACEHOLDER_BIO, 'services_offered' => null]);
+        $this->assertFalse($svc->isProfileComplete($provider->fresh()));
+        $this->assertNull($svc->processProvider($provider->fresh('user')));
+
+        // All three, with no services and no gallery: complete, email goes out once.
+        $provider->update(['bio' => 'Licensed plumber serving Ottawa.']);
+        $this->assertTrue($svc->isProfileComplete($provider->fresh()));
+        $this->assertSame('reviews', $svc->processProvider($provider->fresh('user')));
+        $this->assertNull($svc->processProvider($provider->fresh('user')));
+
+        Mail::assertQueued(BuildReputationEmail::class, 1);
+    }
+
     public function test_the_release_migration_marks_existing_accounts_as_already_emailed(): void
     {
         Mail::fake();

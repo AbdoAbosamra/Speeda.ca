@@ -247,6 +247,10 @@ class GoogleAuthController extends Controller
             return redirect()->route('admin.dashboard')->with('success', $message);
         }
 
+        if (session('url.intended') === route('provider.offers.create')) {
+            return redirect()->intended(app(AuthService::class)->getRedirectPath($user))->with('success', $message);
+        }
+
         return redirect(app(AuthService::class)->getRedirectPath($user))->with('success', $message);
     }
 

@@ -165,6 +165,7 @@
             <div class="completion-bar">
                 <div class="fill" style="width: {{ $pct }}%; background: linear-gradient(90deg, @if($pct >= 80)#10b981,#059669 @elseif($pct >= 50) #f59e0b,#d97706 @else #ef4444,#dc2626 @endif);"></div>
             </div>
+            <x-profile-completion-checklist :provider="$serviceProvider" />
         </div>
 
         {{-- Summary Cards --}}

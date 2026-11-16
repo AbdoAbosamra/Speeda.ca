@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
- * An admin-managed deal attributed to a real service provider.
+ * A deal attributed to a real provider, published only after admin approval.
  *
- * Status is never stored: it is derived from the active switch and the two
- * dates, so an offer appears and disappears on schedule without a cron job.
+ * Review state is stored; publication status is derived from that state,
+ * the active switch and dates, without needing a scheduled publishing job.
  * The provider's name, logo, city and WhatsApp number always come from the
  * live provider record rather than being copied onto the offer.
  */
@@ -35,13 +35,18 @@ class Offer extends Model
     public const CTA_WHATSAPP = 'whatsapp';
     public const CTA_PROFILE = 'profile';
     public const CTA_URL = 'url';
-    public const CTAS = [self::CTA_WHATSAPP, self::CTA_PROFILE, self::CTA_URL];
+    public const CTAS = [self::CTA_WHATSAPP, self::CTA_PROFILE];
 
     public const STATUS_LIVE = 'live';
     public const STATUS_SCHEDULED = 'scheduled';
     public const STATUS_EXPIRED = 'expired';
     public const STATUS_DRAFT = 'draft';
-    public const STATUSES = [self::STATUS_LIVE, self::STATUS_SCHEDULED, self::STATUS_EXPIRED, self::STATUS_DRAFT];
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_REJECTED = 'rejected';
+    public const REVIEW_APPROVED = 'approved';
+    public const STATUSES = [self::STATUS_PENDING, self::STATUS_REJECTED, self::STATUS_LIVE, self::STATUS_SCHEDULED, self::STATUS_EXPIRED, self::STATUS_DRAFT];
+
+    protected $attributes = ['review_status' => self::REVIEW_APPROVED];
 
     /** Where cover images live on the public disk. */
     public const IMAGE_DIR = 'offers';
@@ -71,11 +76,14 @@ class Offer extends Model
         'updated_by',
         'verified_at',
         'verified_by',
+        'review_status', 'submitted_at', 'reviewed_at', 'reviewed_by', 'rejection_reason',
     ];
 
     protected $casts = [
         'deal_value' => 'float',
         'verified_at' => 'datetime',
+        'submitted_at' => 'datetime',
+        'reviewed_at' => 'datetime',
         'starts_at' => 'date',
         'ends_at' => 'date',
         'is_active' => 'boolean',
@@ -90,7 +98,11 @@ class Offer extends Model
 
     protected static function booted(): void
     {
-        $invalidate = fn () => \Illuminate\Support\Facades\Cache::forget('admin_dash_offers');
+        $invalidate = function () {
+            foreach (['admin_dash_offers', 'admin_pending_offers', 'admin_dash_action_center'] as $key) {
+                \Illuminate\Support\Facades\Cache::forget($key);
+            }
+        };
         static::saved($invalidate);
         static::deleted($invalidate);
         static::restored($invalidate);
@@ -145,6 +157,11 @@ class Offer extends Model
         return $this->belongsTo(User::class, 'verified_by');
     }
 
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
     /* =====================================================================
      |  QUERIES
      * ===================================================================== */
@@ -158,6 +175,7 @@ class Offer extends Model
         $today = Carbon::today()->toDateString();
 
         return $query
+            ->where('offers.review_status', self::REVIEW_APPROVED)
             ->where('offers.is_active', true)
             ->where(fn ($q) => $q->whereNull('starts_at')->orWhereDate('starts_at', '<=', $today))
             ->where(fn ($q) => $q->whereNull('ends_at')->orWhereDate('ends_at', '>=', $today))
@@ -169,6 +187,10 @@ class Offer extends Model
      */
     public function scopeWithStatus(Builder $query, string $status): Builder
     {
+        if (in_array($status, [self::STATUS_PENDING, self::STATUS_REJECTED], true)) {
+            return $query->where('review_status', $status);
+        }
+        $query->where('review_status', self::REVIEW_APPROVED);
         $today = Carbon::today()->toDateString();
 
         return match ($status) {
@@ -252,8 +274,33 @@ class Offer extends Model
      |  STATUS
      * ===================================================================== */
 
+    /** Admin-screen names for every status(), plus soft-deleted rows in statistics. */
+    public const ADMIN_STATUS_LABELS = [
+        self::STATUS_PENDING => 'Pending review',
+        self::STATUS_REJECTED => 'Rejected',
+        self::STATUS_LIVE => 'Live',
+        self::STATUS_SCHEDULED => 'Scheduled',
+        self::STATUS_EXPIRED => 'Expired',
+        self::STATUS_DRAFT => 'Draft',
+        'deleted' => 'Deleted',
+    ];
+
+    public static function adminStatusLabel(string $status): string
+    {
+        return self::ADMIN_STATUS_LABELS[$status] ?? ucfirst($status);
+    }
+
+    /** Pending or rejected: a provider submission that is not approved (yet). */
+    public function awaitsApproval(): bool
+    {
+        return $this->review_status !== self::REVIEW_APPROVED;
+    }
+
     public function status(): string
     {
+        if ($this->review_status !== self::REVIEW_APPROVED) {
+            return $this->review_status;
+        }
         if (! $this->is_active) {
             return self::STATUS_DRAFT;
         }
@@ -478,10 +525,6 @@ class Offer extends Model
      */
     public function effectiveCta(): string
     {
-        if ($this->cta_type === self::CTA_URL && filled($this->cta_url)) {
-            return self::CTA_URL;
-        }
-
         if ($this->cta_type === self::CTA_WHATSAPP && $this->providerWhatsappDigits()) {
             return self::CTA_WHATSAPP;
         }

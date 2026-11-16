@@ -169,6 +169,7 @@ class OfferEngagementController extends Controller
 
         $offers = $user->favoriteOffers()
             ->withCardRelations()
+            ->where('offers.review_status', Offer::REVIEW_APPROVED)
             ->where('offers.is_active', true)
             ->where(fn ($q) => $q->whereNull('starts_at')->orWhereDate('starts_at', '<=', today()))
             ->whereHas('serviceProvider', fn ($q) => $q->publiclyVisible())

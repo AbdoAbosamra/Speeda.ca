@@ -168,7 +168,6 @@ class OfferTrackingService
     {
         return match ($offer->effectiveCta()) {
             Offer::CTA_WHATSAPP => $this->whatsappUrl($offer),
-            Offer::CTA_URL => $offer->cta_url,
             default => route('service-providers.show', $offer->service_provider_id),
         };
     }
